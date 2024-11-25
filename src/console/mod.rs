@@ -111,7 +111,8 @@ impl Console {
 
     pub fn draw(&self, d: &mut RaylibDrawHandle, font_size: i32, _screen_width: i32, screen_height: i32) {
         let line_height = propheight(&d, font_size + 4); // Adjust as needed
-        let console_height = self.max_lines_visible * line_height as usize;
+        let console_height = (self.max_lines_visible +1) * line_height as usize; // +1 for user
+                                                                                 // prompt
 
         let start_y = propheight(&d, screen_height - console_height as i32);
 
