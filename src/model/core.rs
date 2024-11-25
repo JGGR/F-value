@@ -1,6 +1,7 @@
 use super::index::Indice;
 use std::path::PathBuf;
 
+use crate::console::*;
 
 // State struct holding non-`Copy` types
 #[derive(Clone)]
@@ -156,13 +157,30 @@ impl OutputModel {
 }
 
 #[derive(Clone)]
+pub struct ConsoleModel {
+    pub console: Console,
+    name: String,
+}
+
+impl ConsoleModel {
+    pub fn get_name(&self) -> String {
+        return self.name.clone();
+    }
+
+    pub fn set_name(&mut self, new_name: String) {
+        self.name = new_name;
+    }
+}
+
+#[derive(Clone)]
 pub struct Model {
     pub home_model: HomeModel,
     pub second_model: SecondModel,
     pub indice_model: IndiceModel,
     pub fileinput_model: FileInputModel,
     pub infoaggiuntive_model: InfoAggiuntiveModel,
-    pub output_model: OutputModel
+    pub output_model: OutputModel,
+    pub console_model : ConsoleModel,
 }
 
 impl Model {
@@ -192,6 +210,13 @@ impl Model {
             },
             output_model: OutputModel {
                 frame_counter: 0,
+            },
+            console_model : ConsoleModel {
+                console : Console::new(
+                        100, // Max messages
+                        20, // Max messages shown at a time
+                              ),
+                name : "Initial".to_string(),
             }
         }
     }

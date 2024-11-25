@@ -58,6 +58,7 @@ pub enum CurrentView {
     ValidazioneInfoAggiuntive,
     ProduzioneOutput,
     ProduzionePDF,
+    CONSOLE
 }
 
 impl fmt::Display for CurrentView {
@@ -72,6 +73,7 @@ impl fmt::Display for CurrentView {
       CurrentView::ValidazioneInfoAggiuntive => "Validazione Info Aggiuntive",
       CurrentView::ProduzioneOutput => "Produzione Output",
       CurrentView::ProduzionePDF => "Produzione PDF",
+      CurrentView::CONSOLE => "CONSOLE",
     };
     write!(f, "{}", string_representation)
   }

@@ -4,6 +4,7 @@ mod state;
 mod model;
 mod views;
 mod controllers;
+mod console;
 mod core;
 mod engines;
 #[cfg(test)]
@@ -111,6 +112,8 @@ fn main() {
     let output_controller = OutputController::new();
     let mut produzione_output_view = ProduzioneOutputView::new();
     let mut produzione_pdf_view = ProduzionePDFView::new();
+    let console_controller = ConsoleController::new();
+    let mut console_view = ConsoleView::new();
 
     let window_title = format!("esox v{SHORT_PROJECT_VERSION}");
 
@@ -166,6 +169,9 @@ fn main() {
             CurrentView::ProduzioneOutput | CurrentView::ProduzionePDF=> {
                 output_controller.update(&rl, &mut main_state);
             }
+            CurrentView::CONSOLE => {
+                console_controller.update(&rl);
+            }
         }
 
         let mut d = rl.begin_drawing(&thread);
@@ -205,6 +211,9 @@ fn main() {
             }
             CurrentView::ProduzionePDF => {
                 produzione_pdf_view.draw(&mut d, &thread, &output_controller, &main_state);
+            }
+            CurrentView::CONSOLE => {
+                console_view.draw(&mut d, &thread, &console_controller, main_state.current_font_height);
             }
         }
 

@@ -5,6 +5,10 @@ use crate::state::GLOBAL_STATE;
 use crate::CurrentView;
 use raylib::RaylibHandle;
 use std::path::PathBuf;
+use raylib::consts::KeyboardKey::*;
+
+use std::time::{SystemTime, UNIX_EPOCH}; // Only needed for test timestamp in ConsoleController for
+                                         // now
 
 // Controller to update and access the state
 pub struct HomeController;
@@ -345,5 +349,39 @@ impl LogController {
     pub fn update(&self, _rl: &RaylibHandle) {
         //let mut state = GLOBAL_STATE.lock().unwrap();
         //state.second_model.set_name("Updated".to_string());
+    }
+}
+
+pub struct ConsoleController;
+
+impl ConsoleController {
+
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn update(&self, rl : &RaylibHandle) {
+        let mut state = GLOBAL_STATE.lock().unwrap();
+        // Handle input
+        if rl.is_key_pressed(KEY_UP) {
+            state.console_model.console.scroll_up(1);
+        }
+        if rl.is_key_pressed(KEY_DOWN) {
+            state.console_model.console.scroll_down(1);
+        }
+        if rl.is_key_pressed(KEY_ENTER) {
+            let now = SystemTime::now();
+            let timestamp = now
+                .duration_since(UNIX_EPOCH)
+                .expect("Time went backwards")
+                .as_millis();
+            state.console_model.console.add_message(rl, format!("This is a test message #{}", timestamp), rl.get_screen_width(), 20);
+        }
+        state.console_model.set_name("Updated".to_string());
+    }
+
+    pub fn get_state(&self) -> ConsoleModel {
+        let state = GLOBAL_STATE.lock().unwrap();
+        return state.console_model.clone();
     }
 }

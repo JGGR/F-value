@@ -1112,3 +1112,23 @@ fn draw_rainbow_text(d: &mut RaylibDrawHandle, x: i32, y: i32, text: &str, frame
     let text_y = y; //- text_bounds.y as i32 / 2;
     d.draw_text_ex(font, text, Vector2::new(text_x as f32, text_y as f32), text_font_height as f32, text_spacing as f32, rainbow_color);
 }
+
+pub struct ConsoleView {
+}
+
+impl ConsoleView {
+    pub fn new() -> Self {
+        Self {}
+    }
+    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &ConsoleController, current_font_size : i32) {
+        d.clear_background(Color::GRAY);
+
+        // Draw the state retrieved via the Controller
+        let state = controller.get_state();
+        let state_name = state.get_name();
+        let line = format!("Name: {}", state_name);
+        d.draw_text(&line, 10, 10, current_font_size, Color::BLACK);
+
+        state.console.draw(d, current_font_size, propwidth(&d, ESOX_SCREEN_WIDTH), propheight(&d, ESOX_SCREEN_HEIGHT));
+    }
+}

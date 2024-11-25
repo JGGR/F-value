@@ -402,6 +402,7 @@ pub fn draw_main(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
             CurrentView::ProduzionePDF => {
                 main_state.current_view = CurrentView::HOME;
             }
+            _ => {}
         }
     }
 
@@ -415,6 +416,25 @@ pub fn draw_main(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
     let itext = CString::new(itext).unwrap();
     if d.gui_button(rrect(settings_button_x, settings_button_y, settings_button_width,  settings_button_height), Some(itext.as_c_str())) {
         main_state.showing_settings_box = true;
+    }
+
+    let y_spacing = propheight(&d, 10);
+
+    let console_button_width = settings_button_width;
+    let console_button_x = settings_button_x;
+    let console_button_height = settings_button_height;
+    let console_button_y = settings_button_y + settings_button_height + y_spacing;
+
+    // "Console view" button
+    if d.gui_button(rrect(console_button_x, console_button_y, console_button_width, console_button_height), Some(rstr!("Console"))) {
+        match main_state.current_view {
+            CurrentView::CONSOLE => {
+                main_state.current_view = CurrentView::HOME;
+            }
+            _ => {
+                main_state.current_view = CurrentView::CONSOLE;
+            }
+        }
     }
 
     if lock_gui && main_state.showing_settings_box {
