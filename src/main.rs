@@ -170,7 +170,7 @@ fn main() {
                 output_controller.update(&rl, &mut main_state);
             }
             CurrentView::CONSOLE => {
-                console_controller.update(&rl);
+                console_controller.update(&mut rl);
             }
         }
 

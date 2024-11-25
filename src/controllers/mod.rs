@@ -7,9 +7,6 @@ use raylib::RaylibHandle;
 use std::path::PathBuf;
 use raylib::consts::KeyboardKey::*;
 
-use std::time::{SystemTime, UNIX_EPOCH}; // Only needed for test timestamp in ConsoleController for
-                                         // now
-
 // Controller to update and access the state
 pub struct HomeController;
 
@@ -360,7 +357,7 @@ impl ConsoleController {
         Self
     }
 
-    pub fn update(&self, rl : &RaylibHandle) {
+    pub fn update(&self, rl : &mut RaylibHandle) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         // Handle input
         if rl.is_key_pressed(KEY_UP) {
@@ -369,13 +366,20 @@ impl ConsoleController {
         if rl.is_key_pressed(KEY_DOWN) {
             state.console_model.console.scroll_down(1);
         }
+
+        // Detect and pass keys to the console
+        while let Some(c) = rl.get_char_pressed() {
+            state.console_model.console.handle_input(rl, Some(c), 20, false, false);
+        }
+
+        // Check for Enter key press
         if rl.is_key_pressed(KEY_ENTER) {
-            let now = SystemTime::now();
-            let timestamp = now
-                .duration_since(UNIX_EPOCH)
-                .expect("Time went backwards")
-                .as_millis();
-            state.console_model.console.add_message(rl, format!("This is a test message #{}", timestamp), rl.get_screen_width(), 20);
+            state.console_model.console.handle_input(rl, None, 20, true, false);
+        }
+
+        // Check for Backspace key press
+        if rl.is_key_pressed(KEY_BACKSPACE) {
+            state.console_model.console.handle_input(rl, None, 20, false, true);
         }
         state.console_model.set_name("Updated".to_string());
     }

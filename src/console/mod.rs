@@ -10,6 +10,7 @@ pub struct Console {
     view_offset: usize,         // Offset for the currently visible messages
     max_lines_visible: usize,   // Number of lines that fit in the view
     autoscroll: bool,           // Flag to track autoscroll state
+    prompt : String,            // User prompt
 }
 
 fn wrap_text(rl: &RaylibHandle, text: &str, max_width: i32, font_size: i32) -> Vec<String> {
@@ -46,6 +47,7 @@ impl Console {
             view_offset: 0,
             max_lines_visible,
             autoscroll: true, // Start with autoscroll enabled
+            prompt: String::new(),
         }
     }
 
@@ -76,6 +78,24 @@ impl Console {
         }
     }
 
+    /// Handle character input (e.g., from `raylib` key events)
+    pub fn handle_input(&mut self, rl: &RaylibHandle, input_char: Option<char>, current_font_size: i32, is_enter_pressed: bool, is_backspace_pressed: bool) {
+        if let Some(c) = input_char {
+            self.prompt.push(c);
+        }
+
+        // Handle backspace key
+        if is_backspace_pressed {
+            self.prompt.pop();
+        }
+
+        // Handle enter key
+        if is_enter_pressed {
+            self.add_message(rl, self.prompt.clone(), 780, current_font_size);
+            self.prompt.clear();
+        }
+    }
+
     pub fn scroll_up(&mut self, lines: usize) {
         self.view_offset = self.view_offset.saturating_sub(lines);
         self.autoscroll = false; // Disable autoscroll when user scrolls up
@@ -89,7 +109,7 @@ impl Console {
         }
     }
 
-    pub fn draw(&self, d: &mut RaylibDrawHandle, font_size: i32, screen_width: i32, screen_height: i32) {
+    pub fn draw(&self, d: &mut RaylibDrawHandle, font_size: i32, _screen_width: i32, screen_height: i32) {
         let line_height = propheight(&d, font_size + 4); // Adjust as needed
         let console_height = self.max_lines_visible * line_height as usize;
 
@@ -110,5 +130,14 @@ impl Console {
                 Color::WHITE,
             );
         }
+
+         // Draw the prompt at the bottom of the console
+        d.draw_text(
+            &format!("> {}", self.prompt),
+            propwidth(&d, 10),
+            screen_height - line_height,
+            font_size,
+            Color::YELLOW,
+        );
     }
 }
