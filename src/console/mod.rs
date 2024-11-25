@@ -65,6 +65,15 @@ impl Console {
 
     pub fn add_message(&mut self, rl: &RaylibHandle, msg: String, max_width: i32, font_size: i32) {
         let wrapped_lines = wrap_text(rl, &msg, max_width, font_size);
+
+        // Non so come meglio potremmo gestire un word wrap diverso
+        // Al momento parole troppo lunghe (spazi separano parole) non sono
+        // splittate
+        //
+        // Possibilmente, lo split potrebbe essere fatto dalla draw invece che dalla add_message()
+        // come ora, MA con dei limiti. Per esempio, usando una stima (media?) per la larghezza
+        // del carattere (funziona in generale, ma da' problemi se ci sono molti caratteri diversi
+        // dalla media).
         for line in wrapped_lines {
             if self.messages.len() == self.max_messages {
                 self.messages.pop_front();
