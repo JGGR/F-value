@@ -118,7 +118,7 @@ impl Console {
         }
     }
 
-    pub fn draw(&self, d: &mut RaylibDrawHandle, font_size: i32, _screen_width: i32, screen_height: i32) {
+    pub fn draw(&self, d: &mut RaylibDrawHandle, font_size: i32, _screen_width: i32, screen_height: i32, font: &Font) {
         let line_height = propheight(&d, font_size + 4); // Adjust as needed
         let console_height = (self.max_lines_visible +1) * line_height as usize; // +1 for user
                                                                                  // prompt
@@ -132,21 +132,23 @@ impl Console {
             .take(self.max_lines_visible)
             .enumerate()
         {
-            d.draw_text(
+            d.draw_text_ex(
+                font,
                 line,
-                propwidth(&d, 10),
-                start_y + (i as i32 * line_height),
-                font_size,
+                Vector2::new(propwidth(&d, 10) as f32, (start_y + (i as i32 * line_height)) as f32),
+                font_size as f32,
+                0.0,
                 Color::WHITE,
             );
         }
 
          // Draw the prompt at the bottom of the console
-        d.draw_text(
+        d.draw_text_ex(
+            font,
             &format!("> {}", self.prompt),
-            propwidth(&d, 10),
-            screen_height - line_height,
-            font_size,
+            Vector2::new(propwidth(&d, 10) as f32, (screen_height - line_height) as f32),
+            font_size as f32,
+            0.0,
             Color::YELLOW,
         );
     }

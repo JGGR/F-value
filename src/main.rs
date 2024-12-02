@@ -113,7 +113,6 @@ fn main() {
     let mut produzione_output_view = ProduzioneOutputView::new();
     let mut produzione_pdf_view = ProduzionePDFView::new();
     let console_controller = ConsoleController::new();
-    let mut console_view = ConsoleView::new();
 
     let window_title = format!("esox v{SHORT_PROJECT_VERSION}");
 
@@ -143,6 +142,8 @@ fn main() {
         Color::get_color(txt_color_int as u32),
         Color::get_color(bg_color_int as u32)
     );
+
+    let mut console_view = ConsoleView::new(&mut rl, &thread, gui_current_font_height);
 
     while !main_state.should_quit {
 

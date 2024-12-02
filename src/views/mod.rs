@@ -1114,11 +1114,22 @@ fn draw_rainbow_text(d: &mut RaylibDrawHandle, x: i32, y: i32, text: &str, frame
 }
 
 pub struct ConsoleView {
+    font : Font,
+    current_font_size : i32,
+    default_font_size : i32,
 }
 
 impl ConsoleView {
-    pub fn new() -> Self {
-        Self {}
+    pub fn new(rl: &mut RaylibHandle, thread : &RaylibThread, font_size : i32) -> Self {
+        Self {
+            font : rl.load_font_from_memory(&thread,
+                ".ttf",
+                CONSOLE_FONT_DATA,
+                font_size,
+                None).expect("failed loading console font"),
+            default_font_size : font_size,
+            current_font_size : font_size,
+        }
     }
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &ConsoleController, current_font_size : i32) {
         d.clear_background(Color::GRAY);
@@ -1129,6 +1140,6 @@ impl ConsoleView {
         let line = format!("Name: {}", state_name);
         d.draw_text(&line, 10, 10, current_font_size, Color::BLACK);
 
-        state.console.draw(d, current_font_size, propwidth(&d, ESOX_SCREEN_WIDTH), propheight(&d, ESOX_SCREEN_HEIGHT));
+        state.console.draw(d, self.current_font_size, propwidth(&d, ESOX_SCREEN_WIDTH), propheight(&d, ESOX_SCREEN_HEIGHT), &self.font);
     }
 }
