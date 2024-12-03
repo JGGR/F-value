@@ -191,7 +191,7 @@ pub fn draw_main(d : &mut RaylibDrawHandle, main_state : &mut MainState, current
         current_view_banner_x,
         current_view_banner_y,
         *current_font_height,
-        Color::BLACK.alpha(0.8)
+        main_state.default_txt_color.alpha(0.8)
     );
 
     let info_button_width = propwidth(&d, 50);
