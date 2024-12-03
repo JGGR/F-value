@@ -116,6 +116,21 @@ impl SelezioneIndiceView {
         let button_hfbi_height = button_niseci_height;
         let button_hfbi_y = button_niseci_y + button_niseci_height + button_indice_y_spacing;
 
+        let groupbox_width = button_niseci_width + propwidth(&d, 100);
+        let groupbox_x = button_niseci_x - propwidth(&d, 50);
+        let groupbox_height = button_niseci_height * 2 + button_indice_y_spacing + propheight(&d, 100);
+        let groupbox_y = button_niseci_y - propheight(&d, 50);
+
+        d.gui_group_box(
+            rrect(
+                groupbox_x,
+                groupbox_y,
+                groupbox_width,
+                groupbox_height
+            ),
+            Some(rstr!("Seleziona Indice"))
+        );
+
         if d.gui_button(
             rrect(
                 button_niseci_x,
