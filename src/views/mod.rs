@@ -175,8 +175,7 @@ impl SelezioneFileInputView {
 
         let state = controller.get_state();
         let frame_counter = state.get_frame_counter();
-        let speed = 0.01; // Smaller value = slower cycle
-        draw_todo_view_text(d, frame_counter, speed, current_font_size);
+        draw_todo_view_text(d, frame_counter, current_font_size);
     }
 }
 
@@ -197,8 +196,7 @@ impl ValidazioneFileInputView {
 
         let state = controller.get_state();
         let frame_counter = state.get_frame_counter();
-        let speed = 0.01; // Smaller value = slower cycle
-        draw_todo_view_text(d, frame_counter, speed, current_font_size);
+        draw_todo_view_text(d, frame_counter, current_font_size);
     }
 }
 
@@ -219,8 +217,7 @@ impl SelezioneInfoAggiuntiveView {
 
         let state = controller.get_state();
         let frame_counter = state.get_frame_counter();
-        let speed = 0.01; // Smaller value = slower cycle
-        draw_todo_view_text(d, frame_counter, speed, current_font_size);
+        draw_todo_view_text(d, frame_counter, current_font_size);
     }
 }
 
@@ -241,8 +238,7 @@ impl ValidazioneInfoAggiuntiveView {
 
         let state = controller.get_state();
         let frame_counter = state.get_frame_counter();
-        let speed = 0.01; // Smaller value = slower cycle
-        draw_todo_view_text(d, frame_counter, speed, current_font_size);
+        draw_todo_view_text(d, frame_counter, current_font_size);
     }
 }
 
@@ -263,8 +259,7 @@ impl ProduzioneOutputView {
 
         let state = controller.get_state();
         let frame_counter = state.get_frame_counter();
-        let speed = 0.01; // Smaller value = slower cycle
-        draw_todo_view_text(d, frame_counter, speed, current_font_size);
+        draw_todo_view_text(d, frame_counter, current_font_size);
     }
 }
 
@@ -285,8 +280,7 @@ impl ProduzionePDFView {
 
         let state = controller.get_state();
         let frame_counter = state.get_frame_counter();
-        let speed = 0.01; // Smaller value = slower cycle
-        draw_todo_view_text(d, frame_counter, speed, current_font_size);
+        draw_todo_view_text(d, frame_counter, current_font_size);
     }
 }
 
@@ -299,7 +293,9 @@ fn rainbow_color_from_framecounter(frame_counter: u32, speed: f32) -> Color {
     return rainbow_color;
 }
 
-fn draw_todo_view_text(d: &mut RaylibDrawHandle, frame_counter: u32, rainbow_speed: f32, current_font_size: i32) {
+fn draw_todo_view_text(d: &mut RaylibDrawHandle, frame_counter: u32, current_font_size: i32) {
+
+    let rainbow_speed = 0.01; // Smaller speed = slower cycle
     let rainbow_color = rainbow_color_from_framecounter(frame_counter, rainbow_speed);
 
     let todo_label = "TODO: Implement this View";
