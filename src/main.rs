@@ -61,16 +61,16 @@ fn main() {
                 second_controller.update(&rl);
             }
             CurrentView::SelezioneIndice => {
-                indice_controller.update(&rl);
+                indice_controller.update(&rl, &mut main_state);
             }
             CurrentView::SelezioneFileInput | CurrentView::ValidazioneFileInput => {
-                fileinput_controller.update(&rl);
+                fileinput_controller.update(&rl, &mut main_state);
             }
             CurrentView::SelezioneInfoAggiuntive | CurrentView::ValidazioneInfoAggiuntive => {
-                infoaggiuntive_controller.update(&rl);
+                infoaggiuntive_controller.update(&rl, &mut main_state);
             }
             CurrentView::ProduzioneOutput | CurrentView::ProduzionePDF=> {
-                output_controller.update(&rl);
+                output_controller.update(&rl, &mut main_state);
             }
         }
 

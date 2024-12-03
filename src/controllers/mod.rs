@@ -1,4 +1,5 @@
 use crate::model::core::*;
+use crate::core::MainState;
 use crate::state::GLOBAL_STATE;
 use raylib::RaylibHandle;
 
@@ -66,7 +67,7 @@ impl IndiceController {
         Self
     }
 
-    pub fn update(&self, _rl : &RaylibHandle) {
+    pub fn update(&self, _rl : &RaylibHandle, _main_state : &mut MainState) {
         //let mut state = GLOBAL_STATE.lock().unwrap();
         //state.second_model.set_name("Updated".to_string());
     }
@@ -79,7 +80,7 @@ impl FileInputController {
         Self
     }
 
-    pub fn update(&self, _rl : &RaylibHandle) {
+    pub fn update(&self, _rl : &RaylibHandle, _main_state : &mut MainState) {
         //let mut state = GLOBAL_STATE.lock().unwrap();
         //state.second_model.set_name("Updated".to_string());
     }
@@ -92,7 +93,7 @@ impl InfoAggiuntiveController {
         Self
     }
 
-    pub fn update(&self, _rl : &RaylibHandle) {
+    pub fn update(&self, _rl : &RaylibHandle, _main_state: &mut MainState) {
         //let mut state = GLOBAL_STATE.lock().unwrap();
         //state.second_model.set_name("Updated".to_string());
     }
@@ -105,7 +106,7 @@ impl OutputController {
         Self
     }
 
-    pub fn update(&self, _rl : &RaylibHandle) {
+    pub fn update(&self, _rl : &RaylibHandle, _main_state: &mut MainState) {
         //let mut state = GLOBAL_STATE.lock().unwrap();
         //state.second_model.set_name("Updated".to_string());
     }
