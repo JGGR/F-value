@@ -159,26 +159,23 @@ pub fn draw_settings_box(d: &mut RaylibDrawHandle, main_state : &mut MainState, 
         let gui_theme_button_width = gui_theme_label_width;
         let gui_theme_button_height = gui_theme_label_height;
 
-        let curr_theme_str = main_state.theme.to_string();
-        let curr_theme_cstr = CString::new(curr_theme_str).unwrap();
-        // Change theme button
-        if d.gui_button(rrect(gui_theme_button_x, gui_theme_button_y, gui_theme_button_width, gui_theme_button_height), Some(curr_theme_cstr.as_c_str())) {
-            match main_state.theme {
-                GuiTheme::Light => {
-                    main_state.theme = GuiTheme::Dark;
-                    main_state.reapply_theme = true;
-                }
-                GuiTheme::Dark => {
-                    main_state.theme = GuiTheme::Light;
-                    main_state.reapply_theme = true;
-                }
-            }
-        }
+        let gui_theme_cstr = CString::new("Light;Dark;Bluish;Candy;Cherry;Cyber;Jungle;Lavanda;Terminal").unwrap();
 
+        d.gui_combo_box(
+            rrect(
+                gui_theme_button_x,
+                gui_theme_button_y,
+                gui_theme_button_width,
+                gui_theme_button_height),
+            Some(gui_theme_cstr.as_c_str()),
+            &mut main_state.gui_theme_combobox_active
+        );
 
         // Reset settings button
         if d.gui_button(rrect(fontsize_label_x, fontsize_label_y + fontsize_label_height * 3, fontsize_label_width, fontsize_label_height), Some(rstr!("Reset"))) {
             *current_font_height = default_font_height;
+
+            main_state.gui_theme_combobox_active = GuiTheme::Light as i32;
         }
 
         if result == true {

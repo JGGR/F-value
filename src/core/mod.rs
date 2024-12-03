@@ -10,6 +10,13 @@ pub const SHORT_PROJECT_VERSION: &'static str = env!("SHORT_VERSION_STRING");
 pub const ESOX_SCREEN_WIDTH : i32 = 960;
 pub const ESOX_SCREEN_HEIGHT : i32 = 540;
 pub const DARK_THEME_DATA: &[u8] = include_bytes!("../../assets/style_dark.rgs");
+pub const BLUISH_THEME_DATA: &[u8] = include_bytes!("../../assets/style_bluish.rgs");
+pub const CANDY_THEME_DATA: &[u8] = include_bytes!("../../assets/style_candy.rgs");
+pub const CHERRY_THEME_DATA: &[u8] = include_bytes!("../../assets/style_cherry.rgs");
+pub const CYBER_THEME_DATA: &[u8] = include_bytes!("../../assets/style_cyber.rgs");
+pub const JUNGLE_THEME_DATA: &[u8] = include_bytes!("../../assets/style_jungle.rgs");
+pub const LAVANDA_THEME_DATA: &[u8] = include_bytes!("../../assets/style_lavanda.rgs");
+pub const TERMINAL_THEME_DATA: &[u8] = include_bytes!("../../assets/style_terminal.rgs");
 
 pub enum CurrentView {
     HOME,
@@ -40,9 +47,17 @@ impl fmt::Display for CurrentView {
   }
 }
 
+#[derive(Copy,Clone)]
 pub enum GuiTheme {
     Light,
-    Dark
+    Dark,
+    Bluish,
+    Candy,
+    Cherry,
+    Cyber,
+    Jungle,
+    Lavanda,
+    Terminal
 }
 
 impl fmt::Display for GuiTheme {
@@ -50,8 +65,34 @@ impl fmt::Display for GuiTheme {
         let string_representation = match *self {
             GuiTheme::Light => "Light",
             GuiTheme::Dark => "Dark",
+            GuiTheme::Bluish => "Bluish",
+            GuiTheme::Candy => "Candy",
+            GuiTheme::Cherry => "Cherry",
+            GuiTheme::Cyber => "Cyber",
+            GuiTheme::Jungle => "Jungle",
+            GuiTheme::Lavanda => "Lavanda",
+            GuiTheme::Terminal => "Terminal",
         };
         write!(f, "{}", string_representation)
+    }
+}
+
+impl TryFrom<i32> for GuiTheme {
+    type Error = ();
+
+    fn try_from(v: i32) -> Result<Self, Self::Error> {
+        match v {
+            x if x == GuiTheme::Light as i32 => Ok(GuiTheme::Light),
+            x if x == GuiTheme::Dark as i32 => Ok(GuiTheme::Dark),
+            x if x == GuiTheme::Bluish as i32 => Ok(GuiTheme::Bluish),
+            x if x == GuiTheme::Candy as i32 => Ok(GuiTheme::Candy),
+            x if x == GuiTheme::Cherry as i32 => Ok(GuiTheme::Cherry),
+            x if x == GuiTheme::Cyber as i32 => Ok(GuiTheme::Cyber),
+            x if x == GuiTheme::Jungle as i32 => Ok(GuiTheme::Jungle),
+            x if x == GuiTheme::Lavanda as i32 => Ok(GuiTheme::Lavanda),
+            x if x == GuiTheme::Terminal as i32 => Ok(GuiTheme::Terminal),
+            _ => Err(()),
+        }
     }
 }
 
@@ -64,7 +105,7 @@ pub struct MainState {
     pub spinner_font_height_edit_mode : bool,
     pub current_view : CurrentView,
     pub theme : GuiTheme,
-    pub reapply_theme : bool,
+    pub gui_theme_combobox_active : i32,
 }
 
 impl MainState {
@@ -78,7 +119,7 @@ impl MainState {
             spinner_font_height_edit_mode : false,
             current_view : CurrentView::HOME,
             theme : GuiTheme::Light,
-            reapply_theme : false,
+            gui_theme_combobox_active : GuiTheme::Light as i32,
         }
     }
 }
