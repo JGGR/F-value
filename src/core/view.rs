@@ -1,5 +1,4 @@
 use crate::core::*;
-use raylib::consts::GuiControlProperty::TEXT_COLOR_NORMAL;
 use std::ffi::CString;
 use raylib::consts::GuiIconName::*;
 use raylib::consts::GuiControl::DEFAULT;
@@ -35,7 +34,7 @@ pub fn draw_quit_win(d: &mut RaylibDrawHandle, showing_quit_win : &mut bool, sho
     }
 }
 
-pub fn draw_info_box(d: &mut RaylibDrawHandle, showing_info_box : &mut bool, current_font_height : i32) {
+pub fn draw_info_box(d: &mut RaylibDrawHandle, showing_info_box : &mut bool, default_txt_color : Color, current_font_height : i32) {
     if *showing_info_box {
         d.draw_rectangle(
             0,
@@ -65,9 +64,6 @@ pub fn draw_info_box(d: &mut RaylibDrawHandle, showing_info_box : &mut bool, cur
             ),
             Some(itext.as_c_str()),
         );
-
-        let txt_color_int = d.gui_get_style(DEFAULT, TEXT_COLOR_NORMAL as i32);
-        let default_txt_color = Color::get_color(txt_color_int as u32);
 
         d.draw_text(
             &proj_info_str,
@@ -259,6 +255,6 @@ pub fn draw_main(d : &mut RaylibDrawHandle, main_state : &mut MainState, current
     }
 
     draw_settings_box(d, main_state, current_font_height, default_font_height);
-    draw_info_box(d, &mut main_state.showing_info_box, *current_font_height);
+    draw_info_box(d, &mut main_state.showing_info_box, main_state.default_txt_color, *current_font_height);
     draw_quit_win(d, &mut main_state.showing_quit_win, &mut main_state.should_quit);
 }

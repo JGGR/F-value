@@ -11,9 +11,10 @@ use crate::core::view::*;
 use crate::core::controller::*;
 use crate::controllers::*;
 use crate::views::*;
+use raylib::prelude::*;
 use raylib::consts::GuiControl::DEFAULT;
 use raylib::consts::GuiDefaultProperty::TEXT_SIZE;
-
+use raylib::consts::GuiControlProperty::TEXT_COLOR_NORMAL;
 fn main() {
     eprintln!("{PROJECT_VERSION}");
     let home_controller = HomeController::new();
@@ -32,8 +33,6 @@ fn main() {
     let mut produzione_output_view = ProduzioneOutputView::new();
     let mut produzione_pdf_view = ProduzionePDFView::new();
 
-    let mut main_state = MainState::new();
-
     let window_title = format!("esox v{SHORT_PROJECT_VERSION}");
 
     let (mut rl, thread) = raylib::init()
@@ -48,6 +47,10 @@ fn main() {
 
     let mut default_font_height : i32 = rl.gui_get_style(DEFAULT, TEXT_SIZE as i32);
     let mut current_font_height : i32 = default_font_height;
+
+
+    let txt_color_int = rl.gui_get_style(DEFAULT, TEXT_COLOR_NORMAL as i32);
+    let mut main_state = MainState::new(Color::get_color(txt_color_int as u32));
 
     while !main_state.should_quit {
 

@@ -3,6 +3,7 @@ use raylib::RaylibHandle;
 use raylib::consts::GuiDefaultProperty::TEXT_SIZE;
 use raylib::consts::KeyboardKey::*;
 use raylib::consts::GuiControl::DEFAULT;
+use raylib::consts::GuiControlProperty::TEXT_COLOR_NORMAL;
 use std::fs::File;
 use std::io::Write;
 use std::path::PathBuf;
@@ -62,6 +63,8 @@ pub fn update_main(rl : &mut RaylibHandle, main_state : &mut MainState, default_
         }
         *default_font_size = rl.gui_get_style(DEFAULT, TEXT_SIZE as i32);
         *current_font_size = *default_font_size;
+        let txt_color_int = rl.gui_get_style(DEFAULT, TEXT_COLOR_NORMAL as i32);
+        main_state.default_txt_color = Color::get_color(txt_color_int as u32);
     }
 
     rl.gui_set_style(DEFAULT, TEXT_SIZE as i32, *current_font_size); // Update font size

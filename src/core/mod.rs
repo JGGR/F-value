@@ -113,10 +113,11 @@ pub struct MainState {
     pub current_view : CurrentView,
     pub theme : GuiTheme,
     pub gui_theme_combobox_active : i32,
+    pub default_txt_color : Color,
 }
 
 impl MainState {
-    pub fn new() -> Self {
+    pub fn new(default_txt_color: Color) -> Self {
         Self {
             frame_counter : 0,
             showing_quit_win : false,
@@ -127,6 +128,7 @@ impl MainState {
             current_view : CurrentView::HOME,
             theme : GuiTheme::Light,
             gui_theme_combobox_active : GuiTheme::Light as i32,
+            default_txt_color : default_txt_color,
         }
     }
 }
