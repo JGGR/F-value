@@ -9,15 +9,15 @@ pub const PROJECT_VERSION: &'static str = env!("VERSION_STRING");
 pub const SHORT_PROJECT_VERSION: &'static str = env!("SHORT_VERSION_STRING");
 pub const ESOX_SCREEN_WIDTH : i32 = 960;
 pub const ESOX_SCREEN_HEIGHT : i32 = 540;
-pub const DARK_THEME_DATA: &[u8] = include_bytes!("../../assets/style_dark.rgs");
-pub const BLUISH_THEME_DATA: &[u8] = include_bytes!("../../assets/style_bluish.rgs");
-pub const CANDY_THEME_DATA: &[u8] = include_bytes!("../../assets/style_candy.rgs");
-pub const CHERRY_THEME_DATA: &[u8] = include_bytes!("../../assets/style_cherry.rgs");
-pub const CYBER_THEME_DATA: &[u8] = include_bytes!("../../assets/style_cyber.rgs");
-pub const JUNGLE_THEME_DATA: &[u8] = include_bytes!("../../assets/style_jungle.rgs");
-pub const LAVANDA_THEME_DATA: &[u8] = include_bytes!("../../assets/style_lavanda.rgs");
-pub const TERMINAL_THEME_DATA: &[u8] = include_bytes!("../../assets/style_terminal.rgs");
-pub const ASHES_THEME_DATA: &[u8] = include_bytes!("../../assets/style_ashes.rgs");
+pub const DARK_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_dark.rgs");
+pub const BLUISH_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_bluish.rgs");
+pub const CANDY_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_candy.rgs");
+pub const CHERRY_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_cherry.rgs");
+pub const CYBER_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_cyber.rgs");
+pub const JUNGLE_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_jungle.rgs");
+pub const LAVANDA_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_lavanda.rgs");
+pub const TERMINAL_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_terminal.rgs");
+pub const ASHES_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_ashes.rgs");
 pub const GUI_THEME_COMBOBOX_STR : &str = "Light;Dark;Bluish;Candy;Cherry;Cyber;Jungle;Lavanda;Terminal;Ashes";
 
 pub enum CurrentView {
