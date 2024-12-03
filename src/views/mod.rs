@@ -2,7 +2,7 @@ use crate::core::*;
 use crate::controllers::*;
 use raylib::prelude::*;
 use raylib::consts::GuiControl::DEFAULT;
-use raylib::consts::GuiDefaultProperty::BACKGROUND_COLOR;
+use raylib::consts::GuiDefaultProperty::{BACKGROUND_COLOR, TEXT_SPACING};
 
 // A view responsible for rendering the state
 // Tightly coupled with its respective controller
@@ -309,5 +309,7 @@ fn draw_todo_view_text(d: &mut RaylibDrawHandle, frame_counter: u32, current_fon
     let todo_label_font_size = current_font_size *2;
     let todo_label_x = d.get_screen_width() / 2 - d.measure_text(todo_label, todo_label_font_size) / 2;
     let todo_label_y = d.get_screen_height() / 2 - propheight(&d, todo_label_font_size) / 2;
-    d.draw_text(todo_label, todo_label_x, todo_label_y, todo_label_font_size, rainbow_color);
+    let curr_font = d.gui_get_font();
+    let text_spacing = d.gui_get_style(DEFAULT, TEXT_SPACING as i32);
+    d.draw_text_ex(curr_font, todo_label, Vector2::new(todo_label_x as f32, todo_label_y as f32), todo_label_font_size as f32, text_spacing as f32, rainbow_color);
 }
