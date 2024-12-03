@@ -87,3 +87,122 @@ impl SecondView {
         controller.set_value(self.spinner_value);
     }
 }
+
+pub struct SelezioneIndiceView {
+
+}
+
+impl SelezioneIndiceView {
+
+    pub fn new() -> Self {
+        Self {
+
+        }
+    }
+
+    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &IndiceController, current_font_size : i32) {
+        d.clear_background(Color::GRAY);
+    }
+}
+
+pub struct SelezioneFileInputView {
+
+}
+
+impl SelezioneFileInputView {
+
+    pub fn new() -> Self {
+        Self {
+
+        }
+    }
+
+    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &FileInputController, current_font_size : i32) {
+        d.clear_background(Color::GRAY);
+    }
+}
+
+pub struct ValidazioneFileInputView {
+
+}
+
+impl ValidazioneFileInputView {
+
+    pub fn new() -> Self {
+        Self {
+
+        }
+    }
+
+    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &FileInputController, current_font_size : i32) {
+        d.clear_background(Color::GRAY);
+    }
+}
+
+pub struct SelezioneInfoAggiuntiveView {
+
+}
+
+impl SelezioneInfoAggiuntiveView {
+
+    pub fn new() -> Self {
+        Self {
+
+        }
+    }
+
+    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &InfoAggiuntiveController, current_font_size : i32) {
+        d.clear_background(Color::GRAY);
+    }
+}
+
+pub struct ValidazioneInfoAggiuntiveView {
+
+}
+
+impl ValidazioneInfoAggiuntiveView {
+
+    pub fn new() -> Self {
+        Self {
+
+        }
+    }
+
+    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &InfoAggiuntiveController, current_font_size : i32) {
+        d.clear_background(Color::GRAY);
+    }
+}
+
+pub struct ProduzioneOutputView {
+
+}
+
+impl ProduzioneOutputView {
+
+    pub fn new() -> Self {
+        Self {
+
+        }
+    }
+
+    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &OutputController, current_font_size : i32) {
+        d.clear_background(Color::GRAY);
+    }
+}
+
+pub struct ProduzionePDFView {
+
+}
+
+impl ProduzionePDFView {
+
+    pub fn new() -> Self {
+        Self {
+
+        }
+    }
+
+    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &OutputController, current_font_size : i32) {
+        d.clear_background(Color::GRAY);
+    }
+}

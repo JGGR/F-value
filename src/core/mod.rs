@@ -2,6 +2,7 @@ pub mod view;
 pub mod controller;
 
 use raylib::prelude::*;
+use std::fmt;
 
 pub const EXIT_KEY: raylib::consts::KeyboardKey = raylib::consts::KeyboardKey::KEY_ESCAPE;
 pub const PROJECT_VERSION: &'static str = env!("VERSION_STRING");
@@ -11,8 +12,33 @@ pub const ESOX_SCREEN_HEIGHT : i32 = 540;
 
 pub enum CurrentView {
     HOME,
-    SECOND
+    SECOND,
+    SelezioneIndice,
+    SelezioneFileInput,
+    ValidazioneFileInput,
+    SelezioneInfoAggiuntive,
+    ValidazioneInfoAggiuntive,
+    ProduzioneOutput,
+    ProduzionePDF,
 }
+
+impl fmt::Display for CurrentView {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    let string_representation = match *self {
+      CurrentView::HOME => "HOME",
+      CurrentView::SECOND => "SECOND",
+      CurrentView::SelezioneIndice => "Selezione Indice",
+      CurrentView::SelezioneFileInput => "Selezione File Input",
+      CurrentView::ValidazioneFileInput => "Validazione File Input",
+      CurrentView::SelezioneInfoAggiuntive => "Selezione Info Aggiuntive",
+      CurrentView::ValidazioneInfoAggiuntive => "Validazione Info Aggiuntive",
+      CurrentView::ProduzioneOutput => "Produzione Output",
+      CurrentView::ProduzionePDF => "Produzione PDF",
+    };
+    write!(f, "{}", string_representation)
+  }
+}
+
 
 pub struct MainState {
     pub showing_quit_win : bool,

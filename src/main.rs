@@ -20,6 +20,17 @@ fn main() {
     let mut home_view = HomeView::new();
     let second_controller = SecondController::new();
     let mut second_view = SecondView::new();
+    let indice_controller = IndiceController::new();
+    let mut selezione_indice_view = SelezioneIndiceView::new();
+    let fileinput_controller = FileInputController::new();
+    let mut selezione_fileinput_view = SelezioneFileInputView::new();
+    let mut validazione_fileinput_view = ValidazioneFileInputView::new();
+    let infoaggiuntive_controller = InfoAggiuntiveController::new();
+    let mut selezione_infoaggiuntive_view = SelezioneInfoAggiuntiveView::new();
+    let mut validazione_infoaggiuntive_view = ValidazioneInfoAggiuntiveView::new();
+    let output_controller = OutputController::new();
+    let mut produzione_output_view = ProduzioneOutputView::new();
+    let mut produzione_pdf_view = ProduzionePDFView::new();
 
     let mut main_state = MainState::new();
 
@@ -49,6 +60,18 @@ fn main() {
             CurrentView::SECOND => {
                 second_controller.update(&rl);
             }
+            CurrentView::SelezioneIndice => {
+                indice_controller.update(&rl);
+            }
+            CurrentView::SelezioneFileInput | CurrentView::ValidazioneFileInput => {
+                fileinput_controller.update(&rl);
+            }
+            CurrentView::SelezioneInfoAggiuntive | CurrentView::ValidazioneInfoAggiuntive => {
+                infoaggiuntive_controller.update(&rl);
+            }
+            CurrentView::ProduzioneOutput | CurrentView::ProduzionePDF=> {
+                output_controller.update(&rl);
+            }
         }
 
         let mut d = rl.begin_drawing(&thread);
@@ -61,6 +84,27 @@ fn main() {
             }
             CurrentView::SECOND => {
                 second_view.draw(&mut d, &thread, &second_controller, current_font_height);
+            }
+            CurrentView::SelezioneIndice => {
+                selezione_indice_view.draw(&mut d, &thread, &indice_controller, current_font_height);
+            }
+            CurrentView::SelezioneFileInput => {
+                selezione_fileinput_view.draw(&mut d, &thread, &fileinput_controller, current_font_height);
+            }
+            CurrentView::ValidazioneFileInput => {
+                validazione_fileinput_view.draw(&mut d, &thread, &fileinput_controller, current_font_height);
+            }
+            CurrentView::SelezioneInfoAggiuntive => {
+                selezione_infoaggiuntive_view.draw(&mut d, &thread, &infoaggiuntive_controller, current_font_height);
+            }
+            CurrentView::ValidazioneInfoAggiuntive => {
+                validazione_infoaggiuntive_view.draw(&mut d, &thread, &infoaggiuntive_controller, current_font_height);
+            }
+            CurrentView::ProduzioneOutput => {
+                produzione_output_view.draw(&mut d, &thread, &output_controller, current_font_height);
+            }
+            CurrentView::ProduzionePDF => {
+                produzione_pdf_view.draw(&mut d, &thread, &output_controller, current_font_height);
             }
         }
 

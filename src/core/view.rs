@@ -154,6 +154,19 @@ pub fn draw_settings_box(d: &mut RaylibDrawHandle, main_state : &mut MainState, 
 }
 
 pub fn draw_main(d : &mut RaylibDrawHandle, main_state : &mut MainState, current_font_height : &mut i32, default_font_height : i32) {
+
+    let current_view_name = main_state.current_view.to_string();
+    let current_view_banner_x = propwidth(&d, 200);
+    let current_view_banner_y = propheight(&d, 25);
+
+    d.draw_text(
+        &current_view_name,
+        current_view_banner_x,
+        current_view_banner_y,
+        *current_font_height,
+        Color::BLACK.alpha(0.8)
+    );
+
     let info_button_width = propwidth(&d, 50);
     let info_button_x = propwidth(&d, 800);
     let info_button_height = propwidth(&d, 50);
@@ -178,6 +191,27 @@ pub fn draw_main(d : &mut RaylibDrawHandle, main_state : &mut MainState, current
                 main_state.current_view = CurrentView::SECOND;
             }
             CurrentView::SECOND => {
+                main_state.current_view = CurrentView::SelezioneIndice;
+            }
+            CurrentView::SelezioneIndice => {
+                main_state.current_view = CurrentView::SelezioneFileInput;
+            }
+            CurrentView::SelezioneFileInput => {
+                main_state.current_view = CurrentView::ValidazioneFileInput;
+            }
+            CurrentView::ValidazioneFileInput => {
+                main_state.current_view = CurrentView::SelezioneInfoAggiuntive;
+            }
+            CurrentView::SelezioneInfoAggiuntive => {
+                main_state.current_view = CurrentView::ValidazioneInfoAggiuntive;
+            }
+            CurrentView::ValidazioneInfoAggiuntive => {
+                main_state.current_view = CurrentView::ProduzioneOutput;
+            }
+            CurrentView::ProduzioneOutput => {
+                main_state.current_view = CurrentView::ProduzionePDF;
+            }
+            CurrentView::ProduzionePDF => {
                 main_state.current_view = CurrentView::HOME;
             }
         }

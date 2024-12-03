@@ -58,3 +58,68 @@ impl SecondController {
         state.second_model.set_value(val);
     }
 }
+
+pub struct IndiceController;
+
+impl IndiceController {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn update(&self, _rl : &RaylibHandle) {
+        //let mut state = GLOBAL_STATE.lock().unwrap();
+        //state.second_model.set_name("Updated".to_string());
+    }
+}
+
+pub struct FileInputController;
+
+impl FileInputController {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn update(&self, _rl : &RaylibHandle) {
+        //let mut state = GLOBAL_STATE.lock().unwrap();
+        //state.second_model.set_name("Updated".to_string());
+    }
+}
+
+pub struct InfoAggiuntiveController;
+
+impl InfoAggiuntiveController {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn update(&self, _rl : &RaylibHandle) {
+        //let mut state = GLOBAL_STATE.lock().unwrap();
+        //state.second_model.set_name("Updated".to_string());
+    }
+}
+
+pub struct OutputController;
+
+impl OutputController {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn update(&self, _rl : &RaylibHandle) {
+        //let mut state = GLOBAL_STATE.lock().unwrap();
+        //state.second_model.set_name("Updated".to_string());
+    }
+}
+
+pub struct LogController;
+
+impl LogController {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn update(&self, _rl : &RaylibHandle) {
+        //let mut state = GLOBAL_STATE.lock().unwrap();
+        //state.second_model.set_name("Updated".to_string());
+    }
+}
