@@ -101,7 +101,45 @@ impl SelezioneIndiceView {
     }
 
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &IndiceController, current_font_size : i32) {
-        d.clear_background(Color::GRAY);
+        d.clear_background(Color::RAYWHITE);
+
+        let button_niseci_width = propwidth(&d, 200);
+        let button_niseci_x = d.get_screen_width() / 2 - button_niseci_width /2;
+        let button_niseci_height = propwidth(&d, 50);
+
+        let button_indice_y_spacing = button_niseci_height;
+
+        let button_niseci_y = d.get_screen_height() / 2 - button_indice_y_spacing / 2 - button_niseci_height;
+
+        let button_hfbi_width = button_niseci_width;
+        let button_hfbi_x = button_niseci_x;
+        let button_hfbi_height = button_niseci_height;
+        let button_hfbi_y = button_niseci_y + button_niseci_height + button_indice_y_spacing;
+
+        if d.gui_button(
+            rrect(
+                button_niseci_x,
+                button_niseci_y,
+                button_niseci_width,
+                button_niseci_height
+            ),
+            Some(rstr!("NISECI"))
+        ) {
+            println!("TODO: call controller to update model. Controller can update main_state.current_view on next frame in update()");
+        }
+
+        if d.gui_button(
+            rrect(
+                button_hfbi_x,
+                button_hfbi_y,
+                button_hfbi_width,
+                button_hfbi_height,
+            ),
+            Some(rstr!("HFBI"))
+        ) {
+            println!("TODO: call controller to update model. Controller can update main_state.current_view on next frame in update()");
+        }
+
     }
 }
 
@@ -118,7 +156,7 @@ impl SelezioneFileInputView {
     }
 
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &FileInputController, current_font_size : i32) {
-        d.clear_background(Color::GRAY);
+        d.clear_background(Color::RAYWHITE);
     }
 }
 
@@ -135,7 +173,7 @@ impl ValidazioneFileInputView {
     }
 
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &FileInputController, current_font_size : i32) {
-        d.clear_background(Color::GRAY);
+        d.clear_background(Color::RAYWHITE);
     }
 }
 
@@ -152,7 +190,7 @@ impl SelezioneInfoAggiuntiveView {
     }
 
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &InfoAggiuntiveController, current_font_size : i32) {
-        d.clear_background(Color::GRAY);
+        d.clear_background(Color::RAYWHITE);
     }
 }
 
@@ -169,7 +207,7 @@ impl ValidazioneInfoAggiuntiveView {
     }
 
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &InfoAggiuntiveController, current_font_size : i32) {
-        d.clear_background(Color::GRAY);
+        d.clear_background(Color::RAYWHITE);
     }
 }
 
@@ -186,7 +224,7 @@ impl ProduzioneOutputView {
     }
 
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &OutputController, current_font_size : i32) {
-        d.clear_background(Color::GRAY);
+        d.clear_background(Color::RAYWHITE);
     }
 }
 
@@ -203,6 +241,6 @@ impl ProduzionePDFView {
     }
 
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &OutputController, current_font_size : i32) {
-        d.clear_background(Color::GRAY);
+        d.clear_background(Color::RAYWHITE);
     }
 }
