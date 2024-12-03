@@ -176,17 +176,7 @@ impl SelezioneFileInputView {
         let state = controller.get_state();
         let frame_counter = state.get_frame_counter();
         let speed = 0.01; // Smaller value = slower cycle
-        let red = (0.5 * (1.0 + (frame_counter as f32 * speed).sin()) * 255.0) as u8;
-        let green = (0.5 * (1.0 + (frame_counter as f32 * speed + 2.0).sin()) * 255.0) as u8;
-        let blue = (0.5 * (1.0 + (frame_counter as f32 * speed + 4.0).sin()) * 255.0) as u8;
-
-        let rainbow_color = Color::new(red, green, blue, 255);
-
-        let todo_label = "TODO: Implement this View";
-        let todo_label_font_size = current_font_size *2;
-        let todo_label_x = d.get_screen_width() / 2 - d.measure_text(todo_label, todo_label_font_size) / 2;
-        let todo_label_y = d.get_screen_height() / 2 - propheight(&d, todo_label_font_size) / 2;
-        d.draw_text(todo_label, todo_label_x, todo_label_y, todo_label_font_size, rainbow_color);
+        draw_todo_view_text(d, frame_counter, speed, current_font_size);
     }
 }
 
@@ -208,17 +198,7 @@ impl ValidazioneFileInputView {
         let state = controller.get_state();
         let frame_counter = state.get_frame_counter();
         let speed = 0.01; // Smaller value = slower cycle
-        let red = (0.5 * (1.0 + (frame_counter as f32 * speed).sin()) * 255.0) as u8;
-        let green = (0.5 * (1.0 + (frame_counter as f32 * speed + 2.0).sin()) * 255.0) as u8;
-        let blue = (0.5 * (1.0 + (frame_counter as f32 * speed + 4.0).sin()) * 255.0) as u8;
-
-        let rainbow_color = Color::new(red, green, blue, 255);
-
-        let todo_label = "TODO: Implement this View";
-        let todo_label_font_size = current_font_size *2;
-        let todo_label_x = d.get_screen_width() / 2 - d.measure_text(todo_label, todo_label_font_size) / 2;
-        let todo_label_y = d.get_screen_height() / 2 - propheight(&d, todo_label_font_size) / 2;
-        d.draw_text(todo_label, todo_label_x, todo_label_y, todo_label_font_size, rainbow_color);
+        draw_todo_view_text(d, frame_counter, speed, current_font_size);
     }
 }
 
@@ -240,17 +220,7 @@ impl SelezioneInfoAggiuntiveView {
         let state = controller.get_state();
         let frame_counter = state.get_frame_counter();
         let speed = 0.01; // Smaller value = slower cycle
-        let red = (0.5 * (1.0 + (frame_counter as f32 * speed).sin()) * 255.0) as u8;
-        let green = (0.5 * (1.0 + (frame_counter as f32 * speed + 2.0).sin()) * 255.0) as u8;
-        let blue = (0.5 * (1.0 + (frame_counter as f32 * speed + 4.0).sin()) * 255.0) as u8;
-
-        let rainbow_color = Color::new(red, green, blue, 255);
-
-        let todo_label = "TODO: Implement this View";
-        let todo_label_font_size = current_font_size *2;
-        let todo_label_x = d.get_screen_width() / 2 - d.measure_text(todo_label, todo_label_font_size) / 2;
-        let todo_label_y = d.get_screen_height() / 2 - propheight(&d, todo_label_font_size) / 2;
-        d.draw_text(todo_label, todo_label_x, todo_label_y, todo_label_font_size, rainbow_color);
+        draw_todo_view_text(d, frame_counter, speed, current_font_size);
     }
 }
 
@@ -272,17 +242,7 @@ impl ValidazioneInfoAggiuntiveView {
         let state = controller.get_state();
         let frame_counter = state.get_frame_counter();
         let speed = 0.01; // Smaller value = slower cycle
-        let red = (0.5 * (1.0 + (frame_counter as f32 * speed).sin()) * 255.0) as u8;
-        let green = (0.5 * (1.0 + (frame_counter as f32 * speed + 2.0).sin()) * 255.0) as u8;
-        let blue = (0.5 * (1.0 + (frame_counter as f32 * speed + 4.0).sin()) * 255.0) as u8;
-
-        let rainbow_color = Color::new(red, green, blue, 255);
-
-        let todo_label = "TODO: Implement this View";
-        let todo_label_font_size = current_font_size *2;
-        let todo_label_x = d.get_screen_width() / 2 - d.measure_text(todo_label, todo_label_font_size) / 2;
-        let todo_label_y = d.get_screen_height() / 2 - propheight(&d, todo_label_font_size) / 2;
-        d.draw_text(todo_label, todo_label_x, todo_label_y, todo_label_font_size, rainbow_color);
+        draw_todo_view_text(d, frame_counter, speed, current_font_size);
     }
 }
 
@@ -304,17 +264,7 @@ impl ProduzioneOutputView {
         let state = controller.get_state();
         let frame_counter = state.get_frame_counter();
         let speed = 0.01; // Smaller value = slower cycle
-        let red = (0.5 * (1.0 + (frame_counter as f32 * speed).sin()) * 255.0) as u8;
-        let green = (0.5 * (1.0 + (frame_counter as f32 * speed + 2.0).sin()) * 255.0) as u8;
-        let blue = (0.5 * (1.0 + (frame_counter as f32 * speed + 4.0).sin()) * 255.0) as u8;
-
-        let rainbow_color = Color::new(red, green, blue, 255);
-
-        let todo_label = "TODO: Implement this View";
-        let todo_label_font_size = current_font_size *2;
-        let todo_label_x = d.get_screen_width() / 2 - d.measure_text(todo_label, todo_label_font_size) / 2;
-        let todo_label_y = d.get_screen_height() / 2 - propheight(&d, todo_label_font_size) / 2;
-        d.draw_text(todo_label, todo_label_x, todo_label_y, todo_label_font_size, rainbow_color);
+        draw_todo_view_text(d, frame_counter, speed, current_font_size);
     }
 }
 
@@ -336,16 +286,25 @@ impl ProduzionePDFView {
         let state = controller.get_state();
         let frame_counter = state.get_frame_counter();
         let speed = 0.01; // Smaller value = slower cycle
-        let red = (0.5 * (1.0 + (frame_counter as f32 * speed).sin()) * 255.0) as u8;
-        let green = (0.5 * (1.0 + (frame_counter as f32 * speed + 2.0).sin()) * 255.0) as u8;
-        let blue = (0.5 * (1.0 + (frame_counter as f32 * speed + 4.0).sin()) * 255.0) as u8;
-
-        let rainbow_color = Color::new(red, green, blue, 255);
-
-        let todo_label = "TODO: Implement this View";
-        let todo_label_font_size = current_font_size *2;
-        let todo_label_x = d.get_screen_width() / 2 - d.measure_text(todo_label, todo_label_font_size) / 2;
-        let todo_label_y = d.get_screen_height() / 2 - propheight(&d, todo_label_font_size) / 2;
-        d.draw_text(todo_label, todo_label_x, todo_label_y, todo_label_font_size, rainbow_color);
+        draw_todo_view_text(d, frame_counter, speed, current_font_size);
     }
+}
+
+fn rainbow_color_from_framecounter(frame_counter: u32, speed: f32) -> Color {
+    let red = (0.5 * (1.0 + (frame_counter as f32 * speed).sin()) * 255.0) as u8;
+    let green = (0.5 * (1.0 + (frame_counter as f32 * speed + 2.0).sin()) * 255.0) as u8;
+    let blue = (0.5 * (1.0 + (frame_counter as f32 * speed + 4.0).sin()) * 255.0) as u8;
+
+    let rainbow_color = Color::new(red, green, blue, 255);
+    return rainbow_color;
+}
+
+fn draw_todo_view_text(d: &mut RaylibDrawHandle, frame_counter: u32, rainbow_speed: f32, current_font_size: i32) {
+    let rainbow_color = rainbow_color_from_framecounter(frame_counter, rainbow_speed);
+
+    let todo_label = "TODO: Implement this View";
+    let todo_label_font_size = current_font_size *2;
+    let todo_label_x = d.get_screen_width() / 2 - d.measure_text(todo_label, todo_label_font_size) / 2;
+    let todo_label_y = d.get_screen_height() / 2 - propheight(&d, todo_label_font_size) / 2;
+    d.draw_text(todo_label, todo_label_x, todo_label_y, todo_label_font_size, rainbow_color);
 }
