@@ -1,6 +1,8 @@
 use crate::core::*;
 use crate::controllers::*;
 use raylib::prelude::*;
+use raylib::consts::GuiControl::DEFAULT;
+use raylib::consts::GuiDefaultProperty::BACKGROUND_COLOR;
 
 // A view responsible for rendering the state
 // Tightly coupled with its respective controller
@@ -171,7 +173,8 @@ impl SelezioneFileInputView {
     }
 
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &FileInputController, current_font_size : i32) {
-        d.clear_background(Color::GRAY);
+        clear_bg_with_default(d);
+
 
         let state = controller.get_state();
         let frame_counter = state.get_frame_counter();
@@ -192,7 +195,7 @@ impl ValidazioneFileInputView {
     }
 
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &FileInputController, current_font_size : i32) {
-        d.clear_background(Color::GRAY);
+        clear_bg_with_default(d);
 
         let state = controller.get_state();
         let frame_counter = state.get_frame_counter();
@@ -213,7 +216,7 @@ impl SelezioneInfoAggiuntiveView {
     }
 
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &InfoAggiuntiveController, current_font_size : i32) {
-        d.clear_background(Color::GRAY);
+        clear_bg_with_default(d);
 
         let state = controller.get_state();
         let frame_counter = state.get_frame_counter();
@@ -234,7 +237,7 @@ impl ValidazioneInfoAggiuntiveView {
     }
 
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &InfoAggiuntiveController, current_font_size : i32) {
-        d.clear_background(Color::GRAY);
+        clear_bg_with_default(d);
 
         let state = controller.get_state();
         let frame_counter = state.get_frame_counter();
@@ -255,7 +258,7 @@ impl ProduzioneOutputView {
     }
 
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &OutputController, current_font_size : i32) {
-        d.clear_background(Color::GRAY);
+        clear_bg_with_default(d);
 
         let state = controller.get_state();
         let frame_counter = state.get_frame_counter();
@@ -276,12 +279,16 @@ impl ProduzionePDFView {
     }
 
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &OutputController, current_font_size : i32) {
-        d.clear_background(Color::GRAY);
-
+        clear_bg_with_default(d);
         let state = controller.get_state();
         let frame_counter = state.get_frame_counter();
         draw_todo_view_text(d, frame_counter, current_font_size);
     }
+}
+
+fn clear_bg_with_default(d: &mut RaylibDrawHandle) {
+    let bg_color_int = d.gui_get_style(DEFAULT, BACKGROUND_COLOR as i32);
+    d.clear_background(Color::get_color(bg_color_int as u32));
 }
 
 fn rainbow_color_from_framecounter(frame_counter: u32, speed: f32) -> Color {

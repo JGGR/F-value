@@ -1,7 +1,6 @@
 use crate::core::*;
 use std::ffi::CString;
 use raylib::consts::GuiIconName::*;
-use raylib::consts::GuiControl::DEFAULT;
 
 pub fn draw_quit_win(d: &mut RaylibDrawHandle, showing_quit_win : &mut bool, should_quit : &mut bool) {
     if *showing_quit_win {
