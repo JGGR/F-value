@@ -141,6 +141,40 @@ pub fn draw_settings_box(d: &mut RaylibDrawHandle, main_state : &mut MainState, 
         ) {
             main_state.spinner_font_height_edit_mode = !main_state.spinner_font_height_edit_mode;
         }
+        let gui_theme_label_width = fontsize_label_width;
+        let gui_theme_label_x = fontsize_label_x;
+        let gui_theme_label_height = fontsize_label_height;
+        let gui_theme_label_y = fontsize_label_y + y_spacing *2;
+        if d.gui_label(
+            rrect(
+                gui_theme_label_x,
+                gui_theme_label_y,
+                gui_theme_label_width,
+                gui_theme_label_height
+            ),
+            Some(rstr!("Gui Theme"))
+        ) { }
+        let gui_theme_button_x = gui_theme_label_x + gui_theme_label_width + x_spacing;
+        let gui_theme_button_y = gui_theme_label_y;
+        let gui_theme_button_width = gui_theme_label_width;
+        let gui_theme_button_height = gui_theme_label_height;
+
+        let curr_theme_str = main_state.theme.to_string();
+        let curr_theme_cstr = CString::new(curr_theme_str).unwrap();
+        // Change theme button
+        if d.gui_button(rrect(gui_theme_button_x, gui_theme_button_y, gui_theme_button_width, gui_theme_button_height), Some(curr_theme_cstr.as_c_str())) {
+            match main_state.theme {
+                GuiTheme::Light => {
+                    main_state.theme = GuiTheme::Dark;
+                    main_state.reapply_theme = true;
+                }
+                GuiTheme::Dark => {
+                    main_state.theme = GuiTheme::Light;
+                    main_state.reapply_theme = true;
+                }
+            }
+        }
+
 
         // Reset settings button
         if d.gui_button(rrect(fontsize_label_x, fontsize_label_y + fontsize_label_height * 3, fontsize_label_width, fontsize_label_height), Some(rstr!("Reset"))) {

@@ -46,13 +46,13 @@ fn main() {
     rl.set_exit_key(None); // This allows capturing the exit key with a message box
     rl.set_target_fps(30);
 
-    let default_font_height : i32 = rl.gui_get_style(DEFAULT, TEXT_SIZE as i32);
+    let mut default_font_height : i32 = rl.gui_get_style(DEFAULT, TEXT_SIZE as i32);
     let mut current_font_height : i32 = default_font_height;
 
     while !main_state.should_quit {
 
         // Base update step
-        update_main(&mut rl, &mut main_state, current_font_height);
+        update_main(&mut rl, &mut main_state, &mut default_font_height, &mut current_font_height);
 
         // Current view update step
         match main_state.current_view {

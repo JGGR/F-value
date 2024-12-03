@@ -9,6 +9,7 @@ pub const PROJECT_VERSION: &'static str = env!("VERSION_STRING");
 pub const SHORT_PROJECT_VERSION: &'static str = env!("SHORT_VERSION_STRING");
 pub const ESOX_SCREEN_WIDTH : i32 = 960;
 pub const ESOX_SCREEN_HEIGHT : i32 = 540;
+pub const DARK_THEME_DATA: &[u8] = include_bytes!("../../assets/style_dark.rgs");
 
 pub enum CurrentView {
     HOME,
@@ -39,6 +40,20 @@ impl fmt::Display for CurrentView {
   }
 }
 
+pub enum GuiTheme {
+    Light,
+    Dark
+}
+
+impl fmt::Display for GuiTheme {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let string_representation = match *self {
+            GuiTheme::Light => "Light",
+            GuiTheme::Dark => "Dark",
+        };
+        write!(f, "{}", string_representation)
+    }
+}
 
 pub struct MainState {
     pub frame_counter : u32,
@@ -48,6 +63,8 @@ pub struct MainState {
     pub showing_settings_box : bool,
     pub spinner_font_height_edit_mode : bool,
     pub current_view : CurrentView,
+    pub theme : GuiTheme,
+    pub reapply_theme : bool,
 }
 
 impl MainState {
@@ -59,7 +76,9 @@ impl MainState {
             showing_info_box : false,
             showing_settings_box : false,
             spinner_font_height_edit_mode : false,
-            current_view : CurrentView::HOME
+            current_view : CurrentView::HOME,
+            theme : GuiTheme::Light,
+            reapply_theme : false,
         }
     }
 }
