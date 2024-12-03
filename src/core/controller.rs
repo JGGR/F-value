@@ -50,6 +50,10 @@ pub fn update_main(rl : &mut RaylibHandle, main_state : &mut MainState, default_
                 load_style_from_memory(rl, TERMINAL_THEME_DATA);
                 main_state.theme = GuiTheme::Terminal;
             }
+            Ok(GuiTheme::Ashes) => {
+                load_style_from_memory(rl, ASHES_THEME_DATA);
+                main_state.theme = GuiTheme::Ashes;
+            }
             Ok(GuiTheme::Light) => {
                 rl.gui_load_style_default();
                 main_state.theme = GuiTheme::Light;

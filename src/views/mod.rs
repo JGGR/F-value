@@ -295,7 +295,7 @@ fn rainbow_color_from_framecounter(frame_counter: u32, speed: f32) -> Color {
 
 fn draw_todo_view_text(d: &mut RaylibDrawHandle, frame_counter: u32, current_font_size: i32) {
 
-    let rainbow_speed = 0.01; // Smaller speed = slower cycle
+    let rainbow_speed = 0.03; // Smaller speed = slower cycle
     let rainbow_color = rainbow_color_from_framecounter(frame_counter, rainbow_speed);
 
     let todo_label = "TODO: Implement this View";

@@ -159,7 +159,7 @@ pub fn draw_settings_box(d: &mut RaylibDrawHandle, main_state : &mut MainState, 
         let gui_theme_button_width = gui_theme_label_width;
         let gui_theme_button_height = gui_theme_label_height;
 
-        let gui_theme_cstr = CString::new("Light;Dark;Bluish;Candy;Cherry;Cyber;Jungle;Lavanda;Terminal").unwrap();
+        let gui_theme_cstr = CString::new(GUI_THEME_COMBOBOX_STR).unwrap();
 
         d.gui_combo_box(
             rrect(

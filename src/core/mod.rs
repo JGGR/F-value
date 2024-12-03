@@ -17,6 +17,8 @@ pub const CYBER_THEME_DATA: &[u8] = include_bytes!("../../assets/style_cyber.rgs
 pub const JUNGLE_THEME_DATA: &[u8] = include_bytes!("../../assets/style_jungle.rgs");
 pub const LAVANDA_THEME_DATA: &[u8] = include_bytes!("../../assets/style_lavanda.rgs");
 pub const TERMINAL_THEME_DATA: &[u8] = include_bytes!("../../assets/style_terminal.rgs");
+pub const ASHES_THEME_DATA: &[u8] = include_bytes!("../../assets/style_ashes.rgs");
+pub const GUI_THEME_COMBOBOX_STR : &str = "Light;Dark;Bluish;Candy;Cherry;Cyber;Jungle;Lavanda;Terminal;Ashes";
 
 pub enum CurrentView {
     HOME,
@@ -57,7 +59,8 @@ pub enum GuiTheme {
     Cyber,
     Jungle,
     Lavanda,
-    Terminal
+    Terminal,
+    Ashes
 }
 
 impl fmt::Display for GuiTheme {
@@ -72,6 +75,7 @@ impl fmt::Display for GuiTheme {
             GuiTheme::Jungle => "Jungle",
             GuiTheme::Lavanda => "Lavanda",
             GuiTheme::Terminal => "Terminal",
+            GuiTheme::Ashes => "Ashes",
         };
         write!(f, "{}", string_representation)
     }
@@ -91,6 +95,7 @@ impl TryFrom<i32> for GuiTheme {
             x if x == GuiTheme::Jungle as i32 => Ok(GuiTheme::Jungle),
             x if x == GuiTheme::Lavanda as i32 => Ok(GuiTheme::Lavanda),
             x if x == GuiTheme::Terminal as i32 => Ok(GuiTheme::Terminal),
+            x if x == GuiTheme::Ashes as i32 => Ok(GuiTheme::Ashes),
             _ => Err(()),
         }
     }
