@@ -81,8 +81,13 @@ impl FileInputController {
     }
 
     pub fn update(&self, _rl : &RaylibHandle, _main_state : &mut MainState) {
-        //let mut state = GLOBAL_STATE.lock().unwrap();
-        //state.second_model.set_name("Updated".to_string());
+        let mut state = GLOBAL_STATE.lock().unwrap();
+        state.fileinput_model.increment_frame_counter();
+    }
+
+    pub fn get_state(&self) -> FileInputModel {
+        let state = GLOBAL_STATE.lock().unwrap();
+        return state.fileinput_model.clone();
     }
 }
 
@@ -93,9 +98,14 @@ impl InfoAggiuntiveController {
         Self
     }
 
-    pub fn update(&self, _rl : &RaylibHandle, _main_state: &mut MainState) {
-        //let mut state = GLOBAL_STATE.lock().unwrap();
-        //state.second_model.set_name("Updated".to_string());
+    pub fn update(&self, _rl : &RaylibHandle, _main_state : &mut MainState) {
+        let mut state = GLOBAL_STATE.lock().unwrap();
+        state.infoaggiuntive_model.increment_frame_counter();
+    }
+
+    pub fn get_state(&self) -> InfoAggiuntiveModel {
+        let state = GLOBAL_STATE.lock().unwrap();
+        return state.infoaggiuntive_model.clone();
     }
 }
 
@@ -106,9 +116,14 @@ impl OutputController {
         Self
     }
 
-    pub fn update(&self, _rl : &RaylibHandle, _main_state: &mut MainState) {
-        //let mut state = GLOBAL_STATE.lock().unwrap();
-        //state.second_model.set_name("Updated".to_string());
+    pub fn update(&self, _rl : &RaylibHandle, _main_state : &mut MainState) {
+        let mut state = GLOBAL_STATE.lock().unwrap();
+        state.output_model.increment_frame_counter();
+    }
+
+    pub fn get_state(&self) -> OutputModel {
+        let state = GLOBAL_STATE.lock().unwrap();
+        return state.output_model.clone();
     }
 }
 

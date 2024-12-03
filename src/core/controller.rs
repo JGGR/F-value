@@ -7,6 +7,8 @@ use raylib::consts::GuiControl::DEFAULT;
 pub fn update_main(rl : &mut RaylibHandle, main_state : &mut MainState, current_font_size : i32) {
     main_state.should_quit = rl.window_should_close();
 
+    main_state.frame_counter += 1;
+
     rl.gui_set_style(DEFAULT, TEXT_SIZE as i32, current_font_size); // Update font size
 
     if rl.is_key_pressed(crate::EXIT_KEY) {

@@ -41,6 +41,7 @@ impl fmt::Display for CurrentView {
 
 
 pub struct MainState {
+    pub frame_counter : u32,
     pub showing_quit_win : bool,
     pub should_quit : bool,
     pub showing_info_box : bool,
@@ -52,6 +53,7 @@ pub struct MainState {
 impl MainState {
     pub fn new() -> Self {
         Self {
+            frame_counter : 0,
             showing_quit_win : false,
             should_quit : false,
             showing_info_box : false,
