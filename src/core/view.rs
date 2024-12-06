@@ -48,13 +48,24 @@ pub fn draw_info_box(d: &mut RaylibDrawHandle, showing_info_box : &mut bool, fon
         let itext = CString::new(itext).unwrap();
 
         let proj_info_str = format!("Version: {SHORT_PROJECT_VERSION}");
-        let proj_info_font_height = current_font_height; // propheight(&d, 11);
-                                        // We should not scale the text height.
-        let proj_info_txt_bounds = font.measure_text(&proj_info_str, proj_info_font_height as f32, default_txt_spacing as f32);
+        let proj_info_txt_bounds = font.measure_text(&proj_info_str, current_font_height as f32, default_txt_spacing as f32);
+        let proj_info_str_y = d.get_screen_height() / 2 - current_font_height / 2;
 
-        let infobox_height = propheight(&d, 100) + proj_info_txt_bounds.y as i32;
+        // No multiline text.
+        let proj_name_str1 = format!("esox - Strumento per il calcolo");
+        let proj_name_str2 = format!("NISECI e HFBI");
+
+        let proj_name_str1_txt_bounds = font.measure_text(&proj_name_str1, current_font_height as f32, default_txt_spacing as f32);
+        let proj_name_str2_txt_bounds = font.measure_text(&proj_name_str2, current_font_height as f32, default_txt_spacing as f32);
+
+        let proj_name_str1_y = proj_info_str_y + (proj_info_txt_bounds.y as i32 * 2);
+        let proj_name_str2_y = proj_name_str1_y + proj_name_str1_txt_bounds.y as i32;
+
+        let widest_line = std::cmp::max(proj_info_txt_bounds.x as i32, std::cmp::max(proj_name_str1_txt_bounds.x as i32, proj_name_str2_txt_bounds.x as i32));
+
+        let infobox_height = propheight(&d, 100) + proj_info_txt_bounds.y as i32 + proj_name_str1_txt_bounds.y as i32 + proj_name_str2_txt_bounds.y as i32;
         let infobox_y = d.get_screen_height() / 2 - infobox_height / 2;
-        let infobox_width = propwidth(&d, 50) + proj_info_txt_bounds.x as i32;
+        let infobox_width = propwidth(&d, 50) + widest_line as i32;
         let infobox_x = d.get_screen_width() / 2 - infobox_width / 2;
         let result = d.gui_window_box(
             rrect(
@@ -71,9 +82,33 @@ pub fn draw_info_box(d: &mut RaylibDrawHandle, showing_info_box : &mut bool, fon
             &proj_info_str,
             Vector2::new(
                 (d.get_screen_width() / 2 - proj_info_txt_bounds.x as i32 / 2) as f32,
-                (infobox_y + infobox_height / 2 - proj_info_font_height / 2) as f32
+                proj_info_str_y as f32,
             ),
-            proj_info_font_height as f32,
+            current_font_height as f32,
+            default_txt_spacing as f32,
+            default_txt_color
+        );
+
+        d.draw_text_ex(
+            font,
+            &proj_name_str1,
+            Vector2::new(
+                (d.get_screen_width() / 2 - proj_name_str1_txt_bounds.x as i32 / 2) as f32,
+                proj_name_str1_y as f32,
+            ),
+            current_font_height as f32,
+            default_txt_spacing as f32,
+            default_txt_color
+        );
+
+        d.draw_text_ex(
+            font,
+            &proj_name_str2,
+            Vector2::new(
+                (d.get_screen_width() / 2 - proj_name_str2_txt_bounds.x as i32 / 2) as f32,
+                proj_name_str2_y as f32,
+            ),
+            current_font_height as f32,
             default_txt_spacing as f32,
             default_txt_color
         );
@@ -93,7 +128,7 @@ pub fn draw_settings_box(d: &mut RaylibDrawHandle, main_state : &mut MainState) 
             d.get_screen_height(),
             Color::RAYWHITE.alpha(0.8),
         );
-        let itext = d.gui_icon_text(ICON_GEAR, Some(rstr!("Settings")));
+        let itext = d.gui_icon_text(ICON_GEAR, Some(rstr!("Impostazioni")));
         let itext = CString::new(itext).unwrap();
         let settingsbox_width = propwidth(&d, 250);
         let settingsbox_x =  d.get_screen_width() / 2 - settingsbox_width / 2;
@@ -121,7 +156,7 @@ pub fn draw_settings_box(d: &mut RaylibDrawHandle, main_state : &mut MainState) 
                 fontsize_label_width,
                 fontsize_label_height
             ),
-            Some(rstr!("Font size"))
+            Some(rstr!("Dimensione Font"))
         ) { }
         let fontspinner_x = fontsize_label_x + fontsize_label_width + x_spacing;
         let fontspinner_y = fontsize_label_y;
@@ -163,7 +198,7 @@ pub fn draw_settings_box(d: &mut RaylibDrawHandle, main_state : &mut MainState) 
                 gui_theme_label_width,
                 gui_theme_label_height
             ),
-            Some(rstr!("Gui Theme"))
+            Some(rstr!("Tema"))
         ) { }
         let gui_theme_button_x = gui_theme_label_x + gui_theme_label_width + x_spacing;
         let gui_theme_button_y = gui_theme_label_y;
@@ -219,7 +254,9 @@ pub fn draw_main(d : &mut RaylibDrawHandle, main_state : &mut MainState) {
     let y_spacing = propheight(&d, 5);
 
     // Info button
-    if d.gui_button(rrect(info_button_x, info_button_y, info_button_width, info_button_height), Some(rstr!("Info"))) {
+    let itext = d.gui_icon_text(ICON_INFO, Some(rstr!("")));
+    let itext = CString::new(itext).unwrap();
+    if d.gui_button(rrect(info_button_x, info_button_y, info_button_width, info_button_height), Some(itext.as_c_str())) {
         main_state.showing_info_box = true;
     }
 
@@ -229,7 +266,9 @@ pub fn draw_main(d : &mut RaylibDrawHandle, main_state : &mut MainState) {
     let changeview_button_y = info_button_y + info_button_height + y_spacing;
 
     // "Change view" button
-    if d.gui_button(rrect(changeview_button_x, changeview_button_y, changeview_button_width, changeview_button_height), Some(rstr!("Prossimo"))) {
+    let itext = d.gui_icon_text(ICON_PLAYER_NEXT, Some(rstr!("")));
+    let itext = CString::new(itext).unwrap();
+    if d.gui_button(rrect(changeview_button_x, changeview_button_y, changeview_button_width, changeview_button_height), Some(itext.as_c_str())) {
         match main_state.current_view {
             CurrentView::HOME => {
                 main_state.current_view = CurrentView::SECOND;
@@ -267,7 +306,9 @@ pub fn draw_main(d : &mut RaylibDrawHandle, main_state : &mut MainState) {
     let settings_button_y = changeview_button_y + changeview_button_height + y_spacing;
 
     // Settings button
-    if d.gui_button(rrect(settings_button_x, settings_button_y, settings_button_width,  settings_button_height), Some(rstr!("Settings"))) {
+    let itext = d.gui_icon_text(ICON_GEAR, Some(rstr!("")));
+    let itext = CString::new(itext).unwrap();
+    if d.gui_button(rrect(settings_button_x, settings_button_y, settings_button_width,  settings_button_height), Some(itext.as_c_str())) {
         main_state.showing_settings_box = true;
     }
 
