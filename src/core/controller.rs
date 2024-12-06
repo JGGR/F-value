@@ -68,6 +68,7 @@ pub fn update_main(rl : &mut RaylibHandle, main_state : &mut MainState) {
         let bg_color_int = rl.gui_get_style(DEFAULT, BACKGROUND_COLOR as i32);
         main_state.default_txt_color = Color::get_color(txt_color_int as u32);
         main_state.default_bg_color = Color::get_color(bg_color_int as u32);
+        main_state.current_font = rl.gui_get_font();
     }
 
     if rl.is_key_pressed(crate::EXIT_KEY) {

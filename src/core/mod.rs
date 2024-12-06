@@ -116,11 +116,12 @@ pub struct MainState {
     pub current_font_height : i32,
     pub default_txt_spacing : i32,
     pub default_txt_color : Color,
+    pub current_font : WeakFont,
     pub default_bg_color : Color,
 }
 
 impl MainState {
-    pub fn new(default_font_height: i32, current_font_height: i32, default_txt_spacing: i32, default_txt_color: Color, default_bg_color: Color) -> Self {
+    pub fn new(default_font_height: i32, current_font_height: i32, default_txt_spacing: i32, current_font: WeakFont, default_txt_color: Color, default_bg_color: Color) -> Self {
         Self {
             frame_counter : 0,
             showing_quit_win : false,
@@ -134,6 +135,7 @@ impl MainState {
             current_font_height : current_font_height,
             default_txt_spacing : default_txt_spacing,
             default_txt_color : default_txt_color,
+            current_font : current_font,
             default_bg_color : default_bg_color,
         }
     }
