@@ -1,8 +1,6 @@
 use crate::core::*;
 use crate::controllers::*;
 use raylib::prelude::*;
-use raylib::consts::GuiControl::DEFAULT;
-use raylib::consts::GuiDefaultProperty::{BACKGROUND_COLOR, TEXT_SPACING};
 
 // A view responsible for rendering the state
 // Tightly coupled with its respective controller
@@ -19,7 +17,7 @@ impl HomeView {
         }
     }
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &HomeController, main_state: &MainState) {
-        clear_bg_with_default(d);
+        d.clear_background(main_state.default_bg_color);
 
         // Draw the state retrieved via the Controller
         let state = controller.get_state();
@@ -61,7 +59,7 @@ impl SecondView {
         }
     }
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &SecondController, main_state: &MainState) {
-        clear_bg_with_default(d);
+        d.clear_background(main_state.default_bg_color);
 
         // Draw the state retrieved via the Controller
         let state = controller.get_state();
@@ -102,8 +100,8 @@ impl SelezioneIndiceView {
         }
     }
 
-    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, _controller: &IndiceController, _main_state: &MainState) {
-        clear_bg_with_default(d);
+    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, _controller: &IndiceController, main_state: &MainState) {
+        d.clear_background(main_state.default_bg_color);
 
         let button_niseci_width = propwidth(&d, 200);
         let button_niseci_x = d.get_screen_width() / 2 - button_niseci_width /2;
@@ -173,12 +171,12 @@ impl SelezioneFileInputView {
     }
 
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &FileInputController, main_state: &MainState) {
-        clear_bg_with_default(d);
+        d.clear_background(main_state.default_bg_color);
 
 
         let state = controller.get_state();
         let frame_counter = state.get_frame_counter();
-        draw_todo_view_text(d, frame_counter, main_state.current_font_height);
+        draw_todo_view_text(d, frame_counter, main_state.default_txt_spacing, main_state.current_font_height);
     }
 }
 
@@ -195,11 +193,11 @@ impl ValidazioneFileInputView {
     }
 
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &FileInputController, main_state: &MainState) {
-        clear_bg_with_default(d);
+        d.clear_background(main_state.default_bg_color);
 
         let state = controller.get_state();
         let frame_counter = state.get_frame_counter();
-        draw_todo_view_text(d, frame_counter, main_state.current_font_height);
+        draw_todo_view_text(d, frame_counter, main_state.default_txt_spacing, main_state.current_font_height);
     }
 }
 
@@ -216,11 +214,11 @@ impl SelezioneInfoAggiuntiveView {
     }
 
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &InfoAggiuntiveController, main_state: &MainState) {
-        clear_bg_with_default(d);
+        d.clear_background(main_state.default_bg_color);
 
         let state = controller.get_state();
         let frame_counter = state.get_frame_counter();
-        draw_todo_view_text(d, frame_counter, main_state.current_font_height);
+        draw_todo_view_text(d, frame_counter, main_state.default_txt_spacing, main_state.current_font_height);
     }
 }
 
@@ -237,11 +235,11 @@ impl ValidazioneInfoAggiuntiveView {
     }
 
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &InfoAggiuntiveController, main_state: &MainState) {
-        clear_bg_with_default(d);
+        d.clear_background(main_state.default_bg_color);
 
         let state = controller.get_state();
         let frame_counter = state.get_frame_counter();
-        draw_todo_view_text(d, frame_counter, main_state.current_font_height);
+        draw_todo_view_text(d, frame_counter, main_state.default_txt_spacing, main_state.current_font_height);
     }
 }
 
@@ -258,11 +256,11 @@ impl ProduzioneOutputView {
     }
 
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &OutputController, main_state: &MainState) {
-        clear_bg_with_default(d);
+        d.clear_background(main_state.default_bg_color);
 
         let state = controller.get_state();
         let frame_counter = state.get_frame_counter();
-        draw_todo_view_text(d, frame_counter, main_state.current_font_height);
+        draw_todo_view_text(d, frame_counter, main_state.default_txt_spacing, main_state.current_font_height);
     }
 }
 
@@ -279,16 +277,12 @@ impl ProduzionePDFView {
     }
 
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &OutputController, main_state: &MainState) {
-        clear_bg_with_default(d);
+        d.clear_background(main_state.default_bg_color);
+
         let state = controller.get_state();
         let frame_counter = state.get_frame_counter();
-        draw_todo_view_text(d, frame_counter, main_state.current_font_height);
+        draw_todo_view_text(d, frame_counter, main_state.default_txt_spacing, main_state.current_font_height);
     }
-}
-
-fn clear_bg_with_default(d: &mut RaylibDrawHandle) {
-    let bg_color_int = d.gui_get_style(DEFAULT, BACKGROUND_COLOR as i32);
-    d.clear_background(Color::get_color(bg_color_int as u32));
 }
 
 fn rainbow_color_from_framecounter(frame_counter: u32, speed: f32) -> Color {
@@ -300,7 +294,7 @@ fn rainbow_color_from_framecounter(frame_counter: u32, speed: f32) -> Color {
     return rainbow_color;
 }
 
-fn draw_todo_view_text(d: &mut RaylibDrawHandle, frame_counter: u32, current_font_height: i32) {
+fn draw_todo_view_text(d: &mut RaylibDrawHandle, frame_counter: u32, text_spacing: i32, current_font_height: i32) {
 
     let rainbow_speed = 0.03; // Smaller speed = slower cycle
     let rainbow_color = rainbow_color_from_framecounter(frame_counter, rainbow_speed);
@@ -310,6 +304,5 @@ fn draw_todo_view_text(d: &mut RaylibDrawHandle, frame_counter: u32, current_fon
     let todo_label_x = d.get_screen_width() / 2 - d.measure_text(todo_label, todo_label_font_height) / 2;
     let todo_label_y = d.get_screen_height() / 2 - propheight(&d, todo_label_font_height) / 2;
     let curr_font = d.gui_get_font();
-    let text_spacing = d.gui_get_style(DEFAULT, TEXT_SPACING as i32);
     d.draw_text_ex(curr_font, todo_label, Vector2::new(todo_label_x as f32, todo_label_y as f32), todo_label_font_height as f32, text_spacing as f32, rainbow_color);
 }

@@ -1,7 +1,6 @@
 use crate::core::*;
 use raylib::RaylibHandle;
-use raylib::consts::GuiDefaultProperty::TEXT_SIZE;
-use raylib::consts::GuiDefaultProperty::BACKGROUND_COLOR;
+use raylib::consts::GuiDefaultProperty::{BACKGROUND_COLOR, TEXT_SIZE, TEXT_SPACING};
 use raylib::consts::KeyboardKey::*;
 use raylib::consts::GuiControl::DEFAULT;
 use raylib::consts::GuiControlProperty::TEXT_COLOR_NORMAL;
@@ -64,6 +63,7 @@ pub fn update_main(rl : &mut RaylibHandle, main_state : &mut MainState) {
         }
         main_state.default_font_height = rl.gui_get_style(DEFAULT, TEXT_SIZE as i32);
         main_state.current_font_height = main_state.default_font_height;
+        main_state.default_txt_spacing = rl.gui_get_style(DEFAULT, TEXT_SPACING as i32);
         let txt_color_int = rl.gui_get_style(DEFAULT, TEXT_COLOR_NORMAL as i32);
         let bg_color_int = rl.gui_get_style(DEFAULT, BACKGROUND_COLOR as i32);
         main_state.default_txt_color = Color::get_color(txt_color_int as u32);

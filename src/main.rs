@@ -13,8 +13,7 @@ use crate::controllers::*;
 use crate::views::*;
 use raylib::prelude::*;
 use raylib::consts::GuiControl::DEFAULT;
-use raylib::consts::GuiDefaultProperty::TEXT_SIZE;
-use raylib::consts::GuiDefaultProperty::BACKGROUND_COLOR;
+use raylib::consts::GuiDefaultProperty::{BACKGROUND_COLOR, TEXT_SIZE, TEXT_SPACING};
 use raylib::consts::GuiControlProperty::TEXT_COLOR_NORMAL;
 fn main() {
     eprintln!("{PROJECT_VERSION}");
@@ -51,9 +50,11 @@ fn main() {
 
     let txt_color_int = rl.gui_get_style(DEFAULT, TEXT_COLOR_NORMAL as i32);
     let bg_color_int = rl.gui_get_style(DEFAULT, BACKGROUND_COLOR as i32);
+    let txt_spacing = rl.gui_get_style(DEFAULT, TEXT_SPACING as i32);
     let mut main_state = MainState::new(
         gui_default_font_height,
         gui_current_font_height,
+        txt_spacing,
         Color::get_color(txt_color_int as u32),
         Color::get_color(bg_color_int as u32)
     );
