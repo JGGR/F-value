@@ -197,10 +197,9 @@ pub fn draw_main(d : &mut RaylibDrawHandle, main_state : &mut MainState) {
     let current_view_banner_x = propwidth(&d, 200);
     let current_view_banner_y = propheight(&d, 25);
 
-    let current_font = d.gui_get_font();
     let text_spacing = d.gui_get_style(DEFAULT, TEXT_SPACING as i32);
     d.draw_text_ex(
-        current_font,
+        &main_state.current_font,
         &current_view_name,
         Vector2::new(current_view_banner_x as f32, current_view_banner_y as f32),
         (main_state.current_font_height) as f32,
