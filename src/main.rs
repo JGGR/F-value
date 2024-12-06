@@ -69,8 +69,8 @@ fn main() {
     rl.set_exit_key(None); // This allows capturing the exit key with a message box
     rl.set_target_fps(30);
 
-    let gui_default_font_height : i32 = rl.gui_get_style(DEFAULT, TEXT_SIZE as i32);
-    let gui_current_font_height : i32 = gui_default_font_height;
+    let gui_default_font_height: i32 = rl.gui_get_style(DEFAULT, TEXT_SIZE as i32);
+    let gui_current_font_height: i32 = gui_default_font_height;
 
     let txt_color_int = rl.gui_get_style(DEFAULT, TEXT_COLOR_NORMAL as i32);
     let bg_color_int = rl.gui_get_style(DEFAULT, BACKGROUND_COLOR as i32);

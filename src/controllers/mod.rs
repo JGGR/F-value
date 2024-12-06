@@ -11,7 +11,7 @@ impl HomeController {
         Self
     }
 
-    pub fn update(&self, _rl : &RaylibHandle) {
+    pub fn update(&self, _rl: &RaylibHandle) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.home_model.set_name("Updated".to_string());
     }
@@ -21,12 +21,12 @@ impl HomeController {
         return state.home_model.clone();
     }
 
-    pub fn _set_name(&self, name : String) {
+    pub fn _set_name(&self, name: String) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.home_model.set_name(name);
     }
 
-    pub fn set_value(&self, val : i32) {
+    pub fn set_value(&self, val: i32) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.home_model.set_value(val);
     }
@@ -39,7 +39,7 @@ impl SecondController {
         Self
     }
 
-    pub fn update(&self, _rl : &RaylibHandle) {
+    pub fn update(&self, _rl: &RaylibHandle) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.second_model.set_name("Updated".to_string());
     }
@@ -49,12 +49,12 @@ impl SecondController {
         return state.second_model.clone();
     }
 
-    pub fn _set_name(&self, name : String) {
+    pub fn _set_name(&self, name: String) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.second_model.set_name(name);
     }
 
-    pub fn set_value(&self, val : i32) {
+    pub fn set_value(&self, val: i32) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.second_model.set_value(val);
     }
@@ -67,7 +67,7 @@ impl IndiceController {
         Self
     }
 
-    pub fn update(&self, _rl : &RaylibHandle, _main_state : &mut MainState) {
+    pub fn update(&self, _rl: &RaylibHandle, _main_state: &mut MainState) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.indice_model.increment_frame_counter();
     }
@@ -80,7 +80,7 @@ impl FileInputController {
         Self
     }
 
-    pub fn update(&self, _rl : &RaylibHandle, _main_state : &mut MainState) {
+    pub fn update(&self, _rl: &RaylibHandle, _main_state: &mut MainState) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.fileinput_model.increment_frame_counter();
     }
@@ -98,7 +98,7 @@ impl InfoAggiuntiveController {
         Self
     }
 
-    pub fn update(&self, _rl : &RaylibHandle, _main_state : &mut MainState) {
+    pub fn update(&self, _rl: &RaylibHandle, _main_state: &mut MainState) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.infoaggiuntive_model.increment_frame_counter();
     }
@@ -116,7 +116,7 @@ impl OutputController {
         Self
     }
 
-    pub fn update(&self, _rl : &RaylibHandle, _main_state : &mut MainState) {
+    pub fn update(&self, _rl: &RaylibHandle, _main_state: &mut MainState) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.output_model.increment_frame_counter();
     }
@@ -134,7 +134,7 @@ impl LogController {
         Self
     }
 
-    pub fn update(&self, _rl : &RaylibHandle) {
+    pub fn update(&self, _rl: &RaylibHandle) {
         //let mut state = GLOBAL_STATE.lock().unwrap();
         //state.second_model.set_name("Updated".to_string());
     }
