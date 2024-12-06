@@ -90,31 +90,31 @@ fn main() {
         // Current view draw step
         match main_state.current_view {
             CurrentView::HOME => {
-                home_view.draw(&mut d, &thread, &home_controller, current_font_height);
+                home_view.draw(&mut d, &thread, &home_controller, &main_state, current_font_height);
             }
             CurrentView::SECOND => {
-                second_view.draw(&mut d, &thread, &second_controller, current_font_height);
+                second_view.draw(&mut d, &thread, &second_controller, &main_state, current_font_height);
             }
             CurrentView::SelezioneIndice => {
-                selezione_indice_view.draw(&mut d, &thread, &indice_controller, current_font_height);
+                selezione_indice_view.draw(&mut d, &thread, &indice_controller, &main_state, current_font_height);
             }
             CurrentView::SelezioneFileInput => {
-                selezione_fileinput_view.draw(&mut d, &thread, &fileinput_controller, current_font_height);
+                selezione_fileinput_view.draw(&mut d, &thread, &fileinput_controller, &main_state, current_font_height);
             }
             CurrentView::ValidazioneFileInput => {
-                validazione_fileinput_view.draw(&mut d, &thread, &fileinput_controller, current_font_height);
+                validazione_fileinput_view.draw(&mut d, &thread, &fileinput_controller, &main_state, current_font_height);
             }
             CurrentView::SelezioneInfoAggiuntive => {
-                selezione_infoaggiuntive_view.draw(&mut d, &thread, &infoaggiuntive_controller, current_font_height);
+                selezione_infoaggiuntive_view.draw(&mut d, &thread, &infoaggiuntive_controller, &main_state, current_font_height);
             }
             CurrentView::ValidazioneInfoAggiuntive => {
-                validazione_infoaggiuntive_view.draw(&mut d, &thread, &infoaggiuntive_controller, current_font_height);
+                validazione_infoaggiuntive_view.draw(&mut d, &thread, &infoaggiuntive_controller, &main_state, current_font_height);
             }
             CurrentView::ProduzioneOutput => {
-                produzione_output_view.draw(&mut d, &thread, &output_controller, current_font_height);
+                produzione_output_view.draw(&mut d, &thread, &output_controller, &main_state, current_font_height);
             }
             CurrentView::ProduzionePDF => {
-                produzione_pdf_view.draw(&mut d, &thread, &output_controller, current_font_height);
+                produzione_pdf_view.draw(&mut d, &thread, &output_controller, &main_state, current_font_height);
             }
         }
 

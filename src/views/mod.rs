@@ -18,14 +18,14 @@ impl HomeView {
             spinner_edit_mode : false,
         }
     }
-    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &HomeController, current_font_size : i32) {
-        d.clear_background(Color::RAYWHITE);
+    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &HomeController, main_state: &MainState, current_font_size : i32) {
+        clear_bg_with_default(d);
 
         // Draw the state retrieved via the Controller
         let state = controller.get_state();
         let state_name = state.get_name();
         let line = format!("Value: {}, Name: {}", state.get_value(), state_name);
-        d.draw_text(&line, 10, 10, current_font_size, Color::BLACK);
+        d.draw_text(&line, 10, 10, current_font_size, main_state.default_txt_color);
 
 
         let updated_spinner = d.gui_spinner(
@@ -60,14 +60,14 @@ impl SecondView {
             spinner_edit_mode : false,
         }
     }
-    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &SecondController, current_font_size : i32) {
-        d.clear_background(Color::GRAY);
+    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &SecondController, main_state: &MainState, current_font_size : i32) {
+        clear_bg_with_default(d);
 
         // Draw the state retrieved via the Controller
         let state = controller.get_state();
         let state_name = state.get_name();
         let line = format!("Value: {}, Name: {}", state.get_value(), state_name);
-        d.draw_text(&line, 10, 10, current_font_size, Color::BLACK);
+        d.draw_text(&line, 10, 10, current_font_size, main_state.default_txt_color);
 
 
         let updated_spinner = d.gui_spinner(
@@ -102,8 +102,8 @@ impl SelezioneIndiceView {
         }
     }
 
-    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &IndiceController, current_font_size : i32) {
-        d.clear_background(Color::RAYWHITE);
+    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &IndiceController, _main_state: &MainState, current_font_size : i32) {
+        clear_bg_with_default(d);
 
         let button_niseci_width = propwidth(&d, 200);
         let button_niseci_x = d.get_screen_width() / 2 - button_niseci_width /2;
@@ -172,7 +172,7 @@ impl SelezioneFileInputView {
         }
     }
 
-    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &FileInputController, current_font_size : i32) {
+    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &FileInputController, _main_state: &MainState, current_font_size : i32) {
         clear_bg_with_default(d);
 
 
@@ -194,7 +194,7 @@ impl ValidazioneFileInputView {
         }
     }
 
-    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &FileInputController, current_font_size : i32) {
+    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &FileInputController, _main_state: &MainState, current_font_size : i32) {
         clear_bg_with_default(d);
 
         let state = controller.get_state();
@@ -215,7 +215,7 @@ impl SelezioneInfoAggiuntiveView {
         }
     }
 
-    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &InfoAggiuntiveController, current_font_size : i32) {
+    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &InfoAggiuntiveController, _main_state: &MainState, current_font_size : i32) {
         clear_bg_with_default(d);
 
         let state = controller.get_state();
@@ -236,7 +236,7 @@ impl ValidazioneInfoAggiuntiveView {
         }
     }
 
-    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &InfoAggiuntiveController, current_font_size : i32) {
+    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &InfoAggiuntiveController, _main_state: &MainState, current_font_size : i32) {
         clear_bg_with_default(d);
 
         let state = controller.get_state();
@@ -257,7 +257,7 @@ impl ProduzioneOutputView {
         }
     }
 
-    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &OutputController, current_font_size : i32) {
+    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &OutputController, _main_state: &MainState, current_font_size : i32) {
         clear_bg_with_default(d);
 
         let state = controller.get_state();
@@ -278,7 +278,7 @@ impl ProduzionePDFView {
         }
     }
 
-    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &OutputController, current_font_size : i32) {
+    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &OutputController, _main_state: &MainState, current_font_size : i32) {
         clear_bg_with_default(d);
         let state = controller.get_state();
         let frame_counter = state.get_frame_counter();
