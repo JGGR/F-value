@@ -26,7 +26,7 @@ impl HomeView {
         d.draw_text_ex(
             &main_state.current_font,
             &line,
-            Vector2::new(10.0, 10.0),
+            Vector2::new(100.0, 10.0),
             main_state.current_font_height as f32,
             main_state.default_txt_spacing as f32,
             main_state.default_txt_color
@@ -34,7 +34,7 @@ impl HomeView {
 
 
         let updated_spinner = d.gui_spinner(
-            rrect(propwidth(&d, 50), propheight(&d, 50), propwidth(&d, 125), propheight(&d, 30)),
+            rrect(propwidth(&d, 100), propheight(&d, 50), propwidth(&d, 125), propheight(&d, 30)),
             None,
             &mut self.spinner_value,
             0,
@@ -75,7 +75,7 @@ impl SecondView {
         d.draw_text_ex(
             &main_state.current_font,
             &line,
-            Vector2::new(10.0, 10.0),
+            Vector2::new(100.0, 10.0),
             main_state.current_font_height as f32,
             main_state.default_txt_spacing as f32,
             main_state.default_txt_color
@@ -83,7 +83,7 @@ impl SecondView {
 
 
         let updated_spinner = d.gui_spinner(
-            rrect(propwidth(&d, 50), propheight(&d, 50), propwidth(&d, 125), propheight(&d, 30)),
+            rrect(propwidth(&d, 100), propheight(&d, 50), propwidth(&d, 125), propheight(&d, 30)),
             None,
             &mut self.spinner_value,
             0,

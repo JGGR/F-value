@@ -233,7 +233,7 @@ pub fn draw_settings_box(d: &mut RaylibDrawHandle, main_state : &mut MainState) 
 pub fn draw_main(d : &mut RaylibDrawHandle, main_state : &mut MainState) {
 
     let current_view_name = main_state.current_view.to_string();
-    let current_view_banner_x = propwidth(&d, 200);
+    let current_view_banner_x = propwidth(&d, 100);
     let current_view_banner_y = propheight(&d, 25);
 
     let text_spacing = d.gui_get_style(DEFAULT, TEXT_SPACING as i32);
@@ -247,9 +247,9 @@ pub fn draw_main(d : &mut RaylibDrawHandle, main_state : &mut MainState) {
     );
 
     let info_button_width = propwidth(&d, 50);
-    let info_button_x = propwidth(&d, 800);
+    let info_button_x = propwidth(&d, 5);
     let info_button_height = propwidth(&d, 50);
-    let info_button_y = propwidth(&d, 25);
+    let info_button_y = propheight(&d, 5);
 
     let y_spacing = propheight(&d, 5);
 
