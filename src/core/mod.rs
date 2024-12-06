@@ -13,8 +13,8 @@ pub const PROJECT_BUILD_TYPE: &'static str = env!("BUILD_TYPE");
 pub const _PROJECT_BRANCH: &'static str = env!("BRANCH_NAME");
 pub const _COMMIT_HASH: &'static str = env!("COMMIT_HASH");
 pub const COMMIT_HASH_PLUS: &'static str = env!("COMMIT_HASH_PLUS");
-pub const ESOX_SCREEN_WIDTH : i32 = 960;
-pub const ESOX_SCREEN_HEIGHT : i32 = 540;
+pub const ESOX_SCREEN_WIDTH: i32 = 960;
+pub const ESOX_SCREEN_HEIGHT: i32 = 540;
 pub const DARK_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_dark.rgs");
 pub const BLUISH_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_bluish.rgs");
 pub const CANDY_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_candy.rgs");
@@ -26,7 +26,7 @@ pub const TERMINAL_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style
 pub const ASHES_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_ashes.rgs");
 
 //TODO: add test to check if this string respects the discriminant ordering in GuiTheme
-pub const GUI_THEME_COMBOBOX_STR : &str = "Light;Dark;Bluish;Candy;Cherry;Cyber;Jungle;Lavanda;Terminal;Ashes";
+pub const GUI_THEME_COMBOBOX_STR: &str = "Light;Dark;Bluish;Candy;Cherry;Cyber;Jungle;Lavanda;Terminal;Ashes";
 
 pub enum CurrentView {
     HOME,
@@ -110,44 +110,44 @@ impl TryFrom<i32> for GuiTheme {
 }
 
 pub struct MainState {
-    pub frame_counter : u32,
-    pub showing_quit_win : bool,
-    pub should_quit : bool,
-    pub showing_info_box : bool,
-    pub showing_settings_box : bool,
-    pub current_view : CurrentView,
-    pub theme : GuiTheme,
-    pub gui_theme_combobox_active : i32,
-    pub default_font_height : i32,
-    pub current_font_height : i32,
-    pub default_txt_spacing : i32,
-    pub default_txt_color : Color,
-    pub current_font : WeakFont,
-    pub default_bg_color : Color,
+    pub frame_counter: u32,
+    pub showing_quit_win: bool,
+    pub should_quit: bool,
+    pub showing_info_box: bool,
+    pub showing_settings_box: bool,
+    pub current_view: CurrentView,
+    pub theme: GuiTheme,
+    pub gui_theme_combobox_active: i32,
+    pub default_font_height: i32,
+    pub current_font_height: i32,
+    pub default_txt_spacing: i32,
+    pub default_txt_color: Color,
+    pub current_font: WeakFont,
+    pub default_bg_color: Color,
 }
 
 impl MainState {
     pub fn new(default_font_height: i32, current_font_height: i32, default_txt_spacing: i32, current_font: WeakFont, default_txt_color: Color, default_bg_color: Color) -> Self {
         Self {
-            frame_counter : 0,
-            showing_quit_win : false,
-            should_quit : false,
-            showing_info_box : false,
-            showing_settings_box : false,
-            current_view : CurrentView::HOME,
-            theme : GuiTheme::Light,
-            gui_theme_combobox_active : GuiTheme::Light as i32,
-            default_font_height : default_font_height,
-            current_font_height : current_font_height,
-            default_txt_spacing : default_txt_spacing,
-            default_txt_color : default_txt_color,
-            current_font : current_font,
-            default_bg_color : default_bg_color,
+            frame_counter: 0,
+            showing_quit_win: false,
+            should_quit: false,
+            showing_info_box: false,
+            showing_settings_box: false,
+            current_view: CurrentView::HOME,
+            theme: GuiTheme::Light,
+            gui_theme_combobox_active: GuiTheme::Light as i32,
+            default_font_height: default_font_height,
+            current_font_height: current_font_height,
+            default_txt_spacing: default_txt_spacing,
+            default_txt_color: default_txt_color,
+            current_font: current_font,
+            default_bg_color: default_bg_color,
         }
     }
 }
 
-pub fn propwidth(d : &RaylibDrawHandle<'_>, to_scale : i32) -> i32
+pub fn propwidth(d: &RaylibDrawHandle<'_>, to_scale: i32) -> i32
 {
     if to_scale < 0 || to_scale > ESOX_SCREEN_WIDTH {
         panic!("propw():  invalid to_scale value received: {to_scale}");
@@ -156,7 +156,7 @@ pub fn propwidth(d : &RaylibDrawHandle<'_>, to_scale : i32) -> i32
     return current_screen_width * to_scale / ESOX_SCREEN_WIDTH;
 }
 
-pub fn propheight(d : &RaylibDrawHandle<'_>, to_scale : i32) -> i32
+pub fn propheight(d: &RaylibDrawHandle<'_>, to_scale: i32) -> i32
 {
     if to_scale < 0 || to_scale > ESOX_SCREEN_HEIGHT {
         panic!("proph():  invalid to_scale value received: {to_scale}");

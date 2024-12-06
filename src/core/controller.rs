@@ -10,7 +10,7 @@ use std::path::PathBuf;
 use std::ffi::CString;
 
 
-pub fn update_main(rl : &mut RaylibHandle, main_state : &mut MainState) {
+pub fn update_main(rl: &mut RaylibHandle, main_state: &mut MainState) {
     main_state.should_quit = rl.window_should_close();
 
     main_state.frame_counter += 1;

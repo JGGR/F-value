@@ -4,7 +4,7 @@ use raylib::consts::GuiIconName::*;
 use raylib::consts::GuiControl::DEFAULT;
 use raylib::consts::GuiDefaultProperty::{TEXT_SPACING, TEXT_SIZE};
 
-pub fn draw_quit_win(d: &mut RaylibDrawHandle, showing_quit_win : &mut bool, should_quit : &mut bool) {
+pub fn draw_quit_win(d: &mut RaylibDrawHandle, showing_quit_win: &mut bool, should_quit: &mut bool) {
     if *showing_quit_win {
         d.draw_rectangle(
             0,
@@ -35,7 +35,7 @@ pub fn draw_quit_win(d: &mut RaylibDrawHandle, showing_quit_win : &mut bool, sho
     }
 }
 
-pub fn draw_info_box(d: &mut RaylibDrawHandle, showing_info_box : &mut bool, font: &WeakFont, default_txt_spacing: i32, default_txt_color : Color, current_font_height : i32) {
+pub fn draw_info_box(d: &mut RaylibDrawHandle, showing_info_box: &mut bool, font: &WeakFont, default_txt_spacing: i32, default_txt_color: Color, current_font_height: i32) {
     if *showing_info_box {
         d.draw_rectangle(
             0,
@@ -119,7 +119,7 @@ pub fn draw_info_box(d: &mut RaylibDrawHandle, showing_info_box : &mut bool, fon
     }
 }
 
-pub fn draw_settings_box(d: &mut RaylibDrawHandle, main_state : &mut MainState) {
+pub fn draw_settings_box(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
     if main_state.showing_settings_box {
         d.draw_rectangle(
             0,
@@ -230,7 +230,7 @@ pub fn draw_settings_box(d: &mut RaylibDrawHandle, main_state : &mut MainState) 
     }
 }
 
-pub fn draw_main(d : &mut RaylibDrawHandle, main_state : &mut MainState) {
+pub fn draw_main(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
 
     let current_view_name = main_state.current_view.to_string();
     let current_view_banner_x = propwidth(&d, 100);

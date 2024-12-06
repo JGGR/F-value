@@ -5,15 +5,15 @@ use raylib::prelude::*;
 // A view responsible for rendering the state
 // Tightly coupled with its respective controller
 pub struct HomeView {
-    spinner_value : i32,
-    spinner_edit_mode : bool,
+    spinner_value: i32,
+    spinner_edit_mode: bool,
 }
 
 impl HomeView {
     pub fn new() -> Self {
         Self {
-            spinner_value : 0,
-            spinner_edit_mode : false,
+            spinner_value: 0,
+            spinner_edit_mode: false,
         }
     }
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &HomeController, main_state: &MainState) {
@@ -56,15 +56,15 @@ impl HomeView {
 }
 
 pub struct SecondView {
-    spinner_value : i32,
-    spinner_edit_mode : bool,
+    spinner_value: i32,
+    spinner_edit_mode: bool,
 }
 
 impl SecondView {
     pub fn new() -> Self {
         Self {
-            spinner_value : 0,
-            spinner_edit_mode : false,
+            spinner_value: 0,
+            spinner_edit_mode: false,
         }
     }
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &SecondController, main_state: &MainState) {
