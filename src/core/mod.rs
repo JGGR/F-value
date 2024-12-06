@@ -5,8 +5,14 @@ use raylib::prelude::*;
 use std::fmt;
 
 pub const EXIT_KEY: raylib::consts::KeyboardKey = raylib::consts::KeyboardKey::KEY_ESCAPE;
-pub const PROJECT_VERSION: &'static str = env!("VERSION_STRING");
+pub const PROJECT_NAME: &'static str = env!("CARGO_PKG_NAME");
+pub const PROJECT_VERSION: &'static str = env!("CARGO_PKG_VERSION");
+pub const PROJECT_VERSION_FULL: &'static str = env!("VERSION_STRING");
 pub const SHORT_PROJECT_VERSION: &'static str = env!("SHORT_VERSION_STRING");
+pub const PROJECT_BUILD_TYPE: &'static str = env!("BUILD_TYPE");
+pub const _PROJECT_BRANCH: &'static str = env!("BRANCH_NAME");
+pub const _COMMIT_HASH: &'static str = env!("COMMIT_HASH");
+pub const COMMIT_HASH_PLUS: &'static str = env!("COMMIT_HASH_PLUS");
 pub const ESOX_SCREEN_WIDTH : i32 = 960;
 pub const ESOX_SCREEN_HEIGHT : i32 = 540;
 pub const DARK_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_dark.rgs");

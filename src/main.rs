@@ -15,8 +15,32 @@ use raylib::prelude::*;
 use raylib::consts::GuiControl::DEFAULT;
 use raylib::consts::GuiDefaultProperty::{BACKGROUND_COLOR, TEXT_SIZE, TEXT_SPACING};
 use raylib::consts::GuiControlProperty::TEXT_COLOR_NORMAL;
+
+use std::env;
+
 fn main() {
-    eprintln!("{PROJECT_VERSION}");
+
+    let args: Vec<String> = env::args().collect(); // Using this panics on receiving invalid Unicode
+
+    match args.len() {
+        1 => {},
+        _ => {
+            for arg in &args[1..] {
+                match arg.as_str() {
+                    "-v" | "--version" | "-version" => {
+                        println!("{PROJECT_NAME} v{PROJECT_VERSION}-{COMMIT_HASH_PLUS} ({PROJECT_BUILD_TYPE})");
+                        return;
+                    }
+                    _ => {
+                        println!("Ignored arg: {{{arg}}}");
+                    }
+                }
+            }
+        },
+    }
+
+    eprintln!("{PROJECT_VERSION_FULL}");
+
     let home_controller = HomeController::new();
     let mut home_view = HomeView::new();
     let second_controller = SecondController::new();

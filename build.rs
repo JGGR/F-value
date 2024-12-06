@@ -69,6 +69,7 @@ fn main() {
             commit_hash_plus,
             BUILD_TYPE);
 
+    println!("cargo:rustc-env=BUILD_TYPE={}", BUILD_TYPE);
     println!("cargo:rustc-env=BRANCH_NAME={}", branch_name);
     println!("cargo:rustc-env=COMMIT_HASH={}", commit_hash);
     println!("cargo:rustc-env=COMMIT_HASH_PLUS={}", commit_hash_plus);
