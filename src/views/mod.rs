@@ -26,7 +26,9 @@ impl HomeView {
         d.draw_text_ex(
             &main_state.current_font,
             &line,
-            Vector2::new(100.0, 10.0),
+            // We use propwidth/height for the text starting position:
+            // this is not the bound
+            Vector2::new(propwidth(&d, 100) as f32, propheight(&d, 10) as f32),
             main_state.current_font_height as f32,
             main_state.default_txt_spacing as f32,
             main_state.default_txt_color
@@ -75,7 +77,9 @@ impl SecondView {
         d.draw_text_ex(
             &main_state.current_font,
             &line,
-            Vector2::new(100.0, 10.0),
+            // We use propwidth/height for the text starting position:
+            // this is not the bound
+            Vector2::new(propwidth(&d, 100) as f32, propheight(&d, 10) as f32),
             main_state.current_font_height as f32,
             main_state.default_txt_spacing as f32,
             main_state.default_txt_color
