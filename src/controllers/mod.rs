@@ -21,7 +21,7 @@ impl HomeController {
         return state.home_model.clone();
     }
 
-    pub fn set_name(&self, name : String) {
+    pub fn _set_name(&self, name : String) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.home_model.set_name(name);
     }
@@ -49,7 +49,7 @@ impl SecondController {
         return state.second_model.clone();
     }
 
-    pub fn set_name(&self, name : String) {
+    pub fn _set_name(&self, name : String) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.second_model.set_name(name);
     }
@@ -68,8 +68,8 @@ impl IndiceController {
     }
 
     pub fn update(&self, _rl : &RaylibHandle, _main_state : &mut MainState) {
-        //let mut state = GLOBAL_STATE.lock().unwrap();
-        //state.second_model.set_name("Updated".to_string());
+        let mut state = GLOBAL_STATE.lock().unwrap();
+        state.indice_model.increment_frame_counter();
     }
 }
 

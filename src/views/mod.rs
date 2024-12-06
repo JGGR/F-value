@@ -102,7 +102,7 @@ impl SelezioneIndiceView {
         }
     }
 
-    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &IndiceController, _main_state: &MainState) {
+    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, _controller: &IndiceController, _main_state: &MainState) {
         clear_bg_with_default(d);
 
         let button_niseci_width = propwidth(&d, 200);

@@ -50,15 +50,21 @@ impl SecondModel {
 // State struct holding non-`Copy` types
 #[derive(Clone)]
 pub struct IndiceModel {
-    value: i32,
-    name: String,
+    frame_counter : u32,
+}
+
+impl IndiceModel {
+    pub fn _get_frame_counter(&self) -> u32 {
+        return self.frame_counter;
+    }
+    pub fn increment_frame_counter(&mut self) {
+        self.frame_counter += 1;
+    }
 }
 
 // State struct holding non-`Copy` types
 #[derive(Clone)]
 pub struct FileInputModel {
-    value: i32,
-    name: String,
     frame_counter : u32,
 }
 
@@ -74,8 +80,6 @@ impl FileInputModel {
 // State struct holding non-`Copy` types
 #[derive(Clone)]
 pub struct InfoAggiuntiveModel {
-    value: i32,
-    name: String,
     frame_counter : u32,
 }
 
@@ -91,8 +95,6 @@ impl InfoAggiuntiveModel {
 // State struct holding non-`Copy` types
 #[derive(Clone)]
 pub struct OutputModel {
-    value: i32,
-    name: String,
     frame_counter : u32,
 }
 
@@ -127,22 +129,15 @@ impl Model {
                 name : "Initial".to_string(),
             },
             indice_model : IndiceModel {
-                value : 2,
-                name : "Initial".to_string(),
+                frame_counter : 0,
             },
             fileinput_model : FileInputModel {
-                value : 3,
-                name : "Initial".to_string(),
                 frame_counter : 0,
             },
             infoaggiuntive_model : InfoAggiuntiveModel {
-                value : 4,
-                name : "Initial".to_string(),
                 frame_counter : 0,
             },
             output_model : OutputModel {
-                value : 5,
-                name : "Initial".to_string(),
                 frame_counter : 0,
             }
         }
