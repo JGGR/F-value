@@ -80,7 +80,7 @@ pub fn draw_info_box(d: &mut RaylibDrawHandle, showing_info_box : &mut bool, def
     }
 }
 
-pub fn draw_settings_box(d: &mut RaylibDrawHandle, main_state : &mut MainState, current_font_height : &mut i32, default_font_height : i32) {
+pub fn draw_settings_box(d: &mut RaylibDrawHandle, main_state : &mut MainState) {
     if main_state.showing_settings_box {
         d.draw_rectangle(
             0,
@@ -131,7 +131,7 @@ pub fn draw_settings_box(d: &mut RaylibDrawHandle, main_state : &mut MainState, 
                 fontspinner_height
             ),
             None,
-            current_font_height,
+            &mut main_state.current_font_height,
             1,
             128,
             main_state.spinner_font_height_edit_mode,
@@ -170,7 +170,7 @@ pub fn draw_settings_box(d: &mut RaylibDrawHandle, main_state : &mut MainState, 
 
         // Reset settings button
         if d.gui_button(rrect(fontsize_label_x, fontsize_label_y + fontsize_label_height * 3, fontsize_label_width, fontsize_label_height), Some(rstr!("Reset"))) {
-            *current_font_height = default_font_height;
+            main_state.current_font_height = main_state.default_font_height;
 
             main_state.gui_theme_combobox_active = GuiTheme::Light as i32;
         }
@@ -181,7 +181,7 @@ pub fn draw_settings_box(d: &mut RaylibDrawHandle, main_state : &mut MainState, 
     }
 }
 
-pub fn draw_main(d : &mut RaylibDrawHandle, main_state : &mut MainState, current_font_height : &mut i32, default_font_height : i32) {
+pub fn draw_main(d : &mut RaylibDrawHandle, main_state : &mut MainState) {
 
     let current_view_name = main_state.current_view.to_string();
     let current_view_banner_x = propwidth(&d, 200);
@@ -193,7 +193,7 @@ pub fn draw_main(d : &mut RaylibDrawHandle, main_state : &mut MainState, current
         current_font,
         &current_view_name,
         Vector2::new(current_view_banner_x as f32, current_view_banner_y as f32),
-        (*current_font_height) as f32,
+        (main_state.current_font_height) as f32,
         text_spacing as f32,
         main_state.default_txt_color.alpha(0.8)
     );
@@ -258,7 +258,7 @@ pub fn draw_main(d : &mut RaylibDrawHandle, main_state : &mut MainState, current
         main_state.showing_settings_box = true;
     }
 
-    draw_settings_box(d, main_state, current_font_height, default_font_height);
-    draw_info_box(d, &mut main_state.showing_info_box, main_state.default_txt_color, *current_font_height);
+    draw_settings_box(d, main_state);
+    draw_info_box(d, &mut main_state.showing_info_box, main_state.default_txt_color, main_state.current_font_height);
     draw_quit_win(d, &mut main_state.showing_quit_win, &mut main_state.should_quit);
 }

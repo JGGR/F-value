@@ -46,13 +46,14 @@ fn main() {
     rl.set_exit_key(None); // This allows capturing the exit key with a message box
     rl.set_target_fps(30);
 
-    let mut default_font_height : i32 = rl.gui_get_style(DEFAULT, TEXT_SIZE as i32);
-    let mut current_font_height : i32 = default_font_height;
-
+    let gui_default_font_height : i32 = rl.gui_get_style(DEFAULT, TEXT_SIZE as i32);
+    let gui_current_font_height : i32 = gui_default_font_height;
 
     let txt_color_int = rl.gui_get_style(DEFAULT, TEXT_COLOR_NORMAL as i32);
     let bg_color_int = rl.gui_get_style(DEFAULT, BACKGROUND_COLOR as i32);
     let mut main_state = MainState::new(
+        gui_default_font_height,
+        gui_current_font_height,
         Color::get_color(txt_color_int as u32),
         Color::get_color(bg_color_int as u32)
     );
@@ -60,7 +61,7 @@ fn main() {
     while !main_state.should_quit {
 
         // Base update step
-        update_main(&mut rl, &mut main_state, &mut default_font_height, &mut current_font_height);
+        update_main(&mut rl, &mut main_state);
 
         // Current view update step
         match main_state.current_view {
@@ -90,37 +91,37 @@ fn main() {
         // Current view draw step
         match main_state.current_view {
             CurrentView::HOME => {
-                home_view.draw(&mut d, &thread, &home_controller, &main_state, current_font_height);
+                home_view.draw(&mut d, &thread, &home_controller, &main_state);
             }
             CurrentView::SECOND => {
-                second_view.draw(&mut d, &thread, &second_controller, &main_state, current_font_height);
+                second_view.draw(&mut d, &thread, &second_controller, &main_state);
             }
             CurrentView::SelezioneIndice => {
-                selezione_indice_view.draw(&mut d, &thread, &indice_controller, &main_state, current_font_height);
+                selezione_indice_view.draw(&mut d, &thread, &indice_controller, &main_state);
             }
             CurrentView::SelezioneFileInput => {
-                selezione_fileinput_view.draw(&mut d, &thread, &fileinput_controller, &main_state, current_font_height);
+                selezione_fileinput_view.draw(&mut d, &thread, &fileinput_controller, &main_state);
             }
             CurrentView::ValidazioneFileInput => {
-                validazione_fileinput_view.draw(&mut d, &thread, &fileinput_controller, &main_state, current_font_height);
+                validazione_fileinput_view.draw(&mut d, &thread, &fileinput_controller, &main_state);
             }
             CurrentView::SelezioneInfoAggiuntive => {
-                selezione_infoaggiuntive_view.draw(&mut d, &thread, &infoaggiuntive_controller, &main_state, current_font_height);
+                selezione_infoaggiuntive_view.draw(&mut d, &thread, &infoaggiuntive_controller, &main_state);
             }
             CurrentView::ValidazioneInfoAggiuntive => {
-                validazione_infoaggiuntive_view.draw(&mut d, &thread, &infoaggiuntive_controller, &main_state, current_font_height);
+                validazione_infoaggiuntive_view.draw(&mut d, &thread, &infoaggiuntive_controller, &main_state);
             }
             CurrentView::ProduzioneOutput => {
-                produzione_output_view.draw(&mut d, &thread, &output_controller, &main_state, current_font_height);
+                produzione_output_view.draw(&mut d, &thread, &output_controller, &main_state);
             }
             CurrentView::ProduzionePDF => {
-                produzione_pdf_view.draw(&mut d, &thread, &output_controller, &main_state, current_font_height);
+                produzione_pdf_view.draw(&mut d, &thread, &output_controller, &main_state);
             }
         }
 
         // Base draw step
         // Render stuff not depending on view
-        draw_main(&mut d, &mut main_state, &mut current_font_height, default_font_height);
+        draw_main(&mut d, &mut main_state);
     }
 }
 

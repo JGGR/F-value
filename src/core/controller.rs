@@ -11,7 +11,7 @@ use std::path::PathBuf;
 use std::ffi::CString;
 
 
-pub fn update_main(rl : &mut RaylibHandle, main_state : &mut MainState, default_font_size : &mut i32, current_font_size : &mut i32) {
+pub fn update_main(rl : &mut RaylibHandle, main_state : &mut MainState) {
     main_state.should_quit = rl.window_should_close();
 
     main_state.frame_counter += 1;
@@ -62,15 +62,15 @@ pub fn update_main(rl : &mut RaylibHandle, main_state : &mut MainState, default_
             }
             Err(_) => eprintln!("unknown number"),
         }
-        *default_font_size = rl.gui_get_style(DEFAULT, TEXT_SIZE as i32);
-        *current_font_size = *default_font_size;
+        main_state.default_font_height = rl.gui_get_style(DEFAULT, TEXT_SIZE as i32);
+        main_state.current_font_height = main_state.default_font_height;
         let txt_color_int = rl.gui_get_style(DEFAULT, TEXT_COLOR_NORMAL as i32);
         let bg_color_int = rl.gui_get_style(DEFAULT, BACKGROUND_COLOR as i32);
         main_state.default_txt_color = Color::get_color(txt_color_int as u32);
         main_state.default_bg_color = Color::get_color(bg_color_int as u32);
     }
 
-    rl.gui_set_style(DEFAULT, TEXT_SIZE as i32, *current_font_size); // Update font size
+    rl.gui_set_style(DEFAULT, TEXT_SIZE as i32, main_state.current_font_height); // Update font height
 
     if rl.is_key_pressed(crate::EXIT_KEY) {
         main_state.showing_quit_win = true;
