@@ -2,7 +2,7 @@ use crate::core::*;
 use std::ffi::CString;
 use raylib::consts::GuiIconName::*;
 use raylib::consts::GuiControl::DEFAULT;
-use raylib::consts::GuiDefaultProperty::TEXT_SPACING;
+use raylib::consts::GuiDefaultProperty::{TEXT_SPACING, TEXT_SIZE};
 
 pub fn draw_quit_win(d: &mut RaylibDrawHandle, showing_quit_win : &mut bool, should_quit : &mut bool) {
     if *showing_quit_win {
@@ -123,6 +123,7 @@ pub fn draw_settings_box(d: &mut RaylibDrawHandle, main_state : &mut MainState) 
         let fontspinner_y = fontsize_label_y;
         let fontspinner_width = fontsize_label_width;
         let fontspinner_height = fontsize_label_height;
+        let mut curr_font_height = main_state.current_font_height;
         if d.gui_spinner(
             rrect(
                 fontspinner_x,
@@ -131,13 +132,22 @@ pub fn draw_settings_box(d: &mut RaylibDrawHandle, main_state : &mut MainState) 
                 fontspinner_height
             ),
             None,
-            &mut main_state.current_font_height,
+            &mut curr_font_height,
             1,
             128,
-            main_state.spinner_font_height_edit_mode,
+            false,
         ) {
-            main_state.spinner_font_height_edit_mode = !main_state.spinner_font_height_edit_mode;
+            println!("HI");
+            //main_state.spinner_font_height_edit_mode = !main_state.spinner_font_height_edit_mode;
         }
+
+        if curr_font_height != main_state.current_font_height {
+            //Detecting this and acting here is better than doing so in
+            //update_main() since we can avoid a hot call on gui_set_style()
+            main_state.current_font_height = curr_font_height;
+            d.gui_set_style(DEFAULT, TEXT_SIZE as i32, main_state.current_font_height);
+        }
+
         let gui_theme_label_width = fontsize_label_width;
         let gui_theme_label_x = fontsize_label_x;
         let gui_theme_label_height = fontsize_label_height;

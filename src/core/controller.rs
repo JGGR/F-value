@@ -70,11 +70,6 @@ pub fn update_main(rl : &mut RaylibHandle, main_state : &mut MainState) {
         main_state.default_bg_color = Color::get_color(bg_color_int as u32);
     }
 
-    // Update font height
-    // NOTE: Doing this on every update is wasteful and should be avoided if possible
-    // For now it seems needed
-    rl.gui_set_style(DEFAULT, TEXT_SIZE as i32, main_state.current_font_height);
-
     if rl.is_key_pressed(crate::EXIT_KEY) {
         main_state.showing_quit_win = true;
     }
