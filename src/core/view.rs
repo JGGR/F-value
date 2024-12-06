@@ -35,7 +35,7 @@ pub fn draw_quit_win(d: &mut RaylibDrawHandle, showing_quit_win : &mut bool, sho
     }
 }
 
-pub fn draw_info_box(d: &mut RaylibDrawHandle, showing_info_box : &mut bool, default_txt_color : Color, current_font_height : i32) {
+pub fn draw_info_box(d: &mut RaylibDrawHandle, showing_info_box : &mut bool, font: &WeakFont, default_txt_spacing: i32, default_txt_color : Color, current_font_height : i32) {
     if *showing_info_box {
         d.draw_rectangle(
             0,
@@ -50,11 +50,11 @@ pub fn draw_info_box(d: &mut RaylibDrawHandle, showing_info_box : &mut bool, def
         let proj_info_str = format!("Version: {SHORT_PROJECT_VERSION}");
         let proj_info_font_height = current_font_height; // propheight(&d, 11);
                                         // We should not scale the text height.
-        let proj_info_txt_width = d.measure_text(&proj_info_str, proj_info_font_height);
+        let proj_info_txt_bounds = font.measure_text(&proj_info_str, proj_info_font_height as f32, default_txt_spacing as f32);
 
-        let infobox_height = propheight(&d, 100);
+        let infobox_height = propheight(&d, 100) + proj_info_txt_bounds.y as i32;
         let infobox_y = d.get_screen_height() / 2 - infobox_height / 2;
-        let infobox_width = propwidth(&d, 50) + proj_info_txt_width;
+        let infobox_width = propwidth(&d, 50) + proj_info_txt_bounds.x as i32;
         let infobox_x = d.get_screen_width() / 2 - infobox_width / 2;
         let result = d.gui_window_box(
             rrect(
@@ -66,11 +66,15 @@ pub fn draw_info_box(d: &mut RaylibDrawHandle, showing_info_box : &mut bool, def
             Some(itext.as_c_str()),
         );
 
-        d.draw_text(
+        d.draw_text_ex(
+            font,
             &proj_info_str,
-            d.get_screen_width() / 2 - proj_info_txt_width / 2,
-            infobox_y + infobox_height / 2 - proj_info_font_height / 2,
-            proj_info_font_height,
+            Vector2::new(
+                (d.get_screen_width() / 2 - proj_info_txt_bounds.x as i32 / 2) as f32,
+                (infobox_y + infobox_height / 2 - proj_info_font_height / 2) as f32
+            ),
+            proj_info_font_height as f32,
+            default_txt_spacing as f32,
             default_txt_color
         );
 
@@ -268,6 +272,6 @@ pub fn draw_main(d : &mut RaylibDrawHandle, main_state : &mut MainState) {
     }
 
     draw_settings_box(d, main_state);
-    draw_info_box(d, &mut main_state.showing_info_box, main_state.default_txt_color, main_state.current_font_height);
+    draw_info_box(d, &mut main_state.showing_info_box, &main_state.current_font, main_state.default_txt_spacing, main_state.default_txt_color, main_state.current_font_height);
     draw_quit_win(d, &mut main_state.showing_quit_win, &mut main_state.should_quit);
 }
