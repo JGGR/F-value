@@ -181,7 +181,7 @@ pub fn draw_settings_box(d: &mut RaylibDrawHandle, main_state : &mut MainState) 
         // Reset settings button
         if d.gui_button(rrect(fontsize_label_x, fontsize_label_y + fontsize_label_height * 3, fontsize_label_width, fontsize_label_height), Some(rstr!("Reset"))) {
             main_state.current_font_height = main_state.default_font_height;
-
+            d.gui_set_style(DEFAULT, TEXT_SIZE as i32, main_state.current_font_height);
             main_state.gui_theme_combobox_active = GuiTheme::Light as i32;
         }
 
