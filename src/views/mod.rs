@@ -317,9 +317,10 @@ fn draw_todo_view_text(d: &mut RaylibDrawHandle, frame_counter: u32, font: &Weak
     let rainbow_speed = 0.03; // Smaller speed = slower cycle
     let rainbow_color = rainbow_color_from_framecounter(frame_counter, rainbow_speed);
 
-    let todo_label = "TODO: Implement this View";
-    let todo_label_font_height = current_font_height *2;
-    let todo_label_x = d.get_screen_width() / 2 - d.measure_text(todo_label, todo_label_font_height) / 2;
-    let todo_label_y = d.get_screen_height() / 2 - propheight(&d, todo_label_font_height) / 2;
-    d.draw_text_ex(font, todo_label, Vector2::new(todo_label_x as f32, todo_label_y as f32), todo_label_font_height as f32, text_spacing as f32, rainbow_color);
+    let todo_txt = "TODO: Implement this View";
+    let todo_txt_font_height = current_font_height *2;
+    let todo_txt_bounds = font.measure_text(&todo_txt, todo_txt_font_height as f32, text_spacing as f32);
+    let todo_txt_x = d.get_screen_width() / 2 - todo_txt_bounds.x as i32 / 2;
+    let todo_txt_y = d.get_screen_height() / 2 - todo_txt_bounds.y as i32 / 2;
+    d.draw_text_ex(font, todo_txt, Vector2::new(todo_txt_x as f32, todo_txt_y as f32), todo_txt_font_height as f32, text_spacing as f32, rainbow_color);
 }
