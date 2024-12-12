@@ -44,11 +44,17 @@ fn main() {
                         return;
                     }
                     "--info" => {
+                        println!("Info: {{");
+                        println!("  Versione: {PROJECT_VERSION}");
+                        println!("  Build: {PROJECT_BUILD_TYPE}");
+                        println!("  Branch: {PROJECT_BRANCH}");
+                        println!("  Commit: {COMMIT_HASH_PLUS}");
+                        println!("}}");
                         println!("Header riferimento NISECI: {{");
-                        println!("{RIFERIMENTO_NISECI_HEADER}");
+                        println!("  {RIFERIMENTO_NISECI_HEADER}");
                         println!("}}");
                         println!("Header campionamento NISECI: {{");
-                        println!("{CAMPIONAMENTO_NISECI_HEADER}");
+                        println!("  {CAMPIONAMENTO_NISECI_HEADER}");
                         println!("}}");
                         return;
                     }
