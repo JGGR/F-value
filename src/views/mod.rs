@@ -417,12 +417,13 @@ impl SelezioneInfoAggiuntiveView {
         let column_2_y = column_1_y;
         // 1 padding on top, 2 below
         let column_1_height = groupbox_height - y_padding*3;
-        let column_2_height = column_1_height;
+        // 1 padding on top, 1 below
+        let column_2_height = groupbox_height - y_padding*2;
 
         // Column 1
 
         let column_1_labels_width = column_width / 2;
-        let column_1_fields_y_spacing = y_padding / 10;
+        let column_1_fields_y_spacing = y_padding / 3;
         let column_1_big_y_spacing = y_padding;
         let column_1_labels_count = 7;
         let column_1_labels_x = column_1_x;
@@ -606,32 +607,49 @@ impl SelezioneInfoAggiuntiveView {
         // Column 2
 
         // spacing between the two groupboxes
-        let column_2_groupbox_y_padding = y_padding;
-        let column_2_groupbox_1_width = column_width;
-        let column_2_groupbox_1_x = column_2_x;
-        let column_2_groupbox_1_y = column_2_y;
-        let column_2_groupbox_1_height = column_2_height - column_2_groupbox_y_padding - y_padding*4;
-        let column_2_groupbox_2_width = column_2_groupbox_1_width;
-        let column_2_groupbox_2_x = column_2_groupbox_1_x;
-        let column_2_groupbox_2_y = column_2_groupbox_1_y + column_2_groupbox_1_height + column_2_groupbox_y_padding;
-        let column_2_groupbox_2_height = column_2_height - column_2_groupbox_1_height;
+        let column_2_groupbox_y_padding = y_padding/2;
+        let column_2_groupbox_niseci_width = column_width;
+        let column_2_groupbox_niseci_x = column_2_x;
+        let column_2_groupbox_niseci_y = column_2_y;
+        let column_2_groupbox_niseci_height = column_2_height - column_2_groupbox_y_padding - y_padding*4;
+        let column_2_groupbox_hfbi_width = column_2_groupbox_niseci_width;
+        let column_2_groupbox_hfbi_x = column_2_groupbox_niseci_x;
+        let column_2_groupbox_hfbi_y = column_2_groupbox_niseci_y + column_2_groupbox_niseci_height + column_2_groupbox_y_padding;
+        let column_2_groupbox_hfbi_height = column_2_height - column_2_groupbox_niseci_height;
+
+        let column_2_comunit_x_padding = x_padding/4;
+        let column_2_comunit_y_padding = column_2_groupbox_y_padding;
+        let column_2_groupbox_comunit_x = column_2_groupbox_niseci_x + column_2_comunit_x_padding;
+        let column_2_groupbox_comunit_y = column_2_groupbox_niseci_y + column_2_comunit_y_padding;
+        let column_2_groupbox_comunit_width = column_2_groupbox_niseci_width - column_2_comunit_x_padding*2;
+        let column_2_groupbox_comunit_height = column_1_labels_height*3 + column_1_fields_y_spacing*4;
 
         d.gui_group_box(
             rrect(
-                column_2_groupbox_1_x,
-                column_2_groupbox_1_y,
-                column_2_groupbox_1_width,
-                column_2_groupbox_1_height
+                column_2_groupbox_niseci_x,
+                column_2_groupbox_niseci_y,
+                column_2_groupbox_niseci_width,
+                column_2_groupbox_niseci_height
             ),
             Some(rstr!("NISECI"))
         );
 
         d.gui_group_box(
             rrect(
-                column_2_groupbox_2_x,
-                column_2_groupbox_2_y,
-                column_2_groupbox_2_width,
-                column_2_groupbox_2_height
+                column_2_groupbox_comunit_x,
+                column_2_groupbox_comunit_y,
+                column_2_groupbox_comunit_width,
+                column_2_groupbox_comunit_height
+            ),
+            Some(rstr!("Comunità NISECI"))
+        );
+
+        d.gui_group_box(
+            rrect(
+                column_2_groupbox_hfbi_x,
+                column_2_groupbox_hfbi_y,
+                column_2_groupbox_hfbi_width,
+                column_2_groupbox_hfbi_height
             ),
             Some(rstr!("HFBI"))
         );
@@ -641,13 +659,13 @@ impl SelezioneInfoAggiuntiveView {
         let todo_txt_font_height = main_state.current_font_height;
 
         let todo_niseci_txt = "TODO: Implement NISECI controls";
-        let todo_niseci_txt_x = column_2_groupbox_1_x + propwidth(&d, 10);
-        let todo_niseci_txt_y = column_2_groupbox_1_y + propheight(&d, 10);
+        let todo_niseci_txt_x = column_2_groupbox_niseci_x + propwidth(&d, 10);
+        let todo_niseci_txt_y = column_2_groupbox_niseci_y + propheight(&d, 30);
         d.draw_text_ex(&main_state.current_font, todo_niseci_txt, Vector2::new(todo_niseci_txt_x as f32, todo_niseci_txt_y as f32), todo_txt_font_height as f32, main_state.default_txt_spacing as f32, rainbow_color);
 
         let todo_hfbi_txt = "TODO: Implement HFBI controls";
-        let todo_hfbi_txt_x = column_2_groupbox_2_x + propwidth(&d, 10);
-        let todo_hfbi_txt_y = column_2_groupbox_2_y + propheight(&d, 10);
+        let todo_hfbi_txt_x = column_2_groupbox_hfbi_x + propwidth(&d, 10);
+        let todo_hfbi_txt_y = column_2_groupbox_hfbi_y + propheight(&d, 10);
         d.draw_text_ex(&main_state.current_font, todo_hfbi_txt, Vector2::new(todo_hfbi_txt_x as f32, todo_hfbi_txt_y as f32), todo_txt_font_height as f32, main_state.default_txt_spacing as f32, rainbow_color);
 
     }
