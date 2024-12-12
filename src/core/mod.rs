@@ -1,8 +1,10 @@
 pub mod view;
 pub mod controller;
+pub mod cli;
 
 use raylib::prelude::*;
 use std::fmt;
+use std::path::PathBuf;
 
 pub const EXIT_KEY: raylib::consts::KeyboardKey = raylib::consts::KeyboardKey::KEY_ESCAPE;
 pub const PROJECT_NAME: &'static str = env!("CARGO_PKG_NAME");
@@ -24,6 +26,15 @@ pub const JUNGLE_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_j
 pub const LAVANDA_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_lavanda.rgs");
 pub const TERMINAL_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_terminal.rgs");
 pub const ASHES_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_ashes.rgs");
+
+#[cfg(all(windows, debug_assertions))]
+pub const SUPPORT_HEADLESS: bool = true;
+
+#[cfg(all(windows, not(debug_assertions)))]
+pub const SUPPORT_HEADLESS: bool = false; // This is due to windows_subsystem being "windows"
+
+#[cfg(not(windows))]
+pub const SUPPORT_HEADLESS: bool = true;
 
 //TODO: add test to check if this string respects the discriminant ordering in GuiTheme
 pub const GUI_THEME_COMBOBOX_STR: &str = "Light;Dark;Bluish;Candy;Cherry;Cyber;Jungle;Lavanda;Terminal;Ashes";
@@ -163,4 +174,18 @@ pub fn propheight(d: &RaylibDrawHandle<'_>, to_scale: i32) -> i32
     }
     let current_screen_height = d.get_screen_height();
     return current_screen_height * to_scale / ESOX_SCREEN_HEIGHT;
+}
+
+pub fn check_campionamento_niseci_path(_path: PathBuf) -> bool {
+    println!("TODO: implement check campionamento NISECI");
+    return false;
+}
+
+pub fn check_riferimento_niseci_path(_path: PathBuf) -> bool {
+    println!("TODO: implement check riferimento NISECI");
+    return false;
+}
+
+pub fn check_campionamento_hfbi_path(_path: PathBuf) -> bool {
+    todo!("Implement check campionamento HFBI");
 }

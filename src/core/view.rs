@@ -44,28 +44,31 @@ pub fn draw_info_box(d: &mut RaylibDrawHandle, showing_info_box: &mut bool, font
             d.get_screen_height(),
             Color::RAYWHITE.alpha(0.8),
         );
+
+        let bar_height = 23; // Height of the "x" bar
+
         let itext = d.gui_icon_text(ICON_INFO, Some(rstr!("Program Info")));
         let itext = CString::new(itext).unwrap();
 
-        let proj_info_str = format!("Version: {SHORT_PROJECT_VERSION}");
+        let proj_info_str = format!("esox {SHORT_PROJECT_VERSION}");
         let proj_info_txt_bounds = font.measure_text(&proj_info_str, current_font_height as f32, default_txt_spacing as f32);
-        let proj_info_str_y = d.get_screen_height() / 2 - current_font_height / 2;
+        //let proj_info_str_y = propheight(&d, 100) - current_font_height / 2;
 
         // No multiline text.
-        let proj_name_str1 = format!("esox - Strumento per il calcolo");
+        let proj_name_str1 = format!("Strumento per il calcolo");
         let proj_name_str2 = format!("NISECI e HFBI");
 
         let proj_name_str1_txt_bounds = font.measure_text(&proj_name_str1, current_font_height as f32, default_txt_spacing as f32);
         let proj_name_str2_txt_bounds = font.measure_text(&proj_name_str2, current_font_height as f32, default_txt_spacing as f32);
 
-        let proj_name_str1_y = proj_info_str_y + (proj_info_txt_bounds.y as i32 * 2);
-        let proj_name_str2_y = proj_name_str1_y + proj_name_str1_txt_bounds.y as i32;
+        //let proj_name_str1_y = proj_info_str_y + (proj_info_txt_bounds.y as i32 * 2);
+        //let proj_name_str2_y = proj_name_str1_y + proj_name_str1_txt_bounds.y as i32;
 
         let widest_line = std::cmp::max(proj_info_txt_bounds.x as i32, std::cmp::max(proj_name_str1_txt_bounds.x as i32, proj_name_str2_txt_bounds.x as i32));
 
-        let infobox_height = propheight(&d, 100) + proj_info_txt_bounds.y as i32 + proj_name_str1_txt_bounds.y as i32 + proj_name_str2_txt_bounds.y as i32;
+        let infobox_height = propheight(&d, 200) + proj_info_txt_bounds.y as i32 + proj_name_str1_txt_bounds.y as i32 + proj_name_str2_txt_bounds.y as i32;
         let infobox_y = d.get_screen_height() / 2 - infobox_height / 2;
-        let infobox_width = propwidth(&d, 50) + widest_line as i32;
+        let infobox_width = propwidth(&d, 100) + widest_line as i32;
         let infobox_x = d.get_screen_width() / 2 - infobox_width / 2;
         let result = d.gui_window_box(
             rrect(
@@ -77,11 +80,20 @@ pub fn draw_info_box(d: &mut RaylibDrawHandle, showing_info_box: &mut bool, font
             Some(itext.as_c_str()),
         );
 
+        let text_y_spacing = propheight(&d, 15);
+        let text_x_spacing = propwidth(&d, 70);
+        let proj_info_str_y = infobox_y + bar_height + text_y_spacing;
+        let proj_info_str_x = infobox_x + text_x_spacing;
+        let proj_name_str1_y = proj_info_str_y + (proj_info_txt_bounds.y as i32 * 2);
+        let proj_name_str1_x = proj_info_str_x;
+        let proj_name_str2_y = proj_name_str1_y + proj_name_str1_txt_bounds.y as i32;
+        let proj_name_str2_x = proj_name_str1_x;
+
         d.draw_text_ex(
             font,
             &proj_info_str,
             Vector2::new(
-                (d.get_screen_width() / 2 - proj_info_txt_bounds.x as i32 / 2) as f32,
+                proj_info_str_x as f32,
                 proj_info_str_y as f32,
             ),
             current_font_height as f32,
@@ -93,7 +105,7 @@ pub fn draw_info_box(d: &mut RaylibDrawHandle, showing_info_box: &mut bool, font
             font,
             &proj_name_str1,
             Vector2::new(
-                (d.get_screen_width() / 2 - proj_name_str1_txt_bounds.x as i32 / 2) as f32,
+                proj_name_str1_x as f32,
                 proj_name_str1_y as f32,
             ),
             current_font_height as f32,
@@ -105,13 +117,74 @@ pub fn draw_info_box(d: &mut RaylibDrawHandle, showing_info_box: &mut bool, font
             font,
             &proj_name_str2,
             Vector2::new(
-                (d.get_screen_width() / 2 - proj_name_str2_txt_bounds.x as i32 / 2) as f32,
+                proj_name_str2_x as f32,
                 proj_name_str2_y as f32,
             ),
             current_font_height as f32,
             default_txt_spacing as f32,
             default_txt_color
         );
+
+        let display_link = "Example: esox-website.it";
+        let actual_link = "https://duckduckgo.com/?t=h_&q=esox+lucius";
+        let link_str = CString::new(display_link).unwrap();
+        let link_x = proj_name_str2_x;
+        let link_y = proj_name_str2_y + proj_name_str2_txt_bounds.y as i32 + text_y_spacing*3;
+        let link_width = infobox_width - text_x_spacing;
+        let link_height = propheight(&d, 25);
+
+        d.gui_label(
+            rrect(
+                infobox_x + propwidth(&d, 10),
+                link_y,
+                text_x_spacing,
+                link_height
+            ),
+            Some(rstr!("Info:"))
+        );
+
+        if d.gui_label_button(
+            rrect(
+                link_x,
+                link_y,
+                link_width,
+                link_height
+            ),
+            Some(link_str.as_c_str())
+        ) {
+            raylib::core::misc::open_url(actual_link);
+        }
+
+        let support_email = "mario@rossi.it";
+        let mail_display_link = "Example: ".to_owned() + support_email;
+        let mail_actual_link = "mailto:".to_owned() + support_email;
+        let mail_link_str = CString::new(mail_display_link).unwrap();
+        let mail_link_x = link_x;
+        let mail_link_y = link_y + link_height;
+        let mail_link_width = link_width;
+        let mail_link_height = link_height;
+
+        d.gui_label(
+            rrect(
+                infobox_x + propwidth(&d, 10),
+                mail_link_y,
+                text_x_spacing,
+                mail_link_height
+            ),
+            Some(rstr!("Support:"))
+        );
+
+        if d.gui_label_button(
+            rrect(
+                mail_link_x,
+                mail_link_y,
+                mail_link_width,
+                mail_link_height
+            ),
+            Some(mail_link_str.as_c_str())
+        ) {
+            raylib::core::misc::open_url(&mail_actual_link);
+        }
 
         if result == true {
             *showing_info_box = false;
