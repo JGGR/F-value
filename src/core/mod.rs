@@ -292,7 +292,7 @@ pub fn parse_csv_riferimento_niseci<R>(mut rdr: csv::Reader<R>) -> (Vec<RecordCs
     (records, errors)
 }
 
-pub fn check_campionamento_niseci_path(path: PathBuf) -> bool {
+pub fn check_campionamento_niseci_path(path: PathBuf) -> Result<Vec<RecordCsvCampionamentoNISECI>,Vec<csv::Error>> {
     let rdr = csv::ReaderBuilder::new()
         .delimiter(b';')
         .from_path(path);
@@ -305,26 +305,26 @@ pub fn check_campionamento_niseci_path(path: PathBuf) -> bool {
 
             if !errors.is_empty() {
                 eprintln!("Errors encountered during processing of campionamento NISECI:");
-                for error in errors {
+                for error in &errors {
                     eprintln!("  {}", error);
                 }
-                return false;
+                return Err(errors);
             } else {
                 println!("All records processed successfully for campionamento NISECI!");
-                for record in records {
+                for record in &records {
                     println!("  Record: {{{record}}}");
                 }
-                return true;
+                return Ok(records);
             }
         }
         Err(e) => {
             eprintln!("Error while opening csv reader: {e}");
-            return false;
+            return Err(Vec::new());
         }
     }
 }
 
-pub fn check_riferimento_niseci_path(path: PathBuf) -> bool {
+pub fn check_riferimento_niseci_path(path: PathBuf) -> Result<Vec<RecordCsvRiferimentoNISECI>,Vec<csv::Error>> {
 
     let rdr = csv::ReaderBuilder::new()
         .delimiter(b';')
@@ -338,21 +338,21 @@ pub fn check_riferimento_niseci_path(path: PathBuf) -> bool {
 
             if !errors.is_empty() {
                 eprintln!("Errors encountered during processing of riferimento NISECI:");
-                for error in errors {
+                for error in &errors {
                     eprintln!("  {}", error);
                 }
-                return false;
+                return Err(errors);
             } else {
                 println!("All records processed successfully for riferimento NISECI!");
-                for record in records {
+                for record in &records {
                     println!("  Record: {{{record}}}");
                 }
-                return true;
+                return Ok(records);
             }
         }
         Err(e) => {
             eprintln!("Error while opening csv reader: {e}");
-            return false;
+            return Err(Vec::new());
         }
     }
 }
