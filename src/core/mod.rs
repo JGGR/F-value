@@ -316,7 +316,7 @@ pub fn translate_error_message(msg: &str) -> String {
     } else if msg.contains("invalid float literal") {
         msg.replace("invalid float literal", "tipo non valido: atteso razionale").replace("field", "campo")
     } else if msg.contains("cannot parse") && msg.contains("from empty string") {
-        msg.replace("cannot parse", "campo vuoto: atteso").replace("float","razionale").replace("string","stringa")
+        msg.replace("cannot parse", "campo vuoto: atteso").replace("float","razionale").replace("integer","intero").replace("from empty string","- trovato: stringa vuota")
     } else {
         msg.to_string() // Default to original message if no match
     }
