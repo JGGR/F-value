@@ -345,6 +345,14 @@ pub struct SelezioneInfoAggiuntiveView {
     valuebox_lunghezza_stazione_value: i32,
     valuebox_larghezza_stazione_edit_mode: bool,
     valuebox_larghezza_stazione_value: i32,
+    dropdownbox_tipocomunit_niseci_edit_mode: bool,
+    dropdownbox_tipocomunit_niseci_value: i32,
+    textbox_fontecomunit_niseci_edit_mode: bool,
+    textbox_fontecomunit_niseci_buffer: [u8; 64],
+    textbox_protocollocomunit_niseci_edit_mode: bool,
+    textbox_protocollocomunit_niseci_buffer: [u8; 64],
+    textbox_bacino_niseci_edit_mode: bool,
+    textbox_bacino_niseci_buffer: [u8; 64],
 }
 
 impl SelezioneInfoAggiuntiveView {
@@ -368,6 +376,22 @@ impl SelezioneInfoAggiuntiveView {
         let data_buffer_bytes = "Inserisci data".as_bytes();
         let data_buffer_len = data_buffer_bytes.len().min(64);
         data_buffer[..data_buffer_len].copy_from_slice(&data_buffer_bytes[..data_buffer_len]);
+
+        let mut fonte_comunit_buffer = [0u8; 64];
+        let fonte_comunit_buffer_bytes = "Inserisci fonte".as_bytes();
+        let fonte_comunit_buffer_len = fonte_comunit_buffer_bytes.len().min(64);
+        fonte_comunit_buffer[..fonte_comunit_buffer_len].copy_from_slice(&fonte_comunit_buffer_bytes[..fonte_comunit_buffer_len]);
+
+        let mut protocollo_comunit_buffer = [0u8; 64];
+        let protocollo_comunit_buffer_bytes = "Inserisci protocollo".as_bytes();
+        let protocollo_comunit_buffer_len = protocollo_comunit_buffer_bytes.len().min(64);
+        protocollo_comunit_buffer[..protocollo_comunit_buffer_len].copy_from_slice(&protocollo_comunit_buffer_bytes[..protocollo_comunit_buffer_len]);
+
+        let mut bacino_buffer = [0u8; 64];
+        let bacino_buffer_bytes = "Inserisci bacino".as_bytes();
+        let bacino_buffer_len = bacino_buffer_bytes.len().min(64);
+        bacino_buffer[..bacino_buffer_len].copy_from_slice(&bacino_buffer_bytes[..bacino_buffer_len]);
+
         Self {
             valuebox_codice_stazione_edit_mode: false,
             valuebox_codice_stazione_value: 0,
@@ -383,6 +407,14 @@ impl SelezioneInfoAggiuntiveView {
             valuebox_lunghezza_stazione_value: 0,
             valuebox_larghezza_stazione_edit_mode: false,
             valuebox_larghezza_stazione_value: 0,
+            dropdownbox_tipocomunit_niseci_edit_mode: false,
+            dropdownbox_tipocomunit_niseci_value: 0,
+            textbox_fontecomunit_niseci_edit_mode: false,
+            textbox_fontecomunit_niseci_buffer: fonte_comunit_buffer,
+            textbox_protocollocomunit_niseci_edit_mode: false,
+            textbox_protocollocomunit_niseci_buffer: protocollo_comunit_buffer,
+            textbox_bacino_niseci_edit_mode: false,
+            textbox_bacino_niseci_buffer: bacino_buffer,
         }
     }
 
@@ -393,7 +425,7 @@ impl SelezioneInfoAggiuntiveView {
         let frame_counter = state.get_frame_counter();
         let groupbox_width = propwidth(&d, 600);
         let groupbox_x = d.get_screen_width() /2 - groupbox_width /2;
-        let groupbox_height = propheight(&d, 400);
+        let groupbox_height = propheight(&d, 450);
         let groupbox_y = d.get_screen_height() / 2 - groupbox_height /2;
 
         d.gui_group_box(
@@ -424,7 +456,7 @@ impl SelezioneInfoAggiuntiveView {
 
         let column_1_labels_width = column_width / 2;
         let column_1_fields_y_spacing = y_padding / 3;
-        let column_1_big_y_spacing = y_padding;
+        let column_1_big_y_spacing = y_padding*2;
         let column_1_labels_count = 7;
         let column_1_labels_x = column_1_x;
         let column_1_labels_height = (column_1_height - (column_1_fields_y_spacing*5) - column_1_big_y_spacing) / column_1_labels_count;
@@ -654,14 +686,117 @@ impl SelezioneInfoAggiuntiveView {
             Some(rstr!("HFBI"))
         );
 
+        let column_2_groupbox_labels_x_spacing = column_2_comunit_x_padding;
+        let column_2_groupbox_labels_width = (column_2_groupbox_comunit_width - column_2_groupbox_labels_x_spacing*2) / 2;
+        let column_2_groupbox_fields_y_spacing = column_1_fields_y_spacing;
+        let column_2_groupbox_labels_x = column_2_groupbox_comunit_x + column_2_groupbox_labels_x_spacing;
+        let column_2_labels_height = column_1_labels_height;
+
+        let column_2_label_tipo_comunit_y = column_2_groupbox_comunit_y + column_2_groupbox_fields_y_spacing;
+        let column_2_label_fonte_comunit_y = column_2_label_tipo_comunit_y + column_2_labels_height + column_2_groupbox_fields_y_spacing;
+        let column_2_label_protocollo_comunit_y = column_2_label_fonte_comunit_y + column_2_labels_height + column_2_groupbox_fields_y_spacing;
+        let column_2_label_bacino_y = column_2_groupbox_comunit_y + column_2_groupbox_comunit_height + column_2_groupbox_fields_y_spacing*2;
+
+        d.gui_label(
+            rrect(
+                column_2_groupbox_labels_x,
+                column_2_label_tipo_comunit_y,
+                column_2_groupbox_labels_width,
+                column_2_labels_height
+            ),
+            Some(rstr!("Tipo"))
+        );
+
+        d.gui_label(
+            rrect(
+                column_2_groupbox_labels_x,
+                column_2_label_fonte_comunit_y,
+                column_2_groupbox_labels_width,
+                column_2_labels_height
+            ),
+            Some(rstr!("Fonte"))
+        );
+
+        d.gui_label(
+            rrect(
+                column_2_groupbox_labels_x,
+                column_2_label_protocollo_comunit_y,
+                column_2_groupbox_labels_width,
+                column_2_labels_height
+            ),
+            Some(rstr!("Protocollo"))
+        );
+
+        d.gui_label(
+            rrect(
+                column_2_groupbox_labels_x,
+                column_2_label_bacino_y,
+                column_2_groupbox_labels_width,
+                column_2_labels_height
+            ),
+            Some(rstr!("Bacino"))
+        );
+
+        let column_2_groupbox_boxes_width = column_2_groupbox_labels_width;
+        let column_2_groupbox_boxes_height = column_2_labels_height;
+        let column_2_groupbox_boxes_x = column_2_groupbox_labels_x + column_2_groupbox_labels_width;
+
+        if d.gui_dropdown_box(
+            rrect(
+                column_2_groupbox_boxes_x,
+                column_2_label_tipo_comunit_y,
+                column_2_groupbox_boxes_width,
+                column_2_groupbox_boxes_height,
+            ),
+            Some(rstr!("Redatta;Fonti;DM260/2010;Mase")),
+            &mut self.dropdownbox_tipocomunit_niseci_value,
+            self.dropdownbox_tipocomunit_niseci_edit_mode,
+        ) {
+            self.dropdownbox_tipocomunit_niseci_edit_mode = !self.dropdownbox_tipocomunit_niseci_edit_mode;
+        }
+
+        if d.gui_text_box(
+            rrect(
+                column_2_groupbox_boxes_x,
+                column_2_label_fonte_comunit_y,
+                column_2_groupbox_boxes_width,
+                column_2_groupbox_boxes_height
+            ),
+            &mut self.textbox_fontecomunit_niseci_buffer,
+            self.textbox_fontecomunit_niseci_edit_mode
+        ) {
+            self.textbox_fontecomunit_niseci_edit_mode = !self.textbox_fontecomunit_niseci_edit_mode;
+        }
+
+        if d.gui_text_box(
+            rrect(
+                column_2_groupbox_boxes_x,
+                column_2_label_protocollo_comunit_y,
+                column_2_groupbox_boxes_width,
+                column_2_groupbox_boxes_height
+            ),
+            &mut self.textbox_protocollocomunit_niseci_buffer,
+            self.textbox_protocollocomunit_niseci_edit_mode
+        ) {
+            self.textbox_protocollocomunit_niseci_edit_mode = !self.textbox_protocollocomunit_niseci_edit_mode;
+        }
+
+        if d.gui_text_box(
+            rrect(
+                column_2_groupbox_boxes_x,
+                column_2_label_bacino_y,
+                column_2_groupbox_boxes_width,
+                column_2_groupbox_boxes_height
+            ),
+            &mut self.textbox_bacino_niseci_buffer,
+            self.textbox_bacino_niseci_edit_mode
+        ) {
+            self.textbox_bacino_niseci_edit_mode = !self.textbox_bacino_niseci_edit_mode;
+        }
+
         let rainbow_speed = 0.03;
         let rainbow_color = rainbow_color_from_framecounter(frame_counter, rainbow_speed);
         let todo_txt_font_height = main_state.current_font_height;
-
-        let todo_niseci_txt = "TODO: Implement NISECI controls";
-        let todo_niseci_txt_x = column_2_groupbox_niseci_x + propwidth(&d, 10);
-        let todo_niseci_txt_y = column_2_groupbox_niseci_y + propheight(&d, 30);
-        d.draw_text_ex(&main_state.current_font, todo_niseci_txt, Vector2::new(todo_niseci_txt_x as f32, todo_niseci_txt_y as f32), todo_txt_font_height as f32, main_state.default_txt_spacing as f32, rainbow_color);
 
         let todo_hfbi_txt = "TODO: Implement HFBI controls";
         let todo_hfbi_txt_x = column_2_groupbox_hfbi_x + propwidth(&d, 10);
