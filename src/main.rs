@@ -70,7 +70,12 @@ fn main() {
     eprintln!("{PROJECT_VERSION_FULL}");
 
     if headless {
-        return run_headless(indice_niseci, &mutargs);
+        let res = run_headless(indice_niseci, &mutargs);
+
+        if !res {
+            eprintln!("Headless run failed");
+        }
+        return;
     }
 
     let home_controller = HomeController::new();
