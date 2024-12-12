@@ -128,17 +128,42 @@ pub fn draw_info_box(d: &mut RaylibDrawHandle, showing_info_box: &mut bool, font
         let display_link = "Example: esox-website.it";
         let actual_link = "https://duckduckgo.com/?t=h_&q=esox+lucius";
         let link_str = CString::new(display_link).unwrap();
+        let link_x = proj_name_str2_x;
+        let link_y = proj_name_str2_y + proj_name_str2_txt_bounds.y as i32;
+        let link_width = infobox_width - text_x_spacing;
+        let link_height = propheight(&d, 25);
 
         if d.gui_label_button(
             rrect(
-                proj_name_str2_x,
-                proj_name_str2_y + proj_name_str2_txt_bounds.y as i32,
-                infobox_width - text_x_spacing,
-                propheight(&d, 25)
+                link_x,
+                link_y,
+                link_width,
+                link_height
             ),
             Some(link_str.as_c_str())
         ) {
             raylib::core::misc::open_url(actual_link);
+        }
+
+        let support_email = "mario@rossi.it";
+        let mail_display_link = "Example: ".to_owned() + support_email;
+        let mail_actual_link = "mailto:".to_owned() + support_email;
+        let mail_link_str = CString::new(mail_display_link).unwrap();
+        let mail_link_x = link_x;
+        let mail_link_y = link_y + link_height;
+        let mail_link_width = link_width;
+        let mail_link_height = link_height;
+
+        if d.gui_label_button(
+            rrect(
+                mail_link_x,
+                mail_link_y,
+                mail_link_width,
+                mail_link_height
+            ),
+            Some(mail_link_str.as_c_str())
+        ) {
+            raylib::core::misc::open_url(&mail_actual_link);
         }
 
         if result == true {
