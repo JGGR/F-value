@@ -158,6 +158,7 @@ impl SelezioneIndiceView {
             ),
             Some(rstr!("NISECI"))
         ) {
+            //TODO: set current indice
             println!("TODO: call controller to update model. Controller can update main_state.current_view on next frame in update()");
         }
 
@@ -170,6 +171,7 @@ impl SelezioneIndiceView {
             ),
             Some(rstr!("HFBI"))
         ) {
+            //TODO: set current indice
             println!("TODO: call controller to update model. Controller can update main_state.current_view on next frame in update()");
         }
 
@@ -191,10 +193,64 @@ impl SelezioneFileInputView {
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &FileInputController, main_state: &MainState) {
         d.clear_background(main_state.default_bg_color);
 
+        let _state = controller.get_state();
+        //TODO: get current indice
 
-        let state = controller.get_state();
-        let frame_counter = state.get_frame_counter();
-        draw_todo_view_text(d, frame_counter, &main_state.current_font, main_state.default_txt_spacing, main_state.current_font_height);
+        let button_riferimento_width = propwidth(&d, 200);
+        let button_riferimento_x = d.get_screen_width() / 2 - button_riferimento_width /2;
+        let button_riferimento_height = propwidth(&d, 50);
+
+        let button_fileinput_y_spacing = button_riferimento_height;
+
+        let button_riferimento_y = d.get_screen_height() / 2 - button_fileinput_y_spacing / 2 - button_riferimento_height;
+
+        let button_campionamento_width = button_riferimento_width;
+        let button_campionamento_x = button_riferimento_x;
+        let button_campionamento_height = button_riferimento_height;
+        let button_campionamento_y = button_riferimento_y + button_riferimento_height + button_fileinput_y_spacing;
+
+        let groupbox_width = button_riferimento_width + propwidth(&d, 100);
+        let groupbox_x = button_riferimento_x - propwidth(&d, 50);
+        let groupbox_height = button_riferimento_height * 2 + button_fileinput_y_spacing + propheight(&d, 100);
+        let groupbox_y = button_riferimento_y - propheight(&d, 50);
+
+        d.gui_group_box(
+            rrect(
+                groupbox_x,
+                groupbox_y,
+                groupbox_width,
+                groupbox_height
+            ),
+            Some(rstr!("Seleziona file di input"))
+        );
+
+        //TODO: disable this when current indice is HFBI
+
+        if d.gui_button(
+            rrect(
+                button_riferimento_x,
+                button_riferimento_y,
+                button_riferimento_width,
+                button_riferimento_height
+            ),
+            Some(rstr!("Riferimento"))
+        ) {
+            println!("TODO: handle click on Riferimento");
+            println!("TODO: call controller to update model. Controller can update main_state.current_view on next frame in update()");
+        }
+
+        if d.gui_button(
+            rrect(
+                button_campionamento_x,
+                button_campionamento_y,
+                button_campionamento_width,
+                button_campionamento_height,
+            ),
+            Some(rstr!("Campionamento"))
+        ) {
+            println!("TODO: handle click on Campionamento");
+            println!("TODO: call controller to update model. Controller can update main_state.current_view on next frame in update()");
+        }
     }
 }
 
@@ -213,9 +269,64 @@ impl ValidazioneFileInputView {
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &FileInputController, main_state: &MainState) {
         d.clear_background(main_state.default_bg_color);
 
-        let state = controller.get_state();
-        let frame_counter = state.get_frame_counter();
-        draw_todo_view_text(d, frame_counter, &main_state.current_font, main_state.default_txt_spacing, main_state.current_font_height);
+        let _state = controller.get_state();
+        //TODO: get current indice
+
+        let button_riferimento_width = propwidth(&d, 200);
+        let button_riferimento_x = d.get_screen_width() / 2 - button_riferimento_width /2;
+        let button_riferimento_height = propwidth(&d, 50);
+
+        let button_fileinput_y_spacing = button_riferimento_height;
+
+        let button_riferimento_y = d.get_screen_height() / 2 - button_fileinput_y_spacing / 2 - button_riferimento_height;
+
+        let button_campionamento_width = button_riferimento_width;
+        let button_campionamento_x = button_riferimento_x;
+        let button_campionamento_height = button_riferimento_height;
+        let button_campionamento_y = button_riferimento_y + button_riferimento_height + button_fileinput_y_spacing;
+
+        let groupbox_width = button_riferimento_width + propwidth(&d, 100);
+        let groupbox_x = button_riferimento_x - propwidth(&d, 50);
+        let groupbox_height = button_riferimento_height * 2 + button_fileinput_y_spacing + propheight(&d, 100);
+        let groupbox_y = button_riferimento_y - propheight(&d, 50);
+
+        d.gui_group_box(
+            rrect(
+                groupbox_x,
+                groupbox_y,
+                groupbox_width,
+                groupbox_height
+            ),
+            Some(rstr!("Valida file di input"))
+        );
+
+        //TODO: handle buttons depending on current indice
+
+        if d.gui_button(
+            rrect(
+                button_riferimento_x,
+                button_riferimento_y,
+                button_riferimento_width,
+                button_riferimento_height
+            ),
+            Some(rstr!("Valida Riferimento"))
+        ) {
+            println!("TODO: handle click on Valida Riferimento");
+            println!("TODO: call controller to update model. Controller can update main_state.current_view on next frame in update()");
+        }
+
+        if d.gui_button(
+            rrect(
+                button_campionamento_x,
+                button_campionamento_y,
+                button_campionamento_width,
+                button_campionamento_height,
+            ),
+            Some(rstr!("Valida Campionamento"))
+        ) {
+            println!("TODO: handle click on Valida Campionamento");
+            println!("TODO: call controller to update model. Controller can update main_state.current_view on next frame in update()");
+        }
     }
 }
 
