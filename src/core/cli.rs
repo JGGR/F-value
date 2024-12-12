@@ -92,9 +92,9 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) {
                 println!("TODO: We may skip the riferimento check also in that case");
             }
             Err(errs) => {
-                eprintln!("Campionamento errors:");
+                eprintln!("Campionamento errors in run_headless():");
                 for e in errs {
-                    eprintln!("{e}");
+                    eprintln!("  {e}");
                 }
                 return;
             }
@@ -109,7 +109,7 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) {
                 println!("TODO:  Implement validation step after successful csv parsing");
             }
             Err(errs) => {
-                eprintln!("Riferimento errors:");
+                eprintln!("Riferimento errors in run_headless():");
                 for e in errs {
                     eprintln!("{e}");
                 }
