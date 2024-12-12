@@ -8,6 +8,7 @@ pub fn esox_usage() {
   --headless               Run without GUI
   --hfbi                   Run with HFBI
   --version, -v            Print version and quit
+  --info                   Print debug info and quit
   --help, -h               Print this message and quit");
 }
 

@@ -5,6 +5,7 @@ mod model;
 mod views;
 mod controllers;
 mod core;
+#[cfg(test)]
 mod tests;
 
 use crate::core::*;
@@ -40,6 +41,15 @@ fn main() {
                 match arg.as_str() {
                     "-v" | "--version" | "-version" => {
                         println!("{PROJECT_NAME} v{PROJECT_VERSION}-{COMMIT_HASH_PLUS} ({PROJECT_BUILD_TYPE})");
+                        return;
+                    }
+                    "--info" => {
+                        println!("Header riferimento NISECI: {{");
+                        println!("{RIFERIMENTO_NISECI_HEADER}");
+                        println!("}}");
+                        println!("Header campionamento NISECI: {{");
+                        println!("{CAMPIONAMENTO_NISECI_HEADER}");
+                        println!("}}");
                         return;
                     }
                     "-h" | "-help" | "--help" => {

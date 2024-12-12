@@ -39,8 +39,10 @@ pub const SUPPORT_HEADLESS: bool = false; // This is due to windows_subsystem be
 pub const SUPPORT_HEADLESS: bool = true;
 
 pub const RIFERIMENTO_NISECI_HEADER: &str = "\
-nomeComune;nomeLatino;codiceSpecie;origine;tipoAutoctono;alloNocivita;specieAttesa;clSoglia1;clSoglia2;clSoglia3;clSoglia4;adJuvSoglia1;adJuvSoglia2;adJuvSoglia3;adJuvSoglia4;densSoglia1;densSoglia2
-";
+nomeComune;nomeLatino;codiceSpecie;origine;tipoAutoctono;alloNocivita;specieAttesa;clSoglia1;clSoglia2;clSoglia3;clSoglia4;adJuvSoglia1;adJuvSoglia2;adJuvSoglia3;adJuvSoglia4;densSoglia1;densSoglia2";
+
+pub const CAMPIONAMENTO_NISECI_HEADER: &str = "\
+data;stazione;superficie;numPassaggio;codiceSpecie;lunghezza;peso";
 
 //TODO: add test to check if this string respects the discriminant ordering in GuiTheme
 pub const GUI_THEME_COMBOBOX_STR: &str = "Light;Dark;Bluish;Candy;Cherry;Cyber;Jungle;Lavanda;Terminal;Ashes";
@@ -309,6 +311,10 @@ pub fn translate_error_message(msg: &str) -> String {
         msg.replace("invalid UTF-8 sequence", "sequenza UTF-8 non valida")
     } else if msg.contains("file not found") {
         msg.replace("file not found", "file non trovato")
+    } else if msg.contains("invalid digit found in string") {
+        msg.replace("invalid digit found in string", "tipo non valido: numero, attesa stringa").replace("field", "campo")
+    } else if msg.contains("invalid float literal") {
+        msg.replace("invalid float literal", "tipo non valido: atteso razionale").replace("field", "campo")
     } else {
         msg.to_string() // Default to original message if no match
     }
