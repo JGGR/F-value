@@ -40,48 +40,16 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) -> bool {
     let campionamento_path = PathBuf::from(campionamento_path_str);
     let riferimento_path = PathBuf::from(riferimento_path_str);
 
-    if !campionamento_path.exists() {
-        eprintln!("Error: Passed campionamento does not exist");
+    if !check_path_is_file_ends_with_csv(&campionamento_path) {
+        eprintln!("Fallito controllo path campionamento");
         return false;
-    } else if !campionamento_path.is_file() {
-        eprintln!("Error: Passed campionamento is not a regular file");
-        return false;
-    } else {
-        let ext = campionamento_path.extension();
-        match ext {
-            Some(ex) => {
-                if ! (ex == "csv") {
-                    eprintln!("Error: Passed campionamento does not end with .csv");
-                    return false;
-                }
-            }
-            None => {
-                eprintln!("Error: Passed campionamento does not end with .csv");
-                return false;
-            }
-        }
     }
+
     if do_niseci {
-        if !riferimento_path.exists() {
-            eprintln!("Error: Passed riferimento does not exist");
+
+        if !check_path_is_file_ends_with_csv(&riferimento_path) {
+            eprintln!("Fallito controllo path riferimento");
             return false;
-        } else if !riferimento_path.is_file() {
-            eprintln!("Error: Passed riferimento is not a regular file");
-            return false;
-        } else {
-            let ext = riferimento_path.extension();
-            match ext {
-                Some(ex) => {
-                    if ! (ex == "csv") {
-                        eprintln!("Error: Passed riferimento does not end with .csv");
-                        return false;
-                    }
-                }
-                None => {
-                    eprintln!("Error: Passed riferimento does not end with .csv");
-                    return false;
-                }
-            }
         }
         let mut campionamento_csv_failed = false;
         let campionamento_check_res = check_campionamento_niseci_path(campionamento_path);

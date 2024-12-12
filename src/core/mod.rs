@@ -366,6 +366,31 @@ fn process_errors(errors: &Vec<csv::Error>) {
     }
 }
 
+fn check_path_is_file_ends_with_csv(path: &PathBuf) -> bool {
+    if !path.exists() {
+        eprintln!("Error: Passed path does not exist");
+        return false;
+    } else if !path.is_file() {
+        eprintln!("Error: Passed path is not a regular file");
+        return false;
+    } else {
+        let ext = path.extension();
+        match ext {
+            Some(ex) => {
+                if ! (ex == "csv") {
+                    eprintln!("Error: Passed path does not end with .csv");
+                    return false;
+                }
+                return true;
+            }
+            None => {
+                eprintln!("Error: Passed path does not end with .csv");
+                return false;
+            }
+        }
+    }
+}
+
 pub fn check_campionamento_niseci_reader<R: Read>(reader: R) -> Result<Vec<RecordCsvCampionamentoNISECI>,Vec<csv::Error>> {
     let rdr = csv::ReaderBuilder::new()
         .delimiter(b';')
@@ -395,6 +420,10 @@ pub fn check_campionamento_niseci_reader<R: Read>(reader: R) -> Result<Vec<Recor
 }
 
 pub fn check_campionamento_niseci_path(path: PathBuf) -> Result<Vec<RecordCsvCampionamentoNISECI>,Vec<csv::Error>> {
+    if !check_path_is_file_ends_with_csv(&path) {
+        eprintln!("Il file {} non è un .csv", path.display());
+        return Err(Vec::new());
+    }
     let file = File::open(path).expect("Unable to open file");
     return check_campionamento_niseci_reader(file);
 }
@@ -429,6 +458,10 @@ pub fn check_riferimento_niseci_reader<R: Read>(reader: R) -> Result<Vec<RecordC
 }
 
 pub fn check_riferimento_niseci_path(path: PathBuf) -> Result<Vec<RecordCsvRiferimentoNISECI>,Vec<csv::Error>> {
+    if !check_path_is_file_ends_with_csv(&path) {
+        eprintln!("Il file {} non è un .csv", path.display());
+        return Err(Vec::new());
+    }
     let file = File::open(path).expect("Unable to open file");
     return check_riferimento_niseci_reader(file);
 }
