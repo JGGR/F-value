@@ -50,12 +50,12 @@ pub fn draw_info_box(d: &mut RaylibDrawHandle, showing_info_box: &mut bool, font
         let itext = d.gui_icon_text(ICON_INFO, Some(rstr!("Program Info")));
         let itext = CString::new(itext).unwrap();
 
-        let proj_info_str = format!("Version: {SHORT_PROJECT_VERSION}");
+        let proj_info_str = format!("esox {SHORT_PROJECT_VERSION}");
         let proj_info_txt_bounds = font.measure_text(&proj_info_str, current_font_height as f32, default_txt_spacing as f32);
         //let proj_info_str_y = propheight(&d, 100) - current_font_height / 2;
 
         // No multiline text.
-        let proj_name_str1 = format!("esox - Strumento per il calcolo");
+        let proj_name_str1 = format!("Strumento per il calcolo");
         let proj_name_str2 = format!("NISECI e HFBI");
 
         let proj_name_str1_txt_bounds = font.measure_text(&proj_name_str1, current_font_height as f32, default_txt_spacing as f32);
