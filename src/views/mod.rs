@@ -821,9 +821,39 @@ impl ValidazioneInfoAggiuntiveView {
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &InfoAggiuntiveController, main_state: &MainState) {
         d.clear_background(main_state.default_bg_color);
 
-        let state = controller.get_state();
-        let frame_counter = state.get_frame_counter();
-        draw_todo_view_text(d, frame_counter, &main_state.current_font, main_state.default_txt_spacing, main_state.current_font_height);
+        let _state = controller.get_state();
+        let button_valida_width = propwidth(&d, 200);
+        let button_valida_x = d.get_screen_width() / 2 - button_valida_width /2;
+        let button_valida_height = propwidth(&d, 50);
+        let button_valida_y = d.get_screen_height() / 2 - button_valida_height/2;
+
+        let groupbox_width = button_valida_width + propwidth(&d, 100);
+        let groupbox_x = button_valida_x - propwidth(&d, 50);
+        let groupbox_height = button_valida_height + propheight(&d, 100);
+        let groupbox_y = button_valida_y - propheight(&d, 50);
+
+        d.gui_group_box(
+            rrect(
+                groupbox_x,
+                groupbox_y,
+                groupbox_width,
+                groupbox_height
+            ),
+            Some(rstr!("Valida informazioni aggiuntive"))
+        );
+
+        if d.gui_button(
+            rrect(
+                button_valida_x,
+                button_valida_y,
+                button_valida_width,
+                button_valida_height
+            ),
+            Some(rstr!("Valida info aggiuntive"))
+        ) {
+            //TODO: valida info aggiuntive indice
+            println!("TODO: call controller to update model. Controller can update main_state.current_view on next frame in update()");
+        }
     }
 }
 
