@@ -331,14 +331,58 @@ impl ValidazioneFileInputView {
 }
 
 pub struct SelezioneInfoAggiuntiveView {
-
+    valuebox_codice_stazione_edit_mode: bool,
+    valuebox_codice_stazione_value: i32,
+    textbox_corpo_idrico_edit_mode: bool,
+    textbox_corpo_idrico_buffer: [u8; 64],
+    textbox_regione_edit_mode: bool,
+    textbox_regione_buffer: [u8; 64],
+    textbox_provincia_edit_mode: bool,
+    textbox_provincia_buffer: [u8; 64],
+    textbox_data_edit_mode: bool,
+    textbox_data_buffer: [u8; 64],
+    valuebox_lunghezza_stazione_edit_mode: bool,
+    valuebox_lunghezza_stazione_value: i32,
+    valuebox_larghezza_stazione_edit_mode: bool,
+    valuebox_larghezza_stazione_value: i32,
 }
 
 impl SelezioneInfoAggiuntiveView {
 
     pub fn new() -> Self {
-        Self {
+        let mut corpo_idrico_buffer = [0u8; 64];
+        let corpo_idrico_buffer_bytes = "Inserisci nome".as_bytes();
+        let corpo_idrico_buffer_len = corpo_idrico_buffer_bytes.len().min(64);
+        corpo_idrico_buffer[..corpo_idrico_buffer_len].copy_from_slice(&corpo_idrico_buffer_bytes[..corpo_idrico_buffer_len]);
 
+        let mut regione_buffer = [0u8; 64];
+        let regione_buffer_bytes = "Inserisci regione".as_bytes();
+        let regione_buffer_len = regione_buffer_bytes.len().min(64);
+        regione_buffer[..regione_buffer_len].copy_from_slice(&regione_buffer_bytes[..regione_buffer_len]);
+
+        let mut provincia_buffer = [0u8; 64];
+        let provincia_buffer_bytes = "Inserisci provincia".as_bytes();
+        let provincia_buffer_len = provincia_buffer_bytes.len().min(64);
+        provincia_buffer[..provincia_buffer_len].copy_from_slice(&provincia_buffer_bytes[..provincia_buffer_len]);
+        let mut data_buffer = [0u8; 64];
+        let data_buffer_bytes = "Inserisci data".as_bytes();
+        let data_buffer_len = data_buffer_bytes.len().min(64);
+        data_buffer[..data_buffer_len].copy_from_slice(&data_buffer_bytes[..data_buffer_len]);
+        Self {
+            valuebox_codice_stazione_edit_mode: false,
+            valuebox_codice_stazione_value: 0,
+            textbox_corpo_idrico_edit_mode: false,
+            textbox_corpo_idrico_buffer: corpo_idrico_buffer,
+            textbox_regione_edit_mode: false,
+            textbox_regione_buffer: regione_buffer,
+            textbox_provincia_edit_mode: false,
+            textbox_provincia_buffer: provincia_buffer,
+            textbox_data_edit_mode: false,
+            textbox_data_buffer: data_buffer,
+            valuebox_lunghezza_stazione_edit_mode: false,
+            valuebox_lunghezza_stazione_value: 0,
+            valuebox_larghezza_stazione_edit_mode: false,
+            valuebox_larghezza_stazione_value: 0,
         }
     }
 
@@ -347,7 +391,265 @@ impl SelezioneInfoAggiuntiveView {
 
         let state = controller.get_state();
         let frame_counter = state.get_frame_counter();
-        draw_todo_view_text(d, frame_counter, &main_state.current_font, main_state.default_txt_spacing, main_state.current_font_height);
+        let groupbox_width = propwidth(&d, 600);
+        let groupbox_x = d.get_screen_width() /2 - groupbox_width /2;
+        let groupbox_height = propheight(&d, 400);
+        let groupbox_y = d.get_screen_height() / 2 - groupbox_height /2;
+
+        d.gui_group_box(
+            rrect(
+                groupbox_x,
+                groupbox_y,
+                groupbox_width,
+                groupbox_height
+            ),
+            Some(rstr!("Inserisci informazioni aggiuntive"))
+        );
+
+        let x_padding = groupbox_width / 20;
+        let y_padding = groupbox_height / 15;
+
+        // 2 columns: 2 paddings per side + 1 between the columns
+        let column_width = (groupbox_width - (x_padding * 3))/2;
+        let column_1_x = groupbox_x + x_padding;
+        let column_2_x = column_1_x + column_width + x_padding;
+        let column_1_y = groupbox_y + y_padding;
+        let column_2_y = column_1_y;
+        // 1 padding on top, 2 below
+        let column_1_height = groupbox_height - y_padding*3;
+        let column_2_height = column_1_height;
+
+        // Column 1
+
+        let column_1_labels_width = column_width / 2;
+        let column_1_fields_y_spacing = y_padding / 10;
+        let column_1_big_y_spacing = y_padding;
+        let column_1_labels_count = 7;
+        let column_1_labels_x = column_1_x;
+        let column_1_labels_height = (column_1_height - (column_1_fields_y_spacing*5) - column_1_big_y_spacing) / column_1_labels_count;
+
+        let column_1_label_stazione_y = column_1_y;
+        let column_1_label_corpo_idrico_y = column_1_label_stazione_y + column_1_labels_height + column_1_fields_y_spacing;
+        let column_1_label_regione_y = column_1_label_corpo_idrico_y + column_1_labels_height + column_1_fields_y_spacing;
+        let column_1_label_provincia_y = column_1_label_regione_y + column_1_labels_height + column_1_fields_y_spacing;
+        let column_1_label_data_y = column_1_label_provincia_y + column_1_labels_height + column_1_big_y_spacing;
+        let column_1_label_lunghezza_stazione_y = column_1_label_data_y + column_1_labels_height + column_1_fields_y_spacing;
+        let column_1_label_larghezza_stazione_y = column_1_label_lunghezza_stazione_y + column_1_labels_height + column_1_fields_y_spacing;
+
+        d.gui_label(
+            rrect(
+                column_1_labels_x,
+                column_1_label_stazione_y,
+                column_1_labels_width,
+                column_1_labels_height
+            ),
+            Some(rstr!("Codice stazione"))
+        );
+
+        d.gui_label(
+            rrect(
+                column_1_labels_x,
+                column_1_label_corpo_idrico_y,
+                column_1_labels_width,
+                column_1_labels_height
+            ),
+            Some(rstr!("Nome del corpo idrico"))
+        );
+
+        d.gui_label(
+            rrect(
+                column_1_labels_x,
+                column_1_label_regione_y,
+                column_1_labels_width,
+                column_1_labels_height
+            ),
+            Some(rstr!("Regione"))
+        );
+
+        d.gui_label(
+            rrect(
+                column_1_labels_x,
+                column_1_label_provincia_y,
+                column_1_labels_width,
+                column_1_labels_height
+            ),
+            Some(rstr!("Provincia"))
+        );
+
+        d.gui_label(
+            rrect(
+                column_1_labels_x,
+                column_1_label_data_y,
+                column_1_labels_width,
+                column_1_labels_height
+            ),
+            Some(rstr!("Data"))
+        );
+
+        d.gui_label(
+            rrect(
+                column_1_labels_x,
+                column_1_label_lunghezza_stazione_y,
+                column_1_labels_width,
+                column_1_labels_height
+            ),
+            Some(rstr!("Lunghezza stazione"))
+        );
+
+        d.gui_label(
+            rrect(
+                column_1_labels_x,
+                column_1_label_larghezza_stazione_y,
+                column_1_labels_width,
+                column_1_labels_height
+            ),
+            Some(rstr!("Larghezza stazione"))
+        );
+
+        let column_1_boxes_width = column_1_labels_width;
+        let column_1_boxes_height = column_1_labels_height;
+        let column_1_boxes_x = column_1_labels_x + column_1_labels_width;
+
+        if d.gui_value_box(
+            rrect(
+                column_1_boxes_x,
+                column_1_label_stazione_y,
+                column_1_boxes_width,
+                column_1_boxes_height
+            ),
+            None,
+            &mut self.valuebox_codice_stazione_value,
+            0,
+            100000, //TODO: ask a reasonable max for this
+            self.valuebox_codice_stazione_edit_mode
+        ) {
+            self.valuebox_codice_stazione_edit_mode = !self.valuebox_codice_stazione_edit_mode;
+        }
+        if d.gui_text_box(
+            rrect(
+                column_1_boxes_x,
+                column_1_label_corpo_idrico_y,
+                column_1_boxes_width,
+                column_1_boxes_height
+            ),
+            &mut self.textbox_corpo_idrico_buffer,
+            self.textbox_corpo_idrico_edit_mode
+        ) {
+            self.textbox_corpo_idrico_edit_mode = !self.textbox_corpo_idrico_edit_mode;
+        }
+        if d.gui_text_box(
+            rrect(
+                column_1_boxes_x,
+                column_1_label_regione_y,
+                column_1_boxes_width,
+                column_1_boxes_height
+            ),
+            &mut self.textbox_regione_buffer,
+            self.textbox_regione_edit_mode
+        ) {
+            self.textbox_regione_edit_mode = !self.textbox_regione_edit_mode;
+        }
+        if d.gui_text_box(
+            rrect(
+                column_1_boxes_x,
+                column_1_label_provincia_y,
+                column_1_boxes_width,
+                column_1_boxes_height
+            ),
+            &mut self.textbox_provincia_buffer,
+            self.textbox_provincia_edit_mode
+        ) {
+            self.textbox_provincia_edit_mode = !self.textbox_provincia_edit_mode;
+        }
+        if d.gui_text_box(
+            rrect(
+                column_1_boxes_x,
+                column_1_label_data_y,
+                column_1_boxes_width,
+                column_1_boxes_height
+            ),
+            &mut self.textbox_data_buffer,
+            self.textbox_data_edit_mode
+        ) {
+            self.textbox_data_edit_mode = !self.textbox_data_edit_mode;
+        }
+        if d.gui_value_box(
+            rrect(
+                column_1_boxes_x,
+                column_1_label_lunghezza_stazione_y,
+                column_1_boxes_width,
+                column_1_boxes_height
+            ),
+            None,
+            &mut self.valuebox_lunghezza_stazione_value,
+            0,
+            100000, //TODO: ask a reasonable max for this
+            self.valuebox_lunghezza_stazione_edit_mode
+        ) {
+            self.valuebox_lunghezza_stazione_edit_mode = !self.valuebox_lunghezza_stazione_edit_mode;
+        }
+        if d.gui_value_box(
+            rrect(
+                column_1_boxes_x,
+                column_1_label_larghezza_stazione_y,
+                column_1_boxes_width,
+                column_1_boxes_height
+            ),
+            None,
+            &mut self.valuebox_larghezza_stazione_value,
+            0,
+            100000, //TODO: ask a resonable max for this
+            self.valuebox_larghezza_stazione_edit_mode
+        ) {
+            self.valuebox_larghezza_stazione_edit_mode = !self.valuebox_larghezza_stazione_edit_mode;
+        }
+        // Column 2
+
+        // spacing between the two groupboxes
+        let column_2_groupbox_y_padding = y_padding;
+        let column_2_groupbox_1_width = column_width;
+        let column_2_groupbox_1_x = column_2_x;
+        let column_2_groupbox_1_y = column_2_y;
+        let column_2_groupbox_1_height = column_2_height - column_2_groupbox_y_padding - y_padding*4;
+        let column_2_groupbox_2_width = column_2_groupbox_1_width;
+        let column_2_groupbox_2_x = column_2_groupbox_1_x;
+        let column_2_groupbox_2_y = column_2_groupbox_1_y + column_2_groupbox_1_height + column_2_groupbox_y_padding;
+        let column_2_groupbox_2_height = column_2_height - column_2_groupbox_1_height;
+
+        d.gui_group_box(
+            rrect(
+                column_2_groupbox_1_x,
+                column_2_groupbox_1_y,
+                column_2_groupbox_1_width,
+                column_2_groupbox_1_height
+            ),
+            Some(rstr!("NISECI"))
+        );
+
+        d.gui_group_box(
+            rrect(
+                column_2_groupbox_2_x,
+                column_2_groupbox_2_y,
+                column_2_groupbox_2_width,
+                column_2_groupbox_2_height
+            ),
+            Some(rstr!("HFBI"))
+        );
+
+        let rainbow_speed = 0.03;
+        let rainbow_color = rainbow_color_from_framecounter(frame_counter, rainbow_speed);
+        let todo_txt_font_height = main_state.current_font_height;
+
+        let todo_niseci_txt = "TODO: Implement NISECI controls";
+        let todo_niseci_txt_x = column_2_groupbox_1_x + propwidth(&d, 10);
+        let todo_niseci_txt_y = column_2_groupbox_1_y + propheight(&d, 10);
+        d.draw_text_ex(&main_state.current_font, todo_niseci_txt, Vector2::new(todo_niseci_txt_x as f32, todo_niseci_txt_y as f32), todo_txt_font_height as f32, main_state.default_txt_spacing as f32, rainbow_color);
+
+        let todo_hfbi_txt = "TODO: Implement HFBI controls";
+        let todo_hfbi_txt_x = column_2_groupbox_2_x + propwidth(&d, 10);
+        let todo_hfbi_txt_y = column_2_groupbox_2_y + propheight(&d, 10);
+        d.draw_text_ex(&main_state.current_font, todo_hfbi_txt, Vector2::new(todo_hfbi_txt_x as f32, todo_hfbi_txt_y as f32), todo_txt_font_height as f32, main_state.default_txt_spacing as f32, rainbow_color);
+
     }
 }
 
