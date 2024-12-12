@@ -19,6 +19,17 @@ use raylib::consts::GuiControlProperty::TEXT_COLOR_NORMAL;
 
 use std::env;
 
+fn usage() {
+    println!("{PROJECT_NAME} v{SHORT_PROJECT_VERSION}");
+    println!("Usage: {PROJECT_NAME} [--headless [--hfbi]] <campionamento.csv> <riferimento.csv>");
+    println!(
+        "Flags:
+  --headless               Run without GUI
+  --hfbi                   Run with HFBI
+  --version, -v            Print version and quit
+  --help, -h               Print this message and quit");
+}
+
 fn main() {
 
     let args: Vec<String> = env::args().collect(); // Using this panics on receiving invalid Unicode
@@ -41,6 +52,9 @@ fn main() {
                         println!("{PROJECT_NAME} v{PROJECT_VERSION}-{COMMIT_HASH_PLUS} ({PROJECT_BUILD_TYPE})");
                         return;
                     }
+                    "-h" | "-help" | "--help" => {
+                        return usage();
+                    }
                     "--headless" => {
                         if ! SUPPORT_HEADLESS {
                             eprintln!("Headless run is not supported.");
@@ -53,7 +67,12 @@ fn main() {
                         indice_niseci = false;
                         mutargs.remove(arg_i);
                     }
-                    _ => {}
+                    _ => {
+                        if arg.starts_with("--") {
+                            eprintln!("Unknown flag: {arg}");
+                            return usage();
+                        }
+                    }
                 }
             }
         },
