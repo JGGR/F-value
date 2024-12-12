@@ -796,9 +796,9 @@ impl SelezioneInfoAggiuntiveView {
 
         let rainbow_speed = 0.03;
         let rainbow_color = rainbow_color_from_framecounter(frame_counter, rainbow_speed);
-        let todo_txt_font_height = main_state.current_font_height;
+        let todo_txt_font_height = main_state.current_font_height*2;
 
-        let todo_hfbi_txt = "TODO: Implement HFBI controls";
+        let todo_hfbi_txt = "TODO: HFBI controls";
         let todo_hfbi_txt_x = column_2_groupbox_hfbi_x + propwidth(&d, 10);
         let todo_hfbi_txt_y = column_2_groupbox_hfbi_y + propheight(&d, 10);
         d.draw_text_ex(&main_state.current_font, todo_hfbi_txt, Vector2::new(todo_hfbi_txt_x as f32, todo_hfbi_txt_y as f32), todo_txt_font_height as f32, main_state.default_txt_spacing as f32, rainbow_color);
