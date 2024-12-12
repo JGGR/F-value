@@ -129,9 +129,19 @@ pub fn draw_info_box(d: &mut RaylibDrawHandle, showing_info_box: &mut bool, font
         let actual_link = "https://duckduckgo.com/?t=h_&q=esox+lucius";
         let link_str = CString::new(display_link).unwrap();
         let link_x = proj_name_str2_x;
-        let link_y = proj_name_str2_y + proj_name_str2_txt_bounds.y as i32;
+        let link_y = proj_name_str2_y + proj_name_str2_txt_bounds.y as i32 + text_y_spacing*3;
         let link_width = infobox_width - text_x_spacing;
         let link_height = propheight(&d, 25);
+
+        d.gui_label(
+            rrect(
+                infobox_x + propwidth(&d, 10),
+                link_y,
+                text_x_spacing,
+                link_height
+            ),
+            Some(rstr!("Info:"))
+        );
 
         if d.gui_label_button(
             rrect(
@@ -153,6 +163,16 @@ pub fn draw_info_box(d: &mut RaylibDrawHandle, showing_info_box: &mut bool, font
         let mail_link_y = link_y + link_height;
         let mail_link_width = link_width;
         let mail_link_height = link_height;
+
+        d.gui_label(
+            rrect(
+                infobox_x + propwidth(&d, 10),
+                mail_link_y,
+                text_x_spacing,
+                mail_link_height
+            ),
+            Some(rstr!("Support:"))
+        );
 
         if d.gui_label_button(
             rrect(
