@@ -5,6 +5,8 @@ pub mod cli;
 use raylib::prelude::*;
 use std::fmt;
 use std::path::PathBuf;
+use std::io::Read;
+use std::fs::File;
 
 pub const EXIT_KEY: raylib::consts::KeyboardKey = raylib::consts::KeyboardKey::KEY_ESCAPE;
 pub const PROJECT_NAME: &'static str = env!("CARGO_PKG_NAME");
@@ -354,77 +356,71 @@ fn process_errors(errors: &Vec<csv::Error>) {
     }
 }
 
-pub fn check_campionamento_niseci_path(path: PathBuf) -> Result<Vec<RecordCsvCampionamentoNISECI>,Vec<csv::Error>> {
+pub fn check_campionamento_niseci_reader<R: Read>(reader: R) -> Result<Vec<RecordCsvCampionamentoNISECI>,Vec<csv::Error>> {
     let rdr = csv::ReaderBuilder::new()
         .delimiter(b';')
-        .from_path(path);
-    match rdr {
-        Ok(r) => {
-            let (records, errors) = parse_csv_campionamento_niseci(r);
+        .from_reader(reader);
+    let (records, errors) = parse_csv_campionamento_niseci(rdr);
 
-            println!("Campionamento NISECI: Numero record csv validi: {}", records.len());
-            println!("Campionamento NISECI: Numero record csv non validi: {}", errors.len());
+    println!("Campionamento NISECI: Numero record csv validi: {}", records.len());
+    println!("Campionamento NISECI: Numero record csv non validi: {}", errors.len());
 
-            if !errors.is_empty() {
-                eprintln!("Errori incontrati durante l'elaborazione del campionamento NISECI: {{");
-                /*
-                for error in &errors {
-                    eprintln!("  {}", error);
-                }
-                */
-                process_errors(&errors);
-                eprintln!("}}");
-                return Err(errors);
-            } else {
-                println!("Tutti i record del campionamento NISECI sono stati processati con successo!");
-                for record in &records {
-                    println!("  Record: {{{record}}}");
-                }
-                return Ok(records);
-            }
+    if !errors.is_empty() {
+        eprintln!("Errori incontrati durante l'elaborazione del campionamento NISECI: {{");
+        /*
+        for error in &errors {
+            eprintln!("  {}", error);
         }
-        Err(e) => {
-            eprintln!("Errore nell'apertura del reader csv: {e}");
-            return Err(Vec::new());
+        */
+        process_errors(&errors);
+        eprintln!("}}");
+        return Err(errors);
+    } else {
+        println!("Tutti i record del campionamento NISECI sono stati processati con successo!");
+        for record in &records {
+            println!("  Record: {{{record}}}");
         }
+        return Ok(records);
+    }
+}
+
+pub fn check_campionamento_niseci_path(path: PathBuf) -> Result<Vec<RecordCsvCampionamentoNISECI>,Vec<csv::Error>> {
+    let file = File::open(path).expect("Unable to open file");
+    return check_campionamento_niseci_reader(file);
+}
+
+pub fn check_riferimento_niseci_reader<R: Read>(reader: R) -> Result<Vec<RecordCsvRiferimentoNISECI>,Vec<csv::Error>> {
+
+    let rdr = csv::ReaderBuilder::new()
+        .delimiter(b';')
+        .from_reader(reader);
+    let (records, errors) = parse_csv_riferimento_niseci(rdr);
+
+    println!("Riferimento NISECI: Numero record csv validi: {}", records.len());
+    println!("Riferimento NISECI: Numero record csv non validi: {}", errors.len());
+
+    if !errors.is_empty() {
+        eprintln!("Errori incontrati durante l'elaborazione del riferimento NISECI: {{");
+        /*
+        for error in &errors {
+            eprintln!("  {}", error);
+        }
+        */
+        process_errors(&errors);
+        eprintln!("}}");
+        return Err(errors);
+    } else {
+        println!("Tutti i record del riferimento NISECI sono stati processati con successo!");
+        for record in &records {
+            println!("  Record: {{{record}}}");
+        }
+        return Ok(records);
     }
 }
 
 pub fn check_riferimento_niseci_path(path: PathBuf) -> Result<Vec<RecordCsvRiferimentoNISECI>,Vec<csv::Error>> {
-
-    let rdr = csv::ReaderBuilder::new()
-        .delimiter(b';')
-        .from_path(path);
-    match rdr {
-        Ok(r) => {
-            let (records, errors) = parse_csv_riferimento_niseci(r);
-
-            println!("Riferimento NISECI: Numero record csv validi: {}", records.len());
-            println!("Riferimento NISECI: Numero record csv non validi: {}", errors.len());
-
-            if !errors.is_empty() {
-                eprintln!("Errori incontrati durante l'elaborazione del riferimento NISECI: {{");
-                /*
-                for error in &errors {
-                    eprintln!("  {}", error);
-                }
-                */
-                process_errors(&errors);
-                eprintln!("}}");
-                return Err(errors);
-            } else {
-                println!("Tutti i record del riferimento NISECI sono stati processati con successo!");
-                for record in &records {
-                    println!("  Record: {{{record}}}");
-                }
-                return Ok(records);
-            }
-        }
-        Err(e) => {
-            eprintln!("Errore nell'apertura del reader csv: {e}");
-            return Err(Vec::new());
-        }
-    }
+    let file = File::open(path).expect("Unable to open file");
+    return check_riferimento_niseci_reader(file);
 }
 
 pub fn check_campionamento_hfbi_path(_path: PathBuf) -> bool {
