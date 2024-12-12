@@ -84,6 +84,17 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) {
         let campionamento_check_res = check_campionamento_niseci_path(campionamento_path);
         let riferimento_check_res = check_riferimento_niseci_path(riferimento_path);
         println!("Result: {campionamento_check_res}, {riferimento_check_res}");
+        if !campionamento_check_res {
+            eprintln!("Failed check for campionamento NISECI");
+            return
+        }
+        if !riferimento_check_res {
+            eprintln!("Failed check for riferimento NISECI");
+            return
+        }
+
+        println!("TODO:  Implement validation step after successful csv parsing");
+        return
     } else {
         let campionamento_check_res = check_campionamento_hfbi_path(campionamento_path);
         println!("Result: {campionamento_check_res}");
