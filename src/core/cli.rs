@@ -1,5 +1,16 @@
 use crate::core::*;
 
+pub fn esox_usage() {
+    println!("{PROJECT_NAME} v{SHORT_PROJECT_VERSION}");
+    println!("Usage: {PROJECT_NAME} [--headless [--hfbi]] <campionamento.csv> <riferimento.csv>");
+    println!(
+        "Flags:
+  --headless               Run without GUI
+  --hfbi                   Run with HFBI
+  --version, -v            Print version and quit
+  --help, -h               Print this message and quit");
+}
+
 pub fn run_headless(do_niseci: bool, args: &Vec<String>) {
     let mut arg_i = 0;
     let mut campionamento_path_str = "";
@@ -19,8 +30,7 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) {
             }
             _ => {
                 eprintln!("Error: Unexpected arg: {arg}");
-                //TODO: usage, might as well get clap then
-                return;
+                return esox_usage();
             }
         }
     }
