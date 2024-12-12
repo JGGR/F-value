@@ -82,8 +82,42 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) {
             }
         }
         let campionamento_check_res = check_campionamento_niseci_path(campionamento_path);
+        match campionamento_check_res {
+            Ok(recs) => {
+                println!("Campionamento result:");
+                for r in recs {
+                    println!("{r}");
+                }
+                println!("TODO:  Implement validation step after successful csv parsing");
+                println!("TODO: We may skip the riferimento check also in that case");
+            }
+            Err(errs) => {
+                eprintln!("Campionamento errors:");
+                for e in errs {
+                    eprintln!("{e}");
+                }
+                return;
+            }
+        }
         let riferimento_check_res = check_riferimento_niseci_path(riferimento_path);
-        println!("Result: {campionamento_check_res}, {riferimento_check_res}");
+        match riferimento_check_res {
+            Ok(recs) => {
+                println!("Riferimento result:");
+                for r in recs {
+                    println!("{r}");
+                }
+                println!("TODO:  Implement validation step after successful csv parsing");
+            }
+            Err(errs) => {
+                eprintln!("Riferimento errors:");
+                for e in errs {
+                    eprintln!("{e}");
+                }
+                return;
+            }
+        }
+
+        return
     } else {
         let campionamento_check_res = check_campionamento_hfbi_path(campionamento_path);
         println!("Result: {campionamento_check_res}");

@@ -741,20 +741,6 @@ impl SelezioneInfoAggiuntiveView {
         let column_2_groupbox_boxes_height = column_2_labels_height;
         let column_2_groupbox_boxes_x = column_2_groupbox_labels_x + column_2_groupbox_labels_width;
 
-        if d.gui_dropdown_box(
-            rrect(
-                column_2_groupbox_boxes_x,
-                column_2_label_tipo_comunit_y,
-                column_2_groupbox_boxes_width,
-                column_2_groupbox_boxes_height,
-            ),
-            Some(rstr!("Redatta;Fonti;DM260/2010;Mase")),
-            &mut self.dropdownbox_tipocomunit_niseci_value,
-            self.dropdownbox_tipocomunit_niseci_edit_mode,
-        ) {
-            self.dropdownbox_tipocomunit_niseci_edit_mode = !self.dropdownbox_tipocomunit_niseci_edit_mode;
-        }
-
         if d.gui_text_box(
             rrect(
                 column_2_groupbox_boxes_x,
@@ -792,6 +778,20 @@ impl SelezioneInfoAggiuntiveView {
             self.textbox_bacino_niseci_edit_mode
         ) {
             self.textbox_bacino_niseci_edit_mode = !self.textbox_bacino_niseci_edit_mode;
+        }
+
+        if d.gui_dropdown_box(
+            rrect(
+                column_2_groupbox_boxes_x,
+                column_2_label_tipo_comunit_y,
+                column_2_groupbox_boxes_width,
+                column_2_groupbox_boxes_height,
+            ),
+            Some(rstr!("Redatta;Fonti;DM260/2010;Mase")),
+            &mut self.dropdownbox_tipocomunit_niseci_value,
+            self.dropdownbox_tipocomunit_niseci_edit_mode,
+        ) {
+            self.dropdownbox_tipocomunit_niseci_edit_mode = !self.dropdownbox_tipocomunit_niseci_edit_mode;
         }
 
         let rainbow_speed = 0.03;
