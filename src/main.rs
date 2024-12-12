@@ -9,6 +9,7 @@ mod core;
 use crate::core::*;
 use crate::core::view::*;
 use crate::core::controller::*;
+use crate::core::cli::*;
 use crate::controllers::*;
 use crate::views::*;
 use raylib::prelude::*;
@@ -22,24 +23,47 @@ fn main() {
 
     let args: Vec<String> = env::args().collect(); // Using this panics on receiving invalid Unicode
 
+    let mut mutargs = args.clone();
+    let mut arg_i = 0;
+
+    let mut headless = false;
+
+    let mut indice_niseci = true;
+
+
     match args.len() {
         1 => {},
         _ => {
             for arg in &args[1..] {
+                arg_i += 1;
                 match arg.as_str() {
                     "-v" | "--version" | "-version" => {
                         println!("{PROJECT_NAME} v{PROJECT_VERSION}-{COMMIT_HASH_PLUS} ({PROJECT_BUILD_TYPE})");
                         return;
                     }
-                    _ => {
-                        println!("Ignored arg: {{{arg}}}");
+                    "--headless" => {
+                        if ! SUPPORT_HEADLESS {
+                            eprintln!("Headless run is not supported.");
+                            return;
+                        }
+                        headless = true;
+                        mutargs.remove(arg_i);
                     }
+                    "--hfbi" => {
+                        indice_niseci = false;
+                        mutargs.remove(arg_i);
+                    }
+                    _ => {}
                 }
             }
         },
     }
 
     eprintln!("{PROJECT_VERSION_FULL}");
+
+    if headless {
+        return run_headless(indice_niseci, &mutargs);
+    }
 
     let home_controller = HomeController::new();
     let mut home_view = HomeView::new();
