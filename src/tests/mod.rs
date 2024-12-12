@@ -55,7 +55,9 @@ mod tests {
     #[test]
     fn test_valid_csv_riferimento_niseci() {
         let csv_data = format!(
-            "{}\nCervo;Cervus elaphus;1234;Italia;1;0;1;10;20;30;40;0.1;0.2;0.3;0.4;0.01;0.02",
+            "{}\nCervo;Cervus elaphus;1234;Italia;1;0;1;10;20;30;40;0.1;0.2;0.3;0.4;0.01;0.02
+            Cervo;Cervus elaphus;abc;Italia;1;0;1;10;20;30;40;0.1;0.2;0.3;0.4;0.01;0.02
+            Cervo;Cervus elaphus;1234;Italia;1;0;1;10;20;30;40;1;0.2;0.3;0.4;0.01;0.02",
             RIFERIMENTO_NISECI_HEADER
         );
         let reader = Cursor::new(csv_data);
@@ -110,7 +112,9 @@ mod tests {
     #[test]
     fn test_valid_csv_campionamento_niseci() {
         let csv_data = format!(
-            "{}\n07/07/2019;2190627 Reno 390;750;c1;BA;275;152",
+            "{}\n07/07/2019;2190627 Reno 390;750;c1;BA;275;152
+            07/07/2019;2190627 Reno 390;750;1;BA;275;152
+            abc;2190627 Reno 390;750;c1;BA;275;152",
             CAMPIONAMENTO_NISECI_HEADER
         );
         let reader = Cursor::new(csv_data);
