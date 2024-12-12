@@ -5,6 +5,7 @@ mod model;
 mod views;
 mod controllers;
 mod core;
+mod tests;
 
 use crate::core::*;
 use crate::core::view::*;

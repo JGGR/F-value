@@ -38,6 +38,10 @@ pub const SUPPORT_HEADLESS: bool = false; // This is due to windows_subsystem be
 #[cfg(not(windows))]
 pub const SUPPORT_HEADLESS: bool = true;
 
+pub const RIFERIMENTO_NISECI_HEADER: &str = "\
+nomeComune;nomeLatino;codiceSpecie;origine;tipoAutoctono;alloNocivita;specieAttesa;clSoglia1;clSoglia2;clSoglia3;clSoglia4;adJuvSoglia1;adJuvSoglia2;adJuvSoglia3;adJuvSoglia4;densSoglia1;densSoglia2
+";
+
 //TODO: add test to check if this string respects the discriminant ordering in GuiTheme
 pub const GUI_THEME_COMBOBOX_STR: &str = "Light;Dark;Bluish;Candy;Cherry;Cyber;Jungle;Lavanda;Terminal;Ashes";
 
@@ -181,23 +185,23 @@ pub fn propheight(d: &RaylibDrawHandle<'_>, to_scale: i32) -> i32
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RecordCsvRiferimentoNISECI {
-    nome_comune: String,
-    nome_latino: String,
-    codice_specie: String,
-    origine: String,
-    tipo_autoctono: i32,
-    allo_nocivita: i32,
-    specie_attesa: i32,
-    cl_soglia1: i32,
-    cl_soglia2: i32,
-    cl_soglia3: i32,
-    cl_soglia4: i32,
-    ad_juv_soglia1: f32,
-    ad_juv_soglia2: f32,
-    ad_juv_soglia3: f32,
-    ad_juv_soglia4: f32,
-    dens_soglia1: f32,
-    dens_soglia2: f32,
+    pub nome_comune: String,
+    pub nome_latino: String,
+    pub codice_specie: String,
+    pub origine: String,
+    pub tipo_autoctono: i32,
+    pub allo_nocivita: i32,
+    pub specie_attesa: i32,
+    pub cl_soglia1: i32,
+    pub cl_soglia2: i32,
+    pub cl_soglia3: i32,
+    pub cl_soglia4: i32,
+    pub ad_juv_soglia1: f32,
+    pub ad_juv_soglia2: f32,
+    pub ad_juv_soglia3: f32,
+    pub ad_juv_soglia4: f32,
+    pub dens_soglia1: f32,
+    pub dens_soglia2: f32,
 }
 
 impl fmt::Display for RecordCsvRiferimentoNISECI {
@@ -294,7 +298,7 @@ pub fn parse_csv_riferimento_niseci<R>(mut rdr: csv::Reader<R>) -> (Vec<RecordCs
     (records, errors)
 }
 
-fn translate_error_message(msg: &str) -> String {
+pub fn translate_error_message(msg: &str) -> String {
     if msg.starts_with("missing field") {
         msg.replace("missing field", "campo mancante")
     } else if msg.starts_with("invalid type") {
