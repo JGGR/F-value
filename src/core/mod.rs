@@ -5,6 +5,8 @@ pub mod cli;
 use raylib::prelude::*;
 use std::fmt;
 use std::path::PathBuf;
+use std::io::Read;
+use std::fs::File;
 
 pub const EXIT_KEY: raylib::consts::KeyboardKey = raylib::consts::KeyboardKey::KEY_ESCAPE;
 pub const PROJECT_NAME: &'static str = env!("CARGO_PKG_NAME");
@@ -12,7 +14,7 @@ pub const PROJECT_VERSION: &'static str = env!("CARGO_PKG_VERSION");
 pub const PROJECT_VERSION_FULL: &'static str = env!("VERSION_STRING");
 pub const SHORT_PROJECT_VERSION: &'static str = env!("SHORT_VERSION_STRING");
 pub const PROJECT_BUILD_TYPE: &'static str = env!("BUILD_TYPE");
-pub const _PROJECT_BRANCH: &'static str = env!("BRANCH_NAME");
+pub const PROJECT_BRANCH: &'static str = env!("BRANCH_NAME");
 pub const _COMMIT_HASH: &'static str = env!("COMMIT_HASH");
 pub const COMMIT_HASH_PLUS: &'static str = env!("COMMIT_HASH_PLUS");
 pub const ESOX_SCREEN_WIDTH: i32 = 960;
@@ -35,6 +37,12 @@ pub const SUPPORT_HEADLESS: bool = false; // This is due to windows_subsystem be
 
 #[cfg(not(windows))]
 pub const SUPPORT_HEADLESS: bool = true;
+
+pub const RIFERIMENTO_NISECI_HEADER: &str = "\
+nomeComune;nomeLatino;codiceSpecie;origine;tipoAutoctono;alloNocivita;specieAttesa;clSoglia1;clSoglia2;clSoglia3;clSoglia4;adJuvSoglia1;adJuvSoglia2;adJuvSoglia3;adJuvSoglia4;densSoglia1;densSoglia2";
+
+pub const CAMPIONAMENTO_NISECI_HEADER: &str = "\
+data;stazione;superficie;numPassaggio;codiceSpecie;lunghezza;peso";
 
 //TODO: add test to check if this string respects the discriminant ordering in GuiTheme
 pub const GUI_THEME_COMBOBOX_STR: &str = "Light;Dark;Bluish;Candy;Cherry;Cyber;Jungle;Lavanda;Terminal;Ashes";
@@ -179,47 +187,29 @@ pub fn propheight(d: &RaylibDrawHandle<'_>, to_scale: i32) -> i32
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RecordCsvRiferimentoNISECI {
-    nome_comune: String,
-    nome_latino: String,
-    codice_specie: String,
-    origine: String,
-    tipo_autoctono: i32,
-    allo_nocivita: i32,
-    specie_attesa: i32,
-    cl_soglia1: i32,
-    cl_soglia2: i32,
-    cl_soglia3: i32,
-    cl_soglia4: i32,
-    ad_juv_soglia1: f32,
-    ad_juv_soglia2: f32,
-    ad_juv_soglia3: f32,
-    ad_juv_soglia4: f32,
-    dens_soglia1: f32,
-    dens_soglia2: f32,
+    pub nome_comune: String,
+    pub nome_latino: String,
+    pub codice_specie: String,
+    pub origine: String,
+    pub tipo_autoctono: i32,
+    pub allo_nocivita: i32,
+    pub specie_attesa: i32,
+    pub cl_soglia1: i32,
+    pub cl_soglia2: i32,
+    pub cl_soglia3: i32,
+    pub cl_soglia4: i32,
+    pub ad_juv_soglia1: f32,
+    pub ad_juv_soglia2: f32,
+    pub ad_juv_soglia3: f32,
+    pub ad_juv_soglia4: f32,
+    pub dens_soglia1: f32,
+    pub dens_soglia2: f32,
 }
 
 impl fmt::Display for RecordCsvRiferimentoNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let string_representation = format!(
-            "RecordCsvRiferimentoNISECI: {{
-              nome_comune: [{}],
-              nome_latino: [{}],
-              codice_specie: [{}],
-              origine: [{}],
-              tipo_autoctono: [{}],
-              allo_nocivita: [{}],
-              specie_attesa: [{}],
-              cl_soglia1: [{}],
-              cl_soglia2: [{}],
-              cl_soglia3: [{}],
-              cl_soglia4: [{}],
-              ad_juv_soglia1: [{}],
-              ad_juv_soglia2: [{}],
-              ad_juv_soglia3: [{}],
-              ad_juv_soglia4: [{}],
-              dens_soglia1: [{}],
-              dens_soglia2: [{}]
-              }}",
+            "RecordCsvRiferimentoNISECI: {{ nome_comune: [{}], nome_latino: [{}], codice_specie: [{}], origine: [{}], tipo_autoctono: [{}], allo_nocivita: [{}], specie_attesa: [{}], cl_soglia1: [{}], cl_soglia2: [{}], cl_soglia3: [{}], cl_soglia4: [{}], ad_juv_soglia1: [{}], ad_juv_soglia2: [{}], ad_juv_soglia3: [{}], ad_juv_soglia4: [{}], dens_soglia1: [{}], dens_soglia2: [{}] }}",
               self.nome_comune, self.nome_latino, self.codice_specie, self.origine,
               self.tipo_autoctono, self.allo_nocivita, self.specie_attesa,
               self.cl_soglia1, self.cl_soglia2, self.cl_soglia3, self.cl_soglia4,
@@ -246,15 +236,7 @@ pub struct RecordCsvCampionamentoNISECI {
 impl fmt::Display for RecordCsvCampionamentoNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let string_representation = format!(
-            "RecordCsvCampionamentoNISECI: {{
-              data: [{}],
-              stazione: [{}],
-              superficie: [{}],
-              num_passaggio: [{}],
-              codice_specie: [{}],
-              lunghezza: [{}],
-              peso: [{}],
-              }}",
+            "RecordCsvCampionamentoNISECI: {{ data: [{}], stazione: [{}], superficie: [{}], num_passaggio: [{}], codice_specie: [{}], lunghezza: [{}], peso: [{}] }}",
               // id: [{}], before the }}
               //self.id,
               self.data, self.stazione, self.superficie,
@@ -292,69 +274,196 @@ pub fn parse_csv_riferimento_niseci<R>(mut rdr: csv::Reader<R>) -> (Vec<RecordCs
     (records, errors)
 }
 
-pub fn check_campionamento_niseci_path(path: PathBuf) -> Result<Vec<RecordCsvCampionamentoNISECI>,Vec<csv::Error>> {
-    let rdr = csv::ReaderBuilder::new()
-        .delimiter(b';')
-        .from_path(path);
-    match rdr {
-        Ok(r) => {
-            let (records, errors) = parse_csv_campionamento_niseci(r);
+pub fn translate_error_message(msg: &str) -> String {
+    if msg.starts_with("missing field") {
+        msg.replace("missing field", "campo mancante")
+    } else if msg.starts_with("invalid type") {
+        msg.replace("invalid type", "tipo non valido")
+    } else if msg.starts_with("unexpected end of input") {
+        msg.replace("unexpected end of input", "fine inaspettata dell'input")
+    } else if msg.contains("invalid UTF-8 sequence") {
+        msg.replace("invalid UTF-8 sequence", "sequenza UTF-8 non valida")
+    } else if msg.contains("file not found") {
+        msg.replace("file not found", "file non trovato")
+    } else if msg.contains("invalid digit found in string") {
+        msg.replace("invalid digit found in string", "tipo non valido: numero, attesa stringa")
+            .replace("field", "campo")
+    } else if msg.contains("invalid float literal") {
+        msg.replace("invalid float literal", "tipo non valido: atteso razionale").replace("field", "campo")
+    } else if msg.contains("cannot parse") && msg.contains("from empty string") {
+        // NOTE: there's a leading space in " from empty string", it enables us to attach the ","
+        // to the previous part
+        msg.replace("cannot parse", "campo vuoto: atteso")
+            .replace("float","razionale")
+            .replace("integer","intero")
+            .replace(" from empty string",", trovato: stringa vuota")
+    } else if msg.contains("fields, but the previous record has") {
+        msg.replace("found record with","numero campi: trovato record con")
+            .replace("but the previous record has", "ma il record precedente ha")
+            .replace("fields", "campi")
+    } else {
+        eprintln!("Unmatched translation for {msg}");
+        msg.to_string() // Default to original message if no match
+    }
+}
 
-            println!("Number of valid records: {}", records.len());
-            println!("Number of errors: {}", errors.len());
-
-            if !errors.is_empty() {
-                eprintln!("Errors encountered during processing of campionamento NISECI:");
-                for error in &errors {
-                    eprintln!("  {}", error);
-                }
-                return Err(errors);
-            } else {
-                println!("All records processed successfully for campionamento NISECI!");
-                for record in &records {
-                    println!("  Record: {{{record}}}");
-                }
-                return Ok(records);
-            }
+fn parse_csv_pos(pos: &Option<csv::Position>) -> String {
+    let res;
+    match pos {
+        Some(p) => {
+            let byte_offset = p.byte();
+            let line_offset = p.line();
+            let record_offset = p.record();
+            res = format!("Riga: {} Record: {} Char: {} ", line_offset, record_offset, byte_offset);
         }
-        Err(e) => {
-            eprintln!("Error while opening csv reader: {e}");
-            return Err(Vec::new());
+        None => {
+            res = "none".to_string();
+        }
+    }
+    return res;
+}
+
+fn process_errors(errors: &Vec<csv::Error>) {
+    for error in errors {
+        match error.kind() {
+            csv::ErrorKind::Deserialize { pos, err } => {
+                eprintln!(
+                    "  Errore di deserializzazione alla posizione: {}: {}",
+                    parse_csv_pos(&pos),
+                    translate_error_message(&err.to_string())
+                );
+            }
+            csv::ErrorKind::Io(io_error) => {
+                eprintln!(
+                    "  Errore di I/O: {}",
+                    translate_error_message(&io_error.to_string())
+                );
+            }
+            csv::ErrorKind::Utf8 { pos, err } => {
+                eprintln!(
+                    "  Errore UTF-8 alla posizione: {}: {}",
+                    parse_csv_pos(&pos),
+                    translate_error_message(&err.to_string())
+                );
+            }
+            csv::ErrorKind::UnequalLengths { pos, expected_len, len } => {
+                eprintln!(
+                    "  Errore numero campi alla posizione: {}: lunghezza attesa {}, trovata {}",
+                    parse_csv_pos(&pos),
+                    expected_len,
+                    len
+                    // no translate_error_message() anche se teoricamente lo supporta
+                );
+            }
+            _ => {
+                eprintln!("  Errore sconosciuto: {}", translate_error_message(&error.to_string()));
+            }
         }
     }
 }
 
-pub fn check_riferimento_niseci_path(path: PathBuf) -> Result<Vec<RecordCsvRiferimentoNISECI>,Vec<csv::Error>> {
+fn check_path_is_file_ends_with_csv(path: &PathBuf) -> bool {
+    if !path.exists() {
+        eprintln!("Error: Passed path does not exist");
+        return false;
+    } else if !path.is_file() {
+        eprintln!("Error: Passed path is not a regular file");
+        return false;
+    } else {
+        let ext = path.extension();
+        match ext {
+            Some(ex) => {
+                if ! (ex == "csv") {
+                    eprintln!("Error: Passed path does not end with .csv");
+                    return false;
+                }
+                return true;
+            }
+            None => {
+                eprintln!("Error: Passed path does not end with .csv");
+                return false;
+            }
+        }
+    }
+}
+
+pub fn check_campionamento_niseci_reader<R: Read>(reader: R) -> Result<Vec<RecordCsvCampionamentoNISECI>,Vec<csv::Error>> {
+    let rdr = csv::ReaderBuilder::new()
+        .delimiter(b';')
+        .from_reader(reader);
+    let (records, errors) = parse_csv_campionamento_niseci(rdr);
+
+    println!("Campionamento NISECI: Numero record csv validi: {}", records.len());
+    println!("Campionamento NISECI: Numero record csv non validi: {}", errors.len());
+
+    if !errors.is_empty() {
+        eprintln!("Errori incontrati durante l'elaborazione del campionamento NISECI: {{");
+        /*
+        for error in &errors {
+            eprintln!("  {}", error);
+        }
+        */
+        process_errors(&errors);
+        eprintln!("}}");
+        return Err(errors);
+    } else {
+        println!("Tutti i record del campionamento NISECI sono stati processati con successo!");
+        /*
+        for record in &records {
+            println!("  Record: {{{record}}}");
+        }
+        */
+        return Ok(records);
+    }
+}
+
+pub fn check_campionamento_niseci_path(path: PathBuf) -> Result<Vec<RecordCsvCampionamentoNISECI>,Vec<csv::Error>> {
+    if !check_path_is_file_ends_with_csv(&path) {
+        eprintln!("Il file {} non è un .csv", path.display());
+        return Err(Vec::new());
+    }
+    let file = File::open(path).expect("Unable to open file");
+    return check_campionamento_niseci_reader(file);
+}
+
+pub fn check_riferimento_niseci_reader<R: Read>(reader: R) -> Result<Vec<RecordCsvRiferimentoNISECI>,Vec<csv::Error>> {
 
     let rdr = csv::ReaderBuilder::new()
         .delimiter(b';')
-        .from_path(path);
-    match rdr {
-        Ok(r) => {
-            let (records, errors) = parse_csv_riferimento_niseci(r);
+        .from_reader(reader);
+    let (records, errors) = parse_csv_riferimento_niseci(rdr);
 
-            println!("Number of valid records: {}", records.len());
-            println!("Number of errors: {}", errors.len());
+    println!("Riferimento NISECI: Numero record csv validi: {}", records.len());
+    println!("Riferimento NISECI: Numero record csv non validi: {}", errors.len());
 
-            if !errors.is_empty() {
-                eprintln!("Errors encountered during processing of riferimento NISECI:");
-                for error in &errors {
-                    eprintln!("  {}", error);
-                }
-                return Err(errors);
-            } else {
-                println!("All records processed successfully for riferimento NISECI!");
-                for record in &records {
-                    println!("  Record: {{{record}}}");
-                }
-                return Ok(records);
-            }
+    if !errors.is_empty() {
+        eprintln!("Errori incontrati durante l'elaborazione del riferimento NISECI: {{");
+        /*
+        for error in &errors {
+            eprintln!("  {}", error);
         }
-        Err(e) => {
-            eprintln!("Error while opening csv reader: {e}");
-            return Err(Vec::new());
+        */
+        process_errors(&errors);
+        eprintln!("}}");
+        return Err(errors);
+    } else {
+        println!("Tutti i record del riferimento NISECI sono stati processati con successo!");
+        /*
+        for record in &records {
+            println!("  Record: {{{record}}}");
         }
+        */
+        return Ok(records);
     }
+}
+
+pub fn check_riferimento_niseci_path(path: PathBuf) -> Result<Vec<RecordCsvRiferimentoNISECI>,Vec<csv::Error>> {
+    if !check_path_is_file_ends_with_csv(&path) {
+        eprintln!("Il file {} non è un .csv", path.display());
+        return Err(Vec::new());
+    }
+    let file = File::open(path).expect("Unable to open file");
+    return check_riferimento_niseci_reader(file);
 }
 
 pub fn check_campionamento_hfbi_path(_path: PathBuf) -> bool {

@@ -5,6 +5,8 @@ mod model;
 mod views;
 mod controllers;
 mod core;
+#[cfg(test)]
+mod tests;
 
 use crate::core::*;
 use crate::core::view::*;
@@ -41,6 +43,21 @@ fn main() {
                         println!("{PROJECT_NAME} v{PROJECT_VERSION}-{COMMIT_HASH_PLUS} ({PROJECT_BUILD_TYPE})");
                         return;
                     }
+                    "--info" => {
+                        println!("Info: {{");
+                        println!("  Versione: {PROJECT_VERSION}");
+                        println!("  Build: {PROJECT_BUILD_TYPE}");
+                        println!("  Branch: {PROJECT_BRANCH}");
+                        println!("  Commit: {COMMIT_HASH_PLUS}");
+                        println!("}}");
+                        println!("Header riferimento NISECI: {{");
+                        println!("  {RIFERIMENTO_NISECI_HEADER}");
+                        println!("}}");
+                        println!("Header campionamento NISECI: {{");
+                        println!("  {CAMPIONAMENTO_NISECI_HEADER}");
+                        println!("}}");
+                        return;
+                    }
                     "-h" | "-help" | "--help" => {
                         return esox_usage();
                     }
@@ -70,7 +87,12 @@ fn main() {
     eprintln!("{PROJECT_VERSION_FULL}");
 
     if headless {
-        return run_headless(indice_niseci, &mutargs);
+        let res = run_headless(indice_niseci, &mutargs);
+
+        if !res {
+            eprintln!("Headless run failed");
+        }
+        return;
     }
 
     let home_controller = HomeController::new();

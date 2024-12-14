@@ -8,10 +8,11 @@ pub fn esox_usage() {
   --headless               Run without GUI
   --hfbi                   Run with HFBI
   --version, -v            Print version and quit
+  --info                   Print debug info and quit
   --help, -h               Print this message and quit");
 }
 
-pub fn run_headless(do_niseci: bool, args: &Vec<String>) {
+pub fn run_headless(do_niseci: bool, args: &Vec<String>) -> bool {
     let mut arg_i = 0;
     let mut campionamento_path_str = "";
     let mut riferimento_path_str = "";
@@ -30,7 +31,8 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) {
             }
             _ => {
                 eprintln!("Error: Unexpected arg: {arg}");
-                return esox_usage();
+                esox_usage();
+                return false;
             }
         }
     }
@@ -38,88 +40,69 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) {
     let campionamento_path = PathBuf::from(campionamento_path_str);
     let riferimento_path = PathBuf::from(riferimento_path_str);
 
-    if !campionamento_path.exists() {
-        eprintln!("Error: Passed campionamento does not exist");
-        return;
-    } else if !campionamento_path.is_file() {
-        eprintln!("Error: Passed campionamento is not a regular file");
-        return;
-    } else {
-        let ext = campionamento_path.extension();
-        match ext {
-            Some(ex) => {
-                if ! (ex == "csv") {
-                    eprintln!("Error: Passed campionamento does not end with .csv");
-                    return;
-                }
-            }
-            None => {
-                eprintln!("Error: Passed campionamento does not end with .csv");
-                return;
-            }
-        }
+    if !check_path_is_file_ends_with_csv(&campionamento_path) {
+        eprintln!("Fallito controllo path campionamento");
+        return false;
     }
+
     if do_niseci {
-        if !riferimento_path.exists() {
-            eprintln!("Error: Passed riferimento does not exist");
-            return;
-        } else if !riferimento_path.is_file() {
-            eprintln!("Error: Passed riferimento is not a regular file");
-            return;
-        } else {
-            let ext = riferimento_path.extension();
-            match ext {
-                Some(ex) => {
-                    if ! (ex == "csv") {
-                        eprintln!("Error: Passed riferimento does not end with .csv");
-                        return;
-                    }
-                }
-                None => {
-                    eprintln!("Error: Passed riferimento does not end with .csv");
-                    return;
-                }
-            }
+
+        if !check_path_is_file_ends_with_csv(&riferimento_path) {
+            eprintln!("Fallito controllo path riferimento");
+            return false;
         }
+        let mut campionamento_csv_failed = false;
         let campionamento_check_res = check_campionamento_niseci_path(campionamento_path);
         match campionamento_check_res {
             Ok(recs) => {
-                println!("Campionamento result:");
+                println!("Campionamento result: {{");
                 for r in recs {
-                    println!("{r}");
+                    println!("  {r}");
                 }
+                println!("}}");
                 println!("TODO:  Implement validation step after successful csv parsing");
                 println!("TODO: We may skip the riferimento check also in that case");
             }
-            Err(errs) => {
-                eprintln!("Campionamento errors:");
+            Err(_errs) => {
+                /* Assuming they were printed before this point
+                eprintln!("Campionamento errors in run_headless(): {{");
                 for e in errs {
-                    eprintln!("{e}");
+                    eprintln!("  {e}");
                 }
-                return;
+                eprintln!("}}");
+                */
+                campionamento_csv_failed = true;
+                //return; We keep running to check the other file
             }
         }
+        let mut riferimento_csv_failed = false;
         let riferimento_check_res = check_riferimento_niseci_path(riferimento_path);
         match riferimento_check_res {
             Ok(recs) => {
-                println!("Riferimento result:");
+                println!("Riferimento result: {{");
                 for r in recs {
-                    println!("{r}");
+                    println!("  {r}");
                 }
+                println!("}}");
                 println!("TODO:  Implement validation step after successful csv parsing");
             }
-            Err(errs) => {
-                eprintln!("Riferimento errors:");
+            Err(_errs) => {
+                /* Assuming they were printed before this point
+                eprintln!("Riferimento errors in run_headless(): {{");
                 for e in errs {
-                    eprintln!("{e}");
+                    eprintln!("  {e}");
                 }
-                return;
+                eprintln!("}}");
+                */
+                riferimento_csv_failed = true;
+                //return; We keep running and return later
             }
         }
 
-        return
+        return !riferimento_csv_failed && !campionamento_csv_failed;
     } else {
         let campionamento_check_res = check_campionamento_hfbi_path(campionamento_path);
         println!("Result: {campionamento_check_res}");
+        return true;
     }
 }
