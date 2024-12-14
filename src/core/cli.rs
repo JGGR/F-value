@@ -55,19 +55,22 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) -> bool {
         let campionamento_check_res = check_campionamento_niseci_path(campionamento_path);
         match campionamento_check_res {
             Ok(recs) => {
-                println!("Campionamento result:");
+                println!("Campionamento result: {{");
                 for r in recs {
-                    println!("{r}");
+                    println!("  {r}");
                 }
+                println!("}}");
                 println!("TODO:  Implement validation step after successful csv parsing");
                 println!("TODO: We may skip the riferimento check also in that case");
             }
-            Err(errs) => {
+            Err(_errs) => {
+                /* Assuming they were printed before this point
                 eprintln!("Campionamento errors in run_headless(): {{");
                 for e in errs {
                     eprintln!("  {e}");
                 }
                 eprintln!("}}");
+                */
                 campionamento_csv_failed = true;
                 //return; We keep running to check the other file
             }
@@ -76,18 +79,21 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) -> bool {
         let riferimento_check_res = check_riferimento_niseci_path(riferimento_path);
         match riferimento_check_res {
             Ok(recs) => {
-                println!("Riferimento result:");
+                println!("Riferimento result: {{");
                 for r in recs {
-                    println!("{r}");
+                    println!("  {r}");
                 }
+                println!("}}");
                 println!("TODO:  Implement validation step after successful csv parsing");
             }
-            Err(errs) => {
+            Err(_errs) => {
+                /* Assuming they were printed before this point
                 eprintln!("Riferimento errors in run_headless(): {{");
                 for e in errs {
                     eprintln!("  {e}");
                 }
                 eprintln!("}}");
+                */
                 riferimento_csv_failed = true;
                 //return; We keep running and return later
             }

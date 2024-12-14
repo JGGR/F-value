@@ -209,25 +209,7 @@ pub struct RecordCsvRiferimentoNISECI {
 impl fmt::Display for RecordCsvRiferimentoNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let string_representation = format!(
-            "RecordCsvRiferimentoNISECI: {{
-              nome_comune: [{}],
-              nome_latino: [{}],
-              codice_specie: [{}],
-              origine: [{}],
-              tipo_autoctono: [{}],
-              allo_nocivita: [{}],
-              specie_attesa: [{}],
-              cl_soglia1: [{}],
-              cl_soglia2: [{}],
-              cl_soglia3: [{}],
-              cl_soglia4: [{}],
-              ad_juv_soglia1: [{}],
-              ad_juv_soglia2: [{}],
-              ad_juv_soglia3: [{}],
-              ad_juv_soglia4: [{}],
-              dens_soglia1: [{}],
-              dens_soglia2: [{}]
-              }}",
+            "RecordCsvRiferimentoNISECI: {{ nome_comune: [{}], nome_latino: [{}], codice_specie: [{}], origine: [{}], tipo_autoctono: [{}], allo_nocivita: [{}], specie_attesa: [{}], cl_soglia1: [{}], cl_soglia2: [{}], cl_soglia3: [{}], cl_soglia4: [{}], ad_juv_soglia1: [{}], ad_juv_soglia2: [{}], ad_juv_soglia3: [{}], ad_juv_soglia4: [{}], dens_soglia1: [{}], dens_soglia2: [{}] }}",
               self.nome_comune, self.nome_latino, self.codice_specie, self.origine,
               self.tipo_autoctono, self.allo_nocivita, self.specie_attesa,
               self.cl_soglia1, self.cl_soglia2, self.cl_soglia3, self.cl_soglia4,
@@ -254,15 +236,7 @@ pub struct RecordCsvCampionamentoNISECI {
 impl fmt::Display for RecordCsvCampionamentoNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let string_representation = format!(
-            "RecordCsvCampionamentoNISECI: {{
-              data: [{}],
-              stazione: [{}],
-              superficie: [{}],
-              num_passaggio: [{}],
-              codice_specie: [{}],
-              lunghezza: [{}],
-              peso: [{}],
-              }}",
+            "RecordCsvCampionamentoNISECI: {{ data: [{}], stazione: [{}], superficie: [{}], num_passaggio: [{}], codice_specie: [{}], lunghezza: [{}], peso: [{}] }}",
               // id: [{}], before the }}
               //self.id,
               self.data, self.stazione, self.superficie,
@@ -312,13 +286,21 @@ pub fn translate_error_message(msg: &str) -> String {
     } else if msg.contains("file not found") {
         msg.replace("file not found", "file non trovato")
     } else if msg.contains("invalid digit found in string") {
-        msg.replace("invalid digit found in string", "tipo non valido: numero, attesa stringa").replace("field", "campo")
+        msg.replace("invalid digit found in string", "tipo non valido: numero, attesa stringa")
+            .replace("field", "campo")
     } else if msg.contains("invalid float literal") {
         msg.replace("invalid float literal", "tipo non valido: atteso razionale").replace("field", "campo")
     } else if msg.contains("cannot parse") && msg.contains("from empty string") {
-        msg.replace("cannot parse", "campo vuoto: atteso").replace("float","razionale").replace("integer","intero").replace("from empty string","- trovato: stringa vuota")
+        // NOTE: there's a leading space in " from empty string", it enables us to attach the ","
+        // to the previous part
+        msg.replace("cannot parse", "campo vuoto: atteso")
+            .replace("float","razionale")
+            .replace("integer","intero")
+            .replace(" from empty string",", trovato: stringa vuota")
     } else if msg.contains("fields, but the previous record has") {
-        msg.replace("found record with","numero campi: trovato record con").replace("but the previous record has", "ma il record precedente ha").replace("fields", "campi")
+        msg.replace("found record with","numero campi: trovato record con")
+            .replace("but the previous record has", "ma il record precedente ha")
+            .replace("fields", "campi")
     } else {
         eprintln!("Unmatched translation for {msg}");
         msg.to_string() // Default to original message if no match
@@ -426,9 +408,11 @@ pub fn check_campionamento_niseci_reader<R: Read>(reader: R) -> Result<Vec<Recor
         return Err(errors);
     } else {
         println!("Tutti i record del campionamento NISECI sono stati processati con successo!");
+        /*
         for record in &records {
             println!("  Record: {{{record}}}");
         }
+        */
         return Ok(records);
     }
 }
@@ -464,9 +448,11 @@ pub fn check_riferimento_niseci_reader<R: Read>(reader: R) -> Result<Vec<RecordC
         return Err(errors);
     } else {
         println!("Tutti i record del riferimento NISECI sono stati processati con successo!");
+        /*
         for record in &records {
             println!("  Record: {{{record}}}");
         }
+        */
         return Ok(records);
     }
 }
