@@ -85,6 +85,23 @@ mod tests {
     }
 
     #[test]
+    fn test_csv_riferimento_niseci_lessfields() {
+        let csv_data = format!(
+            "{}\nCervo;Cervus elaphus;1234;Italia;1;0;1;10;20;30;40;0.1;0.2;0.3;0.4;0.01",
+            RIFERIMENTO_NISECI_HEADER
+        );
+        let reader = Cursor::new(csv_data);
+        let result = check_riferimento_niseci_reader(reader);
+
+        assert!(result.is_err());
+        let errors = result.err().unwrap();
+        assert_eq!(errors.len(), 1); // One invalid record
+
+        let translated_error = translate_error_message(&errors[0].to_string());
+        assert!(translated_error.contains("numero campi"));
+    }
+
+    #[test]
     fn test_valid_csv_riferimento_niseci() {
         let csv_data = format!(
             "{}\nCervo;Cervus elaphus;1234;Italia;1;0;1;10;20;30;40;0.1;0.2;0.3;0.4;0.01;0.02

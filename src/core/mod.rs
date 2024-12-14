@@ -317,7 +317,10 @@ pub fn translate_error_message(msg: &str) -> String {
         msg.replace("invalid float literal", "tipo non valido: atteso razionale").replace("field", "campo")
     } else if msg.contains("cannot parse") && msg.contains("from empty string") {
         msg.replace("cannot parse", "campo vuoto: atteso").replace("float","razionale").replace("integer","intero").replace("from empty string","- trovato: stringa vuota")
+    } else if msg.contains("fields, but the previous record has") {
+        msg.replace("found record with","numero campi: trovato record con").replace("but the previous record has", "ma il record precedente ha").replace("fields", "campi")
     } else {
+        eprintln!("Unmatched translation for {msg}");
         msg.to_string() // Default to original message if no match
     }
 }
@@ -359,6 +362,15 @@ fn process_errors(errors: &Vec<csv::Error>) {
                     "  Errore UTF-8 alla posizione: {}: {}",
                     parse_csv_pos(&pos),
                     translate_error_message(&err.to_string())
+                );
+            }
+            csv::ErrorKind::UnequalLengths { pos, expected_len, len } => {
+                eprintln!(
+                    "  Errore numero campi alla posizione: {}: lunghezza attesa {}, trovata {}",
+                    parse_csv_pos(&pos),
+                    expected_len,
+                    len
+                    // no translate_error_message() anche se teoricamente lo supporta
                 );
             }
             _ => {
