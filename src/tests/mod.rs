@@ -175,6 +175,23 @@ mod tests {
     }
 
     #[test]
+    fn test_csv_campionamento_niseci_lessfields() {
+        let csv_data = format!(
+            "{}\n07/07/2019;2190627 Reno 390;75.0;c1;BA;275",
+            CAMPIONAMENTO_NISECI_HEADER
+        );
+        let reader = Cursor::new(csv_data);
+        let result = check_campionamento_niseci_reader(reader);
+
+        assert!(result.is_err());
+        let errors = result.err().unwrap();
+        assert_eq!(errors.len(), 1); // One invalid record
+
+        let translated_error = translate_error_message(&errors[0].to_string());
+        assert!(translated_error.contains("numero campi"));
+    }
+
+    #[test]
     fn test_valid_csv_campionamento_niseci() {
         let csv_data = format!(
             "{}\n07/07/2019;2190627 Reno 390;750;c1;BA;275;152
