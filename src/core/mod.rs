@@ -164,6 +164,10 @@ impl MainState {
             default_bg_color: default_bg_color,
         }
     }
+
+    pub fn set_current_view(&mut self, view: CurrentView) -> () {
+        self.current_view = view;
+    }
 }
 
 pub fn propwidth(d: &RaylibDrawHandle<'_>, to_scale: i32) -> i32

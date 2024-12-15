@@ -1,6 +1,6 @@
 use std::{fmt};
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default, Clone, Copy, PartialEq)]
 pub enum Indice {
   #[default]
   NISECI,

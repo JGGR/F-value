@@ -1,5 +1,8 @@
+use std::process::exit;
+
 use crate::core::*;
 use crate::controllers::*;
+use crate::model::index::Indice;
 use raylib::prelude::*;
 
 // A view responsible for rendering the state
@@ -118,7 +121,7 @@ impl SelezioneIndiceView {
         }
     }
 
-    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, _controller: &IndiceController, main_state: &MainState) {
+    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &IndiceController, main_state: &MainState) {
         d.clear_background(main_state.default_bg_color);
 
         let button_niseci_width = propwidth(&d, 200);
@@ -158,8 +161,7 @@ impl SelezioneIndiceView {
             ),
             Some(rstr!("NISECI"))
         ) {
-            //TODO: set current indice
-            println!("TODO: call controller to update model. Controller can update main_state.current_view on next frame in update()");
+            controller.select_index(Indice::NISECI);
         }
 
         if d.gui_button(
@@ -171,8 +173,7 @@ impl SelezioneIndiceView {
             ),
             Some(rstr!("HFBI"))
         ) {
-            //TODO: set current indice
-            println!("TODO: call controller to update model. Controller can update main_state.current_view on next frame in update()");
+            controller.select_index(Indice::HFBI);
         }
 
     }
@@ -194,7 +195,13 @@ impl SelezioneFileInputView {
         d.clear_background(main_state.default_bg_color);
 
         let _state = controller.get_state();
-        //TODO: get current indice
+        let current_index = match controller.get_current_index() {
+            Some(index) => index,
+            None => {
+                eprintln!("Indice non selezionato");
+                exit(1)
+            }
+        };
 
         let button_riferimento_width = propwidth(&d, 200);
         let button_riferimento_x = d.get_screen_width() / 2 - button_riferimento_width /2;
@@ -207,7 +214,10 @@ impl SelezioneFileInputView {
         let button_campionamento_width = button_riferimento_width;
         let button_campionamento_x = button_riferimento_x;
         let button_campionamento_height = button_riferimento_height;
-        let button_campionamento_y = button_riferimento_y + button_riferimento_height + button_fileinput_y_spacing;
+        let button_campionamento_y = match current_index {
+            Indice::HFBI => button_riferimento_y + button_fileinput_y_spacing,
+            Indice::NISECI => button_riferimento_y + button_riferimento_height + button_fileinput_y_spacing,
+        };
 
         let groupbox_width = button_riferimento_width + propwidth(&d, 100);
         let groupbox_x = button_riferimento_x - propwidth(&d, 50);
@@ -224,19 +234,19 @@ impl SelezioneFileInputView {
             Some(rstr!("Seleziona file di input"))
         );
 
-        //TODO: disable this when current indice is HFBI
-
-        if d.gui_button(
-            rrect(
-                button_riferimento_x,
-                button_riferimento_y,
-                button_riferimento_width,
-                button_riferimento_height
-            ),
-            Some(rstr!("Riferimento"))
-        ) {
-            println!("TODO: handle click on Riferimento");
-            println!("TODO: call controller to update model. Controller can update main_state.current_view on next frame in update()");
+        if current_index != Indice::HFBI {
+            if d.gui_button(
+                rrect(
+                    button_riferimento_x,
+                    button_riferimento_y,
+                    button_riferimento_width,
+                    button_riferimento_height
+                ),
+                Some(rstr!("Riferimento"))
+            ) {
+                println!("TODO: handle click on Riferimento");
+                println!("TODO: call controller to update model. Controller can update main_state.current_view on next frame in update()");
+            }
         }
 
         if d.gui_button(
