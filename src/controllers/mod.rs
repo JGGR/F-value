@@ -1,6 +1,8 @@
 use crate::model::core::*;
 use crate::core::MainState;
+use crate::model::index::Indice;
 use crate::state::GLOBAL_STATE;
+use crate::CurrentView;
 use raylib::RaylibHandle;
 
 // Controller to update and access the state
@@ -67,9 +69,19 @@ impl IndiceController {
         Self
     }
 
-    pub fn update(&self, _rl: &RaylibHandle, _main_state: &mut MainState) {
+    pub fn update(&self, _rl: &RaylibHandle, main_state: &mut MainState) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.indice_model.increment_frame_counter();
+
+        match state.indice_model.get_selected_index() {
+            Some(_index) => main_state.set_current_view(CurrentView::SelezioneFileInput),
+            None => ()
+        }
+    }
+    
+    pub fn select_index(&self, selected_index: Indice) -> () {
+        let mut state = GLOBAL_STATE.lock().unwrap();
+        state.indice_model.set_selected_index(selected_index);
     }
 }
 
@@ -88,6 +100,11 @@ impl FileInputController {
     pub fn get_state(&self) -> FileInputModel {
         let state = GLOBAL_STATE.lock().unwrap();
         return state.fileinput_model.clone();
+    }
+
+    pub fn get_current_index(&self) -> Option<Indice> {
+        let state = GLOBAL_STATE.lock().unwrap();
+        return state.indice_model.get_selected_index();
     }
 }
 

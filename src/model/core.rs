@@ -1,3 +1,6 @@
+use super::index::Indice;
+
+
 // State struct holding non-`Copy` types
 #[derive(Clone)]
 pub struct HomeModel {
@@ -51,6 +54,7 @@ impl SecondModel {
 #[derive(Clone)]
 pub struct IndiceModel {
     frame_counter: u32,
+    selected_index: Option<Indice>
 }
 
 impl IndiceModel {
@@ -59,6 +63,14 @@ impl IndiceModel {
     }
     pub fn increment_frame_counter(&mut self) {
         self.frame_counter += 1;
+    }
+
+    pub fn set_selected_index(&mut self, index: Indice) -> () {
+        self.selected_index = Some(index.clone());
+    }
+
+    pub fn get_selected_index(&self) -> Option<Indice> {
+        return self.selected_index;
     }
 }
 
@@ -130,6 +142,7 @@ impl Model {
             },
             indice_model: IndiceModel {
                 frame_counter: 0,
+                selected_index: None
             },
             fileinput_model: FileInputModel {
                 frame_counter: 0,
