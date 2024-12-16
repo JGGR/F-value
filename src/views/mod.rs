@@ -4,6 +4,7 @@ use crate::core::*;
 use crate::controllers::*;
 use crate::model::index::Indice;
 use raylib::prelude::*;
+use rfd::FileDialog;
 
 // A view responsible for rendering the state
 // Tightly coupled with its respective controller
@@ -161,7 +162,7 @@ impl SelezioneIndiceView {
             ),
             Some(rstr!("NISECI"))
         ) {
-            controller.select_index(Indice::NISECI);
+            controller.set_indice_corrente(Indice::NISECI);
         }
 
         if d.gui_button(
@@ -173,7 +174,7 @@ impl SelezioneIndiceView {
             ),
             Some(rstr!("HFBI"))
         ) {
-            controller.select_index(Indice::HFBI);
+            controller.set_indice_corrente(Indice::HFBI);
         }
 
     }
@@ -244,8 +245,16 @@ impl SelezioneFileInputView {
                 ),
                 Some(rstr!("Riferimento"))
             ) {
-                println!("TODO: handle click on Riferimento");
-                println!("TODO: call controller to update model. Controller can update main_state.current_view on next frame in update()");
+                let file = FileDialog::new()
+                        .add_filter("csv", &["csv"])
+                        .set_directory("/")
+                        .pick_file();
+
+                if let Some(filepath) = file {
+                    controller.set_riferimento_path(Some(filepath));
+                } else {
+                    eprintln!("Error: failed getting a file.");
+                }
             }
         }
 
@@ -258,8 +267,16 @@ impl SelezioneFileInputView {
             ),
             Some(rstr!("Campionamento"))
         ) {
-            println!("TODO: handle click on Campionamento");
-            println!("TODO: call controller to update model. Controller can update main_state.current_view on next frame in update()");
+            let file = FileDialog::new()
+                    .add_filter("csv", &["csv"])
+                    .set_directory("/")
+                    .pick_file();
+
+            if let Some(filepath) = file {
+                controller.set_campionamento_path(Some(filepath));
+            } else {
+                eprintln!("Error: failed getting a file.");
+            }
         }
     }
 }
@@ -280,7 +297,13 @@ impl ValidazioneFileInputView {
         d.clear_background(main_state.default_bg_color);
 
         let _state = controller.get_state();
-        //TODO: get current indice
+        let current_index = match controller.get_current_index() {
+            Some(index) => index,
+            None => {
+                eprintln!("Indice non selezionato");
+                exit(1)
+            }
+        };
 
         let button_riferimento_width = propwidth(&d, 200);
         let button_riferimento_x = d.get_screen_width() / 2 - button_riferimento_width /2;
@@ -293,7 +316,10 @@ impl ValidazioneFileInputView {
         let button_campionamento_width = button_riferimento_width;
         let button_campionamento_x = button_riferimento_x;
         let button_campionamento_height = button_riferimento_height;
-        let button_campionamento_y = button_riferimento_y + button_riferimento_height + button_fileinput_y_spacing;
+        let button_campionamento_y = match current_index {
+            Indice::HFBI => button_riferimento_y + button_fileinput_y_spacing,
+            Indice::NISECI => button_riferimento_y + button_riferimento_height + button_fileinput_y_spacing,
+        };
 
         let groupbox_width = button_riferimento_width + propwidth(&d, 100);
         let groupbox_x = button_riferimento_x - propwidth(&d, 50);
@@ -310,19 +336,18 @@ impl ValidazioneFileInputView {
             Some(rstr!("Valida file di input"))
         );
 
-        //TODO: handle buttons depending on current indice
-
-        if d.gui_button(
-            rrect(
-                button_riferimento_x,
-                button_riferimento_y,
-                button_riferimento_width,
-                button_riferimento_height
-            ),
-            Some(rstr!("Valida Riferimento"))
-        ) {
-            println!("TODO: handle click on Valida Riferimento");
-            println!("TODO: call controller to update model. Controller can update main_state.current_view on next frame in update()");
+        if current_index != Indice::HFBI {
+            if d.gui_button(
+                rrect(
+                    button_riferimento_x,
+                    button_riferimento_y,
+                    button_riferimento_width,
+                    button_riferimento_height
+                ),
+                Some(rstr!("Valida Riferimento"))
+            ) {
+                controller.valida_riferimento_niseci_path();
+            }
         }
 
         if d.gui_button(
@@ -334,8 +359,15 @@ impl ValidazioneFileInputView {
             ),
             Some(rstr!("Valida Campionamento"))
         ) {
-            println!("TODO: handle click on Valida Campionamento");
-            println!("TODO: call controller to update model. Controller can update main_state.current_view on next frame in update()");
+            match current_index {
+                Indice::NISECI => {
+                    controller.valida_campionamento_niseci_path();
+                }
+                Indice::HFBI => {
+                    todo!("Implement controller.valida_campionamento_hfbi_path()");
+                    // controller.valida_campionamento_hfbi_path();
+                }
+            }
         }
     }
 }

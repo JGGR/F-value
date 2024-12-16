@@ -116,6 +116,7 @@ fn main() {
     let (mut rl, thread) = raylib::init()
         .size(ESOX_SCREEN_WIDTH, ESOX_SCREEN_HEIGHT)
         .title(&window_title)
+        .log_level(TraceLogLevel::LOG_ERROR) // Gets rid of raylib init text in the terminal
         .resizable()
         .build();
 
