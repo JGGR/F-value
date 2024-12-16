@@ -67,7 +67,7 @@ impl IndiceModel {
     }
 
     pub fn set_selected_index(&mut self, index: Indice) -> () {
-        self.selected_index = Some(index.clone());
+        self.selected_index = Some(index);
     }
 
     pub fn get_selected_index(&self) -> Option<Indice> {
