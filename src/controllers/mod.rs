@@ -97,9 +97,17 @@ impl FileInputController {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.fileinput_model.increment_frame_counter();
 
-        match state.indice_model.get_selected_index() {
-            Some(index) => {
-                match index {
+        let current_indice;
+        if let Some(idx) = state.indice_model.get_selected_index() {
+            current_indice = idx;
+        } else {
+            eprintln!("FileInputController: User did not select an index. Let's update current view.");
+            main_state.set_current_view(CurrentView::SelezioneIndice);
+            return;
+        }
+        match main_state.current_view {
+            CurrentView::SelezioneFileInput => {
+                match current_indice {
                     Indice::NISECI => {
                         let mut riferimento_ready = false;
 
@@ -129,11 +137,9 @@ impl FileInputController {
                         }
                     }
                 }
-            }
-            None => {
-                eprintln!("FileInputController: User did not select an index. Let's update current view.");
-                main_state.set_current_view(CurrentView::SelezioneIndice);
-            }
+            },
+            CurrentView::ValidazioneFileInput => {},
+            _ => {},
         }
     }
 
