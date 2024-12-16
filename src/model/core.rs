@@ -1,4 +1,5 @@
 use super::index::Indice;
+use std::path::PathBuf;
 
 
 // State struct holding non-`Copy` types
@@ -78,6 +79,8 @@ impl IndiceModel {
 #[derive(Clone)]
 pub struct FileInputModel {
     frame_counter: u32,
+    riferimento_path: Option<PathBuf>,
+    campionamento_path: Option<PathBuf>
 }
 
 impl FileInputModel {
@@ -86,6 +89,21 @@ impl FileInputModel {
     }
     pub fn increment_frame_counter(&mut self) {
         self.frame_counter += 1;
+    }
+    pub fn set_riferimento_path(&mut self, path: Option<PathBuf>) {
+        self.riferimento_path = path;
+    }
+
+    pub fn get_riferimento_path(&self) -> Option<PathBuf> {
+        return self.riferimento_path.clone();
+    }
+
+    pub fn set_campionamento_path(&mut self, path: Option<PathBuf>) {
+        self.campionamento_path = path;
+    }
+
+    pub fn get_campionamento_path(&self) -> Option<PathBuf> {
+        return self.campionamento_path.clone();
     }
 }
 
@@ -146,6 +164,8 @@ impl Model {
             },
             fileinput_model: FileInputModel {
                 frame_counter: 0,
+                riferimento_path: None,
+                campionamento_path: None,
             },
             infoaggiuntive_model: InfoAggiuntiveModel {
                 frame_counter: 0,

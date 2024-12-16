@@ -4,6 +4,7 @@ use crate::model::index::Indice;
 use crate::state::GLOBAL_STATE;
 use crate::CurrentView;
 use raylib::RaylibHandle;
+use std::path::PathBuf;
 
 // Controller to update and access the state
 pub struct HomeController;
@@ -78,7 +79,7 @@ impl IndiceController {
             None => ()
         }
     }
-    
+
     pub fn select_index(&self, selected_index: Indice) -> () {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.indice_model.set_selected_index(selected_index);
@@ -105,6 +106,16 @@ impl FileInputController {
     pub fn get_current_index(&self) -> Option<Indice> {
         let state = GLOBAL_STATE.lock().unwrap();
         return state.indice_model.get_selected_index();
+    }
+
+    pub fn get_riferimento_path(&self) -> Option<PathBuf> {
+        let state = GLOBAL_STATE.lock().unwrap();
+        return state.fileinput_model.get_riferimento_path();
+    }
+
+    pub fn get_campionamento_path(&self) -> Option<PathBuf> {
+        let state = GLOBAL_STATE.lock().unwrap();
+        return state.fileinput_model.get_campionamento_path();
     }
 }
 
