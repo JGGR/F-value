@@ -7,6 +7,7 @@ use std::fmt;
 use std::path::PathBuf;
 use std::io::Read;
 use std::fs::File;
+use crate::model::niseci::SpecieNISECI;
 
 pub const EXIT_KEY: raylib::consts::KeyboardKey = raylib::consts::KeyboardKey::KEY_ESCAPE;
 pub const PROJECT_NAME: &'static str = env!("CARGO_PKG_NAME");
@@ -190,7 +191,7 @@ pub fn propheight(d: &RaylibDrawHandle<'_>, to_scale: i32) -> i32
 
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct RecordCsvRiferimentoNISECI {
+pub struct RecordCsvRiferimentoNISECI { //TODO: add position
     pub nome_comune: String,
     pub nome_latino: String,
     pub codice_specie: String,
@@ -226,7 +227,7 @@ impl fmt::Display for RecordCsvRiferimentoNISECI {
 
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct RecordCsvCampionamentoNISECI {
+pub struct RecordCsvCampionamentoNISECI { //TODO: add position
     //id: i32,
     data: String,
     stazione: String,
@@ -276,6 +277,100 @@ pub fn parse_csv_riferimento_niseci<R>(mut rdr: csv::Reader<R>) -> (Vec<RecordCs
     }
 
     (records, errors)
+}
+
+pub enum RecordCsvRiferimentoNISECIError{
+    ValoreInvalido { msg : String }, //TODO: add position
+}
+
+pub fn parse_recordcsv_riferimento_niseci(records: Vec<RecordCsvRiferimentoNISECI>) -> (Vec<SpecieNISECI>,Vec<RecordCsvRiferimentoNISECIError>) {
+    let mut specie = Vec::new();
+    let mut errors = Vec::new();
+    let mut idx = 0;
+    let mut used_id_specie = Vec::new(); // Stores already-parsed ids to detect doubles
+    for r in records {
+        idx += 1;
+        let mut origine_autoctono = true;
+        match r.origine.as_str() {
+            "ALL" => {
+                origine_autoctono = false;
+            },
+            "AUT" => {},
+            _ => {
+                let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: origine invalida (non \"AUT\" o \"ALL\"): {}", r.origine) };
+                errors.push(err);
+                continue;
+            }
+        }
+        if r.specie_attesa < 0 {
+            let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: specie_attesa < 0") };
+            errors.push(err);
+            continue;
+        }
+        let specie_attesa = r.specie_attesa > 0; // TODO: possiamo prendere qualsiasi non-zero come
+                                                 // "atteso"?
+        if r.tipo_autoctono < 0 {
+            let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: tipo_autoctono < 0") };
+            errors.push(err);
+            continue;
+        }
+
+        let tipo_autoctono: u8;
+        let tipo_alloctono: u8;
+        if origine_autoctono {
+            match r.tipo_autoctono {
+                1 | 2 => {
+                    tipo_autoctono = r.tipo_autoctono as u8;
+                }
+                _ => {
+                    let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: tipo_autoctono invalido (non 1 o 2): {}", r.tipo_autoctono) };
+                    errors.push(err);
+                    continue;
+                }
+            }
+            tipo_alloctono = 0;
+        } else {
+            tipo_autoctono = 0;
+            match r.allo_nocivita {
+                0 | 1 | 2 | 3 => {
+                    tipo_alloctono = r.allo_nocivita as u8;
+                }
+                _ => {
+                    let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: allo_nocivita invalido (non [0..3]): {}", r.allo_nocivita) };
+                    errors.push(err);
+                    continue;
+                }
+            }
+        }
+
+        if r.codice_specie.len() < 1 {
+            let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: codice_specie invalido (lunghezza < 1)") };
+            errors.push(err);
+            continue;
+        }
+
+        let id = r.codice_specie;
+
+        if used_id_specie.contains(&id) {
+            let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: codice_specie invalido (ridefinizione)") };
+            errors.push(err);
+            continue;
+        }
+
+        let nome =  r.nome_latino; //TODO: controllare se dovrebbe essere nome_comune
+
+        let specie_rec = SpecieNISECI {
+            id: id.clone(),
+            nome: nome,
+            tipo_autoctono: tipo_autoctono,
+            tipo_alloctono: tipo_alloctono,
+            specie_attesa: specie_attesa,
+        };
+        specie.push(specie_rec);
+        used_id_specie.push(id);
+    }
+
+    (specie, errors)
 }
 
 pub fn translate_error_message(msg: &str) -> String {

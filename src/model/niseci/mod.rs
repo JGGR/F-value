@@ -4,11 +4,11 @@ use std::fmt;
 use super::location::Location;
 
 pub struct SpecieNISECI {
-  id: String,
-  nome: String,
-  tipo_autoctono: u8, // si potrebbe unire autoctono con alloctono?
-  tipo_alloctono: u8, // ricordo che ne avevamo parlato
-  specie_attesa: bool
+  pub id: String,
+  pub nome: String,
+  pub tipo_autoctono: u8, // si potrebbe unire autoctono con alloctono?
+  pub tipo_alloctono: u8, // ricordo che ne avevamo parlato
+  pub specie_attesa: bool
 }
 
 pub struct RiferimentoNISECI {
