@@ -221,6 +221,11 @@ impl FileInputController {
         state.fileinput_model.set_riferimento_path_valid(false); // Refresh the validity
     }
 
+    pub fn get_riferimento_path_valid(&self) -> bool {
+        let state = GLOBAL_STATE.lock().unwrap();
+        return state.fileinput_model.get_riferimento_path_valid();
+    }
+
     pub fn valida_riferimento_niseci_path(&self) {
         if let Some(path) = self.get_riferimento_path() {
             let csv_check = check_riferimento_niseci_path(path);
@@ -258,6 +263,11 @@ impl FileInputController {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.fileinput_model.set_campionamento_path(campionamento_path);
         state.fileinput_model.set_campionamento_path_valid(false); // Refresh the validity
+    }
+
+    pub fn get_campionamento_path_valid(&self) -> bool {
+        let state = GLOBAL_STATE.lock().unwrap();
+        return state.fileinput_model.get_campionamento_path_valid();
     }
 
     pub fn valida_campionamento_niseci_path(&self) {

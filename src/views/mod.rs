@@ -5,6 +5,7 @@ use crate::controllers::*;
 use crate::model::index::Indice;
 use raylib::prelude::*;
 use rfd::FileDialog;
+use raylib::consts::GuiState::{STATE_NORMAL, STATE_DISABLED};
 
 // A view responsible for rendering the state
 // Tightly coupled with its respective controller
@@ -350,6 +351,13 @@ impl ValidazioneFileInputView {
             }
         }
 
+        let mut turn_off_button_campionamento = false;
+        if current_index == Indice::NISECI && !controller.get_riferimento_path_valid() {
+            turn_off_button_campionamento = true;
+            d.gui_lock();
+            d.gui_set_state(STATE_DISABLED);
+        }
+
         if d.gui_button(
             rrect(
                 button_campionamento_x,
@@ -368,6 +376,11 @@ impl ValidazioneFileInputView {
                     // controller.valida_campionamento_hfbi_path();
                 }
             }
+        }
+
+        if turn_off_button_campionamento {
+            d.gui_set_state(STATE_NORMAL);
+            d.gui_unlock();
         }
     }
 }
