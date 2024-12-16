@@ -7,7 +7,7 @@ use std::fmt;
 use std::path::PathBuf;
 use std::io::Read;
 use std::fs::File;
-use crate::model::niseci::SpecieNISECI;
+use crate::model::niseci::{SpecieNISECI, RecordNISECI};
 
 pub const EXIT_KEY: raylib::consts::KeyboardKey = raylib::consts::KeyboardKey::KEY_ESCAPE;
 pub const PROJECT_NAME: &'static str = env!("CARGO_PKG_NAME");
@@ -265,6 +265,92 @@ pub fn parse_csv_campionamento_niseci<R>(mut rdr: csv::Reader<R>) -> (Vec<Record
     (records, errors)
 }
 
+pub enum RecordCsvCampionamentoNISECIError {
+    ValoreInvalido { msg : String }, //TODO: add position?
+}
+
+pub fn parse_recordcsv_campionamento_niseci(records: Vec<RecordCsvCampionamentoNISECI>, riferimento_specie: Vec<SpecieNISECI>) -> (Vec<RecordNISECI>,Vec<RecordCsvCampionamentoNISECIError>) {
+    let mut campioni = Vec::new();
+    let mut errors = Vec::new();
+    let mut idx = 0;
+    for r in records {
+        idx += 1;
+        if r.codice_specie.len() < 1 {
+            let err = RecordCsvCampionamentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: codice_specie non valido (lunghezza < 1)") };
+            errors.push(err);
+            continue;
+        }
+        let codice_specie = r.codice_specie;
+        let mut opt_matched_specie = None;
+        for s in &riferimento_specie {
+            if s.id == codice_specie {
+                opt_matched_specie = Some(s);
+                break; // TODO: mmmh
+            }
+        }
+
+
+        let matched_specie;
+        if let Some(specie) = opt_matched_specie {
+            matched_specie = specie;
+        } else {
+            let err = RecordCsvCampionamentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: codice_specie non valido (non presente nel riferimento): {}", codice_specie) };
+            errors.push(err);
+            continue;
+        }
+
+
+        let passaggio_cattura;
+        match r.num_passaggio.as_str() {
+            "c1" => {
+                passaggio_cattura = 1;
+            }
+            "c2" => {
+                passaggio_cattura = 2;
+            }
+            _ => {
+                let err = RecordCsvCampionamentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: num_passaggio non valido (non \"c1\" o \"c2\"): {}", r.num_passaggio) };
+                errors.push(err);
+                continue;
+            }
+        }
+
+        if r.lunghezza < 0 {
+            let err = RecordCsvCampionamentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: lunghezza < 0") };
+            errors.push(err);
+            continue;
+        }
+
+        if r.lunghezza > u32::MAX as i32 {
+            let err = RecordCsvCampionamentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: lunghezza troppo grande: {}", r.lunghezza) };
+            errors.push(err);
+            continue;
+        }
+
+        if r.peso < 0 {
+            let err = RecordCsvCampionamentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: peso < 0") };
+            errors.push(err);
+            continue;
+        }
+
+        if r.peso > u32::MAX as i32 {
+            let err = RecordCsvCampionamentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: peso troppo grande: {}", r.peso) };
+            errors.push(err);
+            continue;
+        }
+
+
+        let niseci_rec = RecordNISECI {
+            specie: matched_specie.clone(),
+            passaggio_cattura: passaggio_cattura as u8,
+            lunghezza: r.lunghezza as u32,
+            peso: r.peso as u32
+        };
+        campioni.push(niseci_rec);
+    }
+    (campioni, errors)
+}
+
 pub fn parse_csv_riferimento_niseci<R>(mut rdr: csv::Reader<R>) -> (Vec<RecordCsvRiferimentoNISECI>, Vec<csv::Error>) where R: std::io::Read {
     let mut records = Vec::new();
     let mut errors = Vec::new();
@@ -279,8 +365,8 @@ pub fn parse_csv_riferimento_niseci<R>(mut rdr: csv::Reader<R>) -> (Vec<RecordCs
     (records, errors)
 }
 
-pub enum RecordCsvRiferimentoNISECIError{
-    ValoreInvalido { msg : String }, //TODO: add position
+pub enum RecordCsvRiferimentoNISECIError {
+    ValoreInvalido { msg : String }, //TODO: add position?
 }
 
 pub fn parse_recordcsv_riferimento_niseci(records: Vec<RecordCsvRiferimentoNISECI>) -> (Vec<SpecieNISECI>,Vec<RecordCsvRiferimentoNISECIError>) {
@@ -323,7 +409,7 @@ pub fn parse_recordcsv_riferimento_niseci(records: Vec<RecordCsvRiferimentoNISEC
                     tipo_autoctono = r.tipo_autoctono as u8;
                 }
                 _ => {
-                    let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: tipo_autoctono invalido (non 1 o 2): {}", r.tipo_autoctono) };
+                    let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: tipo_autoctono non valido (non 1 o 2): {}", r.tipo_autoctono) };
                     errors.push(err);
                     continue;
                 }
@@ -336,7 +422,7 @@ pub fn parse_recordcsv_riferimento_niseci(records: Vec<RecordCsvRiferimentoNISEC
                     tipo_alloctono = r.allo_nocivita as u8;
                 }
                 _ => {
-                    let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: allo_nocivita invalido (non [0..3]): {}", r.allo_nocivita) };
+                    let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: allo_nocivita non valido (non [0..3]): {}", r.allo_nocivita) };
                     errors.push(err);
                     continue;
                 }
@@ -344,7 +430,7 @@ pub fn parse_recordcsv_riferimento_niseci(records: Vec<RecordCsvRiferimentoNISEC
         }
 
         if r.codice_specie.len() < 1 {
-            let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: codice_specie invalido (lunghezza < 1)") };
+            let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: codice_specie non valido (lunghezza < 1)") };
             errors.push(err);
             continue;
         }
@@ -352,7 +438,7 @@ pub fn parse_recordcsv_riferimento_niseci(records: Vec<RecordCsvRiferimentoNISEC
         let id = r.codice_specie;
 
         if used_id_specie.contains(&id) {
-            let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: codice_specie invalido (ridefinizione)") };
+            let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: codice_specie non valido (ridefinizione)") };
             errors.push(err);
             continue;
         }
