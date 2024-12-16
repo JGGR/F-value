@@ -6,6 +6,8 @@ use crate::model::index::Indice;
 use raylib::prelude::*;
 use rfd::FileDialog;
 use raylib::consts::GuiState::{STATE_NORMAL, STATE_DISABLED};
+use raylib::consts::GuiIconName::ICON_FILE_OPEN;
+use std::ffi::CString;
 
 // A view responsible for rendering the state
 // Tightly coupled with its respective controller
@@ -237,6 +239,8 @@ impl SelezioneFileInputView {
         );
 
         if current_index != Indice::HFBI {
+            let rif_itext = d.gui_icon_text(ICON_FILE_OPEN, Some(rstr!("Riferimento")));
+            let rif_itext = CString::new(rif_itext).unwrap();
             if d.gui_button(
                 rrect(
                     button_riferimento_x,
@@ -244,7 +248,7 @@ impl SelezioneFileInputView {
                     button_riferimento_width,
                     button_riferimento_height
                 ),
-                Some(rstr!("Riferimento"))
+                Some(rif_itext.as_c_str())
             ) {
                 let file = FileDialog::new()
                         .add_filter("csv", &["csv"])
@@ -259,6 +263,8 @@ impl SelezioneFileInputView {
             }
         }
 
+        let camp_itext = d.gui_icon_text(ICON_FILE_OPEN, Some(rstr!("Campionamento")));
+        let camp_itext = CString::new(camp_itext).unwrap();
         if d.gui_button(
             rrect(
                 button_campionamento_x,
@@ -266,7 +272,7 @@ impl SelezioneFileInputView {
                 button_campionamento_width,
                 button_campionamento_height,
             ),
-            Some(rstr!("Campionamento"))
+            Some(camp_itext.as_c_str())
         ) {
             let file = FileDialog::new()
                     .add_filter("csv", &["csv"])
