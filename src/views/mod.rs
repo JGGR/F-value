@@ -4,6 +4,7 @@ use crate::core::*;
 use crate::controllers::*;
 use crate::model::index::Indice;
 use raylib::prelude::*;
+use rfd::FileDialog;
 
 // A view responsible for rendering the state
 // Tightly coupled with its respective controller
@@ -244,8 +245,16 @@ impl SelezioneFileInputView {
                 ),
                 Some(rstr!("Riferimento"))
             ) {
-                println!("TODO: handle click on Riferimento");
-                println!("TODO: call controller to update model. Controller can update main_state.current_view on next frame in update()");
+                let file = FileDialog::new()
+                        .add_filter("csv", &["csv"])
+                        .set_directory("/")
+                        .pick_file();
+
+                if let Some(filepath) = file {
+                    controller.set_riferimento_path(Some(filepath));
+                } else {
+                    eprintln!("Error: failed getting a file.");
+                }
             }
         }
 
@@ -258,8 +267,16 @@ impl SelezioneFileInputView {
             ),
             Some(rstr!("Campionamento"))
         ) {
-            println!("TODO: handle click on Campionamento");
-            println!("TODO: call controller to update model. Controller can update main_state.current_view on next frame in update()");
+            let file = FileDialog::new()
+                    .add_filter("csv", &["csv"])
+                    .set_directory("/")
+                    .pick_file();
+
+            if let Some(filepath) = file {
+                controller.set_campionamento_path(Some(filepath));
+            } else {
+                eprintln!("Error: failed getting a file.");
+            }
         }
     }
 }

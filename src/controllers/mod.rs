@@ -93,9 +93,48 @@ impl FileInputController {
         Self
     }
 
-    pub fn update(&self, _rl: &RaylibHandle, _main_state: &mut MainState) {
+    pub fn update(&self, _rl: &RaylibHandle, main_state: &mut MainState) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.fileinput_model.increment_frame_counter();
+
+        match state.indice_model.get_selected_index() {
+            Some(index) => {
+                match index {
+                    Indice::NISECI => {
+                        let mut riferimento_ready = false;
+
+                        if let Some(_rif_path) = state.fileinput_model.get_riferimento_path() {
+                            riferimento_ready = true;
+                        }
+                        let mut campionamento_ready = false;
+                        if let Some(_campionamento_path) = state.fileinput_model.get_campionamento_path() {
+                            // Assumes the path is ready to be used.
+                            // The current selection used by the only forces .csv extension
+                            campionamento_ready = true;
+                        }
+
+                        if riferimento_ready && campionamento_ready {
+                            main_state.set_current_view(CurrentView::ValidazioneFileInput);
+                        }
+                    }
+                    Indice::HFBI => {
+                        let mut campionamento_ready = false;
+                        if let Some(_campionamento_path) = state.fileinput_model.get_campionamento_path() {
+                            // Assumes the path is ready to be used.
+                            // The current selection used by the only forces .csv extension
+                            campionamento_ready = true;
+                        }
+                        if campionamento_ready {
+                            main_state.set_current_view(CurrentView::ValidazioneFileInput);
+                        }
+                    }
+                }
+            }
+            None => {
+                eprintln!("FileInputController: User did not select an index. Let's update current view.");
+                main_state.set_current_view(CurrentView::SelezioneIndice);
+            }
+        }
     }
 
     pub fn get_state(&self) -> FileInputModel {
@@ -113,9 +152,19 @@ impl FileInputController {
         return state.fileinput_model.get_riferimento_path();
     }
 
+    pub fn set_riferimento_path(&self, riferimento_path: Option<PathBuf>) {
+        let mut state = GLOBAL_STATE.lock().unwrap();
+        return state.fileinput_model.set_riferimento_path(riferimento_path);
+    }
+
     pub fn get_campionamento_path(&self) -> Option<PathBuf> {
         let state = GLOBAL_STATE.lock().unwrap();
         return state.fileinput_model.get_campionamento_path();
+    }
+
+    pub fn set_campionamento_path(&self, campionamento_path: Option<PathBuf>) {
+        let mut state = GLOBAL_STATE.lock().unwrap();
+        return state.fileinput_model.set_campionamento_path(campionamento_path);
     }
 }
 
