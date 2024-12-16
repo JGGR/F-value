@@ -282,7 +282,7 @@ pub fn parse_recordcsv_campionamento_niseci(records: Vec<RecordCsvCampionamentoN
         }
         let codice_specie = r.codice_specie;
         let mut opt_matched_specie = None;
-        for s in &riferimento_specie {
+        for s in &riferimento_specie { // FIXME: this is O(n^2).
             if s.id == codice_specie {
                 opt_matched_specie = Some(s);
                 break; // TODO: mmmh

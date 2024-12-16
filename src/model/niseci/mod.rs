@@ -3,7 +3,7 @@ use std::fmt;
 
 use super::location::Location;
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct SpecieNISECI {
   pub id: String,
   pub nome: String,
@@ -16,6 +16,7 @@ pub struct RiferimentoNISECI {
   elenco_specie: Vec<SpecieNISECI>
 }
 
+#[derive(Debug)]
 pub struct RecordNISECI {
   pub specie: SpecieNISECI,
   pub passaggio_cattura: u8,

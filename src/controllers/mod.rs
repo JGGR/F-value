@@ -226,7 +226,7 @@ impl FileInputController {
             let csv_check = check_riferimento_niseci_path(path);
 
             match csv_check {
-                Ok(records) => {
+                Ok(_records) => {
                     //TODO: implement post-csv check step.
                     eprintln!("TODO: implement post-csv check step to ensure the records are valid.");
                     let records_check = false;
@@ -236,7 +236,7 @@ impl FileInputController {
                         state.fileinput_model.set_riferimento_path_valid(records_check);
                     }
                 }
-                Err(errors) => {
+                Err(_errors) => {
                     //TODO: handle displaying the errors?
                     /*
                     for err in errors {
@@ -265,7 +265,7 @@ impl FileInputController {
             let csv_check = check_campionamento_niseci_path(path);
 
             match csv_check {
-                Ok(records) => {
+                Ok(_records) => {
                     //TODO: implement post-csv check step.
                     eprintln!("TODO: implement post-csv check step to ensure the records are valid.");
                     let records_check = false;
@@ -275,7 +275,7 @@ impl FileInputController {
                         state.fileinput_model.set_campionamento_path_valid(records_check);
                     }
                 }
-                Err(errors) => {
+                Err(_errors) => {
                     //TODO: handle displaying the errors?
                     /*
                     for err in errors {
