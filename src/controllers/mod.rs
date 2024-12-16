@@ -1,5 +1,5 @@
 use crate::model::core::*;
-use crate::core::MainState;
+use crate::core::{MainState, check_campionamento_niseci_path, check_riferimento_niseci_path, check_campionamento_hfbi_path};
 use crate::model::index::Indice;
 use crate::state::GLOBAL_STATE;
 use crate::CurrentView;
@@ -80,9 +80,9 @@ impl IndiceController {
         }
     }
 
-    pub fn select_index(&self, selected_index: Indice) -> () {
+    pub fn set_indice_corrente(&self, index: Indice) -> () {
         let mut state = GLOBAL_STATE.lock().unwrap();
-        state.indice_model.set_selected_index(selected_index);
+        state.indice_model.set_selected_index(index);
     }
 }
 
@@ -101,7 +101,8 @@ impl FileInputController {
         if let Some(idx) = state.indice_model.get_selected_index() {
             current_indice = idx;
         } else {
-            eprintln!("FileInputController: User did not select an index. Let's update current view.");
+            eprintln!("FileInputController:  User did not select an index");
+            eprintln!("FileInputController:  Let's update current view and go back to SelezioneIndice.");
             main_state.set_current_view(CurrentView::SelezioneIndice);
             return;
         }
@@ -138,7 +139,51 @@ impl FileInputController {
                     }
                 }
             },
-            CurrentView::ValidazioneFileInput => {},
+            CurrentView::ValidazioneFileInput => {
+                match current_indice {
+                    Indice::NISECI => {
+                        if let Some(_rif_path) = state.fileinput_model.get_riferimento_path() {
+                            //
+                        } else {
+                            eprintln!("FileInputController:  User did not select a riferimento niseci path");
+                            eprintln!("FileInputController:  Let's update current view and go back to SelezioneFileInput.");
+                            main_state.set_current_view(CurrentView::SelezioneFileInput);
+                            return;
+                        }
+
+                        if let Some(_campionamento_path) = state.fileinput_model.get_campionamento_path() {
+                            //
+                        } else {
+                            eprintln!("FileInputController:  User did not select a campionamento niseci path");
+                            eprintln!("FileInputController:  Let's update current view and go back to SelezioneFileInput.");
+                            main_state.set_current_view(CurrentView::SelezioneFileInput);
+                            return;
+                        }
+
+                        let riferimento_valid = state.fileinput_model.get_riferimento_path_valid();
+                        let campionamento_valid = state.fileinput_model.get_campionamento_path_valid();
+
+                        if riferimento_valid && campionamento_valid {
+                            main_state.set_current_view(CurrentView::SelezioneInfoAggiuntive);
+                        }
+                    }
+                    Indice::HFBI => {
+                        if let Some(_campionamento_path) = state.fileinput_model.get_campionamento_path() {
+                            //
+                        } else {
+                            eprintln!("FileInputController:  User did not select a campionamento hfbi path");
+                            eprintln!("FileInputController:  Let's update current view and go back to SelezioneFileInput.");
+                            main_state.set_current_view(CurrentView::SelezioneFileInput);
+                            return;
+                        }
+                        let campionamento_valid = state.fileinput_model.get_campionamento_path_valid();
+
+                        if campionamento_valid {
+                            main_state.set_current_view(CurrentView::SelezioneInfoAggiuntive);
+                        }
+                    }
+                }
+            },
             _ => {},
         }
     }
@@ -160,7 +205,36 @@ impl FileInputController {
 
     pub fn set_riferimento_path(&self, riferimento_path: Option<PathBuf>) {
         let mut state = GLOBAL_STATE.lock().unwrap();
-        return state.fileinput_model.set_riferimento_path(riferimento_path);
+        state.fileinput_model.set_riferimento_path(riferimento_path);
+        state.fileinput_model.set_riferimento_path_valid(false); // Refresh the validity
+    }
+
+    pub fn valida_riferimento_niseci_path(&self) {
+        if let Some(path) = self.get_riferimento_path() {
+            let csv_check = check_riferimento_niseci_path(path);
+
+            match csv_check {
+                Ok(records) => {
+                    //TODO: implement post-csv check step.
+                    eprintln!("TODO: implement post-csv check step to ensure the records are valid.");
+                    let records_check = false;
+
+                    if records_check {
+                        let mut state = GLOBAL_STATE.lock().unwrap();
+                        state.fileinput_model.set_riferimento_path_valid(records_check);
+                    }
+                }
+                Err(errors) => {
+                    //TODO: handle displaying the errors?
+                    /*
+                    for err in errors {
+                        eprintln!("FileInputController:  {err}");
+                    }
+                    */
+                    return;
+                }
+            }
+        }
     }
 
     pub fn get_campionamento_path(&self) -> Option<PathBuf> {
@@ -170,7 +244,36 @@ impl FileInputController {
 
     pub fn set_campionamento_path(&self, campionamento_path: Option<PathBuf>) {
         let mut state = GLOBAL_STATE.lock().unwrap();
-        return state.fileinput_model.set_campionamento_path(campionamento_path);
+        state.fileinput_model.set_campionamento_path(campionamento_path);
+        state.fileinput_model.set_campionamento_path_valid(false); // Refresh the validity
+    }
+
+    pub fn valida_campionamento_niseci_path(&self) {
+        if let Some(path) = self.get_campionamento_path() {
+            let csv_check = check_campionamento_niseci_path(path);
+
+            match csv_check {
+                Ok(records) => {
+                    //TODO: implement post-csv check step.
+                    eprintln!("TODO: implement post-csv check step to ensure the records are valid.");
+                    let records_check = false;
+
+                    if records_check {
+                        let mut state = GLOBAL_STATE.lock().unwrap();
+                        state.fileinput_model.set_campionamento_path_valid(records_check);
+                    }
+                }
+                Err(errors) => {
+                    //TODO: handle displaying the errors?
+                    /*
+                    for err in errors {
+                        eprintln!("FileInputController:  {err}");
+                    }
+                    */
+                    return;
+                }
+            }
+        }
     }
 }
 

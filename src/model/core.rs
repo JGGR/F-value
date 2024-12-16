@@ -80,7 +80,9 @@ impl IndiceModel {
 pub struct FileInputModel {
     frame_counter: u32,
     riferimento_path: Option<PathBuf>,
-    campionamento_path: Option<PathBuf>
+    riferimento_path_valid: bool,
+    campionamento_path: Option<PathBuf>,
+    campionamento_path_valid: bool,
 }
 
 impl FileInputModel {
@@ -98,12 +100,28 @@ impl FileInputModel {
         return self.riferimento_path.clone();
     }
 
+    pub fn set_riferimento_path_valid(&mut self, valid: bool) {
+        self.riferimento_path_valid = valid;
+    }
+
+    pub fn get_riferimento_path_valid(&self) -> bool {
+        return self.riferimento_path_valid;
+    }
+
     pub fn set_campionamento_path(&mut self, path: Option<PathBuf>) {
         self.campionamento_path = path;
     }
 
     pub fn get_campionamento_path(&self) -> Option<PathBuf> {
         return self.campionamento_path.clone();
+    }
+
+    pub fn set_campionamento_path_valid(&mut self, valid: bool) {
+        self.campionamento_path_valid = valid;
+    }
+
+    pub fn get_campionamento_path_valid(&self) -> bool {
+        return self.campionamento_path_valid;
     }
 }
 
@@ -165,7 +183,9 @@ impl Model {
             fileinput_model: FileInputModel {
                 frame_counter: 0,
                 riferimento_path: None,
+                riferimento_path_valid: false,
                 campionamento_path: None,
+                campionamento_path_valid: false,
             },
             infoaggiuntive_model: InfoAggiuntiveModel {
                 frame_counter: 0,

@@ -162,7 +162,7 @@ impl SelezioneIndiceView {
             ),
             Some(rstr!("NISECI"))
         ) {
-            controller.select_index(Indice::NISECI);
+            controller.set_indice_corrente(Indice::NISECI);
         }
 
         if d.gui_button(
@@ -174,7 +174,7 @@ impl SelezioneIndiceView {
             ),
             Some(rstr!("HFBI"))
         ) {
-            controller.select_index(Indice::HFBI);
+            controller.set_indice_corrente(Indice::HFBI);
         }
 
     }
@@ -346,8 +346,7 @@ impl ValidazioneFileInputView {
                 ),
                 Some(rstr!("Valida Riferimento"))
             ) {
-                println!("TODO: handle click on Valida Riferimento");
-                println!("TODO: call controller to update model. Controller can update main_state.current_view on next frame in update()");
+                controller.valida_riferimento_niseci_path();
             }
         }
 
@@ -360,8 +359,15 @@ impl ValidazioneFileInputView {
             ),
             Some(rstr!("Valida Campionamento"))
         ) {
-            println!("TODO: handle click on Valida Campionamento");
-            println!("TODO: call controller to update model. Controller can update main_state.current_view on next frame in update()");
+            match current_index {
+                Indice::NISECI => {
+                    controller.valida_campionamento_niseci_path();
+                }
+                Indice::HFBI => {
+                    todo!("Implement controller.valida_campionamento_hfbi_path()");
+                    // controller.valida_campionamento_hfbi_path();
+                }
+            }
         }
     }
 }
