@@ -75,7 +75,11 @@ impl IndiceController {
         state.indice_model.increment_frame_counter();
 
         match state.indice_model.get_selected_index() {
-            Some(_index) => main_state.set_current_view(CurrentView::SelezioneFileInput),
+            Some(index) => {
+                eprintln!("IndiceController:  L'utente ha selezionato indice {index}");
+                eprintln!("IndiceController:  Let's update current view and go to SelezioneFileInput.");
+                main_state.set_current_view(CurrentView::SelezioneFileInput)
+            },
             None => ()
         }
     }
@@ -123,6 +127,8 @@ impl FileInputController {
                         }
 
                         if riferimento_ready && campionamento_ready {
+                            eprintln!("FileInputController:  NISECI - L'utente ha fornito riferimento e campionamento");
+                            eprintln!("FileInputController:  Let's update current view and go to ValidazioneFileInput.");
                             main_state.set_current_view(CurrentView::ValidazioneFileInput);
                         }
                     }
@@ -134,6 +140,8 @@ impl FileInputController {
                             campionamento_ready = true;
                         }
                         if campionamento_ready {
+                            eprintln!("FileInputController:  HFBI - L'utente ha fornito campionamento");
+                            eprintln!("FileInputController:  Let's update current view and go to ValidazioneFileInput.");
                             main_state.set_current_view(CurrentView::ValidazioneFileInput);
                         }
                     }
@@ -164,6 +172,8 @@ impl FileInputController {
                         let campionamento_valid = state.fileinput_model.get_campionamento_path_valid();
 
                         if riferimento_valid && campionamento_valid {
+                            eprintln!("FileInputController:  NISECI - L'utente ha validato riferimento e campionamento");
+                            eprintln!("FileInputController:  Let's update current view and go to SelezioneInfoAggiuntive.");
                             main_state.set_current_view(CurrentView::SelezioneInfoAggiuntive);
                         }
                     }
@@ -179,6 +189,8 @@ impl FileInputController {
                         let campionamento_valid = state.fileinput_model.get_campionamento_path_valid();
 
                         if campionamento_valid {
+                            eprintln!("FileInputController:  HFBI - L'utente ha validato campionamento");
+                            eprintln!("FileInputController:  Let's update current view and go to SelezioneInfoAggiuntive.");
                             main_state.set_current_view(CurrentView::SelezioneInfoAggiuntive);
                         }
                     }
