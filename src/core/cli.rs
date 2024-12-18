@@ -53,34 +53,38 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) -> bool {
         }
         let mut riferimento_csv_failed = false;
         let mut riferimento_valueparse_failed = false;
-        let riferimento_check_res = check_riferimento_niseci_path(riferimento_path);
+        let riferimento_csv_check_res = check_riferimento_niseci_path(riferimento_path);
         let mut riferimento_specie = Vec::new(); // Holds parsed SpecieNISECI
-        match riferimento_check_res {
-            Ok(recs) => {
-                println!("Riferimento result: {{");
-                for r in &recs {
+        match riferimento_csv_check_res {
+            Ok(csv_recs) => {
+                println!("Riferimento csv result: {{");
+                for r in &csv_recs {
                     println!("  {r}");
                 }
                 println!("}}");
-                let (specie, value_errors) = parse_recordcsv_riferimento_niseci(recs);
-                if !value_errors.is_empty() {
-                    eprintln!("Riferimento value errors in run_headless(): {{");
-                    for e in value_errors {
-                        let mut error_txt = "".to_string();
-                        match e {
-                            RecordCsvRiferimentoNISECIError::ValoreInvalido{ msg } => {
-                                error_txt = msg;
-                            }
-                        }
-                        eprintln!("  {}", error_txt);
+                let riferimento_records_check_res = check_records_riferimento_niseci(csv_recs);
+                match riferimento_records_check_res {
+                    Ok(recs_specie) => {
+                        riferimento_specie = recs_specie;
                     }
-                    eprintln!("}}");
-                    riferimento_valueparse_failed = true;
-                    //return; We keep running to check the other file
+                    Err(value_errors) => {
+                        eprintln!("Riferimento value errors in run_headless(): {{");
+                        for e in value_errors {
+                            let mut error_txt = "".to_string();
+                            match e {
+                                RecordCsvRiferimentoNISECIError::ValoreInvalido{ msg } => {
+                                    error_txt = msg;
+                                }
+                            }
+                            eprintln!("  {}", error_txt);
+                        }
+                        eprintln!("}}");
+                        riferimento_valueparse_failed = true;
+                        //return; We keep running to check the other file
+                    }
                 }
-                riferimento_specie = specie;
             }
-            Err(_errs) => {
+            Err(_csv_errs) => {
                 /* Assuming they were printed before this point
                 eprintln!("Riferimento errors in run_headless(): {{");
                 for e in errs {
@@ -100,32 +104,36 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) -> bool {
 
         let mut campionamento_csv_failed = false;
         let mut campionamento_valueparse_failed = false;
-        let campionamento_check_res = check_campionamento_niseci_path(campionamento_path);
+        let campionamento_csv_check_res = check_campionamento_niseci_path(campionamento_path);
         let mut campionamento_specie = Vec::new(); // Holds parsed RecordNISECI
-        match campionamento_check_res {
-            Ok(recs) => {
+        match campionamento_csv_check_res {
+            Ok(csv_recs) => {
                 println!("Campionamento result: {{");
-                for r in &recs {
+                for r in &csv_recs {
                     println!("  {r}");
                 }
                 println!("}}");
-                let (campioni, value_errors) = parse_recordcsv_campionamento_niseci(recs, riferimento_specie.clone());
-                if !value_errors.is_empty() {
-                    eprintln!("Campionamento value errors in run_headless(): {{");
-                    for e in value_errors {
-                        let mut error_txt = "".to_string();
-                        match e {
-                            RecordCsvCampionamentoNISECIError::ValoreInvalido{ msg } => {
-                                error_txt = msg;
-                            }
-                        }
-                        eprintln!("  {}", error_txt);
+                let campionamento_records_check_res = check_records_campionamento_niseci(csv_recs, riferimento_specie.clone());
+                match campionamento_records_check_res {
+                    Ok(campioni) => {
+                        campionamento_specie = campioni;
                     }
-                    eprintln!("}}");
-                    campionamento_valueparse_failed = true;
-                    //return; We keep running and return later
+                    Err(value_errors) => {
+                        eprintln!("Campionamento value errors in run_headless(): {{");
+                        for e in value_errors {
+                            let mut error_txt = "".to_string();
+                            match e {
+                                RecordCsvCampionamentoNISECIError::ValoreInvalido{ msg } => {
+                                    error_txt = msg;
+                                }
+                            }
+                            eprintln!("  {}", error_txt);
+                        }
+                        eprintln!("}}");
+                        campionamento_valueparse_failed = true;
+                        //return; We keep running and return later
+                    }
                 }
-                campionamento_specie = campioni;
             }
             Err(_errs) => {
                 /* Assuming they were printed before this point
