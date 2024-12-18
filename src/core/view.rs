@@ -2,7 +2,7 @@ use crate::core::*;
 use std::ffi::CString;
 use raylib::consts::GuiIconName::*;
 use raylib::consts::GuiControl::DEFAULT;
-use raylib::consts::GuiDefaultProperty::{TEXT_SPACING, TEXT_SIZE};
+use raylib::consts::GuiDefaultProperty::TEXT_SIZE;
 
 pub fn draw_quit_win(d: &mut RaylibDrawHandle, showing_quit_win: &mut bool, should_quit: &mut bool) {
     if *showing_quit_win {
@@ -357,8 +357,6 @@ pub fn draw_main(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
     let info_button_x = core_buttons_panel_x + core_buttons_x_padding;
     let info_button_height = core_button_heigth;
     let info_button_y = core_buttons_panel_y + core_buttons_y_padding;
-
-    let y_spacing = propheight(&d, 5);
 
     // Info button
     let itext = d.gui_icon_text(ICON_INFO, Some(rstr!("")));

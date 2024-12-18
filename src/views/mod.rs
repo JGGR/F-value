@@ -240,7 +240,7 @@ impl SelezioneFileInputView {
         );
 
         if current_index != Indice::HFBI {
-            if let Some(filepath) = controller.get_riferimento_path() { // A file is already set, display button to clear it
+            if let Some(_filepath) = controller.get_riferimento_path() { // A file is already set, display button to clear it
                 let rif_itext = d.gui_icon_text(ICON_BIN, Some(rstr!("Annulla Riferimento")));
                 let rif_itext = CString::new(rif_itext).unwrap();
                 if d.gui_button(
@@ -281,7 +281,7 @@ impl SelezioneFileInputView {
             }
         }
 
-        if let Some(filepath) = controller.get_campionamento_path() { // A file is already set, display button to clear it
+        if let Some(_filepath) = controller.get_campionamento_path() { // A file is already set, display button to clear it
             let camp_itext = d.gui_icon_text(ICON_BIN, Some(rstr!("Annulla Campionamento")));
             let camp_itext = CString::new(camp_itext).unwrap();
             if d.gui_button(

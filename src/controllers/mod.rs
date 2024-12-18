@@ -1,5 +1,5 @@
 use crate::model::core::*;
-use crate::core::{MainState, check_campionamento_niseci_path, check_riferimento_niseci_path, check_campionamento_hfbi_path};
+use crate::core::{MainState, check_campionamento_niseci_path, check_riferimento_niseci_path};
 use crate::model::index::Indice;
 use crate::state::GLOBAL_STATE;
 use crate::CurrentView;

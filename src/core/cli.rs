@@ -70,7 +70,7 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) -> bool {
                     Err(value_errors) => {
                         eprintln!("Riferimento value errors in run_headless(): {{");
                         for e in value_errors {
-                            let mut error_txt = "".to_string();
+                            let error_txt;
                             match e {
                                 RecordCsvRiferimentoNISECIError::ValoreInvalido{ msg } => {
                                     error_txt = msg;
@@ -121,7 +121,7 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) -> bool {
                     Err(value_errors) => {
                         eprintln!("Campionamento value errors in run_headless(): {{");
                         for e in value_errors {
-                            let mut error_txt = "".to_string();
+                            let error_txt;
                             match e {
                                 RecordCsvCampionamentoNISECIError::ValoreInvalido{ msg } => {
                                     error_txt = msg;
