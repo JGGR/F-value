@@ -169,6 +169,10 @@ impl MainState {
     pub fn set_current_view(&mut self, view: CurrentView) -> () {
         self.current_view = view;
     }
+
+    pub fn get_gui_should_lock(&self) -> bool {
+        return self.showing_quit_win || self.showing_info_box || self.showing_settings_box;
+    }
 }
 
 pub fn propwidth(d: &RaylibDrawHandle<'_>, to_scale: i32) -> i32
