@@ -25,11 +25,6 @@ impl HomeView {
     }
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &HomeController, main_state: &MainState) {
         d.clear_background(main_state.default_bg_color);
-        let lock_gui = main_state.get_gui_should_lock();
-
-        if lock_gui {
-            d.gui_lock();
-        }
 
         // Draw the state retrieved via the Controller
         let state = controller.get_state();
@@ -64,10 +59,6 @@ impl HomeView {
         // to the View and ensure to set them on all frames to the model via
         // the controller.
         controller.set_value(self.spinner_value);
-
-        if lock_gui {
-            d.gui_unlock();
-        }
     }
 }
 
@@ -85,11 +76,6 @@ impl SecondView {
     }
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &SecondController, main_state: &MainState) {
         d.clear_background(main_state.default_bg_color);
-        let lock_gui = main_state.get_gui_should_lock();
-
-        if lock_gui {
-            d.gui_lock();
-        }
 
         // Draw the state retrieved via the Controller
         let state = controller.get_state();
@@ -124,10 +110,6 @@ impl SecondView {
         // to the View and ensure to set them on all frames to the model via
         // the controller.
         controller.set_value(self.spinner_value);
-
-        if lock_gui {
-            d.gui_unlock();
-        }
     }
 }
 
@@ -144,12 +126,6 @@ impl SelezioneIndiceView {
     }
 
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &IndiceController, main_state: &MainState) {
-
-        let lock_gui = main_state.get_gui_should_lock();
-
-        if lock_gui {
-            d.gui_lock();
-        }
 
         d.clear_background(main_state.default_bg_color);
 
@@ -204,10 +180,6 @@ impl SelezioneIndiceView {
         ) {
             controller.set_indice_corrente(Indice::HFBI);
         }
-
-        if lock_gui {
-            d.gui_unlock();
-        }
     }
 }
 
@@ -224,12 +196,6 @@ impl SelezioneFileInputView {
     }
 
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &FileInputController, main_state: &MainState) {
-
-        let lock_gui = main_state.get_gui_should_lock();
-
-        if lock_gui {
-            d.gui_lock();
-        }
 
         d.clear_background(main_state.default_bg_color);
 
@@ -354,10 +320,6 @@ impl SelezioneFileInputView {
                 }
             }
         }
-
-        if lock_gui {
-            d.gui_unlock();
-        }
     }
 }
 
@@ -374,12 +336,6 @@ impl ValidazioneFileInputView {
     }
 
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &FileInputController, main_state: &MainState) {
-
-        let lock_gui = main_state.get_gui_should_lock();
-
-        if lock_gui {
-            d.gui_lock();
-        }
 
         d.clear_background(main_state.default_bg_color);
 
@@ -466,10 +422,6 @@ impl ValidazioneFileInputView {
 
         if turn_off_button_campionamento {
             d.gui_set_state(STATE_NORMAL);
-            d.gui_unlock();
-        }
-
-        if lock_gui {
             d.gui_unlock();
         }
     }
@@ -564,12 +516,6 @@ impl SelezioneInfoAggiuntiveView {
     }
 
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &InfoAggiuntiveController, main_state: &MainState) {
-
-        let lock_gui = main_state.get_gui_should_lock();
-
-        if lock_gui {
-            d.gui_lock();
-        }
 
         d.clear_background(main_state.default_bg_color);
 
@@ -957,10 +903,6 @@ impl SelezioneInfoAggiuntiveView {
 
         draw_rainbow_text(d, todo_hfbi_txt_x, todo_hfbi_txt_y, "TODO: HFBI controls", frame_counter, rainbow_speed, &main_state.current_font, main_state.default_txt_spacing, main_state.current_font_height, todo_hfbi_font_scale);
 
-        if lock_gui {
-            d.gui_unlock();
-        }
-
     }
 }
 
@@ -977,12 +919,6 @@ impl ValidazioneInfoAggiuntiveView {
     }
 
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &InfoAggiuntiveController, main_state: &MainState) {
-
-        let lock_gui = main_state.get_gui_should_lock();
-
-        if lock_gui {
-            d.gui_lock();
-        }
 
         d.clear_background(main_state.default_bg_color);
 
@@ -1019,10 +955,6 @@ impl ValidazioneInfoAggiuntiveView {
             //TODO: valida info aggiuntive indice
             println!("TODO: call controller to update model. Controller can update main_state.current_view on next frame in update()");
         }
-
-        if lock_gui {
-            d.gui_unlock();
-        }
     }
 }
 
@@ -1039,12 +971,6 @@ impl ProduzioneOutputView {
     }
 
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &OutputController, main_state: &MainState) {
-
-        let lock_gui = main_state.get_gui_should_lock();
-
-        if lock_gui {
-            d.gui_lock();
-        }
 
         d.clear_background(main_state.default_bg_color);
 
@@ -1096,10 +1022,6 @@ impl ProduzioneOutputView {
             ),
             Some(rstr!("TODO: Output qui"))
         );
-
-        if lock_gui {
-            d.gui_unlock();
-        }
     }
 }
 
@@ -1116,12 +1038,6 @@ impl ProduzionePDFView {
     }
 
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &OutputController, main_state: &MainState) {
-
-        let lock_gui = main_state.get_gui_should_lock();
-
-        if lock_gui {
-            d.gui_lock();
-        }
 
         d.clear_background(main_state.default_bg_color);
 
@@ -1173,10 +1089,6 @@ impl ProduzionePDFView {
             ),
             Some(rstr!("TODO: Output qui"))
         );
-
-        if lock_gui {
-            d.gui_unlock();
-        }
     }
 }
 
