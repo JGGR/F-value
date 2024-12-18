@@ -274,6 +274,7 @@ pub enum RecordCsvCampionamentoNISECIError {
 }
 
 pub fn parse_recordcsv_campionamento_niseci(records: Vec<RecordCsvCampionamentoNISECI>, riferimento_specie: Vec<SpecieNISECI>) -> (Vec<RecordNISECI>,Vec<RecordCsvCampionamentoNISECIError>) {
+    //TODO: update when the model includes the missing fields
     let mut campioni = Vec::new();
     let mut errors = Vec::new();
     let mut idx = 0;
@@ -374,6 +375,7 @@ pub enum RecordCsvRiferimentoNISECIError {
 }
 
 pub fn parse_recordcsv_riferimento_niseci(records: Vec<RecordCsvRiferimentoNISECI>) -> (Vec<SpecieNISECI>,Vec<RecordCsvRiferimentoNISECIError>) {
+    //TODO: update when the model includes the missing fields
     let mut specie = Vec::new();
     let mut errors = Vec::new();
     let mut idx = 0;
