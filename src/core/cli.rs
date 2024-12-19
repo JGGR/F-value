@@ -68,6 +68,7 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) -> bool {
                         riferimento_specie = recs_specie;
                     }
                     Err(value_errors) => {
+                        /* Assuming they were printed before this point
                         eprintln!("Riferimento value errors in run_headless(): {{");
                         for e in value_errors {
                             let error_txt;
@@ -79,6 +80,7 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) -> bool {
                             eprintln!("  {}", error_txt);
                         }
                         eprintln!("}}");
+                        */
                         riferimento_valueparse_failed = true;
                         //return; We keep running to check the other file
                     }
@@ -119,6 +121,7 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) -> bool {
                         campionamento_specie = campioni;
                     }
                     Err(value_errors) => {
+                        /* Assuming they were printed before this point
                         eprintln!("Campionamento value errors in run_headless(): {{");
                         for e in value_errors {
                             let error_txt;
@@ -130,6 +133,7 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) -> bool {
                             eprintln!("  {}", error_txt);
                         }
                         eprintln!("}}");
+                        */
                         campionamento_valueparse_failed = true;
                         //return; We keep running and return later
                     }

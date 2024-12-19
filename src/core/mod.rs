@@ -662,6 +662,7 @@ pub fn check_records_campionamento_niseci(records: Vec<RecordCsvCampionamentoNIS
         for error in &errors {
             eprintln!("  {}", error);
         }
+        eprintln!("}}");
         return Err(errors);
     } else {
         println!("Tutti i record del campionamento NISECI sono stati processati con successo!");
@@ -727,6 +728,7 @@ pub fn check_records_riferimento_niseci(records: Vec<RecordCsvRiferimentoNISECI>
         for error in &errors {
             eprintln!("  {}", error);
         }
+        eprintln!("}}");
         return Err(errors);
     } else {
         println!("Tutti i record del riferimento NISECI sono stati processati con successo!");
