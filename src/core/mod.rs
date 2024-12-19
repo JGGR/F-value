@@ -7,6 +7,7 @@ use std::fmt;
 use std::path::PathBuf;
 use std::io::Read;
 use std::fs::File;
+use crate::model::niseci::{SpecieNISECI, RecordNISECI};
 
 pub const EXIT_KEY: raylib::consts::KeyboardKey = raylib::consts::KeyboardKey::KEY_ESCAPE;
 pub const PROJECT_NAME: &'static str = env!("CARGO_PKG_NAME");
@@ -168,6 +169,10 @@ impl MainState {
     pub fn set_current_view(&mut self, view: CurrentView) -> () {
         self.current_view = view;
     }
+
+    pub fn get_gui_should_lock(&self) -> bool {
+        return self.showing_quit_win || self.showing_info_box || self.showing_settings_box;
+    }
 }
 
 pub fn propwidth(d: &RaylibDrawHandle<'_>, to_scale: i32) -> i32
@@ -190,7 +195,7 @@ pub fn propheight(d: &RaylibDrawHandle<'_>, to_scale: i32) -> i32
 
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct RecordCsvRiferimentoNISECI {
+pub struct RecordCsvRiferimentoNISECI { //TODO: add position
     pub nome_comune: String,
     pub nome_latino: String,
     pub codice_specie: String,
@@ -226,15 +231,15 @@ impl fmt::Display for RecordCsvRiferimentoNISECI {
 
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct RecordCsvCampionamentoNISECI {
+pub struct RecordCsvCampionamentoNISECI { //TODO: add position
     //id: i32,
-    data: String,
-    stazione: String,
-    superficie: i32,
-    num_passaggio: String,
-    codice_specie: String,
-    lunghezza: i32,
-    peso: i32,
+    pub data: String,
+    pub stazione: String,
+    pub superficie: i32,
+    pub num_passaggio: String,
+    pub codice_specie: String,
+    pub lunghezza: i32,
+    pub peso: i32,
 }
 
 impl fmt::Display for RecordCsvCampionamentoNISECI {
@@ -264,6 +269,89 @@ pub fn parse_csv_campionamento_niseci<R>(mut rdr: csv::Reader<R>) -> (Vec<Record
     (records, errors)
 }
 
+pub enum RecordCsvCampionamentoNISECIError {
+    ValoreInvalido { msg : String }, //TODO: add position?
+}
+
+impl fmt::Display for RecordCsvCampionamentoNISECIError {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    let string_representation = match self {
+      RecordCsvCampionamentoNISECIError::ValoreInvalido { msg } => format!("Errore record campionamento NISECI: {}", msg),
+    };
+    write!(f, "{}", string_representation)
+  }
+}
+
+pub fn parse_recordcsv_campionamento_niseci(records: Vec<RecordCsvCampionamentoNISECI>, riferimento_specie: Vec<SpecieNISECI>) -> (Vec<RecordNISECI>,Vec<RecordCsvCampionamentoNISECIError>) {
+    //TODO: update when the model includes the missing fields
+    let mut campioni = Vec::new();
+    let mut errors = Vec::new();
+    let mut idx = 0;
+    for r in records {
+        idx += 1;
+        if r.codice_specie.len() < 1 {
+            let err = RecordCsvCampionamentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: codice_specie non valido (lunghezza < 1)") };
+            errors.push(err);
+            continue;
+        }
+        let codice_specie = r.codice_specie;
+        let mut opt_matched_specie = None;
+        for s in &riferimento_specie { // FIXME: this is O(n^2).
+            if s.id == codice_specie {
+                opt_matched_specie = Some(s);
+                break; // TODO: mmmh
+            }
+        }
+
+
+        let matched_specie;
+        if let Some(specie) = opt_matched_specie {
+            matched_specie = specie;
+        } else {
+            let err = RecordCsvCampionamentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: codice_specie non valido (non presente nel riferimento): {}", codice_specie) };
+            errors.push(err);
+            continue;
+        }
+
+
+        let passaggio_cattura;
+        match r.num_passaggio.as_str() {
+            "c1" => {
+                passaggio_cattura = 1;
+            }
+            "c2" => {
+                passaggio_cattura = 2;
+            }
+            _ => {
+                let err = RecordCsvCampionamentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: num_passaggio non valido (non \"c1\" o \"c2\"): {}", r.num_passaggio) };
+                errors.push(err);
+                continue;
+            }
+        }
+
+        if r.lunghezza < 0 {
+            let err = RecordCsvCampionamentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: lunghezza < 0") };
+            errors.push(err);
+            continue;
+        }
+
+        if r.peso < 0 {
+            let err = RecordCsvCampionamentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: peso < 0") };
+            errors.push(err);
+            continue;
+        }
+
+        let niseci_rec = RecordNISECI {
+            specie: matched_specie.clone(),
+            passaggio_cattura: passaggio_cattura as u8,
+            lunghezza: r.lunghezza as u32,
+            peso: r.peso as u32
+        };
+        campioni.push(niseci_rec);
+    }
+    (campioni, errors)
+}
+
 pub fn parse_csv_riferimento_niseci<R>(mut rdr: csv::Reader<R>) -> (Vec<RecordCsvRiferimentoNISECI>, Vec<csv::Error>) where R: std::io::Read {
     let mut records = Vec::new();
     let mut errors = Vec::new();
@@ -276,6 +364,137 @@ pub fn parse_csv_riferimento_niseci<R>(mut rdr: csv::Reader<R>) -> (Vec<RecordCs
     }
 
     (records, errors)
+}
+
+pub enum RecordCsvRiferimentoNISECIError {
+    ValoreInvalido { msg : String }, //TODO: add position?
+}
+
+impl fmt::Display for RecordCsvRiferimentoNISECIError {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    let string_representation = match self {
+      RecordCsvRiferimentoNISECIError::ValoreInvalido { msg } => format!("Errore record riferimento NISECI: {}", msg),
+    };
+    write!(f, "{}", string_representation)
+  }
+}
+
+pub fn parse_recordcsv_riferimento_niseci(records: Vec<RecordCsvRiferimentoNISECI>) -> (Vec<SpecieNISECI>,Vec<RecordCsvRiferimentoNISECIError>) {
+    //TODO: update when the model includes the missing fields
+    let mut specie = Vec::new();
+    let mut errors = Vec::new();
+    let mut idx = 0;
+    let mut used_id_specie = Vec::new(); // Stores already-parsed ids to detect doubles
+    for r in records {
+        idx += 1;
+        let mut origine_autoctono = true;
+        match r.origine.as_str() {
+            "ALL" => {
+                origine_autoctono = false;
+            },
+            "AUT" => {},
+            _ => {
+                let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: origine invalida (non \"AUT\" o \"ALL\"): {}", r.origine) };
+                errors.push(err);
+                continue;
+            }
+        }
+        if r.specie_attesa < 0 {
+            let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: specie_attesa < 0") };
+            errors.push(err);
+            continue;
+        }
+        let specie_attesa = r.specie_attesa > 0; // TODO: possiamo prendere qualsiasi non-zero come
+                                                 // "atteso"?
+        if r.tipo_autoctono < 0 {
+            let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: tipo_autoctono < 0") };
+            errors.push(err);
+            continue;
+        }
+
+        let tipo_autoctono: u8;
+        let tipo_alloctono: u8;
+        if origine_autoctono {
+            match r.tipo_autoctono {
+                1 | 2 => {
+                    tipo_autoctono = r.tipo_autoctono as u8;
+                }
+                _ => {
+                    let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: tipo_autoctono non valido (non 1 o 2): {}", r.tipo_autoctono) };
+                    errors.push(err);
+                    continue;
+                }
+            }
+            tipo_alloctono = 0;
+        } else {
+            tipo_autoctono = 0;
+            match r.allo_nocivita {
+                0 | 1 | 2 | 3 => {
+                    tipo_alloctono = r.allo_nocivita as u8;
+                }
+                _ => {
+                    let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: allo_nocivita non valido (non [0..3]): {}", r.allo_nocivita) };
+                    errors.push(err);
+                    continue;
+                }
+            }
+        }
+
+        if r.codice_specie.len() < 1 {
+            let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: codice_specie non valido (lunghezza < 1)") };
+            errors.push(err);
+            continue;
+        }
+
+        let id = r.codice_specie;
+
+        if used_id_specie.contains(&id) {
+            let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: codice_specie non valido (ridefinizione)") };
+            errors.push(err);
+            continue;
+        }
+
+        let nome =  r.nome_latino; //TODO: controllare se dovrebbe essere nome_comune
+
+        //TODO: update when SpecieNISECI has the missing fields
+
+        // Check dens_soglia
+        if r.dens_soglia1 < 0.0 {
+            let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: dens_soglia1 non valido (< 0)") };
+            errors.push(err);
+            continue;
+        }
+
+        if r.dens_soglia1 == 0.0 && specie_attesa {
+            let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: dens_soglia1 non valido (== 0) per una specie attesa") };
+            errors.push(err);
+            continue;
+        }
+
+        if r.dens_soglia2 < 0.0 {
+            let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: dens_soglia2 non valido (< 0)") };
+            errors.push(err);
+            continue;
+        }
+
+        if r.dens_soglia2 == 0.0 && specie_attesa {
+            let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: dens_soglia2 non valido (== 0) per una specie attesa") };
+            errors.push(err);
+            continue;
+        }
+
+        let specie_rec = SpecieNISECI {
+            id: id.clone(),
+            nome: nome,
+            tipo_autoctono: tipo_autoctono,
+            tipo_alloctono: tipo_alloctono,
+            specie_attesa: specie_attesa,
+        };
+        specie.push(specie_rec);
+        used_id_specie.push(id);
+    }
+
+    (specie, errors)
 }
 
 pub fn translate_error_message(msg: &str) -> String {
@@ -327,7 +546,7 @@ fn parse_csv_pos(pos: &Option<csv::Position>) -> String {
     return res;
 }
 
-fn process_errors(errors: &Vec<csv::Error>) {
+fn process_csv_errors(errors: &Vec<csv::Error>) {
     for error in errors {
         match error.kind() {
             csv::ErrorKind::Deserialize { pos, err } => {
@@ -401,17 +620,17 @@ pub fn check_campionamento_niseci_reader<R: Read>(reader: R) -> Result<Vec<Recor
     println!("Campionamento NISECI: Numero record csv non validi: {}", errors.len());
 
     if !errors.is_empty() {
-        eprintln!("Errori incontrati durante l'elaborazione del campionamento NISECI: {{");
+        eprintln!("Errori incontrati durante l'elaborazione csv del campionamento NISECI: {{");
         /*
         for error in &errors {
             eprintln!("  {}", error);
         }
         */
-        process_errors(&errors);
+        process_csv_errors(&errors);
         eprintln!("}}");
         return Err(errors);
     } else {
-        println!("Tutti i record del campionamento NISECI sono stati processati con successo!");
+        println!("Tutti i record csv del campionamento NISECI sono stati processati con successo!");
         /*
         for record in &records {
             println!("  Record: {{{record}}}");
@@ -430,6 +649,32 @@ pub fn check_campionamento_niseci_path(path: PathBuf) -> Result<Vec<RecordCsvCam
     return check_campionamento_niseci_reader(file);
 }
 
+pub fn check_records_campionamento_niseci(records: Vec<RecordCsvCampionamentoNISECI>, riferimento_specie: Vec<SpecieNISECI>) -> Result<Vec<RecordNISECI>,Vec<RecordCsvCampionamentoNISECIError>> {
+
+    let (records, errors) = parse_recordcsv_campionamento_niseci(records, riferimento_specie);
+
+    println!("Campionamento NISECI: Numero record validi: {}", records.len());
+    println!("Campionamento NISECI: Numero record non validi: {}", errors.len());
+
+    if !errors.is_empty() {
+        eprintln!("Errori incontrati durante l'elaborazione dei record per campionamento NISECI: {{");
+        //TODO: add process_record_campionamentoNISECI_errors()
+        for error in &errors {
+            eprintln!("  {}", error);
+        }
+        eprintln!("}}");
+        return Err(errors);
+    } else {
+        println!("Tutti i record del campionamento NISECI sono stati processati con successo!");
+        /*
+        for record in &records {
+            println!("  Record: {{{record}}}");
+        }
+        */
+        return Ok(records);
+    }
+}
+
 pub fn check_riferimento_niseci_reader<R: Read>(reader: R) -> Result<Vec<RecordCsvRiferimentoNISECI>,Vec<csv::Error>> {
 
     let rdr = csv::ReaderBuilder::new()
@@ -441,17 +686,17 @@ pub fn check_riferimento_niseci_reader<R: Read>(reader: R) -> Result<Vec<RecordC
     println!("Riferimento NISECI: Numero record csv non validi: {}", errors.len());
 
     if !errors.is_empty() {
-        eprintln!("Errori incontrati durante l'elaborazione del riferimento NISECI: {{");
+        eprintln!("Errori incontrati durante l'elaborazione csv del riferimento NISECI: {{");
         /*
         for error in &errors {
             eprintln!("  {}", error);
         }
         */
-        process_errors(&errors);
+        process_csv_errors(&errors);
         eprintln!("}}");
         return Err(errors);
     } else {
-        println!("Tutti i record del riferimento NISECI sono stati processati con successo!");
+        println!("Tutti i record csv del riferimento NISECI sono stati processati con successo!");
         /*
         for record in &records {
             println!("  Record: {{{record}}}");
@@ -468,6 +713,32 @@ pub fn check_riferimento_niseci_path(path: PathBuf) -> Result<Vec<RecordCsvRifer
     }
     let file = File::open(path).expect("Unable to open file");
     return check_riferimento_niseci_reader(file);
+}
+
+pub fn check_records_riferimento_niseci(records: Vec<RecordCsvRiferimentoNISECI>) -> Result<Vec<SpecieNISECI>,Vec<RecordCsvRiferimentoNISECIError>> {
+
+    let (records, errors) = parse_recordcsv_riferimento_niseci(records);
+
+    println!("Riferimento NISECI: Numero record validi: {}", records.len());
+    println!("Riferimento NISECI: Numero record non validi: {}", errors.len());
+
+    if !errors.is_empty() {
+        eprintln!("Errori incontrati durante l'elaborazione dei record per riferimento NISECI: {{");
+        //TODO: add process_record_riferimentoNISECI_errors()
+        for error in &errors {
+            eprintln!("  {}", error);
+        }
+        eprintln!("}}");
+        return Err(errors);
+    } else {
+        println!("Tutti i record del riferimento NISECI sono stati processati con successo!");
+        /*
+        for record in &records {
+            println!("  Record: {{{record}}}");
+        }
+        */
+        return Ok(records);
+    }
 }
 
 pub fn check_campionamento_hfbi_path(_path: PathBuf) -> bool {

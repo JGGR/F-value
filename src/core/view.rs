@@ -2,7 +2,7 @@ use crate::core::*;
 use std::ffi::CString;
 use raylib::consts::GuiIconName::*;
 use raylib::consts::GuiControl::DEFAULT;
-use raylib::consts::GuiDefaultProperty::{TEXT_SPACING, TEXT_SIZE};
+use raylib::consts::GuiDefaultProperty::TEXT_SIZE;
 
 pub fn draw_quit_win(d: &mut RaylibDrawHandle, showing_quit_win: &mut bool, should_quit: &mut bool) {
     if *showing_quit_win {
@@ -249,7 +249,7 @@ pub fn draw_settings_box(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
             128,
             false,
         ) {
-            println!("HI");
+            //println!("HI");
             //main_state.spinner_font_height_edit_mode = !main_state.spinner_font_height_edit_mode;
         }
 
@@ -305,26 +305,58 @@ pub fn draw_settings_box(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
 
 pub fn draw_main(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
 
-    let current_view_name = main_state.current_view.to_string();
-    let current_view_banner_x = propwidth(&d, 100);
-    let current_view_banner_y = propheight(&d, 25);
+    let lock_gui = main_state.get_gui_should_lock();
 
-    let text_spacing = d.gui_get_style(DEFAULT, TEXT_SPACING as i32);
-    d.draw_text_ex(
-        &main_state.current_font,
-        &current_view_name,
-        Vector2::new(current_view_banner_x as f32, current_view_banner_y as f32),
-        (main_state.current_font_height) as f32,
-        text_spacing as f32,
-        main_state.default_txt_color.alpha(0.8)
+    if lock_gui {
+        d.gui_lock();
+    }
+
+    let status_bar_height = propheight(&d, 35);
+    let status_bar_width = d.get_screen_width();
+    let status_bar_x = 0;
+    let status_bar_y = d.get_screen_height() - status_bar_height;
+
+    let current_view_name = main_state.current_view.to_string();
+
+    let status_bar_txt = CString::new(format!("{}", current_view_name)).unwrap();
+
+    d.gui_status_bar(
+        rrect(
+            status_bar_x,
+            status_bar_y,
+            status_bar_width,
+            status_bar_height
+        ),
+        Some(status_bar_txt.as_c_str())
     );
 
-    let info_button_width = propwidth(&d, 50);
-    let info_button_x = propwidth(&d, 5);
-    let info_button_height = propwidth(&d, 50);
-    let info_button_y = propheight(&d, 5);
+    let navbar_height = status_bar_height;
+    let navbar_width = status_bar_width;
+    let navbar_x = 0;
+    let navbar_y = 0;
 
-    let y_spacing = propheight(&d, 5);
+    let core_button_width = propwidth(&d, 25);
+    let core_button_heigth = core_button_width;
+    let core_buttons_count = 3;
+    let core_buttons_x_padding = propwidth(&d, 5);
+    let core_buttons_y_padding = core_buttons_x_padding;
+    let core_buttons_panel_height = navbar_height;
+    let core_buttons_panel_y = navbar_y;
+    let core_buttons_panel_width = (core_buttons_count * core_button_width) + ((1 + core_buttons_count) * core_buttons_x_padding);
+    let core_buttons_panel_x = d.get_screen_width() - core_buttons_panel_width;
+    d.gui_panel(
+        rrect(navbar_x, navbar_y, navbar_width, navbar_height),
+        None
+    );
+    d.gui_panel(
+        rrect(core_buttons_panel_x, core_buttons_panel_y, core_buttons_panel_width, core_buttons_panel_height),
+        None
+    );
+
+    let info_button_width = core_button_width;
+    let info_button_x = core_buttons_panel_x + core_buttons_x_padding;
+    let info_button_height = core_button_heigth;
+    let info_button_y = core_buttons_panel_y + core_buttons_y_padding;
 
     // Info button
     let itext = d.gui_icon_text(ICON_INFO, Some(rstr!("")));
@@ -334,9 +366,9 @@ pub fn draw_main(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
     }
 
     let changeview_button_width = info_button_width;
-    let changeview_button_x = info_button_x;
+    let changeview_button_x = info_button_x + info_button_width + core_buttons_x_padding;
     let changeview_button_height = info_button_height;
-    let changeview_button_y = info_button_y + info_button_height + y_spacing;
+    let changeview_button_y = info_button_y;
 
     // "Change view" button
     let itext = d.gui_icon_text(ICON_PLAYER_NEXT, Some(rstr!("")));
@@ -374,9 +406,9 @@ pub fn draw_main(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
     }
 
     let settings_button_width = changeview_button_width;
-    let settings_button_x = changeview_button_x;
+    let settings_button_x = changeview_button_x + changeview_button_width + core_buttons_x_padding;
     let settings_button_height = changeview_button_height;
-    let settings_button_y = changeview_button_y + changeview_button_height + y_spacing;
+    let settings_button_y = changeview_button_y;
 
     // Settings button
     let itext = d.gui_icon_text(ICON_GEAR, Some(rstr!("")));
@@ -385,7 +417,31 @@ pub fn draw_main(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
         main_state.showing_settings_box = true;
     }
 
+    if lock_gui && main_state.showing_settings_box {
+        d.gui_unlock();
+    }
     draw_settings_box(d, main_state);
+    if lock_gui && main_state.showing_settings_box {
+        d.gui_lock();
+    }
+
+    if lock_gui && main_state.showing_info_box {
+        d.gui_unlock();
+    }
     draw_info_box(d, &mut main_state.showing_info_box, &main_state.current_font, main_state.default_txt_spacing, main_state.default_txt_color, main_state.current_font_height);
+    if lock_gui && main_state.showing_info_box {
+        d.gui_lock();
+    }
+
+    if lock_gui && main_state.showing_quit_win {
+        d.gui_unlock();
+    }
     draw_quit_win(d, &mut main_state.showing_quit_win, &mut main_state.should_quit);
+    if lock_gui && main_state.showing_quit_win {
+        d.gui_lock();
+    }
+
+    if lock_gui {
+        d.gui_unlock();
+    }
 }

@@ -1,5 +1,5 @@
 use crate::model::core::*;
-use crate::core::{MainState, check_campionamento_niseci_path, check_riferimento_niseci_path, check_campionamento_hfbi_path};
+use crate::core::{MainState, check_campionamento_niseci_path, check_riferimento_niseci_path};
 use crate::model::index::Indice;
 use crate::state::GLOBAL_STATE;
 use crate::CurrentView;
@@ -221,12 +221,17 @@ impl FileInputController {
         state.fileinput_model.set_riferimento_path_valid(false); // Refresh the validity
     }
 
+    pub fn get_riferimento_path_valid(&self) -> bool {
+        let state = GLOBAL_STATE.lock().unwrap();
+        return state.fileinput_model.get_riferimento_path_valid();
+    }
+
     pub fn valida_riferimento_niseci_path(&self) {
         if let Some(path) = self.get_riferimento_path() {
             let csv_check = check_riferimento_niseci_path(path);
 
             match csv_check {
-                Ok(records) => {
+                Ok(_records) => {
                     //TODO: implement post-csv check step.
                     eprintln!("TODO: implement post-csv check step to ensure the records are valid.");
                     let records_check = false;
@@ -236,7 +241,7 @@ impl FileInputController {
                         state.fileinput_model.set_riferimento_path_valid(records_check);
                     }
                 }
-                Err(errors) => {
+                Err(_errors) => {
                     //TODO: handle displaying the errors?
                     /*
                     for err in errors {
@@ -260,12 +265,17 @@ impl FileInputController {
         state.fileinput_model.set_campionamento_path_valid(false); // Refresh the validity
     }
 
+    pub fn get_campionamento_path_valid(&self) -> bool {
+        let state = GLOBAL_STATE.lock().unwrap();
+        return state.fileinput_model.get_campionamento_path_valid();
+    }
+
     pub fn valida_campionamento_niseci_path(&self) {
         if let Some(path) = self.get_campionamento_path() {
             let csv_check = check_campionamento_niseci_path(path);
 
             match csv_check {
-                Ok(records) => {
+                Ok(_records) => {
                     //TODO: implement post-csv check step.
                     eprintln!("TODO: implement post-csv check step to ensure the records are valid.");
                     let records_check = false;
@@ -275,7 +285,7 @@ impl FileInputController {
                         state.fileinput_model.set_campionamento_path_valid(records_check);
                     }
                 }
-                Err(errors) => {
+                Err(_errors) => {
                     //TODO: handle displaying the errors?
                     /*
                     for err in errors {

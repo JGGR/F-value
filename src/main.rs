@@ -169,6 +169,12 @@ fn main() {
 
         let mut d = rl.begin_drawing(&thread);
 
+        let lock_view = main_state.get_gui_should_lock();
+
+        if lock_view {
+            d.gui_lock();
+        }
+
         // Ask the view for render, passing the controller for state changes
         // Current view draw step
         match main_state.current_view {
@@ -199,6 +205,10 @@ fn main() {
             CurrentView::ProduzionePDF => {
                 produzione_pdf_view.draw(&mut d, &thread, &output_controller, &main_state);
             }
+        }
+
+        if lock_view {
+            d.gui_unlock();
         }
 
         // Base draw step

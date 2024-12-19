@@ -5,6 +5,9 @@ use crate::controllers::*;
 use crate::model::index::Indice;
 use raylib::prelude::*;
 use rfd::FileDialog;
+use raylib::consts::GuiState::{STATE_NORMAL, STATE_DISABLED};
+use raylib::consts::GuiIconName::{ICON_FILE_OPEN, ICON_BIN};
+use std::ffi::CString;
 
 // A view responsible for rendering the state
 // Tightly coupled with its respective controller
@@ -123,6 +126,7 @@ impl SelezioneIndiceView {
     }
 
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &IndiceController, main_state: &MainState) {
+
         d.clear_background(main_state.default_bg_color);
 
         let button_niseci_width = propwidth(&d, 200);
@@ -176,7 +180,6 @@ impl SelezioneIndiceView {
         ) {
             controller.set_indice_corrente(Indice::HFBI);
         }
-
     }
 }
 
@@ -193,6 +196,7 @@ impl SelezioneFileInputView {
     }
 
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &FileInputController, main_state: &MainState) {
+
         d.clear_background(main_state.default_bg_color);
 
         let _state = controller.get_state();
@@ -236,14 +240,73 @@ impl SelezioneFileInputView {
         );
 
         if current_index != Indice::HFBI {
+            if let Some(_filepath) = controller.get_riferimento_path() { // A file is already set, display button to clear it
+                let rif_itext = d.gui_icon_text(ICON_BIN, Some(rstr!("Annulla Riferimento")));
+                let rif_itext = CString::new(rif_itext).unwrap();
+                if d.gui_button(
+                    rrect(
+                        button_riferimento_x,
+                        button_riferimento_y,
+                        button_riferimento_width,
+                        button_riferimento_height
+                    ),
+                    Some(rif_itext.as_c_str())
+                ) {
+                    controller.set_riferimento_path(None); // Should already also clear the path_valid
+                                                           // state inside it
+                }
+            } else {
+                let rif_itext = d.gui_icon_text(ICON_FILE_OPEN, Some(rstr!("Riferimento")));
+                let rif_itext = CString::new(rif_itext).unwrap();
+                if d.gui_button(
+                    rrect(
+                        button_riferimento_x,
+                        button_riferimento_y,
+                        button_riferimento_width,
+                        button_riferimento_height
+                    ),
+                    Some(rif_itext.as_c_str())
+                ) {
+                    let file = FileDialog::new()
+                            .add_filter("csv", &["csv"])
+                            .set_directory("/")
+                            .pick_file();
+
+                    if let Some(filepath) = file {
+                        controller.set_riferimento_path(Some(filepath));
+                    } else {
+                        eprintln!("Error: failed getting a file.");
+                    }
+                }
+            }
+        }
+
+        if let Some(_filepath) = controller.get_campionamento_path() { // A file is already set, display button to clear it
+            let camp_itext = d.gui_icon_text(ICON_BIN, Some(rstr!("Annulla Campionamento")));
+            let camp_itext = CString::new(camp_itext).unwrap();
             if d.gui_button(
                 rrect(
-                    button_riferimento_x,
-                    button_riferimento_y,
-                    button_riferimento_width,
-                    button_riferimento_height
+                    button_campionamento_x,
+                    button_campionamento_y,
+                    button_campionamento_width,
+                    button_campionamento_height,
                 ),
-                Some(rstr!("Riferimento"))
+                Some(camp_itext.as_c_str())
+            ) {
+                controller.set_campionamento_path(None); // Should already also clear the path_valid
+                                                       // state inside it
+            }
+        } else {
+            let camp_itext = d.gui_icon_text(ICON_FILE_OPEN, Some(rstr!("Campionamento")));
+            let camp_itext = CString::new(camp_itext).unwrap();
+            if d.gui_button(
+                rrect(
+                    button_campionamento_x,
+                    button_campionamento_y,
+                    button_campionamento_width,
+                    button_campionamento_height,
+                ),
+                Some(camp_itext.as_c_str())
             ) {
                 let file = FileDialog::new()
                         .add_filter("csv", &["csv"])
@@ -251,31 +314,10 @@ impl SelezioneFileInputView {
                         .pick_file();
 
                 if let Some(filepath) = file {
-                    controller.set_riferimento_path(Some(filepath));
+                    controller.set_campionamento_path(Some(filepath));
                 } else {
                     eprintln!("Error: failed getting a file.");
                 }
-            }
-        }
-
-        if d.gui_button(
-            rrect(
-                button_campionamento_x,
-                button_campionamento_y,
-                button_campionamento_width,
-                button_campionamento_height,
-            ),
-            Some(rstr!("Campionamento"))
-        ) {
-            let file = FileDialog::new()
-                    .add_filter("csv", &["csv"])
-                    .set_directory("/")
-                    .pick_file();
-
-            if let Some(filepath) = file {
-                controller.set_campionamento_path(Some(filepath));
-            } else {
-                eprintln!("Error: failed getting a file.");
             }
         }
     }
@@ -294,6 +336,7 @@ impl ValidazioneFileInputView {
     }
 
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &FileInputController, main_state: &MainState) {
+
         d.clear_background(main_state.default_bg_color);
 
         let _state = controller.get_state();
@@ -350,6 +393,13 @@ impl ValidazioneFileInputView {
             }
         }
 
+        let mut turn_off_button_campionamento = false;
+        if current_index == Indice::NISECI && !controller.get_riferimento_path_valid() {
+            turn_off_button_campionamento = true;
+            d.gui_lock();
+            d.gui_set_state(STATE_DISABLED);
+        }
+
         if d.gui_button(
             rrect(
                 button_campionamento_x,
@@ -368,6 +418,11 @@ impl ValidazioneFileInputView {
                     // controller.valida_campionamento_hfbi_path();
                 }
             }
+        }
+
+        if turn_off_button_campionamento {
+            d.gui_set_state(STATE_NORMAL);
+            d.gui_unlock();
         }
     }
 }
@@ -461,6 +516,7 @@ impl SelezioneInfoAggiuntiveView {
     }
 
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &InfoAggiuntiveController, main_state: &MainState) {
+
         d.clear_background(main_state.default_bg_color);
 
         let state = controller.get_state();
@@ -863,6 +919,7 @@ impl ValidazioneInfoAggiuntiveView {
     }
 
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &InfoAggiuntiveController, main_state: &MainState) {
+
         d.clear_background(main_state.default_bg_color);
 
         let _state = controller.get_state();
@@ -914,6 +971,7 @@ impl ProduzioneOutputView {
     }
 
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &OutputController, main_state: &MainState) {
+
         d.clear_background(main_state.default_bg_color);
 
         let _state = controller.get_state();
@@ -980,6 +1038,7 @@ impl ProduzionePDFView {
     }
 
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &OutputController, main_state: &MainState) {
+
         d.clear_background(main_state.default_bg_color);
 
         let _state = controller.get_state();

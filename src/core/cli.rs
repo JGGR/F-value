@@ -51,17 +51,93 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) -> bool {
             eprintln!("Fallito controllo path riferimento");
             return false;
         }
-        let mut campionamento_csv_failed = false;
-        let campionamento_check_res = check_campionamento_niseci_path(campionamento_path);
-        match campionamento_check_res {
-            Ok(recs) => {
-                println!("Campionamento result: {{");
-                for r in recs {
+        let mut riferimento_csv_failed = false;
+        let mut riferimento_valueparse_failed = false;
+        let riferimento_csv_check_res = check_riferimento_niseci_path(riferimento_path);
+        let mut riferimento_specie = Vec::new(); // Holds parsed SpecieNISECI
+        match riferimento_csv_check_res {
+            Ok(csv_recs) => {
+                println!("Riferimento csv result: {{");
+                for r in &csv_recs {
                     println!("  {r}");
                 }
                 println!("}}");
-                println!("TODO:  Implement validation step after successful csv parsing");
-                println!("TODO: We may skip the riferimento check also in that case");
+                let riferimento_records_check_res = check_records_riferimento_niseci(csv_recs);
+                match riferimento_records_check_res {
+                    Ok(recs_specie) => {
+                        riferimento_specie = recs_specie;
+                    }
+                    Err(value_errors) => {
+                        /* Assuming they were printed before this point
+                        eprintln!("Riferimento value errors in run_headless(): {{");
+                        for e in value_errors {
+                            let error_txt;
+                            match e {
+                                RecordCsvRiferimentoNISECIError::ValoreInvalido{ msg } => {
+                                    error_txt = msg;
+                                }
+                            }
+                            eprintln!("  {}", error_txt);
+                        }
+                        eprintln!("}}");
+                        */
+                        riferimento_valueparse_failed = true;
+                        //return; We keep running to check the other file
+                    }
+                }
+            }
+            Err(_csv_errs) => {
+                /* Assuming they were printed before this point
+                eprintln!("Riferimento errors in run_headless(): {{");
+                for e in errs {
+                    eprintln!("  {e}");
+                }
+                eprintln!("}}");
+                */
+                riferimento_csv_failed = true;
+                //return; We keep running to check the other file
+            }
+        }
+
+        if !check_path_is_file_ends_with_csv(&campionamento_path) {
+            eprintln!("Fallito controllo path campionamento");
+            return false;
+        }
+
+        let mut campionamento_csv_failed = false;
+        let mut campionamento_valueparse_failed = false;
+        let campionamento_csv_check_res = check_campionamento_niseci_path(campionamento_path);
+        let mut campionamento_specie = Vec::new(); // Holds parsed RecordNISECI
+        match campionamento_csv_check_res {
+            Ok(csv_recs) => {
+                println!("Campionamento result: {{");
+                for r in &csv_recs {
+                    println!("  {r}");
+                }
+                println!("}}");
+                let campionamento_records_check_res = check_records_campionamento_niseci(csv_recs, riferimento_specie.clone());
+                match campionamento_records_check_res {
+                    Ok(campioni) => {
+                        campionamento_specie = campioni;
+                    }
+                    Err(value_errors) => {
+                        /* Assuming they were printed before this point
+                        eprintln!("Campionamento value errors in run_headless(): {{");
+                        for e in value_errors {
+                            let error_txt;
+                            match e {
+                                RecordCsvCampionamentoNISECIError::ValoreInvalido{ msg } => {
+                                    error_txt = msg;
+                                }
+                            }
+                            eprintln!("  {}", error_txt);
+                        }
+                        eprintln!("}}");
+                        */
+                        campionamento_valueparse_failed = true;
+                        //return; We keep running and return later
+                    }
+                }
             }
             Err(_errs) => {
                 /* Assuming they were printed before this point
@@ -72,34 +148,38 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) -> bool {
                 eprintln!("}}");
                 */
                 campionamento_csv_failed = true;
-                //return; We keep running to check the other file
-            }
-        }
-        let mut riferimento_csv_failed = false;
-        let riferimento_check_res = check_riferimento_niseci_path(riferimento_path);
-        match riferimento_check_res {
-            Ok(recs) => {
-                println!("Riferimento result: {{");
-                for r in recs {
-                    println!("  {r}");
-                }
-                println!("}}");
-                println!("TODO:  Implement validation step after successful csv parsing");
-            }
-            Err(_errs) => {
-                /* Assuming they were printed before this point
-                eprintln!("Riferimento errors in run_headless(): {{");
-                for e in errs {
-                    eprintln!("  {e}");
-                }
-                eprintln!("}}");
-                */
-                riferimento_csv_failed = true;
                 //return; We keep running and return later
             }
         }
 
-        return !riferimento_csv_failed && !campionamento_csv_failed;
+        eprintln!("Check CSV riferimento:  {}", if riferimento_csv_failed { "FAIL" } else { "SUCCESS" });
+        if !riferimento_csv_failed {
+            eprintln!("Check valori riferimento:  {}", if riferimento_valueparse_failed { "FAIL" } else { "SUCCESS" });
+        } else {
+            eprintln!("Check valori riferimento:  SKIPPED (CSV check failed)");
+        }
+        eprintln!("Check CSV campionamento:  {}", if campionamento_csv_failed { "FAIL" } else { "SUCCESS" });
+        if !campionamento_csv_failed {
+            eprintln!("Check valori campionamento:  {}", if campionamento_valueparse_failed { "FAIL" } else { "SUCCESS" });
+        } else {
+            eprintln!("Check valori campionamento:  SKIPPED (CSV check failed)");
+        }
+
+        let had_failures = ( riferimento_csv_failed ||
+            campionamento_csv_failed ) || (
+            riferimento_valueparse_failed ||
+            campionamento_valueparse_failed );
+
+        if !had_failures {
+            for s in riferimento_specie {
+                println!("Specie:  {:?}", s);
+            }
+            for c in campionamento_specie {
+                println!("Campione:  {:?}", c);
+            }
+            println!("TODO:  Implement anagrafica loading, full calc");
+        }
+        return !had_failures;
     } else {
         let campionamento_check_res = check_campionamento_hfbi_path(campionamento_path);
         println!("Result: {campionamento_check_res}");
