@@ -7,7 +7,7 @@ mod tests {
     use crate::{RecordCsvRiferimentoNISECI, check_records_riferimento_niseci};
     use crate::{RecordCsvCampionamentoNISECI, check_records_campionamento_niseci};
     use crate::model::niseci::SpecieNISECI;
-
+    use crate::engines::niseci::linear_regression::{calculate_quantita_stimata, gradient_descent_iterate};
 
     #[test]
     fn test_csv_riferimento_niseci_found_string_expect_int() {
@@ -273,5 +273,36 @@ mod tests {
         let result = check_records_campionamento_niseci(recordcsv_data, riferimento_specie);
 
         assert!(!result.is_err());
+    }
+
+    #[test]
+    fn test_linear_regression() {
+        let records = [100, 75, 50];
+
+        let (m_final, b_final) = gradient_descent_iterate(&records);
+
+        println!("{}, {}", m_final, b_final);
+        assert_eq!(m_final, -25);
+        assert_eq!(b_final, 125);
+    }
+
+    #[test]
+    fn test_quantita_stimata() {
+        let passaggi = [100, 75, 50];
+
+        let quantita_stimata = calculate_quantita_stimata(&passaggi);
+
+        assert!(quantita_stimata.is_ok());
+        assert_eq!(quantita_stimata.unwrap(), 250);
+    }
+
+    #[test]
+    fn test_quantita_stimata_err() {
+        let passaggi = [50, 75, 100];
+
+        let quantita_stimata = calculate_quantita_stimata(&passaggi);
+
+        assert!(quantita_stimata.is_err());
+        assert!(quantita_stimata.is_err_and(|e| e == -1));
     }
 }

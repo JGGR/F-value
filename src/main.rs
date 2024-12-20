@@ -5,6 +5,7 @@ mod model;
 mod views;
 mod controllers;
 mod core;
+mod engines;
 #[cfg(test)]
 mod tests;
 
