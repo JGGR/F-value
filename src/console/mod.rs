@@ -5,6 +5,7 @@ use crate::{propwidth, propheight};
 
 #[derive(Clone)]
 pub struct Console {
+    columns: usize,             // How many chars are shown per line
     messages: VecDeque<String>, // Stores all console messages
     max_messages: usize,        // Limit on messages to keep in memory
     view_offset: usize,         // Offset for the currently visible messages
@@ -13,35 +14,10 @@ pub struct Console {
     prompt : String,            // User prompt
 }
 
-fn wrap_text(rl: &RaylibHandle, text: &str, max_width: i32, font_size: i32) -> Vec<String> {
-    let mut lines = Vec::new();
-    let mut current_line = String::new();
-
-    for word in text.split_whitespace() {
-        let new_line = if current_line.is_empty() {
-            word.to_string()
-        } else {
-            format!("{} {}", current_line, word)
-        };
-
-        if rl.measure_text(&new_line, font_size) > max_width {
-            lines.push(current_line);
-            current_line = word.to_string();
-        } else {
-            current_line = new_line;
-        }
-    }
-
-    if !current_line.is_empty() {
-        lines.push(current_line);
-    }
-
-    lines
-}
-
 impl Console {
-    pub fn new(max_messages: usize, max_lines_visible: usize) -> Self {
+    pub fn new(columns: usize, max_messages: usize, max_lines_visible: usize) -> Self {
         Console {
+            columns: columns,
             messages: VecDeque::with_capacity(max_messages),
             max_messages,
             view_offset: 0,
@@ -64,25 +40,29 @@ impl Console {
     }
 
     pub fn add_message(&mut self, rl: &RaylibHandle, msg: String, max_width: i32, font_size: i32) {
-        let wrapped_lines = wrap_text(rl, &msg, max_width, font_size);
+        let lines = msg.lines();
 
-        // Non so come meglio potremmo gestire un word wrap diverso
-        // Al momento parole troppo lunghe (spazi separano parole) non sono
-        // splittate
-        //
-        // Possibilmente, lo split potrebbe essere fatto dalla draw invece che dalla add_message()
-        // come ora, MA con dei limiti. Per esempio, usando una stima (media?) per la larghezza
-        // del carattere (funziona in generale, ma da' problemi se ci sono molti caratteri diversi
-        // dalla media).
-        for line in wrapped_lines {
-            if self.messages.len() == self.max_messages {
-                self.messages.pop_front();
-            }
-            self.messages.push_back(line);
+        for line in lines {
 
-            // Automatically adjust view if autoscroll is enabled
-            if self.autoscroll {
-                self.scroll_to_bottom();
+            let chunk_size = self.columns;
+
+            let chunks: Vec<String> = line
+                .chars()
+                .collect::<Vec<_>>() // Collect into a vector of chars
+                .chunks(chunk_size) // Split into chunks
+                .map(|chunk| chunk.iter().collect::<String>()) // Convert each chunk to a String
+                .collect();
+
+            for chunk in chunks {
+                if self.messages.len() == self.max_messages {
+                    self.messages.pop_front();
+                }
+                self.messages.push_back(chunk);
+
+                // Automatically adjust view if autoscroll is enabled
+                if self.autoscroll {
+                    self.scroll_to_bottom();
+                }
             }
         }
     }
@@ -111,9 +91,12 @@ impl Console {
     }
 
     pub fn scroll_down(&mut self, lines: usize) {
-        self.view_offset = (self.view_offset + lines).min(self.messages.len());
+        // Ensure we don't scroll beyond the available messages
+        let max_offset = self.messages.len().saturating_sub(self.max_lines_visible);
+        self.view_offset = (self.view_offset + lines).min(max_offset);
+
         // If scrolling reaches the bottom, re-enable autoscroll
-        if self.view_offset == self.messages.len().saturating_sub(self.max_lines_visible) {
+        if self.view_offset == max_offset {
             self.autoscroll = true;
         }
     }
@@ -123,7 +106,10 @@ impl Console {
         let console_height = (self.max_lines_visible +1) * line_height as usize; // +1 for user
                                                                                  // prompt
 
-        let start_y = propheight(&d, screen_height - console_height as i32);
+        let top_y_padding = propheight(&d, 50);
+        let console_start_y = top_y_padding; //propheight(&d, screen_height - console_height as i32);
+
+        let txt_left_x_padding = propwidth(&d, 10);
 
         for (i, line) in self
             .messages
@@ -135,18 +121,21 @@ impl Console {
             d.draw_text_ex(
                 font,
                 line,
-                Vector2::new(propwidth(&d, 10) as f32, (start_y + (i as i32 * line_height)) as f32),
+                Vector2::new(txt_left_x_padding as f32, (console_start_y + (i as i32 * line_height)) as f32),
                 font_size as f32,
                 0.0,
                 Color::WHITE,
             );
         }
 
-         // Draw the prompt at the bottom of the console
+        let prompt_y_padding = top_y_padding;
+        let prompt_y = console_start_y + console_height as i32 + prompt_y_padding - line_height/2;
+
+        // Draw the prompt at the bottom of the console
         d.draw_text_ex(
             font,
             &format!("> {}", self.prompt),
-            Vector2::new(propwidth(&d, 10) as f32, (screen_height - line_height) as f32),
+            Vector2::new(txt_left_x_padding as f32, prompt_y as f32),
             font_size as f32,
             0.0,
             Color::YELLOW,
