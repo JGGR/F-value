@@ -148,7 +148,12 @@ impl Console {
     pub fn scroll_down(&mut self, lines: usize) {
         // Ensure we don't scroll beyond the available messages
         let max_offset = self.messages.len().saturating_sub(self.max_lines_visible);
-        self.view_offset = (self.view_offset + lines).min(max_offset);
+
+        if self.view_offset.saturating_add(lines) <= max_offset {
+            self.view_offset = self.view_offset.saturating_add(lines);
+        } else {
+            self.view_offset = max_offset;
+        }
 
         // If scrolling reaches the bottom, re-enable autoscroll
         if self.view_offset == max_offset {

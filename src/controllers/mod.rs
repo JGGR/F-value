@@ -360,6 +360,17 @@ impl ConsoleController {
     pub fn update(&self, rl : &mut RaylibHandle) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         // Handle input
+
+        let mwheel_move = rl.get_mouse_wheel_move() as i32;
+
+        if mwheel_move != 0 {
+            if mwheel_move > 0 { // Positive is to scroll up
+                state.console_model.console.scroll_up(mwheel_move as usize);
+            } else {
+                state.console_model.console.scroll_down(mwheel_move as usize);
+            }
+        }
+
         if rl.is_key_pressed(KEY_UP) {
             state.console_model.console.scroll_up(1);
         }
