@@ -49,6 +49,7 @@ data;stazione;superficie;numPassaggio;codiceSpecie;lunghezza;peso";
 //TODO: add test to check if this string respects the discriminant ordering in GuiTheme
 pub const GUI_THEME_COMBOBOX_STR: &str = "Light;Dark;Bluish;Candy;Cherry;Cyber;Jungle;Lavanda;Terminal;Ashes";
 
+#[derive(Copy, Clone)]
 pub enum CurrentView {
     HOME,
     SECOND,
@@ -139,6 +140,7 @@ pub struct MainState {
     pub showing_info_box: bool,
     pub showing_settings_box: bool,
     pub current_view: CurrentView,
+    pub previous_view: Option<CurrentView>,
     pub theme: GuiTheme,
     pub gui_theme_combobox_active: i32,
     pub default_font_height: i32,
@@ -158,6 +160,7 @@ impl MainState {
             showing_info_box: false,
             showing_settings_box: false,
             current_view: CurrentView::HOME,
+            previous_view: None,
             theme: GuiTheme::Light,
             gui_theme_combobox_active: GuiTheme::Light as i32,
             default_font_height: default_font_height,
@@ -170,6 +173,7 @@ impl MainState {
     }
 
     pub fn set_current_view(&mut self, view: CurrentView) -> () {
+        self.previous_view = Some(self.current_view);
         self.current_view = view;
     }
 
