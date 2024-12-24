@@ -39,7 +39,7 @@ impl Console {
         self.view_offset == self.messages.len().saturating_sub(self.max_lines_visible)
     }
 
-    pub fn add_message(&mut self, rl: &RaylibHandle, msg: String, max_width: i32, font_size: i32) {
+    pub fn add_message(&mut self, rl: &RaylibHandle, msg: String, font_size: i32) {
         let lines = msg.lines();
 
         for line in lines {
@@ -80,7 +80,32 @@ impl Console {
 
         // Handle enter key
         if is_enter_pressed {
-            self.add_message(rl, self.prompt.clone(), 780, current_font_size);
+            let user_prompt = self.prompt.clone();
+
+            let mut parts = user_prompt.splitn(2, char::is_whitespace); // Split only once at the first whitespace
+
+            let command;
+            if let Some(cmd) = parts.next() {
+                command = cmd.to_string();
+            } else {
+                command = "".to_string();
+            }
+
+            let args;
+            if let Some(a) = parts.next() {
+                args = a.to_string();
+            } else {
+                args = "".to_string();
+            }
+
+            match command.as_str() {
+                "echo" => {
+                    self.add_message(rl, args, current_font_size);
+                }
+                _ => {
+                    self.add_message(rl, format!("Unknown command: {command}"), current_font_size);
+                }
+            }
             self.prompt.clear();
         }
     }
