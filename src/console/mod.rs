@@ -188,7 +188,7 @@ impl Console {
             );
         }
 
-        let prompt_y_padding = top_y_padding;
+        let prompt_y_padding = propheight(&d, 10);
         let prompt_y = console_start_y + console_height as i32 + prompt_y_padding - line_height/2;
         let prompt_color = txt_color;
 
