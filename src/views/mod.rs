@@ -276,6 +276,7 @@ impl SelezioneFileInputView {
                         controller.set_riferimento_path(Some(filepath));
                     } else {
                         eprintln!("Error: failed getting a file.");
+                        controller.add_message("Failed getting a file for riferimento".to_string());
                     }
                 }
             }
@@ -317,6 +318,7 @@ impl SelezioneFileInputView {
                     controller.set_campionamento_path(Some(filepath));
                 } else {
                     eprintln!("Error: failed getting a file.");
+                    controller.add_message("Failed getting a file for campionamento".to_string());
                 }
             }
         }

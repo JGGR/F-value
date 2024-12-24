@@ -84,6 +84,7 @@ pub struct FileInputModel {
     riferimento_path_valid: bool,
     campionamento_path: Option<PathBuf>,
     campionamento_path_valid: bool,
+    errors_occurred: bool,
 }
 
 impl FileInputModel {
@@ -123,6 +124,14 @@ impl FileInputModel {
 
     pub fn get_campionamento_path_valid(&self) -> bool {
         return self.campionamento_path_valid;
+    }
+
+    pub fn get_errors_occurred(&self) -> bool {
+        return self.errors_occurred;
+    }
+
+    pub fn set_errors_occurred(&mut self, val: bool) {
+        self.errors_occurred = val;
     }
 }
 
@@ -204,6 +213,7 @@ impl Model {
                 riferimento_path_valid: false,
                 campionamento_path: None,
                 campionamento_path_valid: false,
+                errors_occurred: false,
             },
             infoaggiuntive_model: InfoAggiuntiveModel {
                 frame_counter: 0,
@@ -214,7 +224,7 @@ impl Model {
             console_model : ConsoleModel {
                 console : Console::new(
                         80, // Columns - chars per line
-                        100, // Max messages
+                        1000, // Max messages
                         17, // Max messages shown at a time
                               ),
                 name : "Initial".to_string(),

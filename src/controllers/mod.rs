@@ -3,6 +3,7 @@ use crate::core::{MainState, check_campionamento_niseci_path, check_riferimento_
 use crate::model::index::Indice;
 use crate::state::GLOBAL_STATE;
 use crate::CurrentView;
+use crate::translate_error_message;
 use raylib::RaylibHandle;
 use std::path::PathBuf;
 use raylib::consts::KeyboardKey::*;
@@ -89,6 +90,11 @@ impl IndiceController {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.indice_model.set_selected_index(index);
     }
+    pub fn add_message(&self, msg: String) {
+        let mut state = GLOBAL_STATE.lock().unwrap();
+
+        state.console_model.console.add_message(msg);
+    }
 }
 
 pub struct FileInputController;
@@ -101,6 +107,14 @@ impl FileInputController {
     pub fn update(&self, _rl: &RaylibHandle, main_state: &mut MainState) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.fileinput_model.increment_frame_counter();
+
+        if state.fileinput_model.get_errors_occurred() {
+            eprintln!("FileInputController:  Errors occurred");
+            eprintln!("FileInputController:  Let's update current view and go to CONSOLE.");
+            main_state.set_current_view(CurrentView::CONSOLE);
+            eprintln!("FileInputController:  Clearing error state");
+            state.fileinput_model.set_errors_occurred(false);
+        }
 
         let current_indice;
         if let Some(idx) = state.indice_model.get_selected_index() {
@@ -242,13 +256,19 @@ impl FileInputController {
                         state.fileinput_model.set_riferimento_path_valid(records_check);
                     }
                 }
-                Err(_errors) => {
+                Err(errors) => {
                     //TODO: handle displaying the errors?
                     /*
                     for err in errors {
                         eprintln!("FileInputController:  {err}");
                     }
                     */
+                    for err in errors {
+                        let translated_error = translate_error_message(&err.to_string());
+                        self.add_message(format!("FileInputController:  {translated_error}"));
+                    }
+                    let mut state = GLOBAL_STATE.lock().unwrap();
+                    state.fileinput_model.set_errors_occurred(true);
                     return;
                 }
             }
@@ -286,17 +306,28 @@ impl FileInputController {
                         state.fileinput_model.set_campionamento_path_valid(records_check);
                     }
                 }
-                Err(_errors) => {
+                Err(errors) => {
                     //TODO: handle displaying the errors?
                     /*
                     for err in errors {
                         eprintln!("FileInputController:  {err}");
                     }
                     */
+                    for err in errors {
+                        let translated_error = translate_error_message(&err.to_string());
+                        self.add_message(format!("FileInputController:  {translated_error}"));
+                    }
+                    let mut state = GLOBAL_STATE.lock().unwrap();
+                    state.fileinput_model.set_errors_occurred(true);
                     return;
                 }
             }
         }
+    }
+    pub fn add_message(&self, msg: String) {
+        let mut state = GLOBAL_STATE.lock().unwrap();
+
+        state.console_model.console.add_message(msg);
     }
 }
 
@@ -316,6 +347,11 @@ impl InfoAggiuntiveController {
         let state = GLOBAL_STATE.lock().unwrap();
         return state.infoaggiuntive_model.clone();
     }
+    pub fn add_message(&self, msg: String) {
+        let mut state = GLOBAL_STATE.lock().unwrap();
+
+        state.console_model.console.add_message(msg);
+    }
 }
 
 pub struct OutputController;
@@ -333,6 +369,11 @@ impl OutputController {
     pub fn get_state(&self) -> OutputModel {
         let state = GLOBAL_STATE.lock().unwrap();
         return state.output_model.clone();
+    }
+    pub fn add_message(&self, msg: String) {
+        let mut state = GLOBAL_STATE.lock().unwrap();
+
+        state.console_model.console.add_message(msg);
     }
 }
 
@@ -367,7 +408,7 @@ impl ConsoleController {
             if mwheel_move > 0 { // Positive is to scroll up
                 state.console_model.console.scroll_up(mwheel_move as usize);
             } else {
-                state.console_model.console.scroll_down(mwheel_move as usize);
+                state.console_model.console.scroll_down(-mwheel_move as usize);
             }
         }
 
@@ -398,5 +439,11 @@ impl ConsoleController {
     pub fn get_state(&self) -> ConsoleModel {
         let state = GLOBAL_STATE.lock().unwrap();
         return state.console_model.clone();
+    }
+
+    pub fn add_message(&self, msg: String) {
+        let mut state = GLOBAL_STATE.lock().unwrap();
+
+        state.console_model.console.add_message(msg);
     }
 }
