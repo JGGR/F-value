@@ -110,6 +110,9 @@ impl Console {
             }
 
             match command.as_str() {
+                "help" => {
+                    self.add_message(format!("esox prompt, comandi disponibili:\n  echo\n  info\n  clear\n  help"));
+                }
                 "echo" => {
                     self.add_message(args);
                 }
@@ -134,6 +137,7 @@ impl Console {
                 }
                 _ => {
                     self.add_message(format!("Unknown command: {command}"));
+                    self.add_message("Run \"help\" for a list of available commands".to_string());
                 }
             }
             self.prompt.clear();
