@@ -161,7 +161,7 @@ impl Console {
         }
     }
 
-    pub fn draw(&self, d: &mut RaylibDrawHandle, font_size: i32, font: &Font) {
+    pub fn draw(&self, d: &mut RaylibDrawHandle, txt_color: Color, font_size: i32, font: &Font) {
         let line_height = propheight(&d, font_size + 4); // Adjust as needed
         let console_height = (self.max_lines_visible +1) * line_height as usize; // +1 for user
                                                                                  // prompt
@@ -184,12 +184,13 @@ impl Console {
                 Vector2::new(txt_left_x_padding as f32, (console_start_y + (i as i32 * line_height)) as f32),
                 font_size as f32,
                 0.0,
-                Color::WHITE,
+                txt_color
             );
         }
 
         let prompt_y_padding = top_y_padding;
         let prompt_y = console_start_y + console_height as i32 + prompt_y_padding - line_height/2;
+        let prompt_color = txt_color;
 
         // Draw the prompt at the bottom of the console
         d.draw_text_ex(
@@ -198,7 +199,7 @@ impl Console {
             Vector2::new(txt_left_x_padding as f32, prompt_y as f32),
             font_size as f32,
             0.0,
-            Color::YELLOW,
+            prompt_color
         );
     }
 }

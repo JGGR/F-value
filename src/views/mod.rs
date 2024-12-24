@@ -1131,11 +1131,11 @@ impl ConsoleView {
             current_font_size : font_size,
         }
     }
-    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &ConsoleController) {
-        d.clear_background(Color::GRAY);
+    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &ConsoleController, main_state: &MainState) {
+        d.clear_background(main_state.default_bg_color);
 
         let state = controller.get_state();
 
-        state.console.draw(d, self.current_font_size, &self.font);
+        state.console.draw(d, main_state.default_txt_color, self.current_font_size, &self.font);
     }
 }

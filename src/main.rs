@@ -214,7 +214,7 @@ fn main() {
                 produzione_pdf_view.draw(&mut d, &thread, &output_controller, &main_state);
             }
             CurrentView::CONSOLE => {
-                console_view.draw(&mut d, &thread, &console_controller);
+                console_view.draw(&mut d, &thread, &console_controller, &main_state);
             }
         }
 
