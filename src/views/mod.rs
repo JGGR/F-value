@@ -1125,21 +1125,17 @@ impl ConsoleView {
             font : rl.load_font_from_memory(&thread,
                 ".ttf",
                 CONSOLE_FONT_DATA,
-                font_size * 2,
+                font_size,// *2,
                 None).expect("failed loading console font"),
             default_font_size : font_size,
             current_font_size : font_size,
         }
     }
-    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &ConsoleController, current_font_size : i32) {
+    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &ConsoleController) {
         d.clear_background(Color::GRAY);
 
-        // Draw the state retrieved via the Controller
         let state = controller.get_state();
-        let state_name = state.get_name();
-        let line = format!("Name: {}", state_name);
-        d.draw_text(&line, 10, 10, current_font_size, Color::BLACK);
 
-        state.console.draw(d, self.current_font_size, propwidth(&d, ESOX_SCREEN_WIDTH), propheight(&d, ESOX_SCREEN_HEIGHT), &self.font);
+        state.console.draw(d, self.current_font_size, &self.font);
     }
 }

@@ -1,6 +1,7 @@
 use std::collections::VecDeque;
 use raylib::prelude::*;
 use crate::{propwidth, propheight};
+use crate::SHORT_PROJECT_VERSION;
 
 
 #[derive(Clone)]
@@ -39,7 +40,7 @@ impl Console {
         self.view_offset == self.messages.len().saturating_sub(self.max_lines_visible)
     }
 
-    pub fn add_message(&mut self, rl: &RaylibHandle, msg: String, font_size: i32) {
+    pub fn add_message(&mut self, msg: String) {
         let lines = msg.lines();
 
         for line in lines {
@@ -68,7 +69,7 @@ impl Console {
     }
 
     /// Handle character input (e.g., from `raylib` key events)
-    pub fn handle_input(&mut self, rl: &RaylibHandle, input_char: Option<char>, current_font_size: i32, is_enter_pressed: bool, is_backspace_pressed: bool) {
+    pub fn handle_input(&mut self, _rl: &RaylibHandle, input_char: Option<char>, is_enter_pressed: bool, is_backspace_pressed: bool) {
         if let Some(c) = input_char {
             self.prompt.push(c);
         }
@@ -110,22 +111,29 @@ impl Console {
 
             match command.as_str() {
                 "echo" => {
-                    self.add_message(rl, args, current_font_size);
+                    self.add_message(args);
                 }
                 "info" => {
                     if args_num < 1 {
-                        self.add_message(rl, format!("info: missing argument"), current_font_size);
-                        self.add_message(rl, format!("usage: info <name>"), current_font_size);
+                        self.add_message(format!("info: missing argument"));
+                        self.add_message(format!("usage: info <name>"));
                     } else {
                         let name = args_vec[0];
-                        self.add_message(rl, format!("info: TODO: report on {name}"), current_font_size);
+                        match name {
+                            "version" => {
+                                self.add_message(format!("esox v{SHORT_PROJECT_VERSION}"));
+                            }
+                            _ => {
+                                self.add_message(format!("info: TODO: report on {name}"));
+                            }
+                        }
                     }
                 }
                 "clear" => {
                     self.messages.clear();
                 }
                 _ => {
-                    self.add_message(rl, format!("Unknown command: {command}"), current_font_size);
+                    self.add_message(format!("Unknown command: {command}"));
                 }
             }
             self.prompt.clear();
@@ -148,7 +156,7 @@ impl Console {
         }
     }
 
-    pub fn draw(&self, d: &mut RaylibDrawHandle, font_size: i32, _screen_width: i32, screen_height: i32, font: &Font) {
+    pub fn draw(&self, d: &mut RaylibDrawHandle, font_size: i32, font: &Font) {
         let line_height = propheight(&d, font_size + 4); // Adjust as needed
         let console_height = (self.max_lines_visible +1) * line_height as usize; // +1 for user
                                                                                  // prompt

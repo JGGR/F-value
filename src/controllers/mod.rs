@@ -369,17 +369,17 @@ impl ConsoleController {
 
         // Detect and pass keys to the console
         while let Some(c) = rl.get_char_pressed() {
-            state.console_model.console.handle_input(rl, Some(c), 20, false, false);
+            state.console_model.console.handle_input(rl, Some(c), false, false);
         }
 
         // Check for Enter key press
         if rl.is_key_pressed(KEY_ENTER) {
-            state.console_model.console.handle_input(rl, None, 20, true, false);
+            state.console_model.console.handle_input(rl, None, true, false);
         }
 
         // Check for Backspace key press
         if rl.is_key_pressed(KEY_BACKSPACE) {
-            state.console_model.console.handle_input(rl, None, 20, false, true);
+            state.console_model.console.handle_input(rl, None, false, true);
         }
         state.console_model.set_name("Updated".to_string());
     }

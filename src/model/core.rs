@@ -215,7 +215,7 @@ impl Model {
                 console : Console::new(
                         80, // Columns - chars per line
                         100, // Max messages
-                        20, // Max messages shown at a time
+                        15, // Max messages shown at a time
                               ),
                 name : "Initial".to_string(),
             }
