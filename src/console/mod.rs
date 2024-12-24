@@ -98,9 +98,31 @@ impl Console {
                 args = "".to_string();
             }
 
+            let args_split = args.split_whitespace();
+            let mut args_vec = Vec::<&str>::new();
+
+            let mut args_num = 0;
+
+            for arg in args_split {
+                args_vec.push(arg);
+                args_num += 1;
+            }
+
             match command.as_str() {
                 "echo" => {
                     self.add_message(rl, args, current_font_size);
+                }
+                "info" => {
+                    if args_num < 1 {
+                        self.add_message(rl, format!("info: missing argument"), current_font_size);
+                        self.add_message(rl, format!("usage: info <name>"), current_font_size);
+                    } else {
+                        let name = args_vec[0];
+                        self.add_message(rl, format!("info: TODO: report on {name}"), current_font_size);
+                    }
+                }
+                "clear" => {
+                    self.messages.clear();
                 }
                 _ => {
                     self.add_message(rl, format!("Unknown command: {command}"), current_font_size);
