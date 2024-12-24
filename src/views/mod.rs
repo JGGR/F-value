@@ -1125,7 +1125,7 @@ impl ConsoleView {
             font : rl.load_font_from_memory(&thread,
                 ".ttf",
                 CONSOLE_FONT_DATA,
-                font_size,
+                font_size * 2,
                 None).expect("failed loading console font"),
             default_font_size : font_size,
             current_font_size : font_size,

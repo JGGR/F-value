@@ -337,7 +337,7 @@ pub fn draw_main(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
 
     let core_button_width = propwidth(&d, 25);
     let core_button_heigth = core_button_width;
-    let core_buttons_count = 3;
+    let core_buttons_count = 4;
     let core_buttons_x_padding = propwidth(&d, 5);
     let core_buttons_y_padding = core_buttons_x_padding;
     let core_buttons_panel_height = navbar_height;
@@ -418,15 +418,15 @@ pub fn draw_main(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
         main_state.showing_settings_box = true;
     }
 
-    let y_spacing = propheight(&d, 10);
-
     let console_button_width = settings_button_width;
-    let console_button_x = settings_button_x;
+    let console_button_x = settings_button_x + settings_button_width + core_buttons_x_padding;
     let console_button_height = settings_button_height;
-    let console_button_y = settings_button_y + settings_button_height + y_spacing;
+    let console_button_y = settings_button_y;
 
     // "Console view" button
-    if d.gui_button(rrect(console_button_x, console_button_y, console_button_width, console_button_height), Some(rstr!("Console"))) {
+    let itext = d.gui_icon_text(ICON_MONITOR, Some(rstr!("")));
+    let itext = CString::new(itext).unwrap();
+    if d.gui_button(rrect(console_button_x, console_button_y, console_button_width, console_button_height), Some(itext.as_c_str())) {
         match main_state.current_view {
             CurrentView::CONSOLE => {
                 main_state.current_view = CurrentView::HOME;
