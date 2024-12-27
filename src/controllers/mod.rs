@@ -91,7 +91,7 @@ impl IndiceController {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.indice_model.set_selected_index(index);
     }
-    pub fn add_message(&self, msg: String) {
+    pub fn add_console_message(&self, msg: String) {
         let mut state = GLOBAL_STATE.lock().unwrap();
 
         state.console_model.console.add_message(msg);
@@ -232,6 +232,11 @@ impl FileInputController {
     }
 
     pub fn set_riferimento_path(&self, riferimento_path: Option<PathBuf>) {
+        if let Some(ref rif_path) = riferimento_path {
+            self.add_console_message(format!("FileInputController:  Selezione percorso riferimento: {{{}}}", rif_path.display()));
+        } else {
+            self.add_console_message(format!("FileInputController:  Deselezione percorso riferimento"));
+        }
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.fileinput_model.set_riferimento_path(riferimento_path);
         state.fileinput_model.set_riferimento_path_valid(false); // Refresh the validity
@@ -259,13 +264,13 @@ impl FileInputController {
 
                     match records_check {
                         Ok(species) => {
-                            self.add_message(format!("FileInputController:  Validazione RiferimentoNISECI completata!"));
+                            self.add_console_message(format!("FileInputController:  Validazione RiferimentoNISECI completata!"));
                             let riferimento = RiferimentoNISECI::new(species);
                             self.set_data_riferimento_niseci(riferimento);
                         }
                         Err(errors) => { // Value errors
                             for e in errors {
-                                self.add_message(format!("FileInputController:  {e}"));
+                                self.add_console_message(format!("FileInputController:  {e}"));
                             }
                             let mut state = GLOBAL_STATE.lock().unwrap();
                             state.fileinput_model.set_errors_occurred(true);
@@ -281,7 +286,7 @@ impl FileInputController {
                     */
                     let processed_errors = process_csv_errors(&errors);
                     for e in processed_errors {
-                        self.add_message(format!("FileInputController:  {e}"));
+                        self.add_console_message(format!("FileInputController:  {e}"));
                     }
                     let mut state = GLOBAL_STATE.lock().unwrap();
                     state.fileinput_model.set_errors_occurred(true);
@@ -297,6 +302,11 @@ impl FileInputController {
     }
 
     pub fn set_campionamento_path(&self, campionamento_path: Option<PathBuf>) {
+        if let Some(ref camp_path) = campionamento_path {
+            self.add_console_message(format!("FileInputController:  Selezione percorso campionamento: {{{}}}", camp_path.display()));
+        } else {
+            self.add_console_message(format!("FileInputController:  Deselezione percorso campionamento"));
+        }
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.fileinput_model.set_campionamento_path(campionamento_path);
         state.fileinput_model.set_campionamento_path_valid(false); // Refresh the validity
@@ -325,13 +335,13 @@ impl FileInputController {
                         let records_check = check_records_campionamento_niseci(records, riferimento_niseci.elenco_specie);
                         match records_check {
                             Ok(campioni) => {
-                                self.add_message(format!("FileInputController:  Validazione CampionamentoNISECI completata!"));
+                                self.add_console_message(format!("FileInputController:  Validazione CampionamentoNISECI completata!"));
                                 let campionamento = CampionamentoNISECI::new(campioni);
                                 self.set_data_campionamento_niseci(campionamento);
                             }
                             Err(errors) => { // Value errors
                                 for e in errors {
-                                    self.add_message(format!("FileInputController:  {e}"));
+                                    self.add_console_message(format!("FileInputController:  {e}"));
                                 }
                                 let mut state = GLOBAL_STATE.lock().unwrap();
                                 state.fileinput_model.set_errors_occurred(true);
@@ -341,7 +351,7 @@ impl FileInputController {
                     } else {
                         let error_msg = "Impossibile validare campionamento_niseci senza avere riferimento";
                         eprintln!("{error_msg}");
-                        self.add_message(format!("FileInputController:  {error_msg}"));
+                        self.add_console_message(format!("FileInputController:  {error_msg}"));
                         state.fileinput_model.set_errors_occurred(true);
                         return;
                     }
@@ -354,7 +364,7 @@ impl FileInputController {
                     */
                     let processed_errors = process_csv_errors(&errors);
                     for e in processed_errors {
-                        self.add_message(format!("FileInputController:  {e}"));
+                        self.add_console_message(format!("FileInputController:  {e}"));
                     }
                     let mut state = GLOBAL_STATE.lock().unwrap();
                     state.fileinput_model.set_errors_occurred(true);
@@ -363,7 +373,7 @@ impl FileInputController {
             }
         }
     }
-    pub fn add_message(&self, msg: String) {
+    pub fn add_console_message(&self, msg: String) {
         let mut state = GLOBAL_STATE.lock().unwrap();
 
         state.console_model.console.add_message(msg);
@@ -391,7 +401,7 @@ impl InfoAggiuntiveController {
         let state = GLOBAL_STATE.lock().unwrap();
         return state.infoaggiuntive_model.clone();
     }
-    pub fn add_message(&self, msg: String) {
+    pub fn add_console_message(&self, msg: String) {
         let mut state = GLOBAL_STATE.lock().unwrap();
 
         state.console_model.console.add_message(msg);
@@ -414,7 +424,7 @@ impl OutputController {
         let state = GLOBAL_STATE.lock().unwrap();
         return state.output_model.clone();
     }
-    pub fn add_message(&self, msg: String) {
+    pub fn add_console_message(&self, msg: String) {
         let mut state = GLOBAL_STATE.lock().unwrap();
 
         state.console_model.console.add_message(msg);
@@ -485,7 +495,7 @@ impl ConsoleController {
         return state.console_model.clone();
     }
 
-    pub fn add_message(&self, msg: String) {
+    pub fn add_console_message(&self, msg: String) {
         let mut state = GLOBAL_STATE.lock().unwrap();
 
         state.console_model.console.add_message(msg);
