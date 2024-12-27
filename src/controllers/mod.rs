@@ -1,5 +1,5 @@
 use crate::model::core::*;
-use crate::core::{MainState, check_campionamento_niseci_path, check_riferimento_niseci_path};
+use crate::core::{MainState, check_campionamento_niseci_path, check_riferimento_niseci_path, check_records_riferimento_niseci};
 use crate::model::index::Indice;
 use crate::state::GLOBAL_STATE;
 use crate::CurrentView;
@@ -246,17 +246,28 @@ impl FileInputController {
             let csv_check = check_riferimento_niseci_path(path);
 
             match csv_check {
-                Ok(_records) => {
-                    //TODO: implement post-csv check step.
-                    eprintln!("TODO: implement post-csv check step to ensure the records are valid.");
-                    let records_check = false;
+                Ok(records) => {
+                    let records_check = check_records_riferimento_niseci(records);
 
-                    if records_check {
-                        let mut state = GLOBAL_STATE.lock().unwrap();
-                        state.fileinput_model.set_riferimento_path_valid(records_check);
+                    match records_check {
+                        Ok(_species) => {
+                            //TODO: ask controller to store the Riferimento
+                            eprintln!("TODO: ask controller to store the Riferimento");
+
+                            let mut state = GLOBAL_STATE.lock().unwrap();
+                            state.fileinput_model.set_riferimento_path_valid(true);
+                        }
+                        Err(errors) => { // Value errors
+                            for e in errors {
+                                self.add_message(format!("FileInputController:  {e}"));
+                            }
+                            let mut state = GLOBAL_STATE.lock().unwrap();
+                            state.fileinput_model.set_errors_occurred(true);
+                            return;
+                        }
                     }
                 }
-                Err(errors) => {
+                Err(errors) => { // Csv errors
                     //TODO: handle displaying the errors?
                     /*
                     for err in errors {
