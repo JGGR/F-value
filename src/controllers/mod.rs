@@ -190,6 +190,7 @@ impl FileInputController {
                         if riferimento_valid && campionamento_valid {
                             eprintln!("FileInputController:  NISECI - L'utente ha validato riferimento e campionamento");
                             eprintln!("FileInputController:  Let's update current view and go to SelezioneInfoAggiuntive.");
+                            self.add_console_message(format!("FileInputController:  NISECI - L'utente ha validato riferimento e campionamento"));
                             main_state.set_current_view(CurrentView::SelezioneInfoAggiuntive);
                         }
                     }
@@ -207,6 +208,7 @@ impl FileInputController {
                         if campionamento_valid {
                             eprintln!("FileInputController:  HFBI - L'utente ha validato campionamento");
                             eprintln!("FileInputController:  Let's update current view and go to SelezioneInfoAggiuntive.");
+                            self.add_console_message(format!("FileInputController:  HFBI - L'utente ha validato campionamento"));
                             main_state.set_current_view(CurrentView::SelezioneInfoAggiuntive);
                         }
                     }
