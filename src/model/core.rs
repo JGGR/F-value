@@ -1,8 +1,10 @@
 use super::index::Indice;
 use super::niseci::{RiferimentoNISECI, CampionamentoNISECI, AnagraficaNISECI, RisultatoNISECI};
 use std::path::PathBuf;
+use std::collections::HashMap;
 
 use crate::console::*;
+use crate::SHORT_PROJECT_VERSION;
 
 // State struct holding non-`Copy` types
 #[derive(Clone)]
@@ -270,10 +272,13 @@ impl Model {
             },
             console_model: ConsoleModel {
                 console: Console::new(
-                        80, // Columns - chars per line
-                        1000, // Max messages
-                        17, // Max messages shown at a time
-                              ),
+                    80, // Columns - chars per line
+                    1000, // Max messages
+                    17, // Max messages shown at a time
+                    HashMap::<String,String>::from([
+                        ("version".to_string(), SHORT_PROJECT_VERSION.to_string()),
+                    ]),
+                ),
                 name: "Initial".to_string(),
             },
             data_model: DataModel {

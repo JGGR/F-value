@@ -1,8 +1,7 @@
-use std::collections::VecDeque;
+use std::collections::{VecDeque, HashMap};
 use raylib::prelude::*;
 use crate::{propwidth, propheight};
 use crate::SHORT_PROJECT_VERSION;
-
 
 #[derive(Clone)]
 pub struct Console {
@@ -12,11 +11,12 @@ pub struct Console {
     view_offset: usize,         // Offset for the currently visible messages
     max_lines_visible: usize,   // Number of lines that fit in the view
     autoscroll: bool,           // Flag to track autoscroll state
-    prompt : String,            // User prompt
+    prompt: String,             // User prompt
+    env: HashMap<String,String>,// Console environment
 }
 
 impl Console {
-    pub fn new(columns: usize, max_messages: usize, max_lines_visible: usize) -> Self {
+    pub fn new(columns: usize, max_messages: usize, max_lines_visible: usize, env: HashMap<String,String>) -> Self {
         Console {
             columns: columns,
             messages: VecDeque::with_capacity(max_messages),
@@ -25,6 +25,7 @@ impl Console {
             max_lines_visible,
             autoscroll: true, // Start with autoscroll enabled
             prompt: String::new(),
+            env: env,
         }
     }
 
@@ -111,7 +112,27 @@ impl Console {
 
             match command.as_str() {
                 "help" => {
-                    self.add_message(format!("esox prompt, comandi disponibili:\n  echo\n  info\n  clear\n  help"));
+                    if args_num < 1 {
+                        self.add_message(format!("esox prompt, comandi disponibili:\n  echo\n  info\n  clear\n  help"));
+                    } else {
+                        let cmd = args_vec[0];
+                        match cmd {
+                            "info" => {
+                                self.add_message(format!("comando info:\n  uso: info <name>\nNomi disponibili: {{"));
+                                let keys: Vec<_> = self.env.keys().cloned().collect();
+                                for k in keys {
+                                    self.add_message(format!("  {k}"));
+                                }
+                                self.add_message(format!("}}"));
+                            }
+                            "echo" | "clear" | "help" => {
+                                self.add_message(format!("help: TODO: help for {cmd}"));
+                            }
+                            _ => {
+                                self.add_message(format!("help: Comando sconosciuto: {cmd}"));
+                            }
+                        }
+                    }
                 }
                 "echo" => {
                     self.add_message(args);
@@ -120,15 +141,18 @@ impl Console {
                     if args_num < 1 {
                         self.add_message(format!("info: missing argument"));
                         self.add_message(format!("usage: info <name>"));
+                        self.add_message(format!("for available names: help info"));
                     } else {
-                        let name = args_vec[0];
-                        match name {
-                            "version" => {
-                                self.add_message(format!("esox v{SHORT_PROJECT_VERSION}"));
-                            }
-                            _ => {
-                                self.add_message(format!("info: TODO: report on {name}"));
-                            }
+                        let name = args_vec[0].to_string();
+
+                        let keys: Vec<_> = self.env.keys().cloned().collect();
+
+                        if keys.contains(&name) {
+                            let val = self.env.get(&name).unwrap();
+                            self.add_message(format!("info: {name}: {{{val}}}"));
+                        } else {
+                            self.add_message(format!("info: Nome sconosciuto: {name}"));
+                            self.add_message(format!("for available names: help info"));
                         }
                     }
                 }
