@@ -41,17 +41,17 @@ pub struct CampionamentoNISECI {
 }
 
 impl CampionamentoNISECI {
-  pub fn fishes_for_every_passage(&self) -> Vec<Point<i32>> {
+    pub fn fishes_for_every_passage(&self) -> Vec<Point<i32>> {
     let mut max_pass = 0;
     for record in self.campionamento.iter() {
-      if record.passaggio_cattura > max_pass {
+        if record.passaggio_cattura > max_pass {
         max_pass = record.passaggio_cattura;
-      }
+        }
     }
 
     let mut passaggi: Vec<i32> = vec![0; max_pass as usize];
     for record in self.campionamento.iter() {
-      passaggi[(record.passaggio_cattura - 1) as usize] += 1;
+        passaggi[(record.passaggio_cattura - 1) as usize] += 1;
     }
 
     let mut tot = 0;
@@ -59,13 +59,18 @@ impl CampionamentoNISECI {
     // x = pesci totali fino a quel passaggio y = pesci del passaggio
     let mut pass_sum: Vec<Point<i32>> = Vec::with_capacity(max_pass as usize);
     for pass in passaggi.iter() {
-      tot += pass;
-      pass_sum.push(Point::new(tot, *pass));
+        tot += pass;
+        pass_sum.push(Point::new(tot, *pass));
     }
 
-    pass_sum
-  }
+        pass_sum
+    }
 
+    pub fn new(campionamento: Vec<RecordNISECI>) -> Self {
+        Self {
+            campionamento: campionamento,
+        }
+    }
 }
 
 #[derive(Clone)]

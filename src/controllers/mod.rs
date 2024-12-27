@@ -1,7 +1,7 @@
 use crate::model::core::*;
-use crate::core::{MainState, check_campionamento_niseci_path, check_riferimento_niseci_path, check_records_riferimento_niseci};
+use crate::core::{MainState, check_campionamento_niseci_path, check_riferimento_niseci_path, check_records_riferimento_niseci, check_records_campionamento_niseci};
 use crate::model::index::Indice;
-use crate::model::niseci::RiferimentoNISECI;
+use crate::model::niseci::{RiferimentoNISECI, CampionamentoNISECI};
 use crate::state::GLOBAL_STATE;
 use crate::CurrentView;
 use crate::process_csv_errors;
@@ -252,6 +252,7 @@ impl FileInputController {
 
                     match records_check {
                         Ok(species) => {
+                            self.add_message(format!("FileInputController:  Validazione RiferimentoNISECI completata!"));
                             let riferimento = RiferimentoNISECI::new(species);
                             let mut state = GLOBAL_STATE.lock().unwrap();
                             state.data_model.set_riferimento_niseci(Some(riferimento));
@@ -268,7 +269,6 @@ impl FileInputController {
                     }
                 }
                 Err(errors) => { // Csv errors
-                    //TODO: handle displaying the errors?
                     /*
                     for err in errors {
                         eprintln!("FileInputController:  {err}");
@@ -307,18 +307,36 @@ impl FileInputController {
             let csv_check = check_campionamento_niseci_path(path);
 
             match csv_check {
-                Ok(_records) => {
-                    //TODO: implement post-csv check step.
-                    eprintln!("TODO: implement post-csv check step to ensure the records are valid.");
-                    let records_check = false;
-
-                    if records_check {
-                        let mut state = GLOBAL_STATE.lock().unwrap();
-                        state.fileinput_model.set_campionamento_path_valid(records_check);
+                Ok(records) => {
+                    let mut state = GLOBAL_STATE.lock().unwrap();
+                    if let Some(riferimento_niseci) = state.data_model.get_riferimento_niseci() {
+                        let records_check = check_records_campionamento_niseci(records, riferimento_niseci.elenco_specie);
+                        match records_check {
+                            Ok(campioni) => {
+                                self.add_message(format!("FileInputController:  Validazione CampionamentoNISECI completata!"));
+                                let campionamento = CampionamentoNISECI::new(campioni);
+                                let mut state = GLOBAL_STATE.lock().unwrap();
+                                state.data_model.set_campionamento_niseci(Some(campionamento));
+                                state.fileinput_model.set_campionamento_path_valid(true);
+                            }
+                            Err(errors) => { // Value errors
+                                for e in errors {
+                                    self.add_message(format!("FileInputController:  {e}"));
+                                }
+                                let mut state = GLOBAL_STATE.lock().unwrap();
+                                state.fileinput_model.set_errors_occurred(true);
+                                return;
+                            }
+                        }
+                    } else {
+                        let error_msg = "Impossibile validare campionamento_niseci senza avere riferimento";
+                        eprintln!("{error_msg}");
+                        self.add_message(format!("FileInputController:  {error_msg}"));
+                        state.fileinput_model.set_errors_occurred(true);
+                        return;
                     }
                 }
-                Err(errors) => {
-                    //TODO: handle displaying the errors?
+                Err(errors) => { // Csv errors
                     /*
                     for err in errors {
                         eprintln!("FileInputController:  {err}");
