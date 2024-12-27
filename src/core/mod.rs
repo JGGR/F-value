@@ -524,6 +524,7 @@ pub fn translate_error_message(msg: &str) -> String {
         // NOTE: there's a leading space in " from empty string", it enables us to attach the ","
         // to the previous part
         msg.replace("cannot parse", "campo vuoto: atteso")
+            .replace("field","campo")
             .replace("float","razionale")
             .replace("integer","intero")
             .replace(" from empty string",", trovato: stringa vuota")
@@ -541,10 +542,20 @@ fn parse_csv_pos(pos: &Option<csv::Position>) -> String {
     let res;
     match pos {
         Some(p) => {
-            let byte_offset = p.byte();
+
+            // These should be equal. We may show the value only once if they are
             let line_offset = p.line();
             let record_offset = p.record();
-            res = format!("Riga: {} Record: {} Char: {} ", line_offset, record_offset, byte_offset);
+
+            if line_offset == record_offset {
+                res = format!("Riga: {}", line_offset);
+            } else { // TODO: How can we hit this branch?
+                res = format!("Riga: {} Record: {}", line_offset, record_offset);
+            }
+
+            // We ignore this since I don't think users may care?
+            // let byte_offset = p.byte();
+            // res = format!("Riga: {} Record: {} Char: {} ", line_offset, record_offset, byte_offset);
         }
         None => {
             res = "none".to_string();
@@ -553,7 +564,7 @@ fn parse_csv_pos(pos: &Option<csv::Position>) -> String {
     return res;
 }
 
-fn process_csv_errors(errors: &Vec<csv::Error>) -> Vec<String> {
+pub fn process_csv_errors(errors: &Vec<csv::Error>) -> Vec<String> {
     let mut res = Vec::new();
     for error in errors {
         match error.kind() {

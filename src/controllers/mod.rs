@@ -3,7 +3,7 @@ use crate::core::{MainState, check_campionamento_niseci_path, check_riferimento_
 use crate::model::index::Indice;
 use crate::state::GLOBAL_STATE;
 use crate::CurrentView;
-use crate::translate_error_message;
+use crate::process_csv_errors;
 use raylib::RaylibHandle;
 use std::path::PathBuf;
 use raylib::consts::KeyboardKey::*;
@@ -263,9 +263,9 @@ impl FileInputController {
                         eprintln!("FileInputController:  {err}");
                     }
                     */
-                    for err in errors {
-                        let translated_error = translate_error_message(&err.to_string());
-                        self.add_message(format!("FileInputController:  {translated_error}"));
+                    let processed_errors = process_csv_errors(&errors);
+                    for e in processed_errors {
+                        self.add_message(format!("FileInputController:  {e}"));
                     }
                     let mut state = GLOBAL_STATE.lock().unwrap();
                     state.fileinput_model.set_errors_occurred(true);
@@ -313,9 +313,9 @@ impl FileInputController {
                         eprintln!("FileInputController:  {err}");
                     }
                     */
-                    for err in errors {
-                        let translated_error = translate_error_message(&err.to_string());
-                        self.add_message(format!("FileInputController:  {translated_error}"));
+                    let processed_errors = process_csv_errors(&errors);
+                    for e in processed_errors {
+                        self.add_message(format!("FileInputController:  {e}"));
                     }
                     let mut state = GLOBAL_STATE.lock().unwrap();
                     state.fileinput_model.set_errors_occurred(true);
