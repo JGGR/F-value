@@ -14,8 +14,17 @@ pub struct SpecieNISECI {
   pub specie_attesa: bool
 }
 
+#[derive(Clone)]
 pub struct RiferimentoNISECI {
   pub elenco_specie: Vec<SpecieNISECI>
+}
+
+impl RiferimentoNISECI {
+    pub fn new(elenco_specie: Vec<SpecieNISECI>) -> Self {
+        Self {
+            elenco_specie: elenco_specie
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -26,6 +35,7 @@ pub struct RecordNISECI {
   pub peso: u32 // in grammi
 }
 
+#[derive(Clone)]
 pub struct CampionamentoNISECI {
   pub campionamento: Vec<RecordNISECI>
 }
@@ -38,7 +48,7 @@ impl CampionamentoNISECI {
         max_pass = record.passaggio_cattura;
       }
     }
-  
+
     let mut passaggi: Vec<i32> = vec![0; max_pass as usize];
     for record in self.campionamento.iter() {
       passaggi[(record.passaggio_cattura - 1) as usize] += 1;
@@ -52,12 +62,13 @@ impl CampionamentoNISECI {
       tot += pass;
       pass_sum.push(Point::new(tot, *pass));
     }
-  
+
     pass_sum
   }
-  
+
 }
 
+#[derive(Clone)]
 pub enum TipoComunitaNISECI {
   Redatta,
   Recuperata,
@@ -66,23 +77,25 @@ pub enum TipoComunitaNISECI {
 }
 
 impl fmt::Display for TipoComunitaNISECI {
-  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-      let string_representation = match *self {
-        TipoComunitaNISECI::Redatta => "Redatta dall'operatore",
-        TipoComunitaNISECI::Recuperata => "Recuperata da fonti bibliografiche",
-        TipoComunitaNISECI::Dm260_2010 => "DM 260/2010",
-        TipoComunitaNISECI::AffinataDalMase => "Affinata dal Mase",
-      };
-      write!(f, "{}", string_representation)
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let string_representation = match *self {
+            TipoComunitaNISECI::Redatta => "Redatta dall'operatore",
+            TipoComunitaNISECI::Recuperata => "Recuperata da fonti bibliografiche",
+            TipoComunitaNISECI::Dm260_2010 => "DM 260/2010",
+            TipoComunitaNISECI::AffinataDalMase => "Affinata dal Mase",
+        };
+        write!(f, "{}", string_representation)
     }
-  }
+}
 
+#[derive(Clone)]
 pub struct ComunitaNISECI {
   tipo: TipoComunitaNISECI,
   fonte: Option<String>,
   numero_protocollo: Option<String>
 }
 
+#[derive(Clone)]
 pub struct AnagraficaNISECI {
   comunita: ComunitaNISECI,
   codice_stazione: u32,
@@ -95,6 +108,7 @@ pub struct AnagraficaNISECI {
   denasita_stimata: u32
 }
 
+#[derive(Clone)]
 pub enum IdroEcoRegioneNISECI {
   AlpiCentroOrientali,
   AlpiMediterranee,
@@ -148,6 +162,7 @@ impl fmt::Display for IdroEcoRegioneNISECI {
   }
 }
 
+#[derive(Clone)]
 pub struct RisultatoNISECI {
   valore: f32,
   rqe: f32,

@@ -1,4 +1,5 @@
 use super::index::Indice;
+use super::niseci::{RiferimentoNISECI, CampionamentoNISECI, AnagraficaNISECI, RisultatoNISECI};
 use std::path::PathBuf;
 
 use crate::console::*;
@@ -182,6 +183,51 @@ impl ConsoleModel {
 }
 
 #[derive(Clone)]
+pub struct DataModelNISECI {
+    riferimento: Option<RiferimentoNISECI>,
+    campionamento: Option<CampionamentoNISECI>,
+    anagrafica: Option<AnagraficaNISECI>,
+    risultato: Option<RisultatoNISECI>,
+}
+
+#[derive(Clone)]
+pub struct DataModel {
+    pub niseci: DataModelNISECI,
+}
+
+impl DataModel {
+    pub fn new(niseci: DataModelNISECI) -> Self {
+        Self {
+            niseci: niseci
+        }
+    }
+    pub fn get_riferimento_niseci(&self) -> Option<RiferimentoNISECI> {
+        return self.niseci.riferimento.clone();
+    }
+    pub fn set_riferimento_niseci(&mut self, riferimento: Option<RiferimentoNISECI>) {
+        self.niseci.riferimento = riferimento;
+    }
+    pub fn get_campionamento_niseci(&self) -> Option<CampionamentoNISECI> {
+        return self.niseci.campionamento.clone();
+    }
+    pub fn set_campionamento_niseci(&mut self, campionamento: Option<CampionamentoNISECI>) {
+        self.niseci.campionamento = campionamento;
+    }
+    pub fn get_anagrafica_niseci(&self) -> Option<AnagraficaNISECI> {
+        return self.niseci.anagrafica.clone();
+    }
+    pub fn set_anagrafica_niseci(&mut self, anagrafica: Option<AnagraficaNISECI>) {
+        self.niseci.anagrafica = anagrafica;
+    }
+    pub fn get_risultato_niseci(&self) -> Option<RisultatoNISECI> {
+        return self.niseci.risultato.clone();
+    }
+    pub fn set_risultato_niseci(&mut self, risultato: Option<RisultatoNISECI>) {
+        self.niseci.risultato = risultato;
+    }
+}
+
+#[derive(Clone)]
 pub struct Model {
     pub home_model: HomeModel,
     pub second_model: SecondModel,
@@ -189,7 +235,8 @@ pub struct Model {
     pub fileinput_model: FileInputModel,
     pub infoaggiuntive_model: InfoAggiuntiveModel,
     pub output_model: OutputModel,
-    pub console_model : ConsoleModel,
+    pub console_model: ConsoleModel,
+    pub data_model: DataModel,
 }
 
 impl Model {
@@ -221,13 +268,21 @@ impl Model {
             output_model: OutputModel {
                 frame_counter: 0,
             },
-            console_model : ConsoleModel {
-                console : Console::new(
+            console_model: ConsoleModel {
+                console: Console::new(
                         80, // Columns - chars per line
                         1000, // Max messages
                         17, // Max messages shown at a time
                               ),
-                name : "Initial".to_string(),
+                name: "Initial".to_string(),
+            },
+            data_model: DataModel {
+                niseci: DataModelNISECI {
+                    riferimento: None,
+                    campionamento: None,
+                    anagrafica: None,
+                    risultato: None,
+                },
             }
         }
     }

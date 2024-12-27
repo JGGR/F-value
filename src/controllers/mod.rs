@@ -1,6 +1,7 @@
 use crate::model::core::*;
 use crate::core::{MainState, check_campionamento_niseci_path, check_riferimento_niseci_path, check_records_riferimento_niseci};
 use crate::model::index::Indice;
+use crate::model::niseci::RiferimentoNISECI;
 use crate::state::GLOBAL_STATE;
 use crate::CurrentView;
 use crate::process_csv_errors;
@@ -250,11 +251,10 @@ impl FileInputController {
                     let records_check = check_records_riferimento_niseci(records);
 
                     match records_check {
-                        Ok(_species) => {
-                            //TODO: ask controller to store the Riferimento
-                            eprintln!("TODO: ask controller to store the Riferimento");
-
+                        Ok(species) => {
+                            let riferimento = RiferimentoNISECI::new(species);
                             let mut state = GLOBAL_STATE.lock().unwrap();
+                            state.data_model.set_riferimento_niseci(Some(riferimento));
                             state.fileinput_model.set_riferimento_path_valid(true);
                         }
                         Err(errors) => { // Value errors
