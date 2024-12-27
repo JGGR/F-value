@@ -242,6 +242,13 @@ impl FileInputController {
         return state.fileinput_model.get_riferimento_path_valid();
     }
 
+    fn set_data_riferimento_niseci(&self, riferimento: RiferimentoNISECI) {
+        let mut state = GLOBAL_STATE.lock().unwrap();
+        self.set_console_env(("riferimento_niseci".to_string(), format!("{riferimento}")));
+        state.data_model.set_riferimento_niseci(Some(riferimento));
+        state.fileinput_model.set_riferimento_path_valid(true);
+    }
+
     pub fn valida_riferimento_niseci_path(&self) {
         if let Some(path) = self.get_riferimento_path() {
             let csv_check = check_riferimento_niseci_path(path);
@@ -254,9 +261,7 @@ impl FileInputController {
                         Ok(species) => {
                             self.add_message(format!("FileInputController:  Validazione RiferimentoNISECI completata!"));
                             let riferimento = RiferimentoNISECI::new(species);
-                            let mut state = GLOBAL_STATE.lock().unwrap();
-                            state.data_model.set_riferimento_niseci(Some(riferimento));
-                            state.fileinput_model.set_riferimento_path_valid(true);
+                            self.set_data_riferimento_niseci(riferimento);
                         }
                         Err(errors) => { // Value errors
                             for e in errors {
@@ -302,6 +307,13 @@ impl FileInputController {
         return state.fileinput_model.get_campionamento_path_valid();
     }
 
+    fn set_data_campionamento_niseci(&self, campionamento: CampionamentoNISECI) {
+        let mut state = GLOBAL_STATE.lock().unwrap();
+        self.set_console_env(("campionamento_niseci".to_string(), format!("{campionamento}")));
+        state.data_model.set_campionamento_niseci(Some(campionamento));
+        state.fileinput_model.set_campionamento_path_valid(true);
+    }
+
     pub fn valida_campionamento_niseci_path(&self) {
         if let Some(path) = self.get_campionamento_path() {
             let csv_check = check_campionamento_niseci_path(path);
@@ -315,9 +327,7 @@ impl FileInputController {
                             Ok(campioni) => {
                                 self.add_message(format!("FileInputController:  Validazione CampionamentoNISECI completata!"));
                                 let campionamento = CampionamentoNISECI::new(campioni);
-                                let mut state = GLOBAL_STATE.lock().unwrap();
-                                state.data_model.set_campionamento_niseci(Some(campionamento));
-                                state.fileinput_model.set_campionamento_path_valid(true);
+                                self.set_data_campionamento_niseci(campionamento);
                             }
                             Err(errors) => { // Value errors
                                 for e in errors {
@@ -357,6 +367,11 @@ impl FileInputController {
         let mut state = GLOBAL_STATE.lock().unwrap();
 
         state.console_model.console.add_message(msg);
+    }
+    pub fn set_console_env(&self, (key, val): (String,String)) {
+        let mut state = GLOBAL_STATE.lock().unwrap();
+
+        state.console_model.console.set_env((key,val));
     }
 }
 
@@ -474,5 +489,11 @@ impl ConsoleController {
         let mut state = GLOBAL_STATE.lock().unwrap();
 
         state.console_model.console.add_message(msg);
+    }
+
+    pub fn set_console_env(&self, (key, val): (String,String)) {
+        let mut state = GLOBAL_STATE.lock().unwrap();
+
+        state.console_model.console.set_env((key,val));
     }
 }

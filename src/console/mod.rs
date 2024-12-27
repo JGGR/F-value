@@ -29,6 +29,10 @@ impl Console {
         }
     }
 
+    pub fn set_env(&mut self, (key, val): (String,String)) {
+        self.env.insert(key, val);
+    }
+
     pub fn get_len(&self) -> usize {
         return self.messages.len();
     }

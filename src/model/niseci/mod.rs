@@ -14,9 +14,28 @@ pub struct SpecieNISECI {
   pub specie_attesa: bool
 }
 
+impl fmt::Display for SpecieNISECI {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let string_representation = format!("SpecieNISECI: {{ id: {{{}}}, nome {{{}}}, tipo_autoctono: {{{}}}, tipo_alloctono: {{{}}}, specie_attesa: {{{}}}",
+                self.id, self.nome, self.tipo_autoctono, self.tipo_alloctono, self.specie_attesa);
+        write!(f, "{}", string_representation)
+    }
+}
+
 #[derive(Clone)]
 pub struct RiferimentoNISECI {
   pub elenco_specie: Vec<SpecieNISECI>
+}
+
+impl fmt::Display for RiferimentoNISECI {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut string_representation = format!("RiferimentoNISECI: {{");
+        for s in &self.elenco_specie {
+            string_representation = format!("{string_representation}\n  {{{s}}},");
+        }
+        string_representation = format!("{string_representation}\n}}");
+        write!(f, "{}", string_representation)
+    }
 }
 
 impl RiferimentoNISECI {
@@ -35,9 +54,28 @@ pub struct RecordNISECI {
   pub peso: u32 // in grammi
 }
 
+impl fmt::Display for RecordNISECI {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let string_representation = format!("RecordNISECI: {{ specie: {{{}}}, passaggio_cattura {{{}}}, lunghezza: {{{}}}, peso: {{{}}}",
+                self.specie, self.passaggio_cattura, self.lunghezza, self.peso);
+        write!(f, "{}", string_representation)
+    }
+}
+
 #[derive(Clone)]
 pub struct CampionamentoNISECI {
   pub campionamento: Vec<RecordNISECI>
+}
+
+impl fmt::Display for CampionamentoNISECI {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut string_representation = format!("CampionaNISECI: {{");
+        for r in &self.campionamento {
+            string_representation = format!("{string_representation}\n  {{{r}}},");
+        }
+        string_representation = format!("{string_representation}\n}}");
+        write!(f, "{}", string_representation)
+    }
 }
 
 impl CampionamentoNISECI {
