@@ -553,43 +553,45 @@ fn parse_csv_pos(pos: &Option<csv::Position>) -> String {
     return res;
 }
 
-fn process_csv_errors(errors: &Vec<csv::Error>) {
+fn process_csv_errors(errors: &Vec<csv::Error>) -> Vec<String> {
+    let mut res = Vec::new();
     for error in errors {
         match error.kind() {
             csv::ErrorKind::Deserialize { pos, err } => {
-                eprintln!(
+                res.push(format!(
                     "  Errore di deserializzazione alla posizione: {}: {}",
                     parse_csv_pos(&pos),
                     translate_error_message(&err.to_string())
-                );
+                ));
             }
             csv::ErrorKind::Io(io_error) => {
-                eprintln!(
+                res.push(format!(
                     "  Errore di I/O: {}",
                     translate_error_message(&io_error.to_string())
-                );
+                ));
             }
             csv::ErrorKind::Utf8 { pos, err } => {
-                eprintln!(
+                res.push(format!(
                     "  Errore UTF-8 alla posizione: {}: {}",
                     parse_csv_pos(&pos),
                     translate_error_message(&err.to_string())
-                );
+                ));
             }
             csv::ErrorKind::UnequalLengths { pos, expected_len, len } => {
-                eprintln!(
+                res.push(format!(
                     "  Errore numero campi alla posizione: {}: lunghezza attesa {}, trovata {}",
                     parse_csv_pos(&pos),
                     expected_len,
                     len
                     // no translate_error_message() anche se teoricamente lo supporta
-                );
+                ));
             }
             _ => {
-                eprintln!("  Errore sconosciuto: {}", translate_error_message(&error.to_string()));
+                res.push(format!("  Errore sconosciuto: {}", translate_error_message(&error.to_string())));
             }
         }
     }
+    return res;
 }
 
 fn check_path_is_file_ends_with_csv(path: &PathBuf) -> bool {
@@ -627,13 +629,16 @@ pub fn check_campionamento_niseci_reader<R: Read>(reader: R) -> Result<Vec<Recor
     println!("Campionamento NISECI: Numero record csv non validi: {}", errors.len());
 
     if !errors.is_empty() {
-        eprintln!("Errori incontrati durante l'elaborazione csv del campionamento NISECI: {{");
         /*
         for error in &errors {
             eprintln!("  {}", error);
         }
         */
-        process_csv_errors(&errors);
+        let processed_errors = process_csv_errors(&errors);
+        eprintln!("Errori incontrati durante l'elaborazione csv del campionamento NISECI: {{");
+        for e in processed_errors {
+            eprintln!("{e}");
+        }
         eprintln!("}}");
         return Err(errors);
     } else {
@@ -699,7 +704,11 @@ pub fn check_riferimento_niseci_reader<R: Read>(reader: R) -> Result<Vec<RecordC
             eprintln!("  {}", error);
         }
         */
-        process_csv_errors(&errors);
+        let processed_errors = process_csv_errors(&errors);
+        eprintln!("Errori incontrati durante l'elaborazione csv del campionamento NISECI: {{");
+        for e in processed_errors {
+            eprintln!("{e}");
+        }
         eprintln!("}}");
         return Err(errors);
     } else {
