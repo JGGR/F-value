@@ -1,6 +1,8 @@
 use std::vec::Vec;
 use std::fmt;
 
+use crate::engines::niseci::linear_regression::Point;
+
 use super::location::Location;
 
 #[derive(Debug, Clone)]
@@ -16,7 +18,7 @@ pub struct RiferimentoNISECI {
   elenco_specie: Vec<SpecieNISECI>
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct RecordNISECI {
   pub specie: SpecieNISECI,
   pub passaggio_cattura: u8,
@@ -25,7 +27,35 @@ pub struct RecordNISECI {
 }
 
 pub struct CampionamentoNISECI {
-  campionamento: Vec<RecordNISECI>
+  pub campionamento: Vec<RecordNISECI>
+}
+
+impl CampionamentoNISECI {
+  pub fn fishes_for_every_passage(&self) -> Vec<Point<i32>> {
+    let mut max_pass = 0;
+    for record in self.campionamento.iter() {
+      if record.passaggio_cattura > max_pass {
+        max_pass = record.passaggio_cattura;
+      }
+    }
+  
+    let mut passaggi: Vec<i32> = vec![0; max_pass as usize];
+    for record in self.campionamento.iter() {
+      passaggi[(record.passaggio_cattura - 1) as usize] += 1;
+    }
+
+    let mut tot = 0;
+
+    // x = pesci totali fino a quel passaggio y = pesci del passaggio
+    let mut pass_sum: Vec<Point<i32>> = Vec::with_capacity(max_pass as usize);
+    for pass in passaggi.iter() {
+      tot += pass;
+      pass_sum.push(Point::new(tot, *pass));
+    }
+  
+    pass_sum
+  }
+  
 }
 
 pub enum TipoComunitaNISECI {
