@@ -2,12 +2,12 @@
 mod tests {
     use std::io::Cursor;
     use crate::{RIFERIMENTO_NISECI_HEADER, CAMPIONAMENTO_NISECI_HEADER};
-    use crate::{translate_error_message};
+    use crate::translate_error_message;
     use crate::{check_riferimento_niseci_reader, check_campionamento_niseci_reader};
     use crate::{RecordCsvRiferimentoNISECI, check_records_riferimento_niseci};
     use crate::{RecordCsvCampionamentoNISECI, check_records_campionamento_niseci};
-    use crate::model::niseci::SpecieNISECI;
-    use crate::engines::niseci::linear_regression::{calculate_quantita_stimata, gradient_descent_iterate};
+    use crate::model::niseci::{CampionamentoNISECI, RecordNISECI, SpecieNISECI};
+    use crate::engines::niseci::linear_regression::{calculate_quantita_stimata, gradient_descent_iterate, Point};
 
     #[test]
     fn test_csv_riferimento_niseci_found_string_expect_int() {
@@ -277,32 +277,107 @@ mod tests {
 
     #[test]
     fn test_linear_regression() {
-        let records = [100, 75, 50];
+        let records = [
+            Point::new(1, 100),
+            Point::new(2, 75),
+            Point::new(3, 50),
+        ];
 
-        let (m_final, b_final) = gradient_descent_iterate(&records);
+        let result = gradient_descent_iterate(&records);
+        assert!(result.is_ok());
 
-        println!("{}, {}", m_final, b_final);
-        assert_eq!(m_final, -25);
-        assert_eq!(b_final, 125);
+        let (m_final, b_final) = result.unwrap();
+        assert_eq!(m_final, -25.0);
+        assert_eq!(b_final, 125.0);
     }
 
     #[test]
     fn test_quantita_stimata() {
-        let passaggi = [100, 75, 50];
+        let passaggi = [
+            Point::new(1, 100),
+            Point::new(2, 75),
+            Point::new(3, 50),
+        ];
 
         let quantita_stimata = calculate_quantita_stimata(&passaggi);
 
         assert!(quantita_stimata.is_ok());
-        assert_eq!(quantita_stimata.unwrap(), 250);
+        assert_eq!(quantita_stimata.unwrap(), 5);
+    }
+
+    #[test]
+    fn test_quantita_stimata_2() {
+        let passaggi = [
+            Point::new(70, 70),
+            Point::new(130, 60),
+            Point::new(150, 20),
+            Point::new(160, 10),
+        ];
+
+        let quantita_stimata = calculate_quantita_stimata(&passaggi);
+
+        assert!(quantita_stimata.is_ok());
+        assert_eq!(quantita_stimata.unwrap(), 190);
     }
 
     #[test]
     fn test_quantita_stimata_err() {
-        let passaggi = [50, 75, 100];
-
+        let passaggi = [
+            Point::new(1, 50),
+            Point::new(2, 75),
+            Point::new(3, 100),
+        ];
         let quantita_stimata = calculate_quantita_stimata(&passaggi);
 
         assert!(quantita_stimata.is_err());
-        assert!(quantita_stimata.is_err_and(|e| e == -1));
+    }
+
+    #[test]
+    fn test_calcolo_pesci_per_passaggio() {
+        let specie_1 = SpecieNISECI {
+            id: "1234".to_string(),
+            nome: "Cervus elaphus".to_string(),
+            tipo_autoctono: 1,
+            tipo_alloctono: 0,
+            specie_attesa: true
+        };
+
+        let record_1 = RecordNISECI {
+            specie: specie_1.clone(),
+            passaggio_cattura: 1,
+            lunghezza: 100, // in millimetri
+            peso: 100 // in grammi
+        };
+        
+        let record_2 = RecordNISECI {
+            specie: specie_1.clone(),
+            passaggio_cattura: 2,
+            lunghezza: 100, // in millimetri
+            peso: 100 // in grammi
+        };
+
+        let record_3 = RecordNISECI {
+            specie: specie_1.clone(),
+            passaggio_cattura: 3,
+            lunghezza: 100, // in millimetri
+            peso: 100 // in grammi
+        };
+
+        let mut c1 = vec![record_1; 20];
+        let mut c2 = vec![record_2; 15];
+        let mut c3 = vec![record_3; 10];
+
+        c1.append(&mut c2);
+        c1.append(&mut c3);
+        let campionamento = CampionamentoNISECI {
+            campionamento: c1
+        };
+        
+        let pesci_per_passaggio = campionamento.fishes_for_every_passage();
+
+        assert_eq!(pesci_per_passaggio[0], Point::new(20, 20));
+        assert_eq!(pesci_per_passaggio[1], Point::new(35, 15));
+        assert_eq!(pesci_per_passaggio[2], Point::new(45, 10));
+
     }
 }
