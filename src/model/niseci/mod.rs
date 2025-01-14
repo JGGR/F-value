@@ -15,7 +15,7 @@ pub struct SpecieNISECI {
 }
 
 pub struct RiferimentoNISECI {
-  elenco_specie: Vec<SpecieNISECI>
+  pub elenco_specie: Vec<SpecieNISECI>
 }
 
 #[derive(Debug, Clone)]
