@@ -152,6 +152,66 @@ fn test_valid_recordcsv_riferimento_niseci() {
 }
 
 #[test]
+fn test_recordcsv_riferimento_niseci_soglie_cl_error() {
+    let record_1 = RecordCsvRiferimentoNISECI {
+        nome_comune: "Cervo".to_string(),
+        nome_latino: "Cervus elaphus".to_string(),
+        codice_specie: "1234".to_string(),
+        origine: "AUT".to_string(),
+        tipo_autoctono: 1,
+        allo_nocivita: 0,
+        specie_attesa: 1,
+        cl_soglia1: 10,
+        cl_soglia2: 50,
+        cl_soglia3: 30,
+        cl_soglia4: 40,
+        ad_juv_soglia1: 0.1,
+        ad_juv_soglia2: 0.2,
+        ad_juv_soglia3: 0.3,
+        ad_juv_soglia4: 0.4,
+        dens_soglia1: 0.1,
+        dens_soglia2: 0.2,
+    };
+    let recordcsv_data = vec![record_1];
+    let result = check_records_riferimento_niseci(recordcsv_data);
+
+    assert!(result.is_err());
+
+    let errors = result.err().unwrap();
+    assert_eq!(errors.len(), 1);
+}
+
+#[test]
+fn test_recordcsv_riferimento_niseci_soglie_ad_juv_error() {
+    let record_1 = RecordCsvRiferimentoNISECI {
+        nome_comune: "Cervo".to_string(),
+        nome_latino: "Cervus elaphus".to_string(),
+        codice_specie: "1234".to_string(),
+        origine: "AUT".to_string(),
+        tipo_autoctono: 1,
+        allo_nocivita: 0,
+        specie_attesa: 1,
+        cl_soglia1: 10,
+        cl_soglia2: 20,
+        cl_soglia3: 30,
+        cl_soglia4: 40,
+        ad_juv_soglia1: 0.1,
+        ad_juv_soglia2: 0.7,
+        ad_juv_soglia3: 0.3,
+        ad_juv_soglia4: 0.4,
+        dens_soglia1: 0.1,
+        dens_soglia2: 0.2,
+    };
+    let recordcsv_data = vec![record_1];
+    let result = check_records_riferimento_niseci(recordcsv_data);
+
+    assert!(result.is_err());
+
+    let errors = result.err().unwrap();
+    assert_eq!(errors.len(), 1);
+}
+
+#[test]
 fn test_csv_campionamento_niseci_found_string_expect_int() {
     let csv_data = format!(
         "{}\n07/07/2019;2190627 Reno 390;abc;c1;BA;275;152",
@@ -248,7 +308,15 @@ fn test_valid_recordcsv_campionamento_niseci() {
         nome: "Cervus elaphus".to_string(),
         tipo_autoctono: 1,
         tipo_alloctono: 0,
-        specie_attesa: true
+        specie_attesa: true,
+        cl_soglia1: 0, // in cm
+        cl_soglia2: 0, // in cm
+        cl_soglia3: 0, // in cm
+        cl_soglia4: 0, // in cm
+        ad_juv_soglia1: 0.0,
+        ad_juv_soglia2: 0.0,
+        ad_juv_soglia3: 0.0,
+        ad_juv_soglia4: 0.0,
     };
 
     let riferimento_specie = vec![specie_1];

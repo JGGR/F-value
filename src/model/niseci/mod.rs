@@ -9,9 +9,17 @@ use super::location::Location;
 pub struct SpecieNISECI {
   pub id: String,
   pub nome: String,
-  pub tipo_autoctono: u8, // si potrebbe unire autoctono con alloctono?
-  pub tipo_alloctono: u8, // ricordo che ne avevamo parlato
-  pub specie_attesa: bool
+  pub tipo_autoctono: u8,
+  pub tipo_alloctono: u8,
+  pub specie_attesa: bool,
+  pub cl_soglia1: i32, // in cm
+  pub cl_soglia2: i32, // in cm
+  pub cl_soglia3: i32, // in cm
+  pub cl_soglia4: i32, // in cm
+  pub ad_juv_soglia1: f32,
+  pub ad_juv_soglia2: f32,
+  pub ad_juv_soglia3: f32,
+  pub ad_juv_soglia4: f32,
 }
 
 impl fmt::Display for SpecieNISECI {

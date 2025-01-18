@@ -230,11 +230,10 @@ pub struct RecordCsvRiferimentoNISECI { //TODO: add position
     pub tipo_autoctono: i32,
     pub allo_nocivita: i32,
     pub specie_attesa: i32,
-    pub cl_soglia1: i32,
-    pub cl_soglia2: i32,
-    pub cl_soglia3: i32,
-    pub cl_soglia4: i32,
-    #[serde(deserialize_with = "deserialize_comma_f32")]
+    pub cl_soglia1: i32, // in cm
+    pub cl_soglia2: i32, // in cm
+    pub cl_soglia3: i32, // in cm
+    pub cl_soglia4: i32, // in cm
     pub ad_juv_soglia1: f32,
     #[serde(deserialize_with = "deserialize_comma_f32")]
     pub ad_juv_soglia2: f32,
@@ -408,12 +407,16 @@ pub fn parse_csv_riferimento_niseci<R>(mut rdr: csv::Reader<R>) -> (Vec<RecordCs
 
 pub enum RecordCsvRiferimentoNISECIError {
     ValoreInvalido { msg : String }, //TODO: add position?
+    SoglieCLNonCrescenti { msg : String },
+    SoglieADJUVNonCrescenti { msg: String }
 }
 
 impl fmt::Display for RecordCsvRiferimentoNISECIError {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    let string_representation = match self {
+let string_representation = match self {
       RecordCsvRiferimentoNISECIError::ValoreInvalido { msg } => format!("Errore record riferimento NISECI: {}", msg),
+      RecordCsvRiferimentoNISECIError::SoglieCLNonCrescenti { msg } => format!("Errore record riferimento NISECI: {}", msg),
+      RecordCsvRiferimentoNISECIError::SoglieADJUVNonCrescenti { msg } => format!("Errore record riferimento NISECI: {}", msg),
     };
     write!(f, "{}", string_representation)
   }
@@ -486,7 +489,7 @@ pub fn parse_recordcsv_riferimento_niseci(records: Vec<RecordCsvRiferimentoNISEC
             continue;
         }
 
-        let id = r.codice_specie;
+        let id = r.codice_specie.clone();
 
         if used_id_specie.contains(&id) {
             let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: codice_specie non valido (ridefinizione)") };
@@ -494,7 +497,7 @@ pub fn parse_recordcsv_riferimento_niseci(records: Vec<RecordCsvRiferimentoNISEC
             continue;
         }
 
-        let nome =  r.nome_latino; //TODO: controllare se dovrebbe essere nome_comune
+        let nome =  r.nome_latino.clone(); //TODO: controllare se dovrebbe essere nome_comune
 
         //TODO: update when SpecieNISECI has the missing fields
 
@@ -522,6 +525,21 @@ pub fn parse_recordcsv_riferimento_niseci(records: Vec<RecordCsvRiferimentoNISEC
             errors.push(err);
             continue;
         }
+        
+        if !check_soglie_cl(&r) {
+            let err = RecordCsvRiferimentoNISECIError::SoglieCLNonCrescenti {
+                msg: format!("Record {idx}: soglie CL non crescenti" )
+            };
+            errors.push(err);
+            continue;
+        }
+        if !check_soglie_ad_juv(&r) {
+            let err = RecordCsvRiferimentoNISECIError::SoglieADJUVNonCrescenti {
+                msg: format!("Record {idx}: soglie AD/JUV non crescenti" )
+            };
+            errors.push(err);
+            continue;
+        }
 
         let specie_rec = SpecieNISECI {
             id: id.clone(),
@@ -529,6 +547,14 @@ pub fn parse_recordcsv_riferimento_niseci(records: Vec<RecordCsvRiferimentoNISEC
             tipo_autoctono: tipo_autoctono,
             tipo_alloctono: tipo_alloctono,
             specie_attesa: specie_attesa,
+            cl_soglia1: r.cl_soglia1, // in cm
+            cl_soglia2: r.cl_soglia2, // in cm
+            cl_soglia3: r.cl_soglia3, // in cm
+            cl_soglia4: r.cl_soglia4, // in cm
+            ad_juv_soglia1: r.ad_juv_soglia1,
+            ad_juv_soglia2: r.ad_juv_soglia2,
+            ad_juv_soglia3: r.ad_juv_soglia3,
+            ad_juv_soglia4: r.ad_juv_soglia4,
         };
         specie.push(specie_rec);
         used_id_specie.push(id);
@@ -860,3 +886,18 @@ pub fn check_records_riferimento_niseci(records: Vec<RecordCsvRiferimentoNISECI>
 pub fn check_campionamento_hfbi_path(_path: PathBuf) -> bool {
     todo!("Implement check campionamento HFBI");
 }
+
+fn check_soglie_cl(r: &RecordCsvRiferimentoNISECI) -> bool {
+    if r.cl_soglia1 < r.cl_soglia2 && r.cl_soglia2 < r.cl_soglia3 && r.cl_soglia3 < r.cl_soglia4 {
+        return true;
+    }
+    false
+}
+
+fn check_soglie_ad_juv(r: &RecordCsvRiferimentoNISECI) -> bool {
+    if r.ad_juv_soglia1 < r.ad_juv_soglia2 && r.ad_juv_soglia2 < r.ad_juv_soglia3 && r.ad_juv_soglia3 < r.ad_juv_soglia4 {
+        return true;
+    }
+    false
+}
+

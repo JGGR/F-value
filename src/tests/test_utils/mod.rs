@@ -9,6 +9,14 @@ pub fn create_dummy_riferimento() -> RiferimentoNISECI {
     nome: "Ciaccio ciaccensis".to_string(),
     tipo_autoctono: 2,
     tipo_alloctono: 0,
+    cl_soglia1: 1,
+    cl_soglia2: 2,
+    cl_soglia3: 3,
+    cl_soglia4: 4,
+    ad_juv_soglia1: 1.0,
+    ad_juv_soglia2: 2.0,
+    ad_juv_soglia3: 3.0,
+    ad_juv_soglia4: 4.0,
   };
   let importante_2 = SpecieNISECI {
     id: 2.to_string(),
@@ -16,6 +24,14 @@ pub fn create_dummy_riferimento() -> RiferimentoNISECI {
     nome: "Ciaccio sbribbrensis".to_string(),
     tipo_autoctono: 2,
     tipo_alloctono: 0,
+    cl_soglia1: 1,
+    cl_soglia2: 2,
+    cl_soglia3: 3,
+    cl_soglia4: 4,
+    ad_juv_soglia1: 1.0,
+    ad_juv_soglia2: 2.0,
+    ad_juv_soglia3: 3.0,
+    ad_juv_soglia4: 4.0,
   };
   let importante_3 = SpecieNISECI {
     id: 3.to_string(),
@@ -23,48 +39,104 @@ pub fn create_dummy_riferimento() -> RiferimentoNISECI {
     nome: "Ciaccio cozzensis".to_string(),
     tipo_autoctono: 2,
     tipo_alloctono: 0,
+    cl_soglia1: 1,
+    cl_soglia2: 2,
+    cl_soglia3: 3,
+    cl_soglia4: 4,
+    ad_juv_soglia1: 1.0,
+    ad_juv_soglia2: 2.0,
+    ad_juv_soglia3: 3.0,
+    ad_juv_soglia4: 4.0,
   };
   let normale_1 = SpecieNISECI {
     id: 4.to_string(),
     specie_attesa: true,
     nome: "Normus sempliciottum".to_string(),
     tipo_autoctono: 1,
-    tipo_alloctono: 0
+    tipo_alloctono: 0,
+    cl_soglia1: 1,
+    cl_soglia2: 2,
+    cl_soglia3: 3,
+    cl_soglia4: 4,
+    ad_juv_soglia1: 1.0,
+    ad_juv_soglia2: 2.0,
+    ad_juv_soglia3: 3.0,
+    ad_juv_soglia4: 4.0,
   };
   let normale_2 = SpecieNISECI {
     id: 5.to_string(),
     specie_attesa: true,
     nome: "Normus qualunquis".to_string(),
     tipo_autoctono: 1,
-    tipo_alloctono: 0
+    tipo_alloctono: 0,
+    cl_soglia1: 1,
+    cl_soglia2: 2,
+    cl_soglia3: 3,
+    cl_soglia4: 4,
+    ad_juv_soglia1: 1.0,
+    ad_juv_soglia2: 2.0,
+    ad_juv_soglia3: 3.0,
+    ad_juv_soglia4: 4.0,
   };
   let alloctono_1 = SpecieNISECI {
     id: 6.to_string(),
     specie_attesa: true,
     nome: "Disturbus infognatus".to_string(),
     tipo_autoctono: 0,
-    tipo_alloctono: 1
+    tipo_alloctono: 1,
+    cl_soglia1: 1,
+    cl_soglia2: 2,
+    cl_soglia3: 3,
+    cl_soglia4: 4,
+    ad_juv_soglia1: 1.0,
+    ad_juv_soglia2: 2.0,
+    ad_juv_soglia3: 3.0,
+    ad_juv_soglia4: 4.0,
   };
   let alloctono_2 = SpecieNISECI {
     id: 7.to_string(),
     specie_attesa: true,
     nome: "Disturbus sotterfugius".to_string(),
     tipo_autoctono: 0,
-    tipo_alloctono: 1
+    tipo_alloctono: 1,
+    cl_soglia1: 1,
+    cl_soglia2: 2,
+    cl_soglia3: 3,
+    cl_soglia4: 4,
+    ad_juv_soglia1: 1.0,
+    ad_juv_soglia2: 2.0,
+    ad_juv_soglia3: 3.0,
+    ad_juv_soglia4: 4.0,
   };
   let inatteso_1 = SpecieNISECI {
     id: 7.to_string(),
     specie_attesa: false,
     nome: "Sorprendo sorprendentes".to_string(),
     tipo_autoctono: 0,
-    tipo_alloctono: 1
+    tipo_alloctono: 1,
+    cl_soglia1: 1,
+    cl_soglia2: 2,
+    cl_soglia3: 3,
+    cl_soglia4: 4,
+    ad_juv_soglia1: 1.0,
+    ad_juv_soglia2: 2.0,
+    ad_juv_soglia3: 3.0,
+    ad_juv_soglia4: 4.0,
   };
   let inatteso_2 = SpecieNISECI {
     id: 8.to_string(),
     specie_attesa: false,
     nome: "Sorprendo improvvisus".to_string(),
     tipo_autoctono: 2,
-    tipo_alloctono: 0
+    tipo_alloctono: 0,
+    cl_soglia1: 1,
+    cl_soglia2: 2,
+    cl_soglia3: 3,
+    cl_soglia4: 4,
+    ad_juv_soglia1: 1.0,
+    ad_juv_soglia2: 2.0,
+    ad_juv_soglia3: 3.0,
+    ad_juv_soglia4: 4.0,
   };
 
   let mut elenco_specie = Vec::with_capacity(9);
@@ -96,6 +168,14 @@ pub fn create_dummy_campionamento_full() -> CampionamentoNISECI {
     nome: "Ciaccio ciaccensis".to_string(),
     tipo_autoctono: 2,
     tipo_alloctono: 0,
+    cl_soglia1: 1,
+    cl_soglia2: 2,
+    cl_soglia3: 3,
+    cl_soglia4: 4,
+    ad_juv_soglia1: 1.0,
+    ad_juv_soglia2: 2.0,
+    ad_juv_soglia3: 3.0,
+    ad_juv_soglia4: 4.0,
   };
   let importante_2 = SpecieNISECI {
     id: 2.to_string(),
@@ -103,6 +183,14 @@ pub fn create_dummy_campionamento_full() -> CampionamentoNISECI {
     nome: "Ciaccio sbribbrensis".to_string(),
     tipo_autoctono: 2,
     tipo_alloctono: 0,
+    cl_soglia1: 1,
+    cl_soglia2: 2,
+    cl_soglia3: 3,
+    cl_soglia4: 4,
+    ad_juv_soglia1: 1.0,
+    ad_juv_soglia2: 2.0,
+    ad_juv_soglia3: 3.0,
+    ad_juv_soglia4: 4.0,
   };
   let importante_3 = SpecieNISECI {
     id: 3.to_string(),
@@ -110,48 +198,104 @@ pub fn create_dummy_campionamento_full() -> CampionamentoNISECI {
     nome: "Ciaccio cozzensis".to_string(),
     tipo_autoctono: 2,
     tipo_alloctono: 0,
+    cl_soglia1: 1,
+    cl_soglia2: 2,
+    cl_soglia3: 3,
+    cl_soglia4: 4,
+    ad_juv_soglia1: 1.0,
+    ad_juv_soglia2: 2.0,
+    ad_juv_soglia3: 3.0,
+    ad_juv_soglia4: 4.0,
   };
   let normale_1 = SpecieNISECI {
     id: 4.to_string(),
     specie_attesa: true,
     nome: "Normus sempliciottum".to_string(),
     tipo_autoctono: 1,
-    tipo_alloctono: 0
+    tipo_alloctono: 0,
+    cl_soglia1: 1,
+    cl_soglia2: 2,
+    cl_soglia3: 3,
+    cl_soglia4: 4,
+    ad_juv_soglia1: 1.0,
+    ad_juv_soglia2: 2.0,
+    ad_juv_soglia3: 3.0,
+    ad_juv_soglia4: 4.0,
   };
   let normale_2 = SpecieNISECI {
     id: 5.to_string(),
     specie_attesa: true,
     nome: "Normus qualunquis".to_string(),
     tipo_autoctono: 1,
-    tipo_alloctono: 0
+    tipo_alloctono: 0,
+    cl_soglia1: 1,
+    cl_soglia2: 2,
+    cl_soglia3: 3,
+    cl_soglia4: 4,
+    ad_juv_soglia1: 1.0,
+    ad_juv_soglia2: 2.0,
+    ad_juv_soglia3: 3.0,
+    ad_juv_soglia4: 4.0,
   };
   let alloctono_1 = SpecieNISECI {
     id: 6.to_string(),
     specie_attesa: true,
     nome: "Disturbus infognatus".to_string(),
     tipo_autoctono: 0,
-    tipo_alloctono: 1
+    tipo_alloctono: 1,
+    cl_soglia1: 1,
+    cl_soglia2: 2,
+    cl_soglia3: 3,
+    cl_soglia4: 4,
+    ad_juv_soglia1: 1.0,
+    ad_juv_soglia2: 2.0,
+    ad_juv_soglia3: 3.0,
+    ad_juv_soglia4: 4.0,
   };
   let alloctono_2 = SpecieNISECI {
     id: 7.to_string(),
     specie_attesa: true,
     nome: "Disturbus sotterfugius".to_string(),
     tipo_autoctono: 0,
-    tipo_alloctono: 1
+    tipo_alloctono: 1,
+    cl_soglia1: 1,
+    cl_soglia2: 2,
+    cl_soglia3: 3,
+    cl_soglia4: 4,
+    ad_juv_soglia1: 1.0,
+    ad_juv_soglia2: 2.0,
+    ad_juv_soglia3: 3.0,
+    ad_juv_soglia4: 4.0,
   };
   let inatteso_1 = SpecieNISECI {
     id: 7.to_string(),
     specie_attesa: false,
     nome: "Sorprendo sorprendentes".to_string(),
     tipo_autoctono: 0,
-    tipo_alloctono: 1
+    tipo_alloctono: 1,
+    cl_soglia1: 1,
+    cl_soglia2: 2,
+    cl_soglia3: 3,
+    cl_soglia4: 4,
+    ad_juv_soglia1: 1.0,
+    ad_juv_soglia2: 2.0,
+    ad_juv_soglia3: 3.0,
+    ad_juv_soglia4: 4.0,
   };
   let inatteso_2 = SpecieNISECI {
     id: 8.to_string(),
     specie_attesa: false,
     nome: "Sorprendo improvvisus".to_string(),
     tipo_autoctono: 2,
-    tipo_alloctono: 0
+    tipo_alloctono: 0,
+    cl_soglia1: 1,
+    cl_soglia2: 2,
+    cl_soglia3: 3,
+    cl_soglia4: 4,
+    ad_juv_soglia1: 1.0,
+    ad_juv_soglia2: 2.0,
+    ad_juv_soglia3: 3.0,
+    ad_juv_soglia4: 4.0,
   };
 
   let record_1 = RecordNISECI {
