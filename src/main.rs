@@ -143,7 +143,7 @@ fn main() {
         Color::get_color(bg_color_int as u32)
     );
 
-    let mut console_view = ConsoleView::new(&mut rl, &thread, gui_current_font_height*2);
+    let mut console_view = ConsoleView::new(&mut rl, &thread, gui_current_font_height*2, txt_spacing);
 
     while !main_state.should_quit {
 

@@ -193,15 +193,32 @@ impl Console {
         }
     }
 
-    pub fn draw(&self, d: &mut RaylibDrawHandle, txt_color: Color, font_size: i32, font: &Font) {
+    pub fn draw(&self, d: &mut RaylibDrawHandle, txt_color: Color, font_size: i32, font_spacing: i32, font: &Font) {
         let line_height = propheight(&d, font_size + 4); // Adjust as needed
         let console_height = (self.max_lines_visible +1) * line_height as usize; // +1 for user
                                                                                  // prompt
+        let monospaced_width = font.measure_text("w", font_size as f32, font_spacing as f32).x;
+        let console_width = monospaced_width as i32 * self.columns as i32;
 
         let top_y_padding = propheight(&d, 50);
         let console_start_y = top_y_padding; //propheight(&d, screen_height - console_height as i32);
-
         let txt_left_x_padding = propwidth(&d, 10);
+
+        // Using txt_color
+        d.draw_rectangle_lines(
+            txt_left_x_padding, console_start_y, console_width, console_height as i32, txt_color,
+        );
+
+        let sidebox_x_padding = txt_left_x_padding;
+        let sidebox_x = txt_left_x_padding + console_width as i32 + sidebox_x_padding;
+        let sidebox_width = d.get_screen_width() - sidebox_x - sidebox_x_padding;
+        let sidebox_y = console_start_y;
+        let sidebox_height = console_height as i32;
+
+        // Using txt_color
+        d.draw_rectangle_lines(
+            sidebox_x, sidebox_y, sidebox_width, sidebox_height, txt_color,
+        );
 
         for (i, line) in self
             .messages

@@ -1119,10 +1119,11 @@ pub struct ConsoleView {
     font : Font,
     current_font_size : i32,
     default_font_size : i32,
+    font_spacing : i32,
 }
 
 impl ConsoleView {
-    pub fn new(rl: &mut RaylibHandle, thread : &RaylibThread, font_size : i32) -> Self {
+    pub fn new(rl: &mut RaylibHandle, thread : &RaylibThread, font_size : i32, font_spacing: i32) -> Self {
         Self {
             font : rl.load_font_from_memory(&thread,
                 ".ttf",
@@ -1131,6 +1132,7 @@ impl ConsoleView {
                 None).expect("failed loading console font"),
             default_font_size : font_size,
             current_font_size : font_size,
+            font_spacing : font_spacing,
         }
     }
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &ConsoleController, main_state: &MainState) {
@@ -1138,6 +1140,6 @@ impl ConsoleView {
 
         let state = controller.get_state();
 
-        state.console.draw(d, main_state.default_txt_color, self.current_font_size, &self.font);
+        state.console.draw(d, main_state.default_txt_color, self.current_font_size, self.font_spacing, &self.font);
     }
 }
