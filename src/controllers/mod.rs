@@ -1,5 +1,5 @@
 use crate::model::core::*;
-use crate::core::{MainState, check_campionamento_niseci_path, check_riferimento_niseci_path, check_records_riferimento_niseci, check_records_campionamento_niseci};
+use crate::core::{MainState, TipoRecordCsv, check_campionamento_niseci_path, check_riferimento_niseci_path, check_records_riferimento_niseci, check_records_campionamento_niseci};
 use crate::model::index::Indice;
 use crate::model::niseci::{RiferimentoNISECI, CampionamentoNISECI};
 use crate::state::GLOBAL_STATE;
@@ -286,7 +286,7 @@ impl FileInputController {
                         eprintln!("FileInputController:  {err}");
                     }
                     */
-                    let processed_errors = process_csv_errors(&errors);
+                    let processed_errors = process_csv_errors(&errors, TipoRecordCsv::RiferimentoNISECI);
                     for e in processed_errors {
                         self.add_console_message(format!("FileInputController:  {e}"));
                     }
@@ -364,7 +364,7 @@ impl FileInputController {
                         eprintln!("FileInputController:  {err}");
                     }
                     */
-                    let processed_errors = process_csv_errors(&errors);
+                    let processed_errors = process_csv_errors(&errors, TipoRecordCsv::CampionamentoNISECI);
                     for e in processed_errors {
                         self.add_console_message(format!("FileInputController:  {e}"));
                     }

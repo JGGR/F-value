@@ -40,9 +40,11 @@ pub const SUPPORT_HEADLESS: bool = false; // This is due to windows_subsystem be
 #[cfg(not(windows))]
 pub const SUPPORT_HEADLESS: bool = true;
 
+pub const RIFERIMENTO_NISECI_HEADER_FIELDS: [&str; 17] = [ "nomeComune", "nomeLatino", "codiceSpecie", "origine", "tipoAutoctono", "alloNocivita", "specieAttesa", "clSoglia1", "clSoglia2", "clSoglia3", "clSoglia4", "adJuvSoglia1", "adJuvSoglia2", "adJuvSoglia3", "adJuvSoglia4", "densSoglia1", "densSoglia2" ];
 pub const RIFERIMENTO_NISECI_HEADER: &str = "\
 nomeComune;nomeLatino;codiceSpecie;origine;tipoAutoctono;alloNocivita;specieAttesa;clSoglia1;clSoglia2;clSoglia3;clSoglia4;adJuvSoglia1;adJuvSoglia2;adJuvSoglia3;adJuvSoglia4;densSoglia1;densSoglia2";
 
+pub const CAMPIONAMENTO_NISECI_HEADER_FIELDS: [&str; 7] = [ "data", "stazione", "superficie", "numPassaggio", "codiceSpecie", "lunghezza", "peso" ];
 pub const CAMPIONAMENTO_NISECI_HEADER: &str = "\
 data;stazione;superficie;numPassaggio;codiceSpecie;lunghezza;peso";
 
@@ -198,6 +200,13 @@ pub fn propheight(d: &RaylibDrawHandle<'_>, to_scale: i32) -> i32
     }
     let current_screen_height = d.get_screen_height();
     return current_screen_height * to_scale / ESOX_SCREEN_HEIGHT;
+}
+
+#[derive(Copy,Clone)]
+pub enum TipoRecordCsv {
+    RiferimentoNISECI,
+    CampionamentoNISECI,
+    CampionamentoHFBI,
 }
 
 #[derive(Debug, serde::Deserialize)]
@@ -564,16 +573,72 @@ fn parse_csv_pos(pos: &Option<csv::Position>) -> String {
     return res;
 }
 
-pub fn process_csv_errors(errors: &Vec<csv::Error>) -> Vec<String> {
+pub fn process_csv_errors(errors: &Vec<csv::Error>, tipo_csv: TipoRecordCsv) -> Vec<String> {
     let mut res = Vec::new();
     for error in errors {
         match error.kind() {
             csv::ErrorKind::Deserialize { pos, err } => {
-                res.push(format!(
-                    "  Errore di deserializzazione alla posizione: {}: {}",
+                let mut field_str;
+                match err.field() {
+                    Some(f) => {
+                        // Deduce name for field from index in the header
+                        // f is u64 starting from 0
+                        let field_idx = f as usize;
+                        match tipo_csv {
+                            TipoRecordCsv::RiferimentoNISECI => {
+                                if field_idx < RIFERIMENTO_NISECI_HEADER_FIELDS.len() {
+                                    field_str = format!("{} ({})", field_idx, RIFERIMENTO_NISECI_HEADER_FIELDS[field_idx]);
+                                } else {
+                                    field_str = "???".to_string();
+                                }
+                            }
+                            TipoRecordCsv::CampionamentoNISECI => {
+                                if field_idx < CAMPIONAMENTO_NISECI_HEADER_FIELDS.len() {
+                                    field_str = format!("{} ({})", field_idx, CAMPIONAMENTO_NISECI_HEADER_FIELDS[field_idx]);
+                                } else {
+                                    field_str = "???".to_string();
+                                }
+                            }
+                            TipoRecordCsv::CampionamentoHFBI => {
+                                // TODO: implement this for HFBI
+                                todo!("Implement this for HFBI");
+                                field_str = field_idx.to_string();
+                            }
+                        }
+                    }
+                    None => {
+                        field_str = "none".to_string();
+                    }
+                }
+                let mut curr_err = format!(
+                    "  Errore di deserializzazione alla posizione: {}: campo {}",
                     parse_csv_pos(&pos),
-                    translate_error_message(&err.to_string())
-                ));
+                    field_str,
+                );
+                match err.kind() {
+                    csv::DeserializeErrorKind::Message( msg ) => {
+                        curr_err = format!("{curr_err}: {}", translate_error_message(msg));
+                    }
+                    csv::DeserializeErrorKind::Unsupported( msg ) => {
+                        curr_err = format!("{curr_err}: {}", translate_error_message(msg));
+                    }
+                    csv::DeserializeErrorKind::UnexpectedEndOfRow => {
+                        curr_err = format!("{curr_err}: Fine riga inatteso");
+                    }
+                    csv::DeserializeErrorKind::InvalidUtf8 ( utf8err ) => {
+                        curr_err = format!("{curr_err}: {}", translate_error_message(&utf8err.to_string()));
+                    }
+                    csv::DeserializeErrorKind::ParseBool ( boolerr ) => {
+                        curr_err = format!("{curr_err}: {}", translate_error_message(&boolerr.to_string()));
+                    }
+                    csv::DeserializeErrorKind::ParseInt ( interr ) => {
+                        curr_err = format!("{curr_err}: {}", translate_error_message(&interr.to_string()));
+                    }
+                    csv::DeserializeErrorKind::ParseFloat ( floaterr ) => {
+                        curr_err = format!("{curr_err}: {}", translate_error_message(&floaterr.to_string()));
+                    }
+                }
+                res.push(curr_err);
             }
             csv::ErrorKind::Io(io_error) => {
                 res.push(format!(
@@ -645,7 +710,7 @@ pub fn check_campionamento_niseci_reader<R: Read>(reader: R) -> Result<Vec<Recor
             eprintln!("  {}", error);
         }
         */
-        let processed_errors = process_csv_errors(&errors);
+        let processed_errors = process_csv_errors(&errors, TipoRecordCsv::CampionamentoNISECI);
         eprintln!("Errori incontrati durante l'elaborazione csv del campionamento NISECI: {{");
         for e in processed_errors {
             eprintln!("{e}");
@@ -715,7 +780,7 @@ pub fn check_riferimento_niseci_reader<R: Read>(reader: R) -> Result<Vec<RecordC
             eprintln!("  {}", error);
         }
         */
-        let processed_errors = process_csv_errors(&errors);
+        let processed_errors = process_csv_errors(&errors, TipoRecordCsv::RiferimentoNISECI);
         eprintln!("Errori incontrati durante l'elaborazione csv del campionamento NISECI: {{");
         for e in processed_errors {
             eprintln!("{e}");
