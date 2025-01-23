@@ -276,6 +276,7 @@ impl SelezioneFileInputView {
                         controller.set_riferimento_path(Some(filepath));
                     } else {
                         eprintln!("Error: failed getting a file.");
+                        controller.add_console_message("Failed getting a file for riferimento".to_string());
                     }
                 }
             }
@@ -317,6 +318,7 @@ impl SelezioneFileInputView {
                     controller.set_campionamento_path(Some(filepath));
                 } else {
                     eprintln!("Error: failed getting a file.");
+                    controller.add_console_message("Failed getting a file for campionamento".to_string());
                 }
             }
         }
@@ -1111,4 +1113,33 @@ fn draw_rainbow_text(d: &mut RaylibDrawHandle, x: i32, y: i32, text: &str, frame
     let text_x = x; //- text_bounds.x as i32 / 2;
     let text_y = y; //- text_bounds.y as i32 / 2;
     d.draw_text_ex(font, text, Vector2::new(text_x as f32, text_y as f32), text_font_height as f32, text_spacing as f32, rainbow_color);
+}
+
+pub struct ConsoleView {
+    font : Font,
+    current_font_size : i32,
+    default_font_size : i32,
+    font_spacing : i32,
+}
+
+impl ConsoleView {
+    pub fn new(rl: &mut RaylibHandle, thread : &RaylibThread, font_size : i32, font_spacing: i32) -> Self {
+        Self {
+            font : rl.load_font_from_memory(&thread,
+                ".ttf",
+                CONSOLE_FONT_DATA,
+                font_size,// *2,
+                None).expect("failed loading console font"),
+            default_font_size : font_size,
+            current_font_size : font_size,
+            font_spacing : font_spacing,
+        }
+    }
+    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &ConsoleController, main_state: &MainState) {
+        d.clear_background(main_state.default_bg_color);
+
+        let state = controller.get_state();
+
+        state.console.draw(d, main_state.default_txt_color, self.current_font_size, self.font_spacing, &self.font);
+    }
 }

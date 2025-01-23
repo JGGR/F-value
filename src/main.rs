@@ -4,6 +4,7 @@ mod state;
 mod model;
 mod views;
 mod controllers;
+mod console;
 mod core;
 mod engines;
 #[cfg(test)]
@@ -111,6 +112,7 @@ fn main() {
     let output_controller = OutputController::new();
     let mut produzione_output_view = ProduzioneOutputView::new();
     let mut produzione_pdf_view = ProduzionePDFView::new();
+    let console_controller = ConsoleController::new();
 
     let window_title = format!("esox v{SHORT_PROJECT_VERSION}");
 
@@ -141,6 +143,8 @@ fn main() {
         Color::get_color(bg_color_int as u32)
     );
 
+    let mut console_view = ConsoleView::new(&mut rl, &thread, gui_current_font_height*2, txt_spacing);
+
     while !main_state.should_quit {
 
         // Base update step
@@ -165,6 +169,9 @@ fn main() {
             }
             CurrentView::ProduzioneOutput | CurrentView::ProduzionePDF=> {
                 output_controller.update(&rl, &mut main_state);
+            }
+            CurrentView::CONSOLE => {
+                console_controller.update(&mut rl);
             }
         }
 
@@ -205,6 +212,9 @@ fn main() {
             }
             CurrentView::ProduzionePDF => {
                 produzione_pdf_view.draw(&mut d, &thread, &output_controller, &main_state);
+            }
+            CurrentView::CONSOLE => {
+                console_view.draw(&mut d, &thread, &console_controller, &main_state);
             }
         }
 

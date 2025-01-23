@@ -1,10 +1,13 @@
 use crate::model::core::*;
-use crate::core::{MainState, check_campionamento_niseci_path, check_riferimento_niseci_path};
+use crate::core::{MainState, TipoRecordCsv, check_campionamento_niseci_path, check_riferimento_niseci_path, check_records_riferimento_niseci, check_records_campionamento_niseci};
 use crate::model::index::Indice;
+use crate::model::niseci::{RiferimentoNISECI, CampionamentoNISECI};
 use crate::state::GLOBAL_STATE;
 use crate::CurrentView;
+use crate::process_csv_errors;
 use raylib::RaylibHandle;
 use std::path::PathBuf;
+use raylib::consts::KeyboardKey::*;
 
 // Controller to update and access the state
 pub struct HomeController;
@@ -88,6 +91,11 @@ impl IndiceController {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.indice_model.set_selected_index(index);
     }
+    pub fn add_console_message(&self, msg: String) {
+        let mut state = GLOBAL_STATE.lock().unwrap();
+
+        state.console_model.console.add_message(msg);
+    }
 }
 
 pub struct FileInputController;
@@ -100,6 +108,14 @@ impl FileInputController {
     pub fn update(&self, _rl: &RaylibHandle, main_state: &mut MainState) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.fileinput_model.increment_frame_counter();
+
+        if state.fileinput_model.get_errors_occurred() {
+            eprintln!("FileInputController:  Errors occurred");
+            eprintln!("FileInputController:  Let's update current view and go to CONSOLE.");
+            main_state.set_current_view(CurrentView::CONSOLE);
+            eprintln!("FileInputController:  Clearing error state");
+            state.fileinput_model.set_errors_occurred(false);
+        }
 
         let current_indice;
         if let Some(idx) = state.indice_model.get_selected_index() {
@@ -174,6 +190,7 @@ impl FileInputController {
                         if riferimento_valid && campionamento_valid {
                             eprintln!("FileInputController:  NISECI - L'utente ha validato riferimento e campionamento");
                             eprintln!("FileInputController:  Let's update current view and go to SelezioneInfoAggiuntive.");
+                            //self.add_console_message(format!("FileInputController:  NISECI - L'utente ha validato riferimento e campionamento"));
                             main_state.set_current_view(CurrentView::SelezioneInfoAggiuntive);
                         }
                     }
@@ -191,6 +208,7 @@ impl FileInputController {
                         if campionamento_valid {
                             eprintln!("FileInputController:  HFBI - L'utente ha validato campionamento");
                             eprintln!("FileInputController:  Let's update current view and go to SelezioneInfoAggiuntive.");
+                            self.add_console_message(format!("FileInputController:  HFBI - L'utente ha validato campionamento"));
                             main_state.set_current_view(CurrentView::SelezioneInfoAggiuntive);
                         }
                     }
@@ -216,6 +234,11 @@ impl FileInputController {
     }
 
     pub fn set_riferimento_path(&self, riferimento_path: Option<PathBuf>) {
+        if let Some(ref rif_path) = riferimento_path {
+            self.add_console_message(format!("FileInputController:  Selezione percorso riferimento: {{{}}}", rif_path.display()));
+        } else {
+            self.add_console_message(format!("FileInputController:  Deselezione percorso riferimento"));
+        }
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.fileinput_model.set_riferimento_path(riferimento_path);
         state.fileinput_model.set_riferimento_path_valid(false); // Refresh the validity
@@ -226,28 +249,54 @@ impl FileInputController {
         return state.fileinput_model.get_riferimento_path_valid();
     }
 
+    fn set_data_riferimento_niseci(&self, riferimento: RiferimentoNISECI) {
+        self.set_console_env(("riferimento_niseci".to_string(), format!("{riferimento}")));
+        let mut state = GLOBAL_STATE.lock().unwrap();
+        state.data_model.set_riferimento_niseci(Some(riferimento));
+        state.fileinput_model.set_riferimento_path_valid(true);
+    }
+
+    pub fn get_data_riferimento_niseci(&self) -> Option<RiferimentoNISECI> {
+        let state = GLOBAL_STATE.lock().unwrap();
+        return state.data_model.get_riferimento_niseci();
+    }
+
     pub fn valida_riferimento_niseci_path(&self) {
         if let Some(path) = self.get_riferimento_path() {
             let csv_check = check_riferimento_niseci_path(path);
 
             match csv_check {
-                Ok(_records) => {
-                    //TODO: implement post-csv check step.
-                    eprintln!("TODO: implement post-csv check step to ensure the records are valid.");
-                    let records_check = false;
+                Ok(records) => {
+                    let records_check = check_records_riferimento_niseci(records);
 
-                    if records_check {
-                        let mut state = GLOBAL_STATE.lock().unwrap();
-                        state.fileinput_model.set_riferimento_path_valid(records_check);
+                    match records_check {
+                        Ok(species) => {
+                            self.add_console_message(format!("FileInputController:  Validazione RiferimentoNISECI completata!"));
+                            let riferimento = RiferimentoNISECI::new(species);
+                            self.set_data_riferimento_niseci(riferimento);
+                        }
+                        Err(errors) => { // Value errors
+                            for e in errors {
+                                self.add_console_message(format!("FileInputController:  {e}"));
+                            }
+                            let mut state = GLOBAL_STATE.lock().unwrap();
+                            state.fileinput_model.set_errors_occurred(true);
+                            return;
+                        }
                     }
                 }
-                Err(_errors) => {
-                    //TODO: handle displaying the errors?
+                Err(errors) => { // Csv errors
                     /*
                     for err in errors {
                         eprintln!("FileInputController:  {err}");
                     }
                     */
+                    let processed_errors = process_csv_errors(&errors, TipoRecordCsv::RiferimentoNISECI);
+                    for e in processed_errors {
+                        self.add_console_message(format!("FileInputController:  {e}"));
+                    }
+                    let mut state = GLOBAL_STATE.lock().unwrap();
+                    state.fileinput_model.set_errors_occurred(true);
                     return;
                 }
             }
@@ -260,6 +309,11 @@ impl FileInputController {
     }
 
     pub fn set_campionamento_path(&self, campionamento_path: Option<PathBuf>) {
+        if let Some(ref camp_path) = campionamento_path {
+            self.add_console_message(format!("FileInputController:  Selezione percorso campionamento: {{{}}}", camp_path.display()));
+        } else {
+            self.add_console_message(format!("FileInputController:  Deselezione percorso campionamento"));
+        }
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.fileinput_model.set_campionamento_path(campionamento_path);
         state.fileinput_model.set_campionamento_path_valid(false); // Refresh the validity
@@ -270,32 +324,89 @@ impl FileInputController {
         return state.fileinput_model.get_campionamento_path_valid();
     }
 
+    fn set_data_campionamento_niseci(&self, campionamento: CampionamentoNISECI) {
+        self.set_console_env(("campionamento_niseci".to_string(), format!("{campionamento}")));
+        let mut state = GLOBAL_STATE.lock().unwrap();
+        state.data_model.set_campionamento_niseci(Some(campionamento));
+        state.fileinput_model.set_campionamento_path_valid(true);
+    }
+
+    pub fn get_data_campionamento_niseci(&self) -> Option<CampionamentoNISECI> {
+        let state = GLOBAL_STATE.lock().unwrap();
+        return state.data_model.get_campionamento_niseci();
+    }
+
     pub fn valida_campionamento_niseci_path(&self) {
         if let Some(path) = self.get_campionamento_path() {
             let csv_check = check_campionamento_niseci_path(path);
 
             match csv_check {
-                Ok(_records) => {
-                    //TODO: implement post-csv check step.
-                    eprintln!("TODO: implement post-csv check step to ensure the records are valid.");
-                    let records_check = false;
-
-                    if records_check {
+                Ok(records) => {
+                    let opt_riferimento_niseci = self.get_data_riferimento_niseci();
+                    //NOTE: no double locking is not allowed! If state is
+                    // still in scope, its lock has not been dropped yet.
+                    //A scope is mandatory to ensure the lock is dropped before calling any
+                    //method on self which would try to acquire a lock itself.
+                    //This is a valid example:
+                    //
+                    //{
+                    //    let mut state = GLOBAL_STATE.lock().unwrap();
+                    //    opt_riferimento_niseci = state.data_model.get_riferimento_niseci();
+                    //}
+                    //But instead we tuck the lock acquisition inside the
+                    //self.get_data_riferimento_niseci() and we chill.
+                    if let Some(riferimento_niseci) = opt_riferimento_niseci {
+                        let records_check = check_records_campionamento_niseci(records, riferimento_niseci.elenco_specie);
+                        match records_check {
+                            Ok(campioni) => {
+                                self.add_console_message(format!("FileInputController:  Validazione CampionamentoNISECI completata!"));
+                                let campionamento = CampionamentoNISECI::new(campioni);
+                                self.set_data_campionamento_niseci(campionamento);
+                            }
+                            Err(errors) => { // Value errors
+                                for e in errors {
+                                    self.add_console_message(format!("FileInputController:  {e}"));
+                                }
+                                let mut state = GLOBAL_STATE.lock().unwrap();
+                                state.fileinput_model.set_errors_occurred(true);
+                                return;
+                            }
+                        }
+                    } else {
+                        let error_msg = "Impossibile validare campionamento_niseci senza avere riferimento";
+                        eprintln!("{error_msg}");
+                        self.add_console_message(format!("FileInputController:  {error_msg}"));
                         let mut state = GLOBAL_STATE.lock().unwrap();
-                        state.fileinput_model.set_campionamento_path_valid(records_check);
+                        state.fileinput_model.set_errors_occurred(true);
+                        return;
                     }
                 }
-                Err(_errors) => {
-                    //TODO: handle displaying the errors?
+                Err(errors) => { // Csv errors
                     /*
                     for err in errors {
                         eprintln!("FileInputController:  {err}");
                     }
                     */
+                    let processed_errors = process_csv_errors(&errors, TipoRecordCsv::CampionamentoNISECI);
+                    for e in processed_errors {
+                        self.add_console_message(format!("FileInputController:  {e}"));
+                    }
+                    let mut state = GLOBAL_STATE.lock().unwrap();
+                    state.fileinput_model.set_errors_occurred(true);
                     return;
                 }
             }
         }
+    }
+    pub fn add_console_message(&self, msg: String) {
+        let mut state = GLOBAL_STATE.lock().unwrap();
+
+        state.console_model.console.add_message(msg);
+    }
+    pub fn set_console_env(&self, (key, val): (String,String)) {
+        let mut state = GLOBAL_STATE.lock().unwrap();
+
+        state.console_model.console.set_env((key,val));
     }
 }
 
@@ -315,6 +426,11 @@ impl InfoAggiuntiveController {
         let state = GLOBAL_STATE.lock().unwrap();
         return state.infoaggiuntive_model.clone();
     }
+    pub fn add_console_message(&self, msg: String) {
+        let mut state = GLOBAL_STATE.lock().unwrap();
+
+        state.console_model.console.add_message(msg);
+    }
 }
 
 pub struct OutputController;
@@ -333,6 +449,11 @@ impl OutputController {
         let state = GLOBAL_STATE.lock().unwrap();
         return state.output_model.clone();
     }
+    pub fn add_console_message(&self, msg: String) {
+        let mut state = GLOBAL_STATE.lock().unwrap();
+
+        state.console_model.console.add_message(msg);
+    }
 }
 
 pub struct LogController;
@@ -345,5 +466,69 @@ impl LogController {
     pub fn update(&self, _rl: &RaylibHandle) {
         //let mut state = GLOBAL_STATE.lock().unwrap();
         //state.second_model.set_name("Updated".to_string());
+    }
+}
+
+pub struct ConsoleController;
+
+impl ConsoleController {
+
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn update(&self, rl : &mut RaylibHandle) {
+        let mut state = GLOBAL_STATE.lock().unwrap();
+        // Handle input
+
+        let mwheel_move = rl.get_mouse_wheel_move() as i32;
+
+        if mwheel_move != 0 {
+            if mwheel_move > 0 { // Positive is to scroll up
+                state.console_model.console.scroll_up(mwheel_move as usize);
+            } else {
+                state.console_model.console.scroll_down(-mwheel_move as usize);
+            }
+        }
+
+        if rl.is_key_pressed(KEY_UP) {
+            state.console_model.console.scroll_up(1);
+        }
+        if rl.is_key_pressed(KEY_DOWN) {
+            state.console_model.console.scroll_down(1);
+        }
+
+        // Detect and pass keys to the console
+        while let Some(c) = rl.get_char_pressed() {
+            state.console_model.console.handle_input(rl, Some(c), false, false);
+        }
+
+        // Check for Enter key press
+        if rl.is_key_pressed(KEY_ENTER) {
+            state.console_model.console.handle_input(rl, None, true, false);
+        }
+
+        // Check for Backspace key press
+        if rl.is_key_pressed(KEY_BACKSPACE) {
+            state.console_model.console.handle_input(rl, None, false, true);
+        }
+        state.console_model.set_name("Updated".to_string());
+    }
+
+    pub fn get_state(&self) -> ConsoleModel {
+        let state = GLOBAL_STATE.lock().unwrap();
+        return state.console_model.clone();
+    }
+
+    pub fn add_console_message(&self, msg: String) {
+        let mut state = GLOBAL_STATE.lock().unwrap();
+
+        state.console_model.console.add_message(msg);
+    }
+
+    pub fn set_console_env(&self, (key, val): (String,String)) {
+        let mut state = GLOBAL_STATE.lock().unwrap();
+
+        state.console_model.console.set_env((key,val));
     }
 }

@@ -337,7 +337,7 @@ pub fn draw_main(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
 
     let core_button_width = propwidth(&d, 25);
     let core_button_heigth = core_button_width;
-    let core_buttons_count = 3;
+    let core_buttons_count = 4;
     let core_buttons_x_padding = propwidth(&d, 5);
     let core_buttons_y_padding = core_buttons_x_padding;
     let core_buttons_panel_height = navbar_height;
@@ -376,32 +376,33 @@ pub fn draw_main(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
     if d.gui_button(rrect(changeview_button_x, changeview_button_y, changeview_button_width, changeview_button_height), Some(itext.as_c_str())) {
         match main_state.current_view {
             CurrentView::HOME => {
-                main_state.current_view = CurrentView::SECOND;
+                main_state.set_current_view(CurrentView::SECOND);
             }
             CurrentView::SECOND => {
-                main_state.current_view = CurrentView::SelezioneIndice;
+                main_state.set_current_view(CurrentView::SelezioneIndice);
             }
             CurrentView::SelezioneIndice => {
-                main_state.current_view = CurrentView::SelezioneFileInput;
+                main_state.set_current_view(CurrentView::SelezioneFileInput);
             }
             CurrentView::SelezioneFileInput => {
-                main_state.current_view = CurrentView::ValidazioneFileInput;
+                main_state.set_current_view(CurrentView::ValidazioneFileInput);
             }
             CurrentView::ValidazioneFileInput => {
-                main_state.current_view = CurrentView::SelezioneInfoAggiuntive;
+                main_state.set_current_view(CurrentView::SelezioneInfoAggiuntive);
             }
             CurrentView::SelezioneInfoAggiuntive => {
-                main_state.current_view = CurrentView::ValidazioneInfoAggiuntive;
+                main_state.set_current_view(CurrentView::ValidazioneInfoAggiuntive);
             }
             CurrentView::ValidazioneInfoAggiuntive => {
-                main_state.current_view = CurrentView::ProduzioneOutput;
+                main_state.set_current_view(CurrentView::ProduzioneOutput);
             }
             CurrentView::ProduzioneOutput => {
-                main_state.current_view = CurrentView::ProduzionePDF;
+                main_state.set_current_view(CurrentView::ProduzionePDF);
             }
             CurrentView::ProduzionePDF => {
-                main_state.current_view = CurrentView::HOME;
+                main_state.set_current_view(CurrentView::HOME);
             }
+            _ => {}
         }
     }
 
@@ -415,6 +416,29 @@ pub fn draw_main(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
     let itext = CString::new(itext).unwrap();
     if d.gui_button(rrect(settings_button_x, settings_button_y, settings_button_width,  settings_button_height), Some(itext.as_c_str())) {
         main_state.showing_settings_box = true;
+    }
+
+    let console_button_width = settings_button_width;
+    let console_button_x = settings_button_x + settings_button_width + core_buttons_x_padding;
+    let console_button_height = settings_button_height;
+    let console_button_y = settings_button_y;
+
+    // "Console view" button
+    let itext = d.gui_icon_text(ICON_MONITOR, Some(rstr!("")));
+    let itext = CString::new(itext).unwrap();
+    if d.gui_button(rrect(console_button_x, console_button_y, console_button_width, console_button_height), Some(itext.as_c_str())) {
+        match main_state.current_view {
+            CurrentView::CONSOLE => {
+                if let Some(prev) = main_state.previous_view {
+                    main_state.set_current_view(prev);
+                } else {
+                    main_state.set_current_view(CurrentView::HOME);
+                }
+            }
+            _ => {
+                main_state.set_current_view(CurrentView::CONSOLE);
+            }
+        }
     }
 
     if lock_gui && main_state.showing_settings_box {

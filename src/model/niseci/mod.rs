@@ -14,8 +14,36 @@ pub struct SpecieNISECI {
   pub specie_attesa: bool
 }
 
+impl fmt::Display for SpecieNISECI {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let string_representation = format!("SpecieNISECI: {{ id: {{{}}}, nome {{{}}}, tipo_autoctono: {{{}}}, tipo_alloctono: {{{}}}, specie_attesa: {{{}}}",
+                self.id, self.nome, self.tipo_autoctono, self.tipo_alloctono, self.specie_attesa);
+        write!(f, "{}", string_representation)
+    }
+}
+
+#[derive(Clone)]
 pub struct RiferimentoNISECI {
   pub elenco_specie: Vec<SpecieNISECI>
+}
+
+impl fmt::Display for RiferimentoNISECI {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut string_representation = format!("RiferimentoNISECI: {{");
+        for s in &self.elenco_specie {
+            string_representation = format!("{string_representation}\n  {{{s}}},");
+        }
+        string_representation = format!("{string_representation}\n}}");
+        write!(f, "{}", string_representation)
+    }
+}
+
+impl RiferimentoNISECI {
+    pub fn new(elenco_specie: Vec<SpecieNISECI>) -> Self {
+        Self {
+            elenco_specie: elenco_specie
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -26,22 +54,42 @@ pub struct RecordNISECI {
   pub peso: u32 // in grammi
 }
 
+impl fmt::Display for RecordNISECI {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let string_representation = format!("RecordNISECI: {{ specie: {{{}}}, passaggio_cattura {{{}}}, lunghezza: {{{}}}, peso: {{{}}}",
+                self.specie, self.passaggio_cattura, self.lunghezza, self.peso);
+        write!(f, "{}", string_representation)
+    }
+}
+
+#[derive(Clone)]
 pub struct CampionamentoNISECI {
   pub campionamento: Vec<RecordNISECI>
 }
 
+impl fmt::Display for CampionamentoNISECI {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut string_representation = format!("CampionaNISECI: {{");
+        for r in &self.campionamento {
+            string_representation = format!("{string_representation}\n  {{{r}}},");
+        }
+        string_representation = format!("{string_representation}\n}}");
+        write!(f, "{}", string_representation)
+    }
+}
+
 impl CampionamentoNISECI {
-  pub fn fishes_for_every_passage(&self) -> Vec<Point<i32>> {
+    pub fn fishes_for_every_passage(&self) -> Vec<Point<i32>> {
     let mut max_pass = 0;
     for record in self.campionamento.iter() {
-      if record.passaggio_cattura > max_pass {
+        if record.passaggio_cattura > max_pass {
         max_pass = record.passaggio_cattura;
-      }
+        }
     }
-  
+
     let mut passaggi: Vec<i32> = vec![0; max_pass as usize];
     for record in self.campionamento.iter() {
-      passaggi[(record.passaggio_cattura - 1) as usize] += 1;
+        passaggi[(record.passaggio_cattura - 1) as usize] += 1;
     }
 
     let mut tot = 0;
@@ -49,15 +97,21 @@ impl CampionamentoNISECI {
     // x = pesci totali fino a quel passaggio y = pesci del passaggio
     let mut pass_sum: Vec<Point<i32>> = Vec::with_capacity(max_pass as usize);
     for pass in passaggi.iter() {
-      tot += pass;
-      pass_sum.push(Point::new(tot, *pass));
+        tot += pass;
+        pass_sum.push(Point::new(tot, *pass));
     }
-  
-    pass_sum
-  }
-  
+
+        pass_sum
+    }
+
+    pub fn new(campionamento: Vec<RecordNISECI>) -> Self {
+        Self {
+            campionamento: campionamento,
+        }
+    }
 }
 
+#[derive(Clone)]
 pub enum TipoComunitaNISECI {
   Redatta,
   Recuperata,
@@ -66,23 +120,25 @@ pub enum TipoComunitaNISECI {
 }
 
 impl fmt::Display for TipoComunitaNISECI {
-  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-      let string_representation = match *self {
-        TipoComunitaNISECI::Redatta => "Redatta dall'operatore",
-        TipoComunitaNISECI::Recuperata => "Recuperata da fonti bibliografiche",
-        TipoComunitaNISECI::Dm260_2010 => "DM 260/2010",
-        TipoComunitaNISECI::AffinataDalMase => "Affinata dal Mase",
-      };
-      write!(f, "{}", string_representation)
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let string_representation = match *self {
+            TipoComunitaNISECI::Redatta => "Redatta dall'operatore",
+            TipoComunitaNISECI::Recuperata => "Recuperata da fonti bibliografiche",
+            TipoComunitaNISECI::Dm260_2010 => "DM 260/2010",
+            TipoComunitaNISECI::AffinataDalMase => "Affinata dal Mase",
+        };
+        write!(f, "{}", string_representation)
     }
-  }
+}
 
+#[derive(Clone)]
 pub struct ComunitaNISECI {
   tipo: TipoComunitaNISECI,
   fonte: Option<String>,
   numero_protocollo: Option<String>
 }
 
+#[derive(Clone)]
 pub struct AnagraficaNISECI {
   comunita: ComunitaNISECI,
   codice_stazione: u32,
@@ -95,6 +151,7 @@ pub struct AnagraficaNISECI {
   denasita_stimata: u32
 }
 
+#[derive(Clone)]
 pub enum IdroEcoRegioneNISECI {
   AlpiCentroOrientali,
   AlpiMediterranee,
@@ -148,6 +205,7 @@ impl fmt::Display for IdroEcoRegioneNISECI {
   }
 }
 
+#[derive(Clone)]
 pub struct RisultatoNISECI {
   valore: f32,
   rqe: f32,

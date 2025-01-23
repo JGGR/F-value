@@ -1,6 +1,10 @@
 use super::index::Indice;
+use super::niseci::{RiferimentoNISECI, CampionamentoNISECI, AnagraficaNISECI, RisultatoNISECI};
 use std::path::PathBuf;
+use std::collections::HashMap;
 
+use crate::console::*;
+use crate::SHORT_PROJECT_VERSION;
 
 // State struct holding non-`Copy` types
 #[derive(Clone)]
@@ -83,6 +87,7 @@ pub struct FileInputModel {
     riferimento_path_valid: bool,
     campionamento_path: Option<PathBuf>,
     campionamento_path_valid: bool,
+    errors_occurred: bool,
 }
 
 impl FileInputModel {
@@ -123,6 +128,14 @@ impl FileInputModel {
     pub fn get_campionamento_path_valid(&self) -> bool {
         return self.campionamento_path_valid;
     }
+
+    pub fn get_errors_occurred(&self) -> bool {
+        return self.errors_occurred;
+    }
+
+    pub fn set_errors_occurred(&mut self, val: bool) {
+        self.errors_occurred = val;
+    }
 }
 
 // State struct holding non-`Copy` types
@@ -156,13 +169,76 @@ impl OutputModel {
 }
 
 #[derive(Clone)]
+pub struct ConsoleModel {
+    pub console: Console,
+    name: String,
+}
+
+impl ConsoleModel {
+    pub fn get_name(&self) -> String {
+        return self.name.clone();
+    }
+
+    pub fn set_name(&mut self, new_name: String) {
+        self.name = new_name;
+    }
+}
+
+#[derive(Clone)]
+pub struct DataModelNISECI {
+    riferimento: Option<RiferimentoNISECI>,
+    campionamento: Option<CampionamentoNISECI>,
+    anagrafica: Option<AnagraficaNISECI>,
+    risultato: Option<RisultatoNISECI>,
+}
+
+#[derive(Clone)]
+pub struct DataModel {
+    pub niseci: DataModelNISECI,
+}
+
+impl DataModel {
+    pub fn new(niseci: DataModelNISECI) -> Self {
+        Self {
+            niseci: niseci
+        }
+    }
+    pub fn get_riferimento_niseci(&self) -> Option<RiferimentoNISECI> {
+        return self.niseci.riferimento.clone();
+    }
+    pub fn set_riferimento_niseci(&mut self, riferimento: Option<RiferimentoNISECI>) {
+        self.niseci.riferimento = riferimento;
+    }
+    pub fn get_campionamento_niseci(&self) -> Option<CampionamentoNISECI> {
+        return self.niseci.campionamento.clone();
+    }
+    pub fn set_campionamento_niseci(&mut self, campionamento: Option<CampionamentoNISECI>) {
+        self.niseci.campionamento = campionamento;
+    }
+    pub fn get_anagrafica_niseci(&self) -> Option<AnagraficaNISECI> {
+        return self.niseci.anagrafica.clone();
+    }
+    pub fn set_anagrafica_niseci(&mut self, anagrafica: Option<AnagraficaNISECI>) {
+        self.niseci.anagrafica = anagrafica;
+    }
+    pub fn get_risultato_niseci(&self) -> Option<RisultatoNISECI> {
+        return self.niseci.risultato.clone();
+    }
+    pub fn set_risultato_niseci(&mut self, risultato: Option<RisultatoNISECI>) {
+        self.niseci.risultato = risultato;
+    }
+}
+
+#[derive(Clone)]
 pub struct Model {
     pub home_model: HomeModel,
     pub second_model: SecondModel,
     pub indice_model: IndiceModel,
     pub fileinput_model: FileInputModel,
     pub infoaggiuntive_model: InfoAggiuntiveModel,
-    pub output_model: OutputModel
+    pub output_model: OutputModel,
+    pub console_model: ConsoleModel,
+    pub data_model: DataModel,
 }
 
 impl Model {
@@ -186,12 +262,34 @@ impl Model {
                 riferimento_path_valid: false,
                 campionamento_path: None,
                 campionamento_path_valid: false,
+                errors_occurred: false,
             },
             infoaggiuntive_model: InfoAggiuntiveModel {
                 frame_counter: 0,
             },
             output_model: OutputModel {
                 frame_counter: 0,
+            },
+            console_model: ConsoleModel {
+                console: Console::new(
+                    80, // Columns - chars per line
+                    1000, // Max messages
+                    17, // Max messages shown at a time
+                    HashMap::<String,String>::from([
+                        ("version".to_string(), SHORT_PROJECT_VERSION.to_string()),
+                        ("riferimento_niseci".to_string(), "Vuoto".to_string()),
+                        ("campionamento_niseci".to_string(), "Vuoto".to_string()),
+                    ]),
+                ),
+                name: "Initial".to_string(),
+            },
+            data_model: DataModel {
+                niseci: DataModelNISECI {
+                    riferimento: None,
+                    campionamento: None,
+                    anagrafica: None,
+                    risultato: None,
+                },
             }
         }
     }

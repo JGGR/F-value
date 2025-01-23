@@ -8,6 +8,8 @@ use std::path::PathBuf;
 use std::io::Read;
 use std::fs::File;
 use crate::model::niseci::{SpecieNISECI, RecordNISECI};
+use serde::Deserialize;
+use serde::de::{self, Deserializer};
 
 pub const EXIT_KEY: raylib::consts::KeyboardKey = raylib::consts::KeyboardKey::KEY_ESCAPE;
 pub const PROJECT_NAME: &'static str = env!("CARGO_PKG_NAME");
@@ -29,6 +31,7 @@ pub const JUNGLE_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_j
 pub const LAVANDA_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_lavanda.rgs");
 pub const TERMINAL_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_terminal.rgs");
 pub const ASHES_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_ashes.rgs");
+pub const CONSOLE_FONT_DATA: &[u8] = include_bytes!("../../assets/ubuntu.mono.ttf");
 
 #[cfg(all(windows, debug_assertions))]
 pub const SUPPORT_HEADLESS: bool = true;
@@ -39,15 +42,18 @@ pub const SUPPORT_HEADLESS: bool = false; // This is due to windows_subsystem be
 #[cfg(not(windows))]
 pub const SUPPORT_HEADLESS: bool = true;
 
+pub const RIFERIMENTO_NISECI_HEADER_FIELDS: [&str; 17] = [ "nomeComune", "nomeLatino", "codiceSpecie", "origine", "tipoAutoctono", "alloNocivita", "specieAttesa", "clSoglia1", "clSoglia2", "clSoglia3", "clSoglia4", "adJuvSoglia1", "adJuvSoglia2", "adJuvSoglia3", "adJuvSoglia4", "densSoglia1", "densSoglia2" ];
 pub const RIFERIMENTO_NISECI_HEADER: &str = "\
 nomeComune;nomeLatino;codiceSpecie;origine;tipoAutoctono;alloNocivita;specieAttesa;clSoglia1;clSoglia2;clSoglia3;clSoglia4;adJuvSoglia1;adJuvSoglia2;adJuvSoglia3;adJuvSoglia4;densSoglia1;densSoglia2";
 
+pub const CAMPIONAMENTO_NISECI_HEADER_FIELDS: [&str; 7] = [ "data", "stazione", "superficie", "numPassaggio", "codiceSpecie", "lunghezza", "peso" ];
 pub const CAMPIONAMENTO_NISECI_HEADER: &str = "\
 data;stazione;superficie;numPassaggio;codiceSpecie;lunghezza;peso";
 
 //TODO: add test to check if this string respects the discriminant ordering in GuiTheme
 pub const GUI_THEME_COMBOBOX_STR: &str = "Light;Dark;Bluish;Candy;Cherry;Cyber;Jungle;Lavanda;Terminal;Ashes";
 
+#[derive(Copy, Clone)]
 pub enum CurrentView {
     HOME,
     SECOND,
@@ -58,6 +64,7 @@ pub enum CurrentView {
     ValidazioneInfoAggiuntive,
     ProduzioneOutput,
     ProduzionePDF,
+    CONSOLE
 }
 
 impl fmt::Display for CurrentView {
@@ -72,6 +79,7 @@ impl fmt::Display for CurrentView {
       CurrentView::ValidazioneInfoAggiuntive => "Validazione Info Aggiuntive",
       CurrentView::ProduzioneOutput => "Produzione Output",
       CurrentView::ProduzionePDF => "Produzione PDF",
+      CurrentView::CONSOLE => "CONSOLE",
     };
     write!(f, "{}", string_representation)
   }
@@ -136,6 +144,7 @@ pub struct MainState {
     pub showing_info_box: bool,
     pub showing_settings_box: bool,
     pub current_view: CurrentView,
+    pub previous_view: Option<CurrentView>,
     pub theme: GuiTheme,
     pub gui_theme_combobox_active: i32,
     pub default_font_height: i32,
@@ -155,6 +164,7 @@ impl MainState {
             showing_info_box: false,
             showing_settings_box: false,
             current_view: CurrentView::HOME,
+            previous_view: None,
             theme: GuiTheme::Light,
             gui_theme_combobox_active: GuiTheme::Light as i32,
             default_font_height: default_font_height,
@@ -167,6 +177,7 @@ impl MainState {
     }
 
     pub fn set_current_view(&mut self, view: CurrentView) -> () {
+        self.previous_view = Some(self.current_view);
         self.current_view = view;
     }
 
@@ -193,6 +204,22 @@ pub fn propheight(d: &RaylibDrawHandle<'_>, to_scale: i32) -> i32
     return current_screen_height * to_scale / ESOX_SCREEN_HEIGHT;
 }
 
+#[derive(Copy,Clone)]
+pub enum TipoRecordCsv {
+    RiferimentoNISECI,
+    CampionamentoNISECI,
+    CampionamentoHFBI,
+}
+
+fn deserialize_comma_f32<'de, D>(deserializer: D) -> Result<f32, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let s: &str = Deserialize::deserialize(deserializer)?;
+    let s = s.replace(',', "."); // Replace comma with dot
+    s.parse::<f32>().map_err(de::Error::custom)
+}
+
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RecordCsvRiferimentoNISECI { //TODO: add position
@@ -207,11 +234,17 @@ pub struct RecordCsvRiferimentoNISECI { //TODO: add position
     pub cl_soglia2: i32,
     pub cl_soglia3: i32,
     pub cl_soglia4: i32,
+    #[serde(deserialize_with = "deserialize_comma_f32")]
     pub ad_juv_soglia1: f32,
+    #[serde(deserialize_with = "deserialize_comma_f32")]
     pub ad_juv_soglia2: f32,
+    #[serde(deserialize_with = "deserialize_comma_f32")]
     pub ad_juv_soglia3: f32,
+    #[serde(deserialize_with = "deserialize_comma_f32")]
     pub ad_juv_soglia4: f32,
+    #[serde(deserialize_with = "deserialize_comma_f32")]
     pub dens_soglia1: f32,
+    #[serde(deserialize_with = "deserialize_comma_f32")]
     pub dens_soglia2: f32,
 }
 
@@ -315,6 +348,7 @@ pub fn parse_recordcsv_campionamento_niseci(records: Vec<RecordCsvCampionamentoN
 
 
         let passaggio_cattura;
+        //TODO: update this abomination when records change to have an integer directly
         match r.num_passaggio.as_str() {
             "c1" => {
                 passaggio_cattura = 1;
@@ -322,8 +356,14 @@ pub fn parse_recordcsv_campionamento_niseci(records: Vec<RecordCsvCampionamentoN
             "c2" => {
                 passaggio_cattura = 2;
             }
+            "c3" => {
+                passaggio_cattura = 3;
+            }
+            "c4" => {
+                passaggio_cattura = 4;
+            }
             _ => {
-                let err = RecordCsvCampionamentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: num_passaggio non valido (non \"c1\" o \"c2\"): {}", r.num_passaggio) };
+                let err = RecordCsvCampionamentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: num_passaggio non valido (non in [\"c1\", \"c2\" ... \"c4\"]): {}", r.num_passaggio) };
                 errors.push(err);
                 continue;
             }
@@ -517,6 +557,7 @@ pub fn translate_error_message(msg: &str) -> String {
         // NOTE: there's a leading space in " from empty string", it enables us to attach the ","
         // to the previous part
         msg.replace("cannot parse", "campo vuoto: atteso")
+            .replace("field","campo")
             .replace("float","razionale")
             .replace("integer","intero")
             .replace(" from empty string",", trovato: stringa vuota")
@@ -534,10 +575,20 @@ fn parse_csv_pos(pos: &Option<csv::Position>) -> String {
     let res;
     match pos {
         Some(p) => {
-            let byte_offset = p.byte();
+
+            // These should be equal. We may show the value only once if they are
             let line_offset = p.line();
             let record_offset = p.record();
-            res = format!("Riga: {} Record: {} Char: {} ", line_offset, record_offset, byte_offset);
+
+            if line_offset == record_offset {
+                res = format!("Riga: {}", line_offset);
+            } else { // TODO: How can we hit this branch?
+                res = format!("Riga: {} Record: {}", line_offset, record_offset);
+            }
+
+            // We ignore this since I don't think users may care?
+            // let byte_offset = p.byte();
+            // res = format!("Riga: {} Record: {} Char: {} ", line_offset, record_offset, byte_offset);
         }
         None => {
             res = "none".to_string();
@@ -546,43 +597,101 @@ fn parse_csv_pos(pos: &Option<csv::Position>) -> String {
     return res;
 }
 
-fn process_csv_errors(errors: &Vec<csv::Error>) {
+pub fn process_csv_errors(errors: &Vec<csv::Error>, tipo_csv: TipoRecordCsv) -> Vec<String> {
+    let mut res = Vec::new();
     for error in errors {
         match error.kind() {
             csv::ErrorKind::Deserialize { pos, err } => {
-                eprintln!(
-                    "  Errore di deserializzazione alla posizione: {}: {}",
+                let mut field_str;
+                match err.field() {
+                    Some(f) => {
+                        // Deduce name for field from index in the header
+                        // f is u64 starting from 0
+                        let field_idx = f as usize;
+                        match tipo_csv {
+                            TipoRecordCsv::RiferimentoNISECI => {
+                                if field_idx < RIFERIMENTO_NISECI_HEADER_FIELDS.len() {
+                                    field_str = format!("{} ({})", field_idx, RIFERIMENTO_NISECI_HEADER_FIELDS[field_idx]);
+                                } else {
+                                    field_str = "???".to_string();
+                                }
+                            }
+                            TipoRecordCsv::CampionamentoNISECI => {
+                                if field_idx < CAMPIONAMENTO_NISECI_HEADER_FIELDS.len() {
+                                    field_str = format!("{} ({})", field_idx, CAMPIONAMENTO_NISECI_HEADER_FIELDS[field_idx]);
+                                } else {
+                                    field_str = "???".to_string();
+                                }
+                            }
+                            TipoRecordCsv::CampionamentoHFBI => {
+                                // TODO: implement this for HFBI
+                                todo!("Implement this for HFBI");
+                                field_str = field_idx.to_string();
+                            }
+                        }
+                    }
+                    None => {
+                        field_str = "none".to_string();
+                    }
+                }
+                let mut curr_err = format!(
+                    "  Errore di deserializzazione alla posizione: {}: campo {}",
                     parse_csv_pos(&pos),
-                    translate_error_message(&err.to_string())
+                    field_str,
                 );
+                match err.kind() {
+                    csv::DeserializeErrorKind::Message( msg ) => {
+                        curr_err = format!("{curr_err}: {}", translate_error_message(msg));
+                    }
+                    csv::DeserializeErrorKind::Unsupported( msg ) => {
+                        curr_err = format!("{curr_err}: {}", translate_error_message(msg));
+                    }
+                    csv::DeserializeErrorKind::UnexpectedEndOfRow => {
+                        curr_err = format!("{curr_err}: Fine riga inatteso");
+                    }
+                    csv::DeserializeErrorKind::InvalidUtf8 ( utf8err ) => {
+                        curr_err = format!("{curr_err}: {}", translate_error_message(&utf8err.to_string()));
+                    }
+                    csv::DeserializeErrorKind::ParseBool ( boolerr ) => {
+                        curr_err = format!("{curr_err}: {}", translate_error_message(&boolerr.to_string()));
+                    }
+                    csv::DeserializeErrorKind::ParseInt ( interr ) => {
+                        curr_err = format!("{curr_err}: {}", translate_error_message(&interr.to_string()));
+                    }
+                    csv::DeserializeErrorKind::ParseFloat ( floaterr ) => {
+                        curr_err = format!("{curr_err}: {}", translate_error_message(&floaterr.to_string()));
+                    }
+                }
+                res.push(curr_err);
             }
             csv::ErrorKind::Io(io_error) => {
-                eprintln!(
+                res.push(format!(
                     "  Errore di I/O: {}",
                     translate_error_message(&io_error.to_string())
-                );
+                ));
             }
             csv::ErrorKind::Utf8 { pos, err } => {
-                eprintln!(
+                res.push(format!(
                     "  Errore UTF-8 alla posizione: {}: {}",
                     parse_csv_pos(&pos),
                     translate_error_message(&err.to_string())
-                );
+                ));
             }
             csv::ErrorKind::UnequalLengths { pos, expected_len, len } => {
-                eprintln!(
+                res.push(format!(
                     "  Errore numero campi alla posizione: {}: lunghezza attesa {}, trovata {}",
                     parse_csv_pos(&pos),
                     expected_len,
                     len
                     // no translate_error_message() anche se teoricamente lo supporta
-                );
+                ));
             }
             _ => {
-                eprintln!("  Errore sconosciuto: {}", translate_error_message(&error.to_string()));
+                res.push(format!("  Errore sconosciuto: {}", translate_error_message(&error.to_string())));
             }
         }
     }
+    return res;
 }
 
 fn check_path_is_file_ends_with_csv(path: &PathBuf) -> bool {
@@ -620,13 +729,16 @@ pub fn check_campionamento_niseci_reader<R: Read>(reader: R) -> Result<Vec<Recor
     println!("Campionamento NISECI: Numero record csv non validi: {}", errors.len());
 
     if !errors.is_empty() {
-        eprintln!("Errori incontrati durante l'elaborazione csv del campionamento NISECI: {{");
         /*
         for error in &errors {
             eprintln!("  {}", error);
         }
         */
-        process_csv_errors(&errors);
+        let processed_errors = process_csv_errors(&errors, TipoRecordCsv::CampionamentoNISECI);
+        eprintln!("Errori incontrati durante l'elaborazione csv del campionamento NISECI: {{");
+        for e in processed_errors {
+            eprintln!("{e}");
+        }
         eprintln!("}}");
         return Err(errors);
     } else {
@@ -692,7 +804,11 @@ pub fn check_riferimento_niseci_reader<R: Read>(reader: R) -> Result<Vec<RecordC
             eprintln!("  {}", error);
         }
         */
-        process_csv_errors(&errors);
+        let processed_errors = process_csv_errors(&errors, TipoRecordCsv::RiferimentoNISECI);
+        eprintln!("Errori incontrati durante l'elaborazione csv del campionamento NISECI: {{");
+        for e in processed_errors {
+            eprintln!("{e}");
+        }
         eprintln!("}}");
         return Err(errors);
     } else {
