@@ -348,6 +348,7 @@ pub fn parse_recordcsv_campionamento_niseci(records: Vec<RecordCsvCampionamentoN
 
 
         let passaggio_cattura;
+        //TODO: update this abomination when records change to have an integer directly
         match r.num_passaggio.as_str() {
             "c1" => {
                 passaggio_cattura = 1;
@@ -355,8 +356,14 @@ pub fn parse_recordcsv_campionamento_niseci(records: Vec<RecordCsvCampionamentoN
             "c2" => {
                 passaggio_cattura = 2;
             }
+            "c3" => {
+                passaggio_cattura = 3;
+            }
+            "c4" => {
+                passaggio_cattura = 4;
+            }
             _ => {
-                let err = RecordCsvCampionamentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: num_passaggio non valido (non \"c1\" o \"c2\"): {}", r.num_passaggio) };
+                let err = RecordCsvCampionamentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: num_passaggio non valido (non in [\"c1\", \"c2\" ... \"c4\"]): {}", r.num_passaggio) };
                 errors.push(err);
                 continue;
             }
