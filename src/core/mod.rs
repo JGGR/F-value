@@ -8,6 +8,8 @@ use std::path::PathBuf;
 use std::io::Read;
 use std::fs::File;
 use crate::model::niseci::{SpecieNISECI, RecordNISECI};
+use serde::Deserialize;
+use serde::de::{self, Deserializer};
 
 pub const EXIT_KEY: raylib::consts::KeyboardKey = raylib::consts::KeyboardKey::KEY_ESCAPE;
 pub const PROJECT_NAME: &'static str = env!("CARGO_PKG_NAME");
@@ -209,6 +211,15 @@ pub enum TipoRecordCsv {
     CampionamentoHFBI,
 }
 
+fn deserialize_comma_f32<'de, D>(deserializer: D) -> Result<f32, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let s: &str = Deserialize::deserialize(deserializer)?;
+    let s = s.replace(',', "."); // Replace comma with dot
+    s.parse::<f32>().map_err(de::Error::custom)
+}
+
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RecordCsvRiferimentoNISECI { //TODO: add position
@@ -223,11 +234,17 @@ pub struct RecordCsvRiferimentoNISECI { //TODO: add position
     pub cl_soglia2: i32,
     pub cl_soglia3: i32,
     pub cl_soglia4: i32,
+    #[serde(deserialize_with = "deserialize_comma_f32")]
     pub ad_juv_soglia1: f32,
+    #[serde(deserialize_with = "deserialize_comma_f32")]
     pub ad_juv_soglia2: f32,
+    #[serde(deserialize_with = "deserialize_comma_f32")]
     pub ad_juv_soglia3: f32,
+    #[serde(deserialize_with = "deserialize_comma_f32")]
     pub ad_juv_soglia4: f32,
+    #[serde(deserialize_with = "deserialize_comma_f32")]
     pub dens_soglia1: f32,
+    #[serde(deserialize_with = "deserialize_comma_f32")]
     pub dens_soglia2: f32,
 }
 
