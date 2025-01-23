@@ -190,7 +190,7 @@ impl FileInputController {
                         if riferimento_valid && campionamento_valid {
                             eprintln!("FileInputController:  NISECI - L'utente ha validato riferimento e campionamento");
                             eprintln!("FileInputController:  Let's update current view and go to SelezioneInfoAggiuntive.");
-                            self.add_console_message(format!("FileInputController:  NISECI - L'utente ha validato riferimento e campionamento"));
+                            //self.add_console_message(format!("FileInputController:  NISECI - L'utente ha validato riferimento e campionamento"));
                             main_state.set_current_view(CurrentView::SelezioneInfoAggiuntive);
                         }
                     }
@@ -250,8 +250,8 @@ impl FileInputController {
     }
 
     fn set_data_riferimento_niseci(&self, riferimento: RiferimentoNISECI) {
-        let mut state = GLOBAL_STATE.lock().unwrap();
         self.set_console_env(("riferimento_niseci".to_string(), format!("{riferimento}")));
+        let mut state = GLOBAL_STATE.lock().unwrap();
         state.data_model.set_riferimento_niseci(Some(riferimento));
         state.fileinput_model.set_riferimento_path_valid(true);
     }
@@ -320,8 +320,8 @@ impl FileInputController {
     }
 
     fn set_data_campionamento_niseci(&self, campionamento: CampionamentoNISECI) {
-        let mut state = GLOBAL_STATE.lock().unwrap();
         self.set_console_env(("campionamento_niseci".to_string(), format!("{campionamento}")));
+        let mut state = GLOBAL_STATE.lock().unwrap();
         state.data_model.set_campionamento_niseci(Some(campionamento));
         state.fileinput_model.set_campionamento_path_valid(true);
     }
@@ -332,8 +332,16 @@ impl FileInputController {
 
             match csv_check {
                 Ok(records) => {
-                    let mut state = GLOBAL_STATE.lock().unwrap();
-                    if let Some(riferimento_niseci) = state.data_model.get_riferimento_niseci() {
+                    let opt_riferimento_niseci;
+                    {
+                        //NOTE: no double locking allowed! state is still in scope and has
+                        //its lock has not been dropped yet.
+                        //The scope is mandatory to ensure the lock is dropped before calling any
+                        //method on self which would try to acquire a lock itself.
+                        let mut state = GLOBAL_STATE.lock().unwrap();
+                        opt_riferimento_niseci = state.data_model.get_riferimento_niseci();
+                    }
+                    if let Some(riferimento_niseci) = opt_riferimento_niseci {
                         let records_check = check_records_campionamento_niseci(records, riferimento_niseci.elenco_specie);
                         match records_check {
                             Ok(campioni) => {
@@ -354,6 +362,7 @@ impl FileInputController {
                         let error_msg = "Impossibile validare campionamento_niseci senza avere riferimento";
                         eprintln!("{error_msg}");
                         self.add_console_message(format!("FileInputController:  {error_msg}"));
+                        let mut state = GLOBAL_STATE.lock().unwrap();
                         state.fileinput_model.set_errors_occurred(true);
                         return;
                     }
