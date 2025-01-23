@@ -256,6 +256,11 @@ impl FileInputController {
         state.fileinput_model.set_riferimento_path_valid(true);
     }
 
+    pub fn get_data_riferimento_niseci(&self) -> Option<RiferimentoNISECI> {
+        let state = GLOBAL_STATE.lock().unwrap();
+        return state.data_model.get_riferimento_niseci();
+    }
+
     pub fn valida_riferimento_niseci_path(&self) {
         if let Some(path) = self.get_riferimento_path() {
             let csv_check = check_riferimento_niseci_path(path);
@@ -326,21 +331,30 @@ impl FileInputController {
         state.fileinput_model.set_campionamento_path_valid(true);
     }
 
+    pub fn get_data_campionamento_niseci(&self) -> Option<CampionamentoNISECI> {
+        let state = GLOBAL_STATE.lock().unwrap();
+        return state.data_model.get_campionamento_niseci();
+    }
+
     pub fn valida_campionamento_niseci_path(&self) {
         if let Some(path) = self.get_campionamento_path() {
             let csv_check = check_campionamento_niseci_path(path);
 
             match csv_check {
                 Ok(records) => {
-                    let opt_riferimento_niseci;
-                    {
-                        //NOTE: no double locking allowed! state is still in scope and has
-                        //its lock has not been dropped yet.
-                        //The scope is mandatory to ensure the lock is dropped before calling any
-                        //method on self which would try to acquire a lock itself.
-                        let mut state = GLOBAL_STATE.lock().unwrap();
-                        opt_riferimento_niseci = state.data_model.get_riferimento_niseci();
-                    }
+                    let opt_riferimento_niseci = self.get_data_riferimento_niseci();
+                    //NOTE: no double locking is not allowed! If state is
+                    // still in scope, its lock has not been dropped yet.
+                    //A scope is mandatory to ensure the lock is dropped before calling any
+                    //method on self which would try to acquire a lock itself.
+                    //This is a valid example:
+                    //
+                    //{
+                    //    let mut state = GLOBAL_STATE.lock().unwrap();
+                    //    opt_riferimento_niseci = state.data_model.get_riferimento_niseci();
+                    //}
+                    //But instead we tuck the lock acquisition inside the
+                    //self.get_data_riferimento_niseci() and we chill.
                     if let Some(riferimento_niseci) = opt_riferimento_niseci {
                         let records_check = check_records_campionamento_niseci(records, riferimento_niseci.elenco_specie);
                         match records_check {
