@@ -230,10 +230,10 @@ pub struct RecordCsvRiferimentoNISECI { //TODO: add position
     pub tipo_autoctono: i32,
     pub allo_nocivita: i32,
     pub specie_attesa: i32,
-    pub cl_soglia1: i32, // in cm
-    pub cl_soglia2: i32, // in cm
-    pub cl_soglia3: i32, // in cm
-    pub cl_soglia4: i32, // in cm
+    pub cl_soglia1: u32, // in mm
+    pub cl_soglia2: u32, // in mm
+    pub cl_soglia3: u32, // in mm
+    pub cl_soglia4: u32, // in mm
     pub ad_juv_soglia1: f32,
     #[serde(deserialize_with = "deserialize_comma_f32")]
     pub ad_juv_soglia2: f32,
