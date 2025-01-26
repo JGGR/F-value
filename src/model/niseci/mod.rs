@@ -30,6 +30,27 @@ impl fmt::Display for SpecieNISECI {
     }
 }
 
+impl SpecieNISECI {
+  pub fn new_dummy_specie() -> SpecieNISECI {
+    SpecieNISECI {
+      id: "0".to_string(),
+      nome: "dummy".to_string(),
+      tipo_autoctono: 0,
+      tipo_alloctono: 0,
+      specie_attesa: true,
+      cl_soglia1: 1, // in mm
+      cl_soglia2: 2, // in mm
+      cl_soglia3: 3, // in mm
+      cl_soglia4: 4,
+      ad_juv_soglia1: 0.1,
+      ad_juv_soglia2: 0.2,
+      ad_juv_soglia3: 0.3,
+      ad_juv_soglia4: 0.4,
+
+    }
+  }
+}
+
 #[derive(Clone)]
 pub struct RiferimentoNISECI {
   pub elenco_specie: Vec<SpecieNISECI>
@@ -221,6 +242,7 @@ pub struct RisultatoNISECI {
 }
 
 pub struct ClassiEtaSpecieNISECI {
+  pub specie: SpecieNISECI,
   pub cl1: i32,
   pub cl2: i32,
   pub cl3: i32,
@@ -232,6 +254,7 @@ pub struct ClassiEtaSpecieNISECI {
 impl ClassiEtaSpecieNISECI {
   pub fn new() -> ClassiEtaSpecieNISECI {
     ClassiEtaSpecieNISECI {
+      specie: SpecieNISECI::new_dummy_specie(),
       cl1: 0,
       cl2: 0,
       cl3: 0,
@@ -241,18 +264,58 @@ impl ClassiEtaSpecieNISECI {
 
   }
 
-  pub fn new_cl_prevalorizzata(cl: ClassiEta) -> ClassiEtaSpecieNISECI {
+  pub fn new_cl_prevalorizzata(record: &RecordNISECI) -> ClassiEtaSpecieNISECI {
     let mut classe = ClassiEtaSpecieNISECI::new();
-    match cl {
-      ClassiEta::CL1 => classe.cl1 = 1,
-      ClassiEta::CL2 => classe.cl2 = 1,
-      ClassiEta::CL3 => classe.cl3 = 1,
-      ClassiEta::CL4 => classe.cl4 = 1,
-      ClassiEta::CL5 => classe.cl5 = 1,
-    }
-
+    classe.update_classi_eta(record);
+    classe.specie = record.specie.clone();
     classe
   }
+
+  pub fn update_classi_eta(&mut self, record: &RecordNISECI) -> () {
+    match ClassiEta::find_classe_eta(record) {
+        ClassiEta::CL1 => self.cl1 += 1,
+        ClassiEta::CL2 => self.cl2 += 1,
+        ClassiEta::CL3 => self.cl3 += 1,
+        ClassiEta::CL4 => self.cl4 += 1,
+        ClassiEta::CL5 => self.cl5 += 1,
+    }
+  }
+
+  fn get_how_many_classes(&self) -> usize {
+    return [self.cl1, self.cl2, self.cl3, self.cl4, self.cl5]
+      .into_iter()
+      .filter(|&value| value > 0)
+      .count();
+  }
+
+  pub fn get_x2_a_criterio_a(&self) -> u8 {
+    let count = self.get_how_many_classes();
+    if count >= 4 {
+      return 1;
+    }
+    if count == 3 {
+      return 2;
+    }
+    return 3;
+  }
+
+  pub fn get_x2_a_criterio_b(&self) -> u8 {
+    let ad_juv = (self.cl4 + self.cl5) as f32 / (self.cl2 + self.cl3) as f32;
+    if ad_juv <= self.specie.ad_juv_soglia1 {
+      return 3;
+    }
+    if ad_juv <= self.specie.ad_juv_soglia2 {
+      return 2;
+    }
+    if ad_juv <= self.specie.ad_juv_soglia3 {
+      return 1;
+    }
+    if ad_juv <= self.specie.ad_juv_soglia4 {
+      return 2;
+    }
+    return 3;
+  }
+
 }
 
 pub enum ClassiEta {

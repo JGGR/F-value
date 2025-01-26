@@ -6,13 +6,13 @@ use crate::{model::niseci::{CampionamentoNISECI, ClassiEta, ClassiEtaSpecieNISEC
 
 
 pub fn calculate_x2(riferimento: &RiferimentoNISECI, campionamento: &CampionamentoNISECI) -> f32 {
-  let x2_a = calculate_x2_a(riferimento, campionamento);
-
+  let x2_a = calculate_sommatoria_x2_a(riferimento, campionamento);
+  // let x2_b = calculate_sommatoria_x2_b(riferimento, campionamento);
 
   0.0
 }
 
-pub fn calculate_x2_a(r: &RiferimentoNISECI, c: &CampionamentoNISECI) -> i32 {
+fn calculate_sommatoria_x2_a(r: &RiferimentoNISECI, c: &CampionamentoNISECI) -> f32 {
 
   // ad ogni specie associo le loro classi che andrò poi a riempire
   // ho controllato i campionamenti di andrea e trovto massimo 9 specie diverse
@@ -24,24 +24,30 @@ pub fn calculate_x2_a(r: &RiferimentoNISECI, c: &CampionamentoNISECI) -> i32 {
     if c.specie.tipo_autoctono == 1 || c.specie.tipo_autoctono == 2 {
       match classi_eta_map.entry(c.specie.id.clone()) {
         Entry::Occupied(mut entry) => {
-          update_classi_eta(entry.get_mut(), &c);
+          entry.get_mut().update_classi_eta(&c);
         },
         Entry::Vacant(entry) => {
-          entry.insert(ClassiEtaSpecieNISECI::new_cl_prevalorizzata(ClassiEta::find_classe_eta(c)));
+          entry.insert(ClassiEtaSpecieNISECI::new_cl_prevalorizzata(&c));
         }
       };
     } 
   }
 
   // ora la mappa è riempita e tutte le classi sono state riempite
-  // si procede quindi al calcolo di x2 per ogni specie campionata autoctona
+  // si procede quindi al calcolo di x2 a per ogni specie campionata autoctona
   // e si va a fare la sommatoria dei parametri trovati
 
+  let mut sommatoria_x2_a = 0.0;
+  for (key, classe) in &classi_eta_map {
+    sommatoria_x2_a += calculate_x2_a(classe);
+  }
 
-
-
-  0
+  sommatoria_x2_a
 }
+
+fn calculate_sommatoria_x2_b() {
+
+} 
 
 fn update_classi_eta(cl: &mut ClassiEtaSpecieNISECI, record: &RecordNISECI) -> () {
   if record.lunghezza < record.specie.cl_soglia1 {
@@ -53,7 +59,30 @@ fn update_classi_eta(cl: &mut ClassiEtaSpecieNISECI, record: &RecordNISECI) -> (
   } else if record.lunghezza < record.specie.cl_soglia4 {
     cl.cl4 += 1;
   } else {
-    cl.cl4 += 1;
+    cl.cl5 += 1;
   }
 }
+
+fn calculate_x2_a(classe: &ClassiEtaSpecieNISECI) -> f32 {
+  let criterio_a: u8 = classe.get_x2_a_criterio_a();
+  let criterio_b: u8 = classe.get_x2_a_criterio_b();
+
+  if criterio_a == 1 && criterio_b == 3 {
+    return 0.5;
+  }
+  if criterio_a == 1 {
+    return 1.0;
+  }
+  if criterio_a == 2 && criterio_b == 3 {
+    return 0.0;
+  }
+  if criterio_a == 2 {
+    return 0.5
+  }
+  if criterio_a == 3 {
+    return 0.0;
+  }
+  return 0.0;
+}
+
 
