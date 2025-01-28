@@ -1,3 +1,5 @@
+use std::collections::hash_map::Entry;
+use std::collections::HashMap;
 use std::vec::Vec;
 use std::fmt;
 
@@ -180,6 +182,15 @@ pub struct AnagraficaNISECI {
   denasita_stimata: u32
 }
 
+impl AnagraficaNISECI {
+  pub fn get_lunghezza_media(&self) -> f32 {
+    self.lunghezza_media_stazione
+  }
+  pub fn get_larghezza_media(&self) -> f32 {
+    self.larghezza_media_stazione
+  }
+}
+
 #[derive(Clone)]
 pub enum IdroEcoRegioneNISECI {
   AlpiCentroOrientali,
@@ -338,6 +349,35 @@ impl ClassiEta {
       return ClassiEta::CL4;
     } else {
       return ClassiEta::CL5;
+    }
+  }
+}
+
+pub struct EsemplariPerCattura {
+  pub specie: SpecieNISECI,
+  pub mappa: HashMap<u8, u32> // la key è il numero del passaggio
+}
+
+impl EsemplariPerCattura {
+  pub fn new_prevalorized(numero_passaggio: u8, specie: &SpecieNISECI) -> EsemplariPerCattura {
+    let mut mappa: HashMap<u8, u32> = HashMap::new();
+    mappa.insert(numero_passaggio, 1);
+
+    EsemplariPerCattura {
+      specie: specie.clone(),
+      mappa: mappa
+    }
+  }
+
+  pub fn fill_passaggio(&mut self, numero_passaggio: u8) -> () {
+    match self.mappa.entry(numero_passaggio) {
+        Entry::Occupied(occupied) => {
+          let numero_esemplari = occupied.get() + 1;
+          self.mappa.insert(numero_passaggio, numero_esemplari);
+        },
+        Entry::Vacant(_) => {
+          self.mappa.insert(numero_passaggio, 1);
+        }
     }
   }
 }
