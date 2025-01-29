@@ -450,6 +450,8 @@ pub struct SelezioneInfoAggiuntiveView {
     textbox_fontecomunit_niseci_buffer: [u8; 64],
     textbox_protocollocomunit_niseci_edit_mode: bool,
     textbox_protocollocomunit_niseci_buffer: [u8; 64],
+    listview_idroecoregione_niseci_value: i32,
+    listview_idroecoregione_niseci_scroll_value: i32,
     textbox_bacino_niseci_edit_mode: bool,
     textbox_bacino_niseci_buffer: [u8; 64],
 }
@@ -512,6 +514,8 @@ impl SelezioneInfoAggiuntiveView {
             textbox_fontecomunit_niseci_buffer: fonte_comunit_buffer,
             textbox_protocollocomunit_niseci_edit_mode: false,
             textbox_protocollocomunit_niseci_buffer: protocollo_comunit_buffer,
+            listview_idroecoregione_niseci_value: 0,
+            listview_idroecoregione_niseci_scroll_value: 0,
             textbox_bacino_niseci_edit_mode: false,
             textbox_bacino_niseci_buffer: bacino_buffer,
         }
@@ -743,7 +747,7 @@ impl SelezioneInfoAggiuntiveView {
         let column_2_groupbox_niseci_width = column_width;
         let column_2_groupbox_niseci_x = column_2_x;
         let column_2_groupbox_niseci_y = column_2_y;
-        let column_2_groupbox_niseci_height = column_2_height - column_2_groupbox_y_padding - y_padding*4;
+        let column_2_groupbox_niseci_height = column_2_height - column_2_groupbox_y_padding - y_padding;
         let column_2_groupbox_hfbi_width = column_2_groupbox_niseci_width;
         let column_2_groupbox_hfbi_x = column_2_groupbox_niseci_x;
         let column_2_groupbox_hfbi_y = column_2_groupbox_niseci_y + column_2_groupbox_niseci_height + column_2_groupbox_y_padding;
@@ -754,7 +758,7 @@ impl SelezioneInfoAggiuntiveView {
         let column_2_groupbox_comunit_x = column_2_groupbox_niseci_x + column_2_comunit_x_padding;
         let column_2_groupbox_comunit_y = column_2_groupbox_niseci_y + column_2_comunit_y_padding;
         let column_2_groupbox_comunit_width = column_2_groupbox_niseci_width - column_2_comunit_x_padding*2;
-        let column_2_groupbox_comunit_height = column_1_labels_height*3 + column_1_fields_y_spacing*4;
+        let column_2_groupbox_comunit_height = column_1_labels_height*6 + column_1_fields_y_spacing*5;
 
         d.gui_group_box(
             rrect(
@@ -795,7 +799,8 @@ impl SelezioneInfoAggiuntiveView {
         let column_2_label_tipo_comunit_y = column_2_groupbox_comunit_y + column_2_groupbox_fields_y_spacing;
         let column_2_label_fonte_comunit_y = column_2_label_tipo_comunit_y + column_2_labels_height + column_2_groupbox_fields_y_spacing;
         let column_2_label_protocollo_comunit_y = column_2_label_fonte_comunit_y + column_2_labels_height + column_2_groupbox_fields_y_spacing;
-        let column_2_label_bacino_y = column_2_groupbox_comunit_y + column_2_groupbox_comunit_height + column_2_groupbox_fields_y_spacing*2;
+        let column_2_label_idroecoregione_y = column_2_label_protocollo_comunit_y + column_2_labels_height + column_2_groupbox_fields_y_spacing;
+        let column_2_label_bacino_y = column_2_groupbox_comunit_y + column_2_groupbox_comunit_height + column_2_groupbox_fields_y_spacing;
 
         d.gui_label(
             rrect(
@@ -825,6 +830,16 @@ impl SelezioneInfoAggiuntiveView {
                 column_2_labels_height
             ),
             Some(rstr!("Protocollo"))
+        );
+
+        d.gui_label(
+            rrect(
+                column_2_groupbox_labels_x,
+                column_2_label_idroecoregione_y,
+                column_2_groupbox_labels_width,
+                column_2_labels_height
+            ),
+            Some(rstr!("Idroecoregione"))
         );
 
         d.gui_label(
@@ -866,6 +881,26 @@ impl SelezioneInfoAggiuntiveView {
         ) {
             self.textbox_protocollocomunit_niseci_edit_mode = !self.textbox_protocollocomunit_niseci_edit_mode;
         }
+
+        let mut _listview_idroecoregione_pick = -1;
+        _listview_idroecoregione_pick = d.gui_list_view(
+            rrect(
+                column_2_groupbox_boxes_x,
+                column_2_label_idroecoregione_y,
+                column_2_groupbox_boxes_width,
+                column_2_groupbox_boxes_height*3
+            ),
+            Some(rstr!(
+                "AlpiCentroOrientali;AlpiMediterranee;AlpiMeridionali;\
+                AlpiOccidentali;AppenninoCentrale;AppenninoMeridionale;\
+                AppenninoPiemontese;AppenninoSettentrionale;BasilicataTavoliere;\
+                BassoLazio;CalabriaNebrodi;Carso;CostaAdriatica;Monferrato;\
+                PianuraPadana;PrealpiDolomiti;PugliaGargano;RomaViterbeseVesuvio;\
+                Sardegna;Sicilia;Toscana"
+            )),
+            &mut self.listview_idroecoregione_niseci_scroll_value,
+            &mut self.listview_idroecoregione_niseci_value,
+        );
 
         if d.gui_text_box(
             rrect(
