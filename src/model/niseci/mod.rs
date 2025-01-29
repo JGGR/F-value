@@ -212,6 +212,12 @@ pub struct ComunitaNISECI {
 }
 
 #[derive(Clone)]
+pub enum AreaNISECI {
+    Alpina,
+    Mediterranea
+}
+
+#[derive(Clone)]
 pub struct AnagraficaNISECI {
   pub comunita: ComunitaNISECI,
   pub codice_stazione: u32,
@@ -452,10 +458,10 @@ impl InfoPopolazioniNISECI {
 
   pub fn get_info_pop(map: &HashMap<String, ClassiEtaSpecieNISECI>) -> Result<InfoPopolazioniNISECI, Vec<String>> {
     let mut errors: Vec<String> = Vec::with_capacity(map.len()); // prenoto ora e poi restringo dopo
-  
+
     let mut info_pop = InfoPopolazioniNISECI::new();
     info_pop.tot_species = map.len();
-    
+
     for (_key, classe) in map {
       match classe.calculate_struttura_popolazione() {
         Ok(popolazione) => {
@@ -475,12 +481,12 @@ impl InfoPopolazioniNISECI {
         Err(error) => errors.push(error),
       }
     }
-  
+
     if errors.len() > 0 {
       errors.shrink_to_fit();
       return Err(errors);
     }
-  
+
     Ok(info_pop)
   }
 }
@@ -522,7 +528,7 @@ impl InfoPopolazioniAlieneNISECI {
       Ok(info) => info,
       Err(err) => return Err(err),
     };
-    
+
     let info_pop_aliene = InfoPopolazioniAlieneNISECI {
       tipo_1,
       tipo_2,
@@ -530,7 +536,7 @@ impl InfoPopolazioniAlieneNISECI {
       tot_specie_aliene: classi_eta.tot_specie_aliene,
       tot_specie_autoctone: classi_eta.tot_specie_autoctone
     };
-    
+
     Ok(info_pop_aliene)
   }
 

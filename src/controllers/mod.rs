@@ -426,6 +426,12 @@ impl InfoAggiuntiveController {
         let state = GLOBAL_STATE.lock().unwrap();
         return state.infoaggiuntive_model.clone();
     }
+
+    pub fn get_current_index(&self) -> Option<Indice> {
+        let state = GLOBAL_STATE.lock().unwrap();
+        return state.indice_model.get_selected_index();
+    }
+
     pub fn add_console_message(&self, msg: String) {
         let mut state = GLOBAL_STATE.lock().unwrap();
 

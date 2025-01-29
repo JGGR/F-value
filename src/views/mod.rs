@@ -452,6 +452,7 @@ pub struct SelezioneInfoAggiuntiveView {
     textbox_protocollocomunit_niseci_buffer: [u8; 64],
     listview_idroecoregione_niseci_value: i32,
     listview_idroecoregione_niseci_scroll_value: i32,
+    combobox_area_niseci_value: i32,
     textbox_bacino_niseci_edit_mode: bool,
     textbox_bacino_niseci_buffer: [u8; 64],
 }
@@ -516,6 +517,7 @@ impl SelezioneInfoAggiuntiveView {
             textbox_protocollocomunit_niseci_buffer: protocollo_comunit_buffer,
             listview_idroecoregione_niseci_value: 0,
             listview_idroecoregione_niseci_scroll_value: 0,
+            combobox_area_niseci_value: 0,
             textbox_bacino_niseci_edit_mode: false,
             textbox_bacino_niseci_buffer: bacino_buffer,
         }
@@ -527,6 +529,14 @@ impl SelezioneInfoAggiuntiveView {
 
         let state = controller.get_state();
         let frame_counter = state.get_frame_counter();
+        let current_index = match controller.get_current_index() {
+            Some(index) => index,
+            None => {
+                eprintln!("InfoAggiuntiveView: Per qualche assurdo motivo l'indice corrente non è validato. Uso NISECI.");
+                Indice::NISECI
+            }
+        };
+
         let groupbox_width = propwidth(&d, 600);
         let groupbox_x = d.get_screen_width() /2 - groupbox_width /2;
         let groupbox_height = propheight(&d, 450);
@@ -553,8 +563,8 @@ impl SelezioneInfoAggiuntiveView {
         let column_2_y = column_1_y;
         // 1 padding on top, 2 below
         let column_1_height = groupbox_height - y_padding*3;
-        // 1 padding on top, 1 below
-        let column_2_height = groupbox_height - y_padding*2;
+        // 1 padding on top, 0 below
+        let column_2_height = groupbox_height - y_padding;
 
         // Column 1
 
@@ -747,48 +757,56 @@ impl SelezioneInfoAggiuntiveView {
         let column_2_groupbox_niseci_width = column_width;
         let column_2_groupbox_niseci_x = column_2_x;
         let column_2_groupbox_niseci_y = column_2_y;
-        let column_2_groupbox_niseci_height = column_2_height - column_2_groupbox_y_padding - y_padding;
+        let column_2_groupbox_niseci_height = column_2_height - column_2_groupbox_y_padding/2;// - y_padding;
         let column_2_groupbox_hfbi_width = column_2_groupbox_niseci_width;
         let column_2_groupbox_hfbi_x = column_2_groupbox_niseci_x;
-        let column_2_groupbox_hfbi_y = column_2_groupbox_niseci_y + column_2_groupbox_niseci_height + column_2_groupbox_y_padding;
-        let column_2_groupbox_hfbi_height = column_2_height - column_2_groupbox_niseci_height;
+        //let column_2_groupbox_hfbi_y = column_2_groupbox_niseci_y + column_2_groupbox_niseci_height + column_2_groupbox_y_padding;
+        //let column_2_groupbox_hfbi_height = column_2_height - column_2_groupbox_niseci_height;
+        let column_2_groupbox_hfbi_y = column_2_groupbox_niseci_y;
+        let column_2_groupbox_hfbi_height = column_2_groupbox_niseci_height - column_2_groupbox_y_padding - y_padding;
 
         let column_2_comunit_x_padding = x_padding/4;
         let column_2_comunit_y_padding = column_2_groupbox_y_padding;
         let column_2_groupbox_comunit_x = column_2_groupbox_niseci_x + column_2_comunit_x_padding;
         let column_2_groupbox_comunit_y = column_2_groupbox_niseci_y + column_2_comunit_y_padding;
         let column_2_groupbox_comunit_width = column_2_groupbox_niseci_width - column_2_comunit_x_padding*2;
-        let column_2_groupbox_comunit_height = column_1_labels_height*6 + column_1_fields_y_spacing*5;
+        let column_2_groupbox_comunit_height = column_1_labels_height*3 + column_1_fields_y_spacing*4;
 
-        d.gui_group_box(
-            rrect(
-                column_2_groupbox_niseci_x,
-                column_2_groupbox_niseci_y,
-                column_2_groupbox_niseci_width,
-                column_2_groupbox_niseci_height
-            ),
-            Some(rstr!("NISECI"))
-        );
+        match current_index {
+            Indice::NISECI => {
+                d.gui_group_box(
+                    rrect(
+                        column_2_groupbox_niseci_x,
+                        column_2_groupbox_niseci_y,
+                        column_2_groupbox_niseci_width,
+                        column_2_groupbox_niseci_height
+                    ),
+                    Some(rstr!("NISECI"))
+                );
 
-        d.gui_group_box(
-            rrect(
-                column_2_groupbox_comunit_x,
-                column_2_groupbox_comunit_y,
-                column_2_groupbox_comunit_width,
-                column_2_groupbox_comunit_height
-            ),
-            Some(rstr!("Comunità NISECI"))
-        );
+                d.gui_group_box(
+                    rrect(
+                        column_2_groupbox_comunit_x,
+                        column_2_groupbox_comunit_y,
+                        column_2_groupbox_comunit_width,
+                        column_2_groupbox_comunit_height
+                    ),
+                    Some(rstr!("Comunità NISECI"))
+                );
 
-        d.gui_group_box(
-            rrect(
-                column_2_groupbox_hfbi_x,
-                column_2_groupbox_hfbi_y,
-                column_2_groupbox_hfbi_width,
-                column_2_groupbox_hfbi_height
-            ),
-            Some(rstr!("HFBI"))
-        );
+            }
+            Indice::HFBI => {
+                d.gui_group_box(
+                    rrect(
+                        column_2_groupbox_hfbi_x,
+                        column_2_groupbox_hfbi_y,
+                        column_2_groupbox_hfbi_width,
+                        column_2_groupbox_hfbi_height
+                    ),
+                    Some(rstr!("HFBI"))
+                );
+            }
+        }
 
         let column_2_groupbox_labels_x_spacing = column_2_comunit_x_padding;
         let column_2_groupbox_labels_width = (column_2_groupbox_comunit_width - column_2_groupbox_labels_x_spacing*2) / 2;
@@ -796,149 +814,177 @@ impl SelezioneInfoAggiuntiveView {
         let column_2_groupbox_labels_x = column_2_groupbox_comunit_x + column_2_groupbox_labels_x_spacing;
         let column_2_labels_height = column_1_labels_height;
 
-        let column_2_label_tipo_comunit_y = column_2_groupbox_comunit_y + column_2_groupbox_fields_y_spacing;
-        let column_2_label_fonte_comunit_y = column_2_label_tipo_comunit_y + column_2_labels_height + column_2_groupbox_fields_y_spacing;
-        let column_2_label_protocollo_comunit_y = column_2_label_fonte_comunit_y + column_2_labels_height + column_2_groupbox_fields_y_spacing;
-        let column_2_label_idroecoregione_y = column_2_label_protocollo_comunit_y + column_2_labels_height + column_2_groupbox_fields_y_spacing;
-        let column_2_label_bacino_y = column_2_groupbox_comunit_y + column_2_groupbox_comunit_height + column_2_groupbox_fields_y_spacing;
+        match current_index {
+            Indice::NISECI => {
+                let column_2_label_tipo_comunit_y = column_2_groupbox_comunit_y + column_2_groupbox_fields_y_spacing;
+                let column_2_label_fonte_comunit_y = column_2_label_tipo_comunit_y + column_2_labels_height + column_2_groupbox_fields_y_spacing;
+                let column_2_label_protocollo_comunit_y = column_2_label_fonte_comunit_y + column_2_labels_height + column_2_groupbox_fields_y_spacing;
+                let column_2_label_idroecoregione_y = column_2_groupbox_comunit_y + column_2_groupbox_comunit_height + column_2_groupbox_fields_y_spacing;
+                let column_2_label_area_niseci_y = column_2_label_idroecoregione_y + column_2_labels_height*4 + column_2_groupbox_fields_y_spacing;
+                let column_2_label_bacino_y = column_2_label_area_niseci_y + column_2_labels_height + column_2_groupbox_fields_y_spacing;
 
-        d.gui_label(
-            rrect(
-                column_2_groupbox_labels_x,
-                column_2_label_tipo_comunit_y,
-                column_2_groupbox_labels_width,
-                column_2_labels_height
-            ),
-            Some(rstr!("Tipo"))
-        );
+                d.gui_label(
+                    rrect(
+                        column_2_groupbox_labels_x,
+                        column_2_label_tipo_comunit_y,
+                        column_2_groupbox_labels_width,
+                        column_2_labels_height
+                    ),
+                    Some(rstr!("Tipo"))
+                );
 
-        d.gui_label(
-            rrect(
-                column_2_groupbox_labels_x,
-                column_2_label_fonte_comunit_y,
-                column_2_groupbox_labels_width,
-                column_2_labels_height
-            ),
-            Some(rstr!("Fonte"))
-        );
+                d.gui_label(
+                    rrect(
+                        column_2_groupbox_labels_x,
+                        column_2_label_fonte_comunit_y,
+                        column_2_groupbox_labels_width,
+                        column_2_labels_height
+                    ),
+                    Some(rstr!("Fonte"))
+                );
 
-        d.gui_label(
-            rrect(
-                column_2_groupbox_labels_x,
-                column_2_label_protocollo_comunit_y,
-                column_2_groupbox_labels_width,
-                column_2_labels_height
-            ),
-            Some(rstr!("Protocollo"))
-        );
+                d.gui_label(
+                    rrect(
+                        column_2_groupbox_labels_x,
+                        column_2_label_protocollo_comunit_y,
+                        column_2_groupbox_labels_width,
+                        column_2_labels_height
+                    ),
+                    Some(rstr!("Protocollo"))
+                );
 
-        d.gui_label(
-            rrect(
-                column_2_groupbox_labels_x,
-                column_2_label_idroecoregione_y,
-                column_2_groupbox_labels_width,
-                column_2_labels_height
-            ),
-            Some(rstr!("Idroecoregione"))
-        );
+                d.gui_label(
+                    rrect(
+                        column_2_groupbox_labels_x,
+                        column_2_label_idroecoregione_y,
+                        column_2_groupbox_labels_width,
+                        column_2_labels_height
+                    ),
+                    Some(rstr!("Idroecoregione"))
+                );
 
-        d.gui_label(
-            rrect(
-                column_2_groupbox_labels_x,
-                column_2_label_bacino_y,
-                column_2_groupbox_labels_width,
-                column_2_labels_height
-            ),
-            Some(rstr!("Bacino"))
-        );
+                d.gui_label(
+                    rrect(
+                        column_2_groupbox_labels_x,
+                        column_2_label_area_niseci_y,
+                        column_2_groupbox_labels_width,
+                        column_2_labels_height
+                    ),
+                    Some(rstr!("Area"))
+                );
 
-        let column_2_groupbox_boxes_width = column_2_groupbox_labels_width;
-        let column_2_groupbox_boxes_height = column_2_labels_height;
-        let column_2_groupbox_boxes_x = column_2_groupbox_labels_x + column_2_groupbox_labels_width;
 
-        if d.gui_text_box(
-            rrect(
-                column_2_groupbox_boxes_x,
-                column_2_label_fonte_comunit_y,
-                column_2_groupbox_boxes_width,
-                column_2_groupbox_boxes_height
-            ),
-            &mut self.textbox_fontecomunit_niseci_buffer,
-            self.textbox_fontecomunit_niseci_edit_mode
-        ) {
-            self.textbox_fontecomunit_niseci_edit_mode = !self.textbox_fontecomunit_niseci_edit_mode;
+                d.gui_label(
+                    rrect(
+                        column_2_groupbox_labels_x,
+                        column_2_label_bacino_y,
+                        column_2_groupbox_labels_width,
+                        column_2_labels_height
+                    ),
+                    Some(rstr!("Bacino"))
+                );
+
+                let column_2_groupbox_boxes_width = column_2_groupbox_labels_width;
+                let column_2_groupbox_boxes_height = column_2_labels_height;
+                let column_2_groupbox_boxes_x = column_2_groupbox_labels_x + column_2_groupbox_labels_width;
+
+                if d.gui_text_box(
+                    rrect(
+                        column_2_groupbox_boxes_x,
+                        column_2_label_fonte_comunit_y,
+                        column_2_groupbox_boxes_width,
+                        column_2_groupbox_boxes_height
+                    ),
+                    &mut self.textbox_fontecomunit_niseci_buffer,
+                    self.textbox_fontecomunit_niseci_edit_mode
+                ) {
+                    self.textbox_fontecomunit_niseci_edit_mode = !self.textbox_fontecomunit_niseci_edit_mode;
+                }
+
+                if d.gui_text_box(
+                    rrect(
+                        column_2_groupbox_boxes_x,
+                        column_2_label_protocollo_comunit_y,
+                        column_2_groupbox_boxes_width,
+                        column_2_groupbox_boxes_height
+                    ),
+                    &mut self.textbox_protocollocomunit_niseci_buffer,
+                    self.textbox_protocollocomunit_niseci_edit_mode
+                ) {
+                    self.textbox_protocollocomunit_niseci_edit_mode = !self.textbox_protocollocomunit_niseci_edit_mode;
+                }
+
+                let mut _listview_idroecoregione_pick = -1;
+                _listview_idroecoregione_pick = d.gui_list_view(
+                    rrect(
+                        column_2_groupbox_boxes_x,
+                        column_2_label_idroecoregione_y,
+                        column_2_groupbox_boxes_width,
+                        column_2_groupbox_boxes_height*4
+                    ),
+                    Some(rstr!(
+                        "AlpiCentroOrientali;AlpiMediterranee;AlpiMeridionali;\
+                        AlpiOccidentali;AppenninoCentrale;AppenninoMeridionale;\
+                        AppenninoPiemontese;AppenninoSettentrionale;BasilicataTavoliere;\
+                        BassoLazio;CalabriaNebrodi;Carso;CostaAdriatica;Monferrato;\
+                        PianuraPadana;PrealpiDolomiti;PugliaGargano;RomaViterbeseVesuvio;\
+                        Sardegna;Sicilia;Toscana"
+                    )),
+                    &mut self.listview_idroecoregione_niseci_scroll_value,
+                    &mut self.listview_idroecoregione_niseci_value,
+                );
+                let mut _comboBoxPick = -1;
+                _comboBoxPick = d.gui_combo_box(
+                    rrect(
+                        column_2_groupbox_boxes_x,
+                        column_2_label_area_niseci_y,
+                        column_2_groupbox_boxes_width,
+                        column_2_groupbox_boxes_height
+                    ),
+                    Some(rstr!("Alpina;Mediterranea")),
+                    &mut self.combobox_area_niseci_value,
+                );
+
+                if d.gui_text_box(
+                    rrect(
+                        column_2_groupbox_boxes_x,
+                        column_2_label_bacino_y,
+                        column_2_groupbox_boxes_width,
+                        column_2_groupbox_boxes_height
+                    ),
+                    &mut self.textbox_bacino_niseci_buffer,
+                    self.textbox_bacino_niseci_edit_mode
+                ) {
+                    self.textbox_bacino_niseci_edit_mode = !self.textbox_bacino_niseci_edit_mode;
+                }
+
+                if d.gui_dropdown_box(
+                    rrect(
+                        column_2_groupbox_boxes_x,
+                        column_2_label_tipo_comunit_y,
+                        column_2_groupbox_boxes_width,
+                        column_2_groupbox_boxes_height,
+                    ),
+                    Some(rstr!("Redatta;Fonti;DM260/2010;Mase")),
+                    &mut self.dropdownbox_tipocomunit_niseci_value,
+                    self.dropdownbox_tipocomunit_niseci_edit_mode,
+                ) {
+                    self.dropdownbox_tipocomunit_niseci_edit_mode = !self.dropdownbox_tipocomunit_niseci_edit_mode;
+                }
+            }
+            Indice::HFBI => {
+                let rainbow_speed = 0.03;
+                let todo_hfbi_font_scale = 2;
+                let todo_hfbi_font_height = main_state.current_font_height * todo_hfbi_font_scale;
+
+                let todo_hfbi_txt = "TODO: HFBI controls";
+                let todo_hfbi_txt_bounds = main_state.current_font.measure_text(todo_hfbi_txt, todo_hfbi_font_height as f32, main_state.default_txt_spacing as f32);
+                let todo_hfbi_txt_x = column_2_groupbox_hfbi_x + (column_2_groupbox_hfbi_width / 2) - (todo_hfbi_txt_bounds.x as i32 / 2);
+                let todo_hfbi_txt_y = column_2_groupbox_hfbi_y + (column_2_groupbox_hfbi_height / 2) - (todo_hfbi_txt_bounds.y as i32 / 2);
+
+                draw_rainbow_text(d, todo_hfbi_txt_x, todo_hfbi_txt_y, "TODO: HFBI controls", frame_counter, rainbow_speed, &main_state.current_font, main_state.default_txt_spacing, main_state.current_font_height, todo_hfbi_font_scale);
+            }
         }
-
-        if d.gui_text_box(
-            rrect(
-                column_2_groupbox_boxes_x,
-                column_2_label_protocollo_comunit_y,
-                column_2_groupbox_boxes_width,
-                column_2_groupbox_boxes_height
-            ),
-            &mut self.textbox_protocollocomunit_niseci_buffer,
-            self.textbox_protocollocomunit_niseci_edit_mode
-        ) {
-            self.textbox_protocollocomunit_niseci_edit_mode = !self.textbox_protocollocomunit_niseci_edit_mode;
-        }
-
-        let mut _listview_idroecoregione_pick = -1;
-        _listview_idroecoregione_pick = d.gui_list_view(
-            rrect(
-                column_2_groupbox_boxes_x,
-                column_2_label_idroecoregione_y,
-                column_2_groupbox_boxes_width,
-                column_2_groupbox_boxes_height*3
-            ),
-            Some(rstr!(
-                "AlpiCentroOrientali;AlpiMediterranee;AlpiMeridionali;\
-                AlpiOccidentali;AppenninoCentrale;AppenninoMeridionale;\
-                AppenninoPiemontese;AppenninoSettentrionale;BasilicataTavoliere;\
-                BassoLazio;CalabriaNebrodi;Carso;CostaAdriatica;Monferrato;\
-                PianuraPadana;PrealpiDolomiti;PugliaGargano;RomaViterbeseVesuvio;\
-                Sardegna;Sicilia;Toscana"
-            )),
-            &mut self.listview_idroecoregione_niseci_scroll_value,
-            &mut self.listview_idroecoregione_niseci_value,
-        );
-
-        if d.gui_text_box(
-            rrect(
-                column_2_groupbox_boxes_x,
-                column_2_label_bacino_y,
-                column_2_groupbox_boxes_width,
-                column_2_groupbox_boxes_height
-            ),
-            &mut self.textbox_bacino_niseci_buffer,
-            self.textbox_bacino_niseci_edit_mode
-        ) {
-            self.textbox_bacino_niseci_edit_mode = !self.textbox_bacino_niseci_edit_mode;
-        }
-
-        if d.gui_dropdown_box(
-            rrect(
-                column_2_groupbox_boxes_x,
-                column_2_label_tipo_comunit_y,
-                column_2_groupbox_boxes_width,
-                column_2_groupbox_boxes_height,
-            ),
-            Some(rstr!("Redatta;Fonti;DM260/2010;Mase")),
-            &mut self.dropdownbox_tipocomunit_niseci_value,
-            self.dropdownbox_tipocomunit_niseci_edit_mode,
-        ) {
-            self.dropdownbox_tipocomunit_niseci_edit_mode = !self.dropdownbox_tipocomunit_niseci_edit_mode;
-        }
-
-        let rainbow_speed = 0.03;
-        let todo_hfbi_font_scale = 2;
-        let todo_hfbi_font_height = main_state.current_font_height * todo_hfbi_font_scale;
-
-        let todo_hfbi_txt = "TODO: HFBI controls";
-        let todo_hfbi_txt_bounds = main_state.current_font.measure_text(todo_hfbi_txt, todo_hfbi_font_height as f32, main_state.default_txt_spacing as f32);
-        let todo_hfbi_txt_x = column_2_groupbox_hfbi_x + (column_2_groupbox_hfbi_width / 2) - (todo_hfbi_txt_bounds.x as i32 / 2);
-        let todo_hfbi_txt_y = column_2_groupbox_hfbi_y + (column_2_groupbox_hfbi_height / 2) - (todo_hfbi_txt_bounds.y as i32 / 2);
-
-        draw_rainbow_text(d, todo_hfbi_txt_x, todo_hfbi_txt_y, "TODO: HFBI controls", frame_counter, rainbow_speed, &main_state.current_font, main_state.default_txt_spacing, main_state.current_font_height, todo_hfbi_font_scale);
 
     }
 }
