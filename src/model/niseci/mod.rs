@@ -22,6 +22,8 @@ pub struct SpecieNISECI {
   pub ad_juv_soglia2: f32,
   pub ad_juv_soglia3: f32,
   pub ad_juv_soglia4: f32,
+  pub dens_soglia1: f32,
+  pub dens_soglia2: f32,
 }
 
 impl fmt::Display for SpecieNISECI {
@@ -48,7 +50,8 @@ impl SpecieNISECI {
       ad_juv_soglia2: 0.2,
       ad_juv_soglia3: 0.3,
       ad_juv_soglia4: 0.4,
-
+      dens_soglia1: 0.5,
+      dens_soglia2: 0.9,
     }
   }
 }

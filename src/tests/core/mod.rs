@@ -317,6 +317,8 @@ fn test_valid_recordcsv_campionamento_niseci() {
         ad_juv_soglia2: 0.0,
         ad_juv_soglia3: 0.0,
         ad_juv_soglia4: 0.0,
+        dens_soglia1: 1.0,
+        dens_soglia2: 2.0,
     };
 
     let riferimento_specie = vec![specie_1];

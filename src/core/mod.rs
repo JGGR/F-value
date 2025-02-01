@@ -526,6 +526,12 @@ pub fn parse_recordcsv_riferimento_niseci(records: Vec<RecordCsvRiferimentoNISEC
             continue;
         }
         
+        if r.dens_soglia1 >= r.dens_soglia2 && specie_attesa {
+            let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: dens_soglia1 maggiore di dens_soglia2 per una specie attesa") };
+            errors.push(err);
+            continue;
+        }
+        
         if !check_soglie_cl(&r) {
             let err = RecordCsvRiferimentoNISECIError::SoglieCLNonCrescenti {
                 msg: format!("Record {idx}: soglie CL non crescenti" )
@@ -555,6 +561,8 @@ pub fn parse_recordcsv_riferimento_niseci(records: Vec<RecordCsvRiferimentoNISEC
             ad_juv_soglia2: r.ad_juv_soglia2,
             ad_juv_soglia3: r.ad_juv_soglia3,
             ad_juv_soglia4: r.ad_juv_soglia4,
+            dens_soglia1: r.dens_soglia1,
+            dens_soglia2: r.dens_soglia2,
         };
         specie.push(specie_rec);
         used_id_specie.push(id);

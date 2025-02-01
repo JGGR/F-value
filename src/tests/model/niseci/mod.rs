@@ -17,6 +17,8 @@ fn test_calcolo_pesci_per_passaggio() {
         ad_juv_soglia2: 2.0,
         ad_juv_soglia3: 3.0,
         ad_juv_soglia4: 4.0,
+        dens_soglia1: 1.0,
+        dens_soglia2: 2.0,
     };
 
     let record_1 = RecordNISECI {

@@ -17,6 +17,8 @@ pub fn create_dummy_riferimento() -> RiferimentoNISECI {
     ad_juv_soglia2: 2.0,
     ad_juv_soglia3: 3.0,
     ad_juv_soglia4: 4.0,
+    dens_soglia1: 1.0,
+    dens_soglia2: 2.0,
   };
   let importante_2 = SpecieNISECI {
     id: 2.to_string(),
@@ -32,6 +34,8 @@ pub fn create_dummy_riferimento() -> RiferimentoNISECI {
     ad_juv_soglia2: 2.0,
     ad_juv_soglia3: 3.0,
     ad_juv_soglia4: 4.0,
+    dens_soglia1: 1.0,
+    dens_soglia2: 2.0,
   };
   let importante_3 = SpecieNISECI {
     id: 3.to_string(),
@@ -47,6 +51,8 @@ pub fn create_dummy_riferimento() -> RiferimentoNISECI {
     ad_juv_soglia2: 2.0,
     ad_juv_soglia3: 3.0,
     ad_juv_soglia4: 4.0,
+    dens_soglia1: 1.0,
+    dens_soglia2: 2.0,
   };
   let normale_1 = SpecieNISECI {
     id: 4.to_string(),
@@ -62,6 +68,8 @@ pub fn create_dummy_riferimento() -> RiferimentoNISECI {
     ad_juv_soglia2: 2.0,
     ad_juv_soglia3: 3.0,
     ad_juv_soglia4: 4.0,
+    dens_soglia1: 1.0,
+    dens_soglia2: 2.0,
   };
   let normale_2 = SpecieNISECI {
     id: 5.to_string(),
@@ -77,6 +85,8 @@ pub fn create_dummy_riferimento() -> RiferimentoNISECI {
     ad_juv_soglia2: 2.0,
     ad_juv_soglia3: 3.0,
     ad_juv_soglia4: 4.0,
+    dens_soglia1: 1.0,
+    dens_soglia2: 2.0,
   };
   let alloctono_1 = SpecieNISECI {
     id: 6.to_string(),
@@ -92,6 +102,8 @@ pub fn create_dummy_riferimento() -> RiferimentoNISECI {
     ad_juv_soglia2: 2.0,
     ad_juv_soglia3: 3.0,
     ad_juv_soglia4: 4.0,
+    dens_soglia1: 1.0,
+    dens_soglia2: 2.0,
   };
   let alloctono_2 = SpecieNISECI {
     id: 7.to_string(),
@@ -107,6 +119,8 @@ pub fn create_dummy_riferimento() -> RiferimentoNISECI {
     ad_juv_soglia2: 2.0,
     ad_juv_soglia3: 3.0,
     ad_juv_soglia4: 4.0,
+    dens_soglia1: 1.0,
+    dens_soglia2: 2.0,
   };
   let inatteso_1 = SpecieNISECI {
     id: 7.to_string(),
@@ -122,6 +136,8 @@ pub fn create_dummy_riferimento() -> RiferimentoNISECI {
     ad_juv_soglia2: 2.0,
     ad_juv_soglia3: 3.0,
     ad_juv_soglia4: 4.0,
+    dens_soglia1: 1.0,
+    dens_soglia2: 2.0,
   };
   let inatteso_2 = SpecieNISECI {
     id: 8.to_string(),
@@ -137,6 +153,8 @@ pub fn create_dummy_riferimento() -> RiferimentoNISECI {
     ad_juv_soglia2: 2.0,
     ad_juv_soglia3: 3.0,
     ad_juv_soglia4: 4.0,
+    dens_soglia1: 1.0,
+    dens_soglia2: 2.0,
   };
 
   let mut elenco_specie = Vec::with_capacity(9);
@@ -176,6 +194,8 @@ pub fn create_dummy_campionamento_full() -> CampionamentoNISECI {
     ad_juv_soglia2: 2.0,
     ad_juv_soglia3: 3.0,
     ad_juv_soglia4: 4.0,
+    dens_soglia1: 1.0,
+    dens_soglia2: 2.0,
   };
   let importante_2 = SpecieNISECI {
     id: 2.to_string(),
@@ -191,6 +211,8 @@ pub fn create_dummy_campionamento_full() -> CampionamentoNISECI {
     ad_juv_soglia2: 2.0,
     ad_juv_soglia3: 3.0,
     ad_juv_soglia4: 4.0,
+    dens_soglia1: 1.0,
+    dens_soglia2: 2.0,
   };
   let importante_3 = SpecieNISECI {
     id: 3.to_string(),
@@ -206,6 +228,8 @@ pub fn create_dummy_campionamento_full() -> CampionamentoNISECI {
     ad_juv_soglia2: 2.0,
     ad_juv_soglia3: 3.0,
     ad_juv_soglia4: 4.0,
+    dens_soglia1: 1.0,
+    dens_soglia2: 2.0,
   };
   let normale_1 = SpecieNISECI {
     id: 4.to_string(),
@@ -221,6 +245,8 @@ pub fn create_dummy_campionamento_full() -> CampionamentoNISECI {
     ad_juv_soglia2: 2.0,
     ad_juv_soglia3: 3.0,
     ad_juv_soglia4: 4.0,
+    dens_soglia1: 1.0,
+    dens_soglia2: 2.0,
   };
   let normale_2 = SpecieNISECI {
     id: 5.to_string(),
@@ -236,6 +262,8 @@ pub fn create_dummy_campionamento_full() -> CampionamentoNISECI {
     ad_juv_soglia2: 2.0,
     ad_juv_soglia3: 3.0,
     ad_juv_soglia4: 4.0,
+    dens_soglia1: 1.0,
+    dens_soglia2: 2.0,
   };
   let alloctono_1 = SpecieNISECI {
     id: 6.to_string(),
@@ -251,6 +279,8 @@ pub fn create_dummy_campionamento_full() -> CampionamentoNISECI {
     ad_juv_soglia2: 2.0,
     ad_juv_soglia3: 3.0,
     ad_juv_soglia4: 4.0,
+    dens_soglia1: 1.0,
+    dens_soglia2: 2.0,
   };
   let alloctono_2 = SpecieNISECI {
     id: 7.to_string(),
@@ -266,6 +296,8 @@ pub fn create_dummy_campionamento_full() -> CampionamentoNISECI {
     ad_juv_soglia2: 2.0,
     ad_juv_soglia3: 3.0,
     ad_juv_soglia4: 4.0,
+    dens_soglia1: 1.0,
+    dens_soglia2: 2.0,
   };
   let inatteso_1 = SpecieNISECI {
     id: 7.to_string(),
@@ -281,6 +313,8 @@ pub fn create_dummy_campionamento_full() -> CampionamentoNISECI {
     ad_juv_soglia2: 2.0,
     ad_juv_soglia3: 3.0,
     ad_juv_soglia4: 4.0,
+    dens_soglia1: 1.0,
+    dens_soglia2: 2.0,
   };
   let inatteso_2 = SpecieNISECI {
     id: 8.to_string(),
@@ -296,6 +330,8 @@ pub fn create_dummy_campionamento_full() -> CampionamentoNISECI {
     ad_juv_soglia2: 2.0,
     ad_juv_soglia3: 3.0,
     ad_juv_soglia4: 4.0,
+    dens_soglia1: 1.0,
+    dens_soglia2: 2.0,
   };
 
   let record_1 = RecordNISECI {

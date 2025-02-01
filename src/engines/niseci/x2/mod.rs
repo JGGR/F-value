@@ -1,6 +1,6 @@
-use std::{collections::{btree_map::{OccupiedEntry, VacantEntry}, hash_map::Entry, HashMap}, thread::current};
+use std::collections::{hash_map::Entry, HashMap};
 
-use crate::{model::niseci::{AnagraficaNISECI, CampionamentoNISECI, ClassiEta, ClassiEtaSpecieNISECI, EsemplariPerCattura, RecordNISECI, RiferimentoNISECI, SpecieNISECI}, RecordCsvCampionamentoNISECI, RecordCsvRiferimentoNISECI};
+use crate::model::niseci::{AnagraficaNISECI, CampionamentoNISECI, ClassiEtaSpecieNISECI, EsemplariPerCattura, RecordNISECI, RiferimentoNISECI};
 
 use super::linear_regression::{calculate_quantita_stimata, Point};
 
@@ -47,7 +47,7 @@ fn calculate_sommatoria_x2_a(r: &RiferimentoNISECI, c: &CampionamentoNISECI) -> 
   sommatoria_x2_a
 }
 
-fn calculate_sommatoria_x2_b(r: &RiferimentoNISECI, c: &CampionamentoNISECI, anagrafica: &AnagraficaNISECI) {
+fn calculate_sommatoria_x2_b(r: &RiferimentoNISECI, c: &CampionamentoNISECI, anagrafica: &AnagraficaNISECI) -> Result<f32, Vec<String>> {
   let superficie = anagrafica.get_larghezza_media() * anagrafica.get_lunghezza_media();
   
   let mut esemplari_per_cattura_map: HashMap<String, EsemplariPerCattura> = HashMap::with_capacity(10);
@@ -67,11 +67,22 @@ fn calculate_sommatoria_x2_b(r: &RiferimentoNISECI, c: &CampionamentoNISECI, ana
 
   // ora che abbiamo riempito la mappa con tutte le catture, possiamo andare
   // a calcolar x2b per ogni specie
-  // let mut sommatoria_x2_b = 0;
-  // for (_key, catture) in &esemplari_per_cattura_map {
-  //   sommatoria_x2_b += calculate_x2_b(catture);
-  // }
+  let mut sommatoria_x2_b = 0.0;
+  let mut errors: Vec<String> = Vec::with_capacity(esemplari_per_cattura_map.len()); // prenoto ora e poi restringo dopo
+  for (_key, catture) in &esemplari_per_cattura_map {
+    match calculate_x2_b(catture, &superficie) {
+        Ok(x2_b) => sommatoria_x2_b += x2_b,
+        Err(err_mess) => errors.push(err_mess),
+    }
+  }
 
+  // controllo se ci sono errori, se sì allora ritorno gli errori
+  if errors.len() > 0 {
+    errors.shrink_to_fit(); // restringo
+    return Err(errors);
+  }
+
+  Ok(sommatoria_x2_b) // finally
 } 
 
 fn update_classi_eta(cl: &mut ClassiEtaSpecieNISECI, record: &RecordNISECI) -> () {
@@ -110,20 +121,32 @@ fn calculate_x2_a(classe: &ClassiEtaSpecieNISECI) -> f32 {
   return 0.0;
 }
 
-fn calculate_x2_b(e: &EsemplariPerCattura, superficie: f32) -> f32 {
+fn calculate_x2_b(e: &EsemplariPerCattura, superficie: &f32) -> Result<f32, String> {
 
-  let quantita_stimata = get_quantita_stimata(&e.mappa);
+  match get_quantita_stimata(&e.mappa) {
+    Ok(q_stimata) => {
+      // calcolo densita stimata
+      let densita_stimata = q_stimata as f32 / superficie;
 
-  // TODO: scrivere ultimi pasaaggi
+      // trovo ora x2_b
+      if densita_stimata > e.specie.dens_soglia2 {
+        return Ok(1.0);
+      }
+      if densita_stimata > e.specie.dens_soglia1 {
+        return Ok(0.5);
+      }
+      return Ok(0.0);
 
-  0.0
+    },
+    Err(err_message) => return Err(err_message)
+  };
 }
 
 fn get_quantita_stimata(passaggi: &HashMap<u8, u32>) -> Result<i32, String> {
   if passaggi.len() == 1 {
     return Ok(passaggi.get(passaggi.keys().min().unwrap()).unwrap().clone() as i32); // brutto anch qua
   }
-  if (passaggi.len() == 2 && passaggi.contains_key(&1) && passaggi.contains_key(&2)) {
+  if passaggi.len() == 2 && passaggi.contains_key(&1) && passaggi.contains_key(&2) {
     let c1 = passaggi.get(&1).unwrap().clone();
     let c2 = passaggi.get(&2).unwrap().clone();
 
