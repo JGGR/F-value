@@ -1,0 +1,127 @@
+﻿nomeComune;nomeLatino;codiceSpecie;origine;tipoAutoctono;alloNocivita;specieAttesa;clSoglia1;clSoglia2;clSoglia3;clSoglia4;adJuvSoglia1;adJuvSoglia2;adJuvSoglia3;adJuvSoglia4;densSoglia1;densSoglia2
+Alborella;Alburnus alborella ;AL;AUT;2;0;1;45;90;130;150;0,5;0,67;1,5;2;0,052246487;0,086500523
+Alborella meridionale;Alburnus albidus;ALM;AUT;2;0;0;45;90;130;150;0,5;0,67;1,5;2;0.0;0.0
+Anguilla;Anguilla anguilla;AN;AUT;2;0;1;250;450;650;800;0,5;0,67;1,5;2;0,00135;0,001971895
+Barbo canino;Barbus caninus;BC;AUT;2;0;0;45;90;130;150;0,5;0,67;1,5;2;0,003275133;0,003365552
+Barbo comune;Barbus plebejus;BA;AUT;2;0;1;80;170;210;300;0,5;0,67;1,5;2;0,00720942;0,036430372
+Barbo tiberino;Barbus tyberinus;BT;AUT;2;0;0;45;90;130;150;0,5;0,67;1,5;2;0.0;0.0
+Bavosa pavone;Salaria pavo;BAP;AUT;2;0;0;45;90;130;150;0,5;0,67;1,5;2;0.0;0.0
+Boga;Boops boops;BOG;AUT;2;0;0;45;90;130;150;0,5;0,67;1,5;2;0.0;0.0
+Bottatrice;Lota lota;BOT;AUT;2;0;0;250;450;650;800;0,5;0,67;1,5;2;0.0;0.0
+Cagnetta;Salaria fluviatilis;SAL;AUT;2;0;0;45;90;130;150;0,5;0,67;1,5;2;0.0;0.0
+Carpa;Cyprinus carpio;CP;AUT;2;0;0;250;450;650;800;0,5;0,67;1,5;2;0,005879365;0,023445969
+Carpione del Fibreno;Salmo fibreni;CAF;AUT;1;0;0;45;90;130;150;0,5;0,67;1,5;2;0.0;0.0
+Carpione del Garda;Salmo carpio;CAG;AUT;1;0;0;80;170;210;300;0,5;0,67;1,5;2;0.0;0.0
+Cavedano italico;Squalius squalus;CV;AUT;2;0;1;80;170;210;300;0,5;0,67;1,5;2;0,060369024;0,17619738
+Cefalo;Mugil cephalus;MUG;AUT;2;0;0;80;170;210;300;0,5;0,67;1,5;2;0.0;0.0
+Cheppia (Alosa Agone);Alosa fallax;CH;AUT;2;0;0;80;170;210;300;0,5;0,67;1,5;2;0.0;0.0
+Cobite barbatello;Barbatula barbatula;BAR;AUT;2;0;0;35;45;60;80;0,5;0,67;1,5;2;0.0;0.0
+Cobite comune;Cobitis taenia bilineata;CO;AUT;2;0;1;35;45;60;80;0,5;0,67;1,5;2;0,003779876;0,010428674
+Cobite mascherato;Sabanejewia larvata;COM;AUT;2;0;0;35;45;60;80;0,5;0,67;1,5;2;0.0;0.0
+Ghiozzetto cenerino;Pomatoschistus canestrini;GHC;AUT;2;0;0;35;45;60;80;0,5;0,67;1,5;2;0.0;0.0
+Ghiozzetto del Tortonese;Pomatoschistus tortonesei;CHT;AUT;2;0;0;35;45;60;80;0,5;0,67;1,5;2;0.0;0.0
+Ghiozzetto di laguna;Knipowitschia panizzae;GHL;AUT;2;0;0;35;45;60;80;0,5;0,67;1,5;2;0.0;0.0
+Ghiozzetto marmoreggiato;Pomatoschistus marmoratus;GHM;AUT;2;0;0;35;45;60;80;0,5;0,67;1,5;2;0.0;0.0
+Ghiozzetto minuto;Pomatoschistus minutus elongatus;GHE;AUT;2;0;0;35;45;60;80;0,5;0,67;1,5;2;0.0;0.0
+Ghiozzo di ruscello;Gobius nigricans;GHR;AUT;2;0;0;35;45;60;80;0,5;0,67;1,5;2;0.0;0.0
+Ghiozzo Gò;Zosterisessor ophiocephalus;GHG;AUT;2;0;0;35;45;60;80;0,5;0,67;1,5;2;0.0;0.0
+Ghiozzo nero;Gobius niger jozo;GHN;AUT;2;0;0;35;45;60;80;0,5;0,67;1,5;2;0.0;0.0
+Ghiozzo padano;Padogobius martensii;GH;AUT;2;0;1;35;45;60;80;0,5;0,67;1,5;2;0,002610741;0,010291667
+Gobione;Gobio benacensis;GO;AUT;2;0;0;35;45;60;80;0,5;0,67;1,5;2;0,001317622;0,00159442
+Lampreda di fiume;Lampetra fluviatilis;LAF;AUT;2;0;0;80;170;210;300;0,5;0,67;1,5;2;0.0;0.0
+Lampreda di mare;Petromyzon marinus;LAM;AUT;2;0;0;45;90;130;150;0,5;0,67;1,5;2;0.0;0.0
+Lampreda di ruscello;Lampetra planeri;LAR;AUT;2;0;0;45;90;130;150;0,5;0,67;1,5;2;0.0;0.0
+Lampreda padana;Lampetra zanandreai;LAP;AUT;2;0;0;45;90;130;150;0,5;0,67;1,5;2;0.0;0.0
+Lasca;Chondrostoma genei;LA;AUT;2;0;1;45;90;130;150;0,5;0,67;1,5;2;0,007285714;0,046040024
+Latterino (Aterina) di lago;Atherina boyeri;LAT;AUT;2;0;0;35;45;60;80;0,5;0,67;1,5;2;0.0;0.0
+Luccio;Esox lucius;LU;AUT;1;0;0;250;450;650;800;0,5;0,67;1,5;2;0.0;0.0
+Muggine calamita;Liza ramada;CEC;AUT;2;0;0;80;170;210;300;0,5;0,67;1,5;2;0.0;0.0
+Muggine dorato;Liza aurata;CED;AUT;2;0;0;80;170;210;300;0,5;0,67;1,5;2;0.0;0.0
+Muggine labbrone;Chelon labrosus;CEL;AUT;2;0;0;45;90;130;150;0,5;0,67;1,5;2;0.0;0.0
+Muggine musino;Liza saliens;MUS;AUT;2;0;0;80;170;210;300;0,5;0,67;1,5;2;0.0;0.0
+Nono;Aphanius fasciatus;NO;AUT;2;0;0;35;45;60;80;0,5;0,67;1,5;2;0.0;0.0
+Orata;Sparus auratus;OR;AUT;1;0;0;80;170;210;300;0,5;0,67;1,5;2;0.0;0.0
+Panzarolo;Knipowitschia punctatissima;PAN;AUT;1;0;0;35;45;60;80;0,5;0,67;1,5;2;0.0;0.0
+Passera di mare;Platichthys flesus italicus;PA;AUT;2;0;0;80;170;210;300;0,5;0,67;1,5;2;0.0;0.0
+Persico reale;Perca fluviatilis;PR;AUT;1;0;0;80;170;210;300;0,5;0,67;1,5;2;0,004285714;0,004285714
+Pesce ago;Syngnathus acus;PAG;AUT;2;0;0;80;170;210;300;0,5;0,67;1,5;2;0.0;0.0
+Pesce ago di rio;Syngnathus abaster;PAR;AUT;2;0;0;45;90;130;150;0,5;0,67;1,5;2;0.0;0.0
+Pigo;Rutilius pigus;PI;AUT;2;0;0;45;90;130;150;0,5;0,67;1,5;2;0.0;0.0
+Rovella;Sarmarutilius rubilio;RV;AUT;2;0;0;45;90;130;150;0,5;0,67;1,5;2;0.0;0.0
+Salmerino;Salvelinus alpinus;SA;AUT;1;0;0;250;450;650;800;0,5;0,67;1,5;2;0.0;0.0
+Sanguinerola;Phoxinus phoxinus;SN;AUT;2;0;0;35;45;60;80;0,5;0,67;1,5;2;0.0;0.0
+Savetta;Chondrostoma soetta;SV;AUT;2;0;0;45;90;130;150;0,5;0,67;1,5;2;0,023005521;0,177107302
+Scardola;Scardinius erythrophthalmus;SC;AUT;2;0;0;80;170;210;300;0,5;0,67;1,5;2;0,004048;0,010333333
+Scazzone;Cottus gobio;SZ;AUT;2;0;0;45;90;130;150;0,5;0,67;1,5;2;0,001523117;0,002053333
+Spigola Branzino;Dicentrarchus labrax;DIC;AUT;1;0;0;80;170;210;300;0,5;0,67;1,5;2;0.0;0.0
+Spinarello;Gasterosteus aculeatus;SP;AUT;2;0;0;35;45;60;80;0,5;0,67;1,5;2;0.0;0.0
+Storione;Acipenser sturio;AC;AUT;2;0;0;250;450;650;800;0,5;0,67;1,5;2;0.0;0.0
+Storione cobice;Acipenser naccarii;ACN;AUT;2;0;0;250;450;650;800;0,5;0,67;1,5;2;0.0;0.0
+Storione ladano;Huso huso;HH;AUT;2;0;0;250;450;650;800;0,5;0,67;1,5;2;0.0;0.0
+Temolo;Thymallus thymallus;TM;AUT;1;0;0;45;90;130;150;0,5;0,67;1,5;2;0.0;0.0
+Tinca;Tinca tinca;TI;AUT;2;0;0;80;170;210;300;0,5;0,67;1,5;2;0.0;0.0
+Triotto;Rutilius erythrophthalmus;TR;AUT;2;0;0;45;90;130;150;0,5;0,67;1,5;2;0,001806394;0,002214141
+Trota appenninica;Salmo ghigi;TF;AUT;1;0;0;80;170;210;300;0,5;0,67;1,5;2;0,031225077;0,105088518
+Trota di lago;Salmo (trutta) lacustris;TFL;AUT;1;0;0;250;450;650;800;0,5;0,67;1,5;2;0.0;0.0
+Trota macrostigma;Salmo (trutta) macrostigma;TMA;AUT;1;0;0;80;170;210;300;0,5;0,67;1,5;2;0.0;0.0
+Trota marmorata;Salmo (trutta) marmoratus;TMR;AUT;1;0;0;80;170;210;300;0,5;0,67;1,5;2;0.0;0.0
+Vairone;Leuciscus souffia muticellus;VA;AUT;2;0;0;45;90;130;150;0,5;0,67;1,5;2;0,026356262;0,077162461
+Abramide comune;Abramis brama;AB;ALL;0;2;0;80;170;210;300;0,5;0,67;1,5;2;0.0;0.0
+Abramide medio o Zope;Ballerus ballerus;ABZ;ALL;0;0;0;80;170;210;300;0,5;0,67;1,5;2;0.0;0.0
+Acerina;Gymnocephalus cernuus;ACE;ALL;0;2;0;80;170;210;300;0,5;0,67;1,5;2;0.0;0.0
+Alborella di fiume;Alburnoides bipunctatus;ALF;ALL;0;0;0;35;45;60;80;0,5;0,67;1,5;2;0.0;0.0
+Alborella europea;Alburnus alburnus;ALE;ALL;0;3;0;35;45;60;80;0,5;0,67;1,5;2;0.0;0.0
+Anguilla americana - Anguilla rostrata;Anguilla rostrata;ANA;ALL;0;3;0;250;450;650;800;0,5;0,67;1,5;2;0.0;0.0
+Aspio;Aspius aspius;ASP;ALL;0;1;0;250;450;650;800;0,5;0,67;1,5;2;0.0;0.0
+Barbo balcanico;Barbus balcanicus;BBA;ALL;0;0;0;45;90;130;150;0,5;0,67;1,5;2;0.0;0.0
+Barbo di Graells - Barbo dell'Ebro;Barbus graellsii;BS;ALL;0;2;0;80;170;210;300;0,5;0,67;1,5;2;0.0;0.0
+Barbo europeo;Barbus barbus;BE;ALL;0;2;0;250;450;650;800;0,5;0,67;1,5;2;0.0;0.0
+Barbo pinnerosse;Barbus haasi  ;BBR;ALL;0;0;0;45;90;130;150;0,5;0,67;1,5;2;0.0;0.0
+Bermejuela;Rutilus arcasii ;BER;ALL;0;0;0;35;45;60;80;0,5;0,67;1,5;2;0.0;0.0
+Blicca;Blicca bjoerkna;BLK;ALL;0;2;0;45;90;130;150;0,5;0,67;1,5;2;0.0;0.0
+Bordallo;Leuciscus carolitertii;BOR;ALL;0;0;0;45;90;130;150;0,5;0,67;1,5;2;0.0;0.0
+Carassio;Carassius carassius;CC;ALL;0;2;0;80;170;210;300;0,5;0,67;1,5;2;0.0;0.0
+Carassio dorato;Carassius auratus;CS;ALL;0;2;0;80;170;210;300;0,5;0,67;1,5;2;0.0;0.0
+Carpa argentata;Hypophthalmichthys molitrix;CPA;ALL;0;3;0;250;450;650;800;0,5;0,67;1,5;2;0.0;0.0
+Carpa di Prussia;Carassius gibelio;CPP;ALL;0;0;0;80;170;210;300;0,5;0,67;1,5;2;0.0;0.0
+Carpa erbivora - Amur;Ctenopharyngodon idellus;AMU;ALL;0;3;0;250;450;650;800;0,5;0,67;1,5;2;0.0;0.0
+Carpa testa grossa;Hypophthalmichthys nobilis;CPT;ALL;0;3;0;250;450;650;800;0,5;0,67;1,5;2;0.0;0.0
+Cavedano europeo;Squalius cephalus;CVV;ALL;0;2;0;45;90;130;150;0,5;0,67;1,5;2;0.0;0.0
+Cobite di stagno orientale;Misgurnus anguillicaudatus;COS;ALL;0;2;0;45;90;130;150;0,5;0,67;1,5;2;0.0;0.0
+Coregone nasello;Coregonus oxyrhynchus;COR;ALL;0;3;0;80;170;210;300;0,5;0,67;1,5;2;0.0;0.0
+Gambusia;Gambusia holbrooki;GAM;ALL;0;2;0;35;45;60;80;0,5;0,67;1,5;2;0.0;0.0
+Gobione europeo;Gobio gobio;GOE;ALL;0;2;0;35;45;60;80;0,5;0,67;1,5;2;0.0;0.0
+Ido;Leuciscus idus;IDO;ALL;0;0;0;80;170;210;300;0,5;0,67;1,5;2;0.0;0.0
+Lasca iberica;Chondrostoma polylepis;LAS;ALL;0;0;0;80;170;210;300;0,5;0,67;1,5;2;0.0;0.0
+Lavarello - Coregone;Coregonus lavaretus;LAV;ALL;0;3;0;80;170;210;300;0,5;0,67;1,5;2;0.0;0.0
+Leucisco d'Albania - Moranec;Pachychilon pictum;MOR;ALL;0;2;0;35;45;60;80;0,5;0,67;1,5;2;0.0;0.0
+Lucioperca - Luccioperca - Sandra;Sander lucioperca;LP;ALL;0;2;0;80;170;210;300;0,5;0,67;1,5;2;0.0;0.0
+Naso;Chondrostoma nasus;NA;ALL;0;2;0;80;170;210;300;0,5;0,67;1,5;2;0.0;0.0
+Persico sole;Lepomis gibbosus;PS;ALL;0;2;0;45;90;130;150;0,5;0,67;1,5;2;0.0;0.0
+Persico trota;Micropterus salmoides;PT;ALL;0;2;0;80;170;210;300;0,5;0,67;1,5;2;0.0;0.0
+Pesce gatto - Pesce gatto nero;Ameiurus melas;PGA;ALL;0;2;0;80;170;210;300;0,5;0,67;1,5;2;0.0;0.0
+Pesce gatto africano;Clarias gariepinus;PGC;ALL;0;2;0;250;450;650;800;0,5;0,67;1,5;2;0.0;0.0
+Pesce gatto maculato;Ictalurus punctatus;PGM;ALL;0;2;0;250;450;650;800;0,5;0,67;1,5;2;0.0;0.0
+Pesce gatto nebuloso;Ameiurus nebulosus;PGN;ALL;0;2;0;80;170;210;300;0,5;0,67;1,5;2;0.0;0.0
+Pesce gatto2;Ictalurus melas;PG;ALL;0;0;0;80;170;210;300;0,5;0,67;1,5;2;0.0;0.0
+Pesce re;Odonthestes bonariensis;PRE;ALL;0;3;0;80;170;210;300;0,5;0,67;1,5;2;0.0;0.0
+Pseudorasbora - Cebacek;Pseudorasbora parva;PRB;ALL;0;2;0;35;45;60;80;0,5;0,67;1,5;2;0.0;0.0
+Rodeo sericeo;Rhodeus sericeus;RD;ALL;0;2;0;35;45;60;80;0,5;0,67;1,5;2;0.0;0.0
+Rutilo - Gardon;Rutilus rutilus;GA;ALL;0;2;0;80;170;210;300;0,5;0,67;1,5;2;0.0;0.0
+Salmerino di fontana;Salvelinus fontinalis;SALF;ALL;0;2;0;80;170;210;300;0,5;0,67;1,5;2;0.0;0.0
+Salmone argentato;Oncorhynchus kisutch;SALA;ALL;0;2;0;80;170;210;300;0,5;0,67;1,5;2;0.0;0.0
+Salmone dell'Atlantico;Salmo salar;SALT;ALL;0;0;0;250;450;650;800;0,5;0,67;1,5;2;0.0;0.0
+Scazzone siberiano;Cottus poecilopus   ;SZS;ALL;0;0;0;35;45;60;80;0,5;0,67;1,5;2;0.0;0.0
+Siluro;Silurus glanis;SL;ALL;0;1;0;250;450;650;800;0,5;0,67;1,5;2;0.0;0.0
+Storione bianco;Acipenser transmontanus;ACB;ALL;0;3;0;250;450;650;800;0,5;0,67;1,5;2;0.0;0.0
+Temolo danubiano;Thymallus thymallus (dan);TMD;ALL;0;2;0;45;90;130;150;0,5;0,67;1,5;2;0.0;0.0
+Tilapia nilotica - Tilapia del Nilo;Oreochromis niloticus;TIL;ALL;0;3;0;80;170;210;300;0,5;0,67;1,5;2;0.0;0.0
+Trota fario atlantica;Salmo (trutta) trutta (atl);TFA;ALL;0;2;0;80;170;210;300;0,5;0,67;1,5;2;0.0;0.0
+Trota iridea;Oncorhynchus mykiss;OM;ALL;0;2;0;250;450;650;800;0,5;0,67;1,5;2;0.0;0.0
+Trota iridea2;Salmo gairdneri;OM2;ALL;0;0;0;250;450;650;800;0,5;0,67;1,5;2;0.0;0.0
+Vimba o Abramide russo;Vimba vimba;VIM;ALL;0;0;0;45;90;130;150;0,5;0,67;1,5;2;0.0;0.0
+Ibrido Barbus;Xbarbus;XBA;ALL;0;3;0;80;170;210;300;0,5;0,67;1,5;2;0.0;0.0
+Ibrido Esox;Xesox;XLU;ALL;0;3;0;250;450;650;800;0,5;0,67;1,5;2;0.0;0.0
+Ibrido Rutilus;Xrutilus;XRV;ALL;0;3;0;45;90;130;150;0,5;0,67;1,5;2;0.0;0.0
+Ibrido Salmo;Xsalmo;XTF;ALL;0;3;0;80;170;210;300;0,5;0,67;1,5;2;0.0;0.0
+Ibrido Thymallus;Xthymalus;XTM;ALL;0;3;0;45;90;130;150;0,5;0,67;1,5;2;0.0;0.0
