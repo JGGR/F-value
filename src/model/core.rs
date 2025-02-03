@@ -142,14 +142,33 @@ impl FileInputModel {
 #[derive(Clone)]
 pub struct InfoAggiuntiveModel {
     frame_counter: u32,
+    done_editing: bool,
+    valid: bool,
 }
 
 impl InfoAggiuntiveModel {
     pub fn get_frame_counter(&self) -> u32 {
         return self.frame_counter;
     }
+
     pub fn increment_frame_counter(&mut self) {
         self.frame_counter += 1;
+    }
+
+    pub fn is_done_editing(&self) -> bool {
+        return self.done_editing;
+    }
+
+    pub fn set_done_editing(&mut self, val: bool) {
+        self.done_editing = val;
+    }
+
+    pub fn is_valid(&self) -> bool {
+        return self.valid;
+    }
+
+    pub fn set_valid(&mut self, val: bool) {
+        self.valid = val;
     }
 }
 
@@ -266,6 +285,8 @@ impl Model {
             },
             infoaggiuntive_model: InfoAggiuntiveModel {
                 frame_counter: 0,
+                done_editing: false,
+                valid: false,
             },
             output_model: OutputModel {
                 frame_counter: 0,
@@ -279,6 +300,7 @@ impl Model {
                         ("version".to_string(), SHORT_PROJECT_VERSION.to_string()),
                         ("riferimento_niseci".to_string(), "Vuoto".to_string()),
                         ("campionamento_niseci".to_string(), "Vuoto".to_string()),
+                        ("anagrafica_niseci".to_string(), "Vuoto".to_string()),
                     ]),
                 ),
                 name: "Initial".to_string(),

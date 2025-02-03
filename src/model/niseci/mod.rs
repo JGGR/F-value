@@ -211,16 +211,53 @@ pub struct ComunitaNISECI {
   pub numero_protocollo: Option<String>
 }
 
+impl fmt::Display for ComunitaNISECI {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    let string_representation = match self.tipo {
+        TipoComunitaNISECI::Redatta | TipoComunitaNISECI::Dm260_2010 => {
+            format!("ComunitaNISECI: {{ tipo: {{{}}}", self.tipo)
+        }
+        TipoComunitaNISECI::Recuperata => {
+            if let Some(fonte) = &self.fonte { //TODO: is this good?
+                format!("ComunitaNISECI: {{ tipo: {{{}}}, fonte: {{{}}} ", self.tipo, fonte)
+            } else {
+                format!("ComunitaNISECI: {{ tipo: {{{}}}, fonte: MANCANTE", self.tipo)
+            }
+        }
+        TipoComunitaNISECI::AffinataDalMase => {
+            if let Some(num_proto) = &self.numero_protocollo { //TODO: is this good?
+                format!("ComunitaNISECI: {{ tipo: {{{}}}, numero_protocollo: {{{}}} ", self.tipo, num_proto)
+            } else {
+                format!("ComunitaNISECI: {{ tipo: {{{}}}, numero_protocollo: MANCANTE", self.tipo)
+            }
+        }
+    };
+    write!(f, "{}", string_representation)
+  }
+}
+
 #[derive(Clone)]
 pub enum AreaNISECI {
     Alpina,
     Mediterranea
 }
 
+impl fmt::Display for AreaNISECI {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut string_representation = format!("AreaNISECI: {{");
+        let string_representation = match *self {
+            AreaNISECI::Alpina => "Alpina",
+            AreaNISECI::Mediterranea => "Mediterranea",
+        };
+        write!(f, "{}", string_representation)
+    }
+}
+
 #[derive(Clone)]
 pub struct AnagraficaNISECI {
   pub comunita: ComunitaNISECI,
   pub codice_stazione: u32,
+  pub area: AreaNISECI,
   pub nome_fiume: String,
   pub bacino_appartenenza: String,
   pub idro_eco_regione: IdroEcoRegioneNISECI,
@@ -235,6 +272,14 @@ impl AnagraficaNISECI {
   }
   pub fn get_larghezza_media(&self) -> f32 {
     self.larghezza_media_stazione
+  }
+}
+
+impl fmt::Display for AnagraficaNISECI {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    let string_representation = format!("AnagraficaNISECI: {{ comunita: {{{}}}, codice_stazione {{{}}}, area: {{{}}}, nome_fiume: {{{}}}, bacino_appartenenza: {{{}}}, idro_eco_regione: {{{}}}, posizione: {{{}}}, lunghezza_stazione: {{{}}}, larghezza_stazione: {{{}}} }}",
+        self.comunita, self.codice_stazione, self.area, self.nome_fiume, self.bacino_appartenenza, self.idro_eco_regione, self.posizione, self.lunghezza_media_stazione, self.larghezza_media_stazione);
+    write!(f, "{}", string_representation)
   }
 }
 

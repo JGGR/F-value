@@ -3,6 +3,12 @@ use std::process::exit;
 use crate::core::*;
 use crate::controllers::*;
 use crate::model::index::Indice;
+use crate::model::location::Location;
+use crate::model::niseci::TipoComunitaNISECI;
+use crate::model::niseci::ComunitaNISECI;
+use crate::model::niseci::AreaNISECI;
+use crate::model::niseci::IdroEcoRegioneNISECI;
+use crate::model::niseci::AnagraficaNISECI;
 use raylib::prelude::*;
 use rfd::FileDialog;
 use raylib::consts::GuiState::{STATE_NORMAL, STATE_DISABLED};
@@ -532,7 +538,7 @@ impl SelezioneInfoAggiuntiveView {
         let current_index = match controller.get_current_index() {
             Some(index) => index,
             None => {
-                eprintln!("InfoAggiuntiveView: Per qualche assurdo motivo l'indice corrente non è validato. Uso NISECI.");
+                eprintln!("SelezioneInfoAggiuntiveView: Per qualche assurdo motivo l'indice corrente non è validato. Uso NISECI.");
                 Indice::NISECI
             }
         };
@@ -551,6 +557,156 @@ impl SelezioneInfoAggiuntiveView {
             ),
             Some(rstr!("Inserisci informazioni aggiuntive"))
         );
+
+        let submit_width = propwidth(&d, 50);
+        let groupbox_x_end = groupbox_x + groupbox_width;
+        let submit_x = groupbox_x_end + (d.get_screen_width() - groupbox_x_end)/2 - submit_width/2;
+        let submit_height = submit_width;
+        let submit_y = d.get_screen_height() /2 - submit_height /2;
+
+        if d.gui_button(rrect(submit_x, submit_y, submit_width, submit_height), Some(rstr!("Conferma"))) {
+
+            // Raylib has trouble handling the string downstream if we don't ensure to do this
+            let end = self.textbox_regione_buffer.iter().position(|&b| b == 0).unwrap_or(self.textbox_regione_buffer.len());
+            let regione_string = match String::from_utf8(self.textbox_regione_buffer[..end].to_vec()) {
+                Ok(s) => s,
+                Err(_) => {
+                    //TODO: signal error: invalid UTF-8
+                    "ERROR".to_string()
+                }
+            };
+
+            // Raylib has trouble handling the string downstream if we don't ensure to do this
+            let end = self.textbox_provincia_buffer.iter().position(|&b| b == 0).unwrap_or(self.textbox_provincia_buffer.len());
+            let provincia_string = match String::from_utf8(self.textbox_provincia_buffer[..end].to_vec()) {
+                Ok(s) => s,
+                Err(_) => {
+                    //TODO: signal error: invalid UTF-8
+                    "ERROR".to_string()
+                }
+            };
+            let posizione = Location {
+                regione: regione_string,
+                provincia: provincia_string,
+            };
+            let larghezza_stazione = self.valuebox_larghezza_stazione_value;
+            let lunghezza_stazione = self.valuebox_lunghezza_stazione_value;
+            let codice_stazione = self.valuebox_codice_stazione_value;
+
+            // Raylib has trouble handling the string downstream if we don't ensure to do this
+            let end = self.textbox_corpo_idrico_buffer.iter().position(|&b| b == 0).unwrap_or(self.textbox_corpo_idrico_buffer.len());
+            let corpo_idrico = match String::from_utf8(self.textbox_corpo_idrico_buffer[..end].to_vec()) {
+                Ok(s) => s,
+                Err(_) => {
+                    //TODO: signal error: invalid UTF-8
+                    "ERROR".to_string()
+                }
+            };
+
+            //TODO: impl TryInto<u32> for TipoComunitaNISECI
+            //Which would also handle errors better than this crap
+            let tipo_comunita = match self.dropdownbox_tipocomunit_niseci_value {
+                0 => TipoComunitaNISECI::Redatta,
+                1 => TipoComunitaNISECI::Recuperata,
+                2 => TipoComunitaNISECI::Dm260_2010,
+                3 => TipoComunitaNISECI::AffinataDalMase,
+                _ => { panic!("Unexpected tipo_comunita in SelezioneInfoAggiuntiveView::draw()"); }
+            };
+            let mut opt_fonte: Option<String> = None;
+            let mut opt_num_protocollo: Option<String> = None;
+            match tipo_comunita {
+                TipoComunitaNISECI::Recuperata => {
+                    // Raylib has trouble handling the string downstream if we don't ensure to do this
+                    let end = self.textbox_fontecomunit_niseci_buffer.iter().position(|&b| b == 0).unwrap_or(self.textbox_fontecomunit_niseci_buffer.len());
+                    opt_fonte = Some(match String::from_utf8(self.textbox_fontecomunit_niseci_buffer[..end].to_vec()) {
+                        Ok(s) => s,
+                        Err(_) => {
+                            //TODO: signal error: invalid UTF-8
+                            "ERROR".to_string()
+                        }
+                    });
+                }
+                TipoComunitaNISECI::AffinataDalMase => {
+                    // Raylib has trouble handling the string downstream if we don't ensure to do this
+                    let end = self.textbox_protocollocomunit_niseci_buffer.iter().position(|&b| b == 0).unwrap_or(self.textbox_protocollocomunit_niseci_buffer.len());
+                    opt_num_protocollo = Some(match String::from_utf8(self.textbox_protocollocomunit_niseci_buffer[..end].to_vec()) {
+                        Ok(s) => s,
+                        Err(_) => {
+                            //TODO: signal error: invalid UTF-8
+                            "ERROR".to_string()
+                        }
+                    });
+                }
+                _ => {}
+            }
+            let comunita = ComunitaNISECI {
+                tipo: tipo_comunita,
+                fonte: opt_fonte,
+                numero_protocollo: opt_num_protocollo
+            };
+            //TODO: impl TryInto<u32> for AreaNISECI
+            //Which would also handle errors better than this crap
+            let area = match self.combobox_area_niseci_value {
+                0 => { // 0 == Alpina I guess
+                    AreaNISECI::Alpina
+                }
+                1 => { // 1 == Mediterranea I guess
+                    AreaNISECI::Mediterranea
+                }
+                _ => { panic!("Unexpected area_niseci in SelezioneInfoAggiuntiveView::draw()"); }
+            };
+
+            // Raylib has trouble handling the string downstream if we don't ensure to do this
+            let end = self.textbox_bacino_niseci_buffer.iter().position(|&b| b == 0).unwrap_or(self.textbox_bacino_niseci_buffer.len());
+            let bacino_niseci = match String::from_utf8(self.textbox_bacino_niseci_buffer[..end].to_vec()) {
+                Ok(s) => s,
+                Err(_) => {
+                    //TODO: signal error: invalid UTF-8
+                    "ERROR".to_string()
+                }
+            };
+
+            //TODO: impl TryInto<u32> for IdroEcoRegioneNISECI
+            //Which would also handle errors better than this crap
+            let idro_ecoregione_niseci = match self.listview_idroecoregione_niseci_value {
+                0 => IdroEcoRegioneNISECI::AlpiCentroOrientali,
+                1 => IdroEcoRegioneNISECI::AlpiMediterranee,
+                2 => IdroEcoRegioneNISECI::AlpiMeridionali,
+                3 => IdroEcoRegioneNISECI::AlpiOccidentali,
+                4 => IdroEcoRegioneNISECI::AppenninoCentrale,
+                5 => IdroEcoRegioneNISECI::AppenninoMeridionale,
+                6 => IdroEcoRegioneNISECI::AppenninoPiemontese,
+                7 => IdroEcoRegioneNISECI::AppenninoSettentrionale,
+                8 => IdroEcoRegioneNISECI::BasilicataTavoliere,
+                9 => IdroEcoRegioneNISECI::BassoLazio,
+                10 => IdroEcoRegioneNISECI::CalabriaNebrodi,
+                11 => IdroEcoRegioneNISECI::Carso,
+                12 => IdroEcoRegioneNISECI::CostaAdriatica,
+                13 => IdroEcoRegioneNISECI::Monferrato,
+                14 => IdroEcoRegioneNISECI::PianuraPadana,
+                15 => IdroEcoRegioneNISECI::PrealpiDolomiti,
+                16 => IdroEcoRegioneNISECI::PugliaGargano,
+                17 => IdroEcoRegioneNISECI::RomaViterbeseVesuvio,
+                18 => IdroEcoRegioneNISECI::Sardegna,
+                19 => IdroEcoRegioneNISECI::Sicilia,
+                20 => IdroEcoRegioneNISECI::Toscana,
+                _ => { panic!("Unexpected idroecoregione_niseci in SelezioneInfoAggiuntiveView::draw()"); }
+            };
+
+            let anagrafica = AnagraficaNISECI {
+                comunita: comunita,
+                codice_stazione: codice_stazione as u32,
+                area: area,
+                nome_fiume: corpo_idrico,
+                bacino_appartenenza: bacino_niseci,
+                idro_eco_regione: idro_ecoregione_niseci,
+                posizione: posizione,
+                lunghezza_media_stazione: lunghezza_stazione as f32,
+                larghezza_media_stazione: larghezza_stazione as f32,
+            };
+
+            controller.submit_anagrafica_niseci(anagrafica);
+        }
 
         let x_padding = groupbox_width / 20;
         let y_padding = groupbox_height / 15;
@@ -888,6 +1044,13 @@ impl SelezioneInfoAggiuntiveView {
                 let column_2_groupbox_boxes_height = column_2_labels_height;
                 let column_2_groupbox_boxes_x = column_2_groupbox_labels_x + column_2_groupbox_labels_width;
 
+                match self.dropdownbox_tipocomunit_niseci_value {
+                    1 => { /* 1 == Fonte I guess */ }
+                    _ => { // Not fonte I guess
+                        d.gui_lock();
+                        d.gui_set_state(STATE_DISABLED);
+                    }
+                }
                 if d.gui_text_box(
                     rrect(
                         column_2_groupbox_boxes_x,
@@ -900,7 +1063,21 @@ impl SelezioneInfoAggiuntiveView {
                 ) {
                     self.textbox_fontecomunit_niseci_edit_mode = !self.textbox_fontecomunit_niseci_edit_mode;
                 }
+                match self.dropdownbox_tipocomunit_niseci_value {
+                    1 => { /* 1 == Fonte I guess */ }
+                    _ => { // Not fonte I guess
+                        d.gui_set_state(STATE_NORMAL);
+                        d.gui_unlock();
+                    }
+                }
 
+                match self.dropdownbox_tipocomunit_niseci_value {
+                    3 => { /* 3 == Mase I guess */ }
+                    _ => { // Not Mase I guess
+                        d.gui_lock();
+                        d.gui_set_state(STATE_DISABLED);
+                    }
+                }
                 if d.gui_text_box(
                     rrect(
                         column_2_groupbox_boxes_x,
@@ -912,6 +1089,13 @@ impl SelezioneInfoAggiuntiveView {
                     self.textbox_protocollocomunit_niseci_edit_mode
                 ) {
                     self.textbox_protocollocomunit_niseci_edit_mode = !self.textbox_protocollocomunit_niseci_edit_mode;
+                }
+                match self.dropdownbox_tipocomunit_niseci_value {
+                    3 => { /* 3 == Mase I guess */ }
+                    _ => { // Not Mase I guess
+                        d.gui_set_state(STATE_NORMAL);
+                        d.gui_unlock();
+                    }
                 }
 
                 let mut _listview_idroecoregione_pick = -1;
@@ -1006,14 +1190,29 @@ impl ValidazioneInfoAggiuntiveView {
         d.clear_background(main_state.default_bg_color);
 
         let _state = controller.get_state();
+
+        let current_index = match controller.get_current_index() {
+            Some(index) => index,
+            None => {
+                eprintln!("ValidazioneInfoAggiuntiveView: Per qualche assurdo motivo l'indice corrente non è validato. Uso NISECI.");
+                Indice::NISECI
+            }
+        };
+
         let button_valida_width = propwidth(&d, 200);
         let button_valida_x = d.get_screen_width() / 2 - button_valida_width /2;
         let button_valida_height = propwidth(&d, 50);
         let button_valida_y = d.get_screen_height() / 2 - button_valida_height/2;
 
+        let y_spacing = button_valida_height;
+        let button_backout_width = button_valida_width;
+        let button_backout_x = button_valida_x;
+        let button_backout_height = button_valida_height;
+        let button_backout_y = button_valida_y + button_valida_height + y_spacing;
+
         let groupbox_width = button_valida_width + propwidth(&d, 100);
         let groupbox_x = button_valida_x - propwidth(&d, 50);
-        let groupbox_height = button_valida_height + propheight(&d, 100);
+        let groupbox_height = button_valida_height * 3 + propheight(&d, 100);
         let groupbox_y = button_valida_y - propheight(&d, 50);
 
         d.gui_group_box(
@@ -1035,8 +1234,37 @@ impl ValidazioneInfoAggiuntiveView {
             ),
             Some(rstr!("Valida info aggiuntive"))
         ) {
-            //TODO: valida info aggiuntive indice
-            println!("TODO: call controller to update model. Controller can update main_state.current_view on next frame in update()");
+            //Ask controller to validate info aggiuntive indice
+            match current_index {
+                Indice::NISECI => {
+                    controller.valida_anagrafica_niseci();
+                }
+                Indice::HFBI => {
+                    //TODO: implement this
+                    //controller.valida_anagrafica_hfbi()
+                }
+            }
+        }
+
+        if d.gui_button(
+            rrect(
+                button_backout_x,
+                button_backout_y,
+                button_backout_width,
+                button_backout_height,
+            ),
+            Some(rstr!("Indietro"))
+        ) {
+            //Ask controller to go back and edit further
+            match current_index {
+                Indice::NISECI => {
+                    controller.backout_anagrafica_niseci();
+                }
+                Indice::HFBI => {
+                    //TODO: implement this
+                    //controller.backout_anagrafica_hfbi();
+                }
+            }
         }
     }
 }
