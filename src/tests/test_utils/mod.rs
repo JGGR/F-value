@@ -419,3 +419,87 @@ pub fn create_dummy_campionamento_chopped() -> CampionamentoNISECI {
     campionamento: chopped
   }
 }
+
+/// In questo campionamento troverai: 
+/// -> C1
+///   -> 30 ciacci
+///   -> 30 trocchi
+///   -> 100 bronzi
+/// -> C2
+///   -> 12 ciacci
+///   -> 15 trocchi
+///   -> 75 bronzi
+/// -> C3
+///   -> 50 bronzi
+// pub fn create_massive_campionamento() -> CampionamentoNISECI {
+//   let importante_1 = get_ciaccio();
+//   let importante_2 = get_trocchio();
+//   let importante_3 = get_bronzo();
+
+//   let mut campionamento: Vec<RecordNISECI> = Vec::with_capacity(312);
+
+  
+
+// }
+
+/// id == 1
+pub fn get_ciaccio() -> SpecieNISECI {
+  SpecieNISECI {
+    id: 1.to_string(),
+    specie_attesa: true,
+    nome: "Ciaccio ciaccensis".to_string(),
+    tipo_autoctono: 2,
+    tipo_alloctono: 0,
+    cl_soglia1: 3,
+    cl_soglia2: 6,
+    cl_soglia3: 9,
+    cl_soglia4: 12,
+    ad_juv_soglia1: 0.5,
+    ad_juv_soglia2: 0.67,
+    ad_juv_soglia3: 1.5,
+    ad_juv_soglia4: 2.0,
+    dens_soglia1: 5.0,
+    dens_soglia2: 10.0,
+  }
+}
+
+/// id == 2
+pub fn get_trocchio() -> SpecieNISECI {
+  SpecieNISECI {
+    id: 2.to_string(),
+    specie_attesa: true,
+    nome: "Trocchio trocchiensis".to_string(),
+    tipo_autoctono: 2,
+    tipo_alloctono: 0,
+    cl_soglia1: 1,
+    cl_soglia2: 2,
+    cl_soglia3: 3,
+    cl_soglia4: 4,
+    ad_juv_soglia1: 1.0,
+    ad_juv_soglia2: 2.0,
+    ad_juv_soglia3: 3.0,
+    ad_juv_soglia4: 4.0,
+    dens_soglia1: 1.0,
+    dens_soglia2: 2.0,
+  }
+}
+/// id == 3
+pub fn get_bronzo() -> SpecieNISECI  {
+  SpecieNISECI {
+    id: 3.to_string(),
+    specie_attesa: true,
+    nome: "Bronzo bronzensis".to_string(),
+    tipo_autoctono: 2,
+    tipo_alloctono: 0,
+    cl_soglia1: 1,
+    cl_soglia2: 2,
+    cl_soglia3: 3,
+    cl_soglia4: 4,
+    ad_juv_soglia1: 1.0,
+    ad_juv_soglia2: 2.0,
+    ad_juv_soglia3: 3.0,
+    ad_juv_soglia4: 4.0,
+    dens_soglia1: 1.0,
+    dens_soglia2: 2.0,
+  }
+}

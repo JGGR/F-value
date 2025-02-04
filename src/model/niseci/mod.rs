@@ -257,11 +257,11 @@ pub struct RisultatoNISECI {
 
 pub struct ClassiEtaSpecieNISECI {
   pub specie: SpecieNISECI,
-  pub cl1: i32,
-  pub cl2: i32,
-  pub cl3: i32,
-  pub cl4: i32,
-  pub cl5: i32,
+  pub cl1: u32,
+  pub cl2: u32,
+  pub cl3: u32,
+  pub cl4: u32,
+  pub cl5: u32,
 }
 
 
@@ -314,8 +314,12 @@ impl ClassiEtaSpecieNISECI {
   }
 
   pub fn get_x2_a_criterio_b(&self) -> u8 {
+    if (self.cl2 + self.cl3) == 0 {
+      return 3;
+    }
+
     let ad_juv = (self.cl4 + self.cl5) as f32 / (self.cl2 + self.cl3) as f32;
-    if ad_juv <= self.specie.ad_juv_soglia1 {
+    if ad_juv < self.specie.ad_juv_soglia1 {
       return 3;
     }
     if ad_juv <= self.specie.ad_juv_soglia2 {

@@ -64,7 +64,7 @@ pub fn gradient_descent_iterate(points: &[Point<i32>]) -> Result<(f32, f32), Str
 }
 
 
-pub fn calculate_quantita_stimata(campionamenti: &[Point<i32>]) -> Result<i32, String> {
+pub fn calculate_quantita_with_regression(campionamenti: &[Point<i32>]) -> Result<u32, String> {
 
   // trova m e b della retta
   let (m, b) = match gradient_descent_iterate(campionamenti) {
@@ -84,7 +84,7 @@ pub fn calculate_quantita_stimata(campionamenti: &[Point<i32>]) -> Result<i32, S
   if quantita_stimata < 0 {
     return Err(format!("quantita stimata negativa {}", quantita_stimata));
   }
-  return Ok(quantita_stimata);
+  return Ok(quantita_stimata as u32);
 }
 
 /// La denormalizzazione riporta la retta normalizzata (rappresentata da m_norm e b_norm)

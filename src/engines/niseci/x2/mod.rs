@@ -2,16 +2,29 @@ use std::collections::{hash_map::Entry, HashMap};
 
 use crate::model::niseci::{AnagraficaNISECI, CampionamentoNISECI, ClassiEtaSpecieNISECI, EsemplariPerCattura, RecordNISECI, RiferimentoNISECI};
 
-use super::linear_regression::{calculate_quantita_stimata, Point};
+use super::linear_regression::{calculate_quantita_with_regression, Point};
 
 
 
 
-pub fn calculate_x2(riferimento: &RiferimentoNISECI, campionamento: &CampionamentoNISECI, anagrafica: &AnagraficaNISECI) -> f32 {
+pub fn calculate_x2(riferimento: &RiferimentoNISECI, campionamento: &CampionamentoNISECI, anagrafica: &AnagraficaNISECI) -> Result<f32, Vec<String>> {
   let x2_a = calculate_sommatoria_x2_a(riferimento, campionamento);
-  let x2_b = calculate_sommatoria_x2_b(riferimento, campionamento, anagrafica);
+  let x2_b = match calculate_sommatoria_x2_b(riferimento, campionamento, anagrafica){
+    Ok(result) => result,
+    Err(errors) => return Err(errors),
+  };
 
-  0.0
+  let mut specie_aut_campionate = 0;
+  for cattura in &campionamento.campionamento {
+    match cattura.specie.tipo_autoctono == 1 || cattura.specie.tipo_autoctono == 2 {
+        true => specie_aut_campionate += 1,
+        false => (),
+    }
+  }
+
+  let result = (0.6 * x2_a + 0.4 * x2_b) / specie_aut_campionate as f32;   
+  
+  Ok(result)
 }
 
 fn calculate_sommatoria_x2_a(r: &RiferimentoNISECI, c: &CampionamentoNISECI) -> f32 {
@@ -121,7 +134,7 @@ fn calculate_x2_a(classe: &ClassiEtaSpecieNISECI) -> f32 {
   return 0.0;
 }
 
-fn calculate_x2_b(e: &EsemplariPerCattura, superficie: &f32) -> Result<f32, String> {
+pub(crate) fn calculate_x2_b(e: &EsemplariPerCattura, superficie: &f32) -> Result<f32, String> {
 
   match get_quantita_stimata(&e.mappa) {
     Ok(q_stimata) => {
@@ -142,34 +155,56 @@ fn calculate_x2_b(e: &EsemplariPerCattura, superficie: &f32) -> Result<f32, Stri
   };
 }
 
-fn get_quantita_stimata(passaggi: &HashMap<u8, u32>) -> Result<i32, String> {
+pub(crate) fn get_quantita_stimata(passaggi: &HashMap<u8, u32>) -> Result<u32, String> {
   if passaggi.len() == 1 {
-    return Ok(passaggi.get(passaggi.keys().min().unwrap()).unwrap().clone() as i32); // brutto anch qua
+    return Ok(*passaggi.get(passaggi.keys().min().unwrap()).unwrap());
   }
   if passaggi.len() == 2 && passaggi.contains_key(&1) && passaggi.contains_key(&2) {
-    let c1 = passaggi.get(&1).unwrap().clone();
-    let c2 = passaggi.get(&2).unwrap().clone();
+    let c1 = *passaggi.get(&1).unwrap();
+    let c2 = *passaggi.get(&2).unwrap();
 
-    return Ok(calculate_passaggi_ripetuti(c1, c2));
+    return calculate_passaggi_ripetuti(c1, c2);
   }
   return calculate_q_stimata_regression(passaggi);
 }
 
-fn calculate_passaggi_ripetuti(c1: u32, c2: u32) -> i32 {
-  let z = 1.0 - (c2 as f32 / c1 as f32);
-  let c = c1 + c2;
+pub(crate) fn calculate_passaggi_ripetuti(c1: u32, c2: u32) -> Result<u32, String> {
   
-  (c as f32 / (1.0 - z.powf(2.0))) as i32
+  match c1 == c2 {
+    true => return Err("Quantita stimata con metodo dei PASSAGGI RIPETUTI: stesso numero di esemplari per entrambi i passaggi".to_string()),
+    false => {},
+  }
+
+  let c = c1 + c2;
+  let divisore = c2 as f32 / c1 as f32;
+  
+  let result = (c as f32 / (1.0 - divisore.powf(2.0))).round() as i32;
+
+
+  match result > 0 {
+    true => return Ok(result as u32),
+    false => return Err("Quantita stimata con metodo dei PASSAGGI RIPETUTI è negativa".to_string()),
+  }
+
+
 }
 
-fn calculate_q_stimata_regression(passaggi: &HashMap<u8, u32>) -> Result<i32, String> {
-  let ultimo_passaggio = passaggi.keys().max().unwrap().clone(); // brutta roba
+pub(crate) fn calculate_q_stimata_regression(passaggi: &HashMap<u8, u32>) -> Result<u32, String> {
+  let ultimo_passaggio = *passaggi.keys().max().unwrap();
 
-  // dalla mappa non riesco a capire se ci siano o meno sei passaggi in cui non è stato trovato pesce
+  // dalla mappa non riesco a capire se ci siano o meno dei passaggi in cui non è stato trovato pesce
   // quindi mi creo un vettore che rappresenta i pesci trovati per ogni passaggio in ordine di passaggio
-  let mut esemplari_per_passaggio = vec![0 as i32; ultimo_passaggio as usize];
+  let mut esemplari_per_passaggio = vec![0 as u32; ultimo_passaggio as usize];
+  
   for (key, value) in passaggi {
-    esemplari_per_passaggio.insert(key.clone() as usize, value.clone() as i32);
+    println!("key {} value {}", key, value);
+    esemplari_per_passaggio[(*key - 1) as usize] = *value;
+  }
+
+let mut i = 0;
+  while i < esemplari_per_passaggio.len() {
+    println!("{}", esemplari_per_passaggio.get(i).unwrap());
+    i += 1;
   }
 
   // ora creo i punti con x == esemplari catturati fino a quel passaggio 
@@ -177,13 +212,17 @@ fn calculate_q_stimata_regression(passaggi: &HashMap<u8, u32>) -> Result<i32, St
   let mut current_tot = 0;
   let points: Vec<Point<i32>> = esemplari_per_passaggio
     .iter()
-    .map(|esemplari: &i32| {
+    .map(|esemplari: &u32| {
       current_tot += esemplari;
-      return Point::new(current_tot, esemplari.clone());
+      return Point::new(current_tot as i32, *esemplari as i32);
     })
     .collect();
+  
+  for point in &points {
+    println!("point {} {}", point.x, point.y);
+  }
 
-  return calculate_quantita_stimata(points.as_slice());
+  return calculate_quantita_with_regression(points.as_slice());
 
 }
 
