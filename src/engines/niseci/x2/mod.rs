@@ -17,9 +17,6 @@ pub fn calculate_x2(campionamento: &CampionamentoNISECI, anagrafica: &Anagrafica
     Err(errors) => return Err(errors),
   };
 
-  println!("x2_a {}", x2_a);
-  println!("x2_b {}", x2_b);
-
   let mut specie_campionate_set:HashMap<String, bool> = HashMap::new();
   for cattura in &campionamento.campionamento {
     if cattura.specie.tipo_autoctono == 1 || cattura.specie.tipo_autoctono == 2 {
@@ -33,8 +30,6 @@ pub fn calculate_x2(campionamento: &CampionamentoNISECI, anagrafica: &Anagrafica
   }
 
   let tot_specie_attese_trovate = specie_campionate_set.len();
-  println!("specie_attese_trovate {} campionate {}", tot_specie_attese_trovate, campionamento.campionamento.len());
-
 
   let result = (0.6 * x2_a + 0.4 * x2_b) / tot_specie_attese_trovate as f32;   
   
@@ -138,9 +133,6 @@ fn update_classi_eta(cl: &mut ClassiEtaSpecieNISECI, record: &RecordNISECI) -> (
 pub(crate) fn calculate_x2_a(classe: &ClassiEtaSpecieNISECI) -> Result<f32, String> {
   let criterio_a: u8 = classe.get_x2_a_criterio_a();
   let criterio_b: u8 = classe.get_x2_a_criterio_b();
-
-  println!("crit a {}", criterio_a);
-  println!("crit b {}", criterio_b);
 
   if criterio_a == 1 && criterio_b == 3 {
     return Ok(0.5);
