@@ -7,27 +7,41 @@ use super::linear_regression::{calculate_quantita_with_regression, Point};
 
 
 
-pub fn calculate_x2(riferimento: &RiferimentoNISECI, campionamento: &CampionamentoNISECI, anagrafica: &AnagraficaNISECI) -> Result<f32, Vec<String>> {
-  let x2_a = calculate_sommatoria_x2_a(riferimento, campionamento);
-  let x2_b = match calculate_sommatoria_x2_b(riferimento, campionamento, anagrafica){
+pub fn calculate_x2(campionamento: &CampionamentoNISECI, anagrafica: &AnagraficaNISECI) -> Result<f32, Vec<String>> {
+  let x2_a = match calculate_sommatoria_x2_a(campionamento) {
+    Ok(x2_a) => x2_a,
+    Err(errors) => return Err(errors),
+  };
+  let x2_b = match calculate_sommatoria_x2_b(campionamento, anagrafica){
     Ok(result) => result,
     Err(errors) => return Err(errors),
   };
 
-  let mut specie_aut_campionate = 0;
+  println!("x2_a {}", x2_a);
+  println!("x2_b {}", x2_b);
+
+  let mut specie_campionate_set:HashMap<String, bool> = HashMap::new();
   for cattura in &campionamento.campionamento {
-    match cattura.specie.tipo_autoctono == 1 || cattura.specie.tipo_autoctono == 2 {
-        true => specie_aut_campionate += 1,
-        false => (),
+    if cattura.specie.tipo_autoctono == 1 || cattura.specie.tipo_autoctono == 2 {
+      match specie_campionate_set.entry(cattura.specie.id.clone()) {
+          Entry::Occupied(_) => {},
+          Entry::Vacant(vacant_entry) => {
+            vacant_entry.insert(true);
+          },
+      }
     }
   }
 
-  let result = (0.6 * x2_a + 0.4 * x2_b) / specie_aut_campionate as f32;   
+  let tot_specie_attese_trovate = specie_campionate_set.len();
+  println!("specie_attese_trovate {} campionate {}", tot_specie_attese_trovate, campionamento.campionamento.len());
+
+
+  let result = (0.6 * x2_a + 0.4 * x2_b) / tot_specie_attese_trovate as f32;   
   
   Ok(result)
 }
 
-fn calculate_sommatoria_x2_a(r: &RiferimentoNISECI, c: &CampionamentoNISECI) -> f32 {
+fn calculate_sommatoria_x2_a(c: &CampionamentoNISECI) -> Result<f32, Vec<String>> {
 
   // ad ogni specie associo le loro classi che andrò poi a riempire
   // ho controllato i campionamenti di andrea e trovto massimo 9 specie diverse
@@ -53,14 +67,23 @@ fn calculate_sommatoria_x2_a(r: &RiferimentoNISECI, c: &CampionamentoNISECI) -> 
   // e si va a fare la sommatoria dei parametri trovati
 
   let mut sommatoria_x2_a = 0.0;
+  let mut errors: Vec<String> = Vec::with_capacity(classi_eta_map.len()); // prenoto ora e poi restringo dopo
   for (_key, classe) in &classi_eta_map {
-    sommatoria_x2_a += calculate_x2_a(classe);
+    match calculate_x2_a(classe) {
+      Ok(x2_a) => sommatoria_x2_a += x2_a,
+      Err(error) => errors.push(error),
+    }
   }
 
-  sommatoria_x2_a
+  if errors.len() > 0 {
+    errors.shrink_to_fit();
+    return Err(errors);
+  }
+
+  Ok(sommatoria_x2_a)
 }
 
-fn calculate_sommatoria_x2_b(r: &RiferimentoNISECI, c: &CampionamentoNISECI, anagrafica: &AnagraficaNISECI) -> Result<f32, Vec<String>> {
+fn calculate_sommatoria_x2_b(c: &CampionamentoNISECI, anagrafica: &AnagraficaNISECI) -> Result<f32, Vec<String>> {
   let superficie = anagrafica.get_larghezza_media() * anagrafica.get_lunghezza_media();
   
   let mut esemplari_per_cattura_map: HashMap<String, EsemplariPerCattura> = HashMap::with_capacity(10);
@@ -112,26 +135,29 @@ fn update_classi_eta(cl: &mut ClassiEtaSpecieNISECI, record: &RecordNISECI) -> (
   }
 }
 
-fn calculate_x2_a(classe: &ClassiEtaSpecieNISECI) -> f32 {
+pub(crate) fn calculate_x2_a(classe: &ClassiEtaSpecieNISECI) -> Result<f32, String> {
   let criterio_a: u8 = classe.get_x2_a_criterio_a();
   let criterio_b: u8 = classe.get_x2_a_criterio_b();
 
+  println!("crit a {}", criterio_a);
+  println!("crit b {}", criterio_b);
+
   if criterio_a == 1 && criterio_b == 3 {
-    return 0.5;
+    return Ok(0.5);
   }
   if criterio_a == 1 {
-    return 1.0;
+    return Ok(1.0);
   }
   if criterio_a == 2 && criterio_b == 3 {
-    return 0.0;
+    return Ok(0.0);
   }
   if criterio_a == 2 {
-    return 0.5
+    return Ok(0.5);
   }
   if criterio_a == 3 {
-    return 0.0;
+    return Ok(0.0);
   }
-  return 0.0;
+  return Err(format!("Il Criterio A o B di x2a è diverso da 1 o 2 o 3. criterio A = {}, criterio B = {}", criterio_a, criterio_b));
 }
 
 pub(crate) fn calculate_x2_b(e: &EsemplariPerCattura, superficie: &f32) -> Result<f32, String> {
@@ -197,14 +223,7 @@ pub(crate) fn calculate_q_stimata_regression(passaggi: &HashMap<u8, u32>) -> Res
   let mut esemplari_per_passaggio = vec![0 as u32; ultimo_passaggio as usize];
   
   for (key, value) in passaggi {
-    println!("key {} value {}", key, value);
     esemplari_per_passaggio[(*key - 1) as usize] = *value;
-  }
-
-let mut i = 0;
-  while i < esemplari_per_passaggio.len() {
-    println!("{}", esemplari_per_passaggio.get(i).unwrap());
-    i += 1;
   }
 
   // ora creo i punti con x == esemplari catturati fino a quel passaggio 
@@ -217,10 +236,6 @@ let mut i = 0;
       return Point::new(current_tot as i32, *esemplari as i32);
     })
     .collect();
-  
-  for point in &points {
-    println!("point {} {}", point.x, point.y);
-  }
 
   return calculate_quantita_with_regression(points.as_slice());
 

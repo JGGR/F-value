@@ -422,25 +422,175 @@ pub fn create_dummy_campionamento_chopped() -> CampionamentoNISECI {
 
 /// In questo campionamento troverai: 
 /// -> C1
-///   -> 30 ciacci
-///   -> 30 trocchi
-///   -> 100 bronzi
+///   -> 10 ciacci cl5
+///   -> 10 ciacci cl4
+///   -> 10 ciacci cl3
 /// -> C2
-///   -> 12 ciacci
-///   -> 15 trocchi
-///   -> 75 bronzi
-/// -> C3
-///   -> 50 bronzi
-// pub fn create_massive_campionamento() -> CampionamentoNISECI {
-//   let importante_1 = get_ciaccio();
-//   let importante_2 = get_trocchio();
-//   let importante_3 = get_bronzo();
-
-//   let mut campionamento: Vec<RecordNISECI> = Vec::with_capacity(312);
-
+///   -> 10 ciacci cl2
+///   -> 5 ciacci cl1
+/// aggiungo in C2 anche una specie alloctono per testare la conta delle specie autoctone trovate
+/// x2a qua vale 1.0 e x2b 1.0
+pub fn create_massive_campionamento_ciacci_1() -> CampionamentoNISECI {
+  let mut ciaccio = get_ciaccio();
+  ciaccio.dens_soglia1 = 3.0;
+  ciaccio.dens_soglia2 = 5.0;
   
+  let mut campionamento: Vec<RecordNISECI> = Vec::with_capacity(45);
 
-// }
+  // 10 ciacci cl5 in c1
+  let ciaccio_cl5_c1 = RecordNISECI {
+    specie: ciaccio.clone(),
+    lunghezza: 13,
+    passaggio_cattura: 1,
+    peso: 10
+  };
+  for _ in 0..10 {
+    campionamento.push(ciaccio_cl5_c1.clone());
+  }
+  
+  // 10 ciacci cl4 in c1
+  let ciaccio_cl4_c1 = RecordNISECI {
+    specie: ciaccio.clone(),
+    lunghezza: 10,
+    passaggio_cattura: 1,
+    peso: 10
+  };
+  for _ in 0..10 {
+    campionamento.push(ciaccio_cl4_c1.clone());
+  }
+
+  // 10 ciacci cl3 in c1
+  let ciaccio_cl3_c1 = RecordNISECI {
+    specie: ciaccio.clone(),
+    lunghezza: 7,
+    passaggio_cattura: 1,
+    peso: 10
+  };
+  for _ in 0..10 {
+    campionamento.push(ciaccio_cl3_c1.clone());
+  }
+
+  // 10 ciacci cl2 in c2
+  let ciaccio_cl2_c2 = RecordNISECI {
+    specie: ciaccio.clone(),
+    lunghezza: 4,
+    passaggio_cattura: 2,
+    peso: 10
+  };
+  for _ in 0..10 {
+    campionamento.push(ciaccio_cl2_c2.clone());
+  }
+
+  // 5 ciacci cl1 in c2
+  let ciaccio_cl1_c2 = RecordNISECI {
+    specie: ciaccio.clone(),
+    lunghezza: 4,
+    passaggio_cattura: 2,
+    peso: 10
+  };
+  for _ in 0..5 {
+    campionamento.push(ciaccio_cl1_c2.clone());
+  }
+
+  // pesce alloctono in C2
+  let trocchio = RecordNISECI {
+    specie: get_trocchio(),
+    passaggio_cattura: 2,
+    lunghezza: 2,
+    peso: 2
+  };
+  campionamento.push(trocchio);
+  
+  CampionamentoNISECI {
+    campionamento: campionamento
+  }
+}
+
+/// In questo campionamento troverai: 
+/// -> C1
+///   -> 10 ciacci cl5
+///   -> 10 ciacci cl4
+///   -> 10 ciacci cl3
+/// -> C2
+///   -> 10 ciacci cl4
+///   -> 5 ciacci cl1
+/// aggiungo in C2 anche una specie alloctono per testare la conta delle specie autoctone trovate
+/// x2a qua vale 0.5 e x2b 1.0
+pub fn create_massive_campionamento_ciacci_2() -> CampionamentoNISECI {
+  let mut ciaccio = get_ciaccio();
+  ciaccio.dens_soglia1 = 3.0;
+  ciaccio.dens_soglia2 = 5.0;
+  
+  let mut campionamento: Vec<RecordNISECI> = Vec::with_capacity(45);
+
+  // 10 ciacci cl5 in c1
+  let ciaccio_cl5_c1 = RecordNISECI {
+    specie: ciaccio.clone(),
+    lunghezza: 13,
+    passaggio_cattura: 1,
+    peso: 10
+  };
+  for _ in 0..10 {
+    campionamento.push(ciaccio_cl5_c1.clone());
+  }
+  
+  // 10 ciacci cl4 in c1
+  let ciaccio_cl4_c1 = RecordNISECI {
+    specie: ciaccio.clone(),
+    lunghezza: 10,
+    passaggio_cattura: 1,
+    peso: 10
+  };
+  for _ in 0..10 {
+    campionamento.push(ciaccio_cl4_c1.clone());
+  }
+
+  // 10 ciacci cl3 in c1
+  let ciaccio_cl3_c1 = RecordNISECI {
+    specie: ciaccio.clone(),
+    lunghezza: 7,
+    passaggio_cattura: 1,
+    peso: 10
+  };
+  for _ in 0..10 {
+    campionamento.push(ciaccio_cl3_c1.clone());
+  }
+
+  // 10 ciacci cl4 in c2
+  let ciaccio_cl4_c2 = RecordNISECI {
+    specie: ciaccio.clone(),
+    lunghezza: 10,
+    passaggio_cattura: 2,
+    peso: 10
+  };
+  for _ in 0..10 {
+    campionamento.push(ciaccio_cl4_c2.clone());
+  }
+
+  // 5 ciacci cl1 in c2
+  let ciaccio_cl1_c2 = RecordNISECI {
+    specie: ciaccio.clone(),
+    lunghezza: 2,
+    passaggio_cattura: 2,
+    peso: 10
+  };
+  for _ in 0..5 {
+    campionamento.push(ciaccio_cl1_c2.clone());
+  }
+
+  // pesce alloctono in C2
+  let trocchio = RecordNISECI {
+    specie: get_trocchio(),
+    passaggio_cattura: 2,
+    lunghezza: 2,
+    peso: 2
+  };
+  campionamento.push(trocchio);
+  
+  CampionamentoNISECI {
+    campionamento: campionamento
+  }
+}
 
 /// id == 1
 pub fn get_ciaccio() -> SpecieNISECI {
@@ -469,8 +619,8 @@ pub fn get_trocchio() -> SpecieNISECI {
     id: 2.to_string(),
     specie_attesa: true,
     nome: "Trocchio trocchiensis".to_string(),
-    tipo_autoctono: 2,
-    tipo_alloctono: 0,
+    tipo_autoctono: 0,
+    tipo_alloctono: 1,
     cl_soglia1: 1,
     cl_soglia2: 2,
     cl_soglia3: 3,

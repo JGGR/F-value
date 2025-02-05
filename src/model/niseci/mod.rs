@@ -167,22 +167,21 @@ impl fmt::Display for TipoComunitaNISECI {
 
 #[derive(Clone)]
 pub struct ComunitaNISECI {
-  tipo: TipoComunitaNISECI,
-  fonte: Option<String>,
-  numero_protocollo: Option<String>
+  pub tipo: TipoComunitaNISECI,
+  pub fonte: Option<String>,
+  pub numero_protocollo: Option<String>
 }
 
 #[derive(Clone)]
 pub struct AnagraficaNISECI {
-  comunita: ComunitaNISECI,
-  codice_stazione: u32,
-  nome_fiume: String,
-  bacino_appartenenza: String,
-  idro_eco_regione: IdroEcoRegioneNISECI,
-  posizione: Location,
-  lunghezza_media_stazione: f32,
-  larghezza_media_stazione: f32,
-  denasita_stimata: u32
+  pub comunita: ComunitaNISECI,
+  pub codice_stazione: u32,
+  pub nome_fiume: String,
+  pub bacino_appartenenza: String,
+  pub idro_eco_regione: IdroEcoRegioneNISECI,
+  pub posizione: Location,
+  pub lunghezza_media_stazione: f32,
+  pub larghezza_media_stazione: f32
 }
 
 impl AnagraficaNISECI {
@@ -319,16 +318,24 @@ impl ClassiEtaSpecieNISECI {
     }
 
     let ad_juv = (self.cl4 + self.cl5) as f32 / (self.cl2 + self.cl3) as f32;
+    println!("ad_juv {}", ad_juv);
+    println!("cl1 {}", self.cl1);
+    println!("cl2 {}", self.cl2);
+    println!("cl3 {}", self.cl3);
+    println!("cl4 {}", self.cl4);
+    println!("cl5 {}", self.cl5);
     if ad_juv < self.specie.ad_juv_soglia1 {
       return 3;
     }
     if ad_juv <= self.specie.ad_juv_soglia2 {
+      println!("entrato1");
       return 2;
     }
     if ad_juv <= self.specie.ad_juv_soglia3 {
       return 1;
     }
     if ad_juv <= self.specie.ad_juv_soglia4 {
+      println!("entrato2");
       return 2;
     }
     return 3;
