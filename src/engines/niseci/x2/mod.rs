@@ -1,6 +1,6 @@
 use std::collections::{hash_map::Entry, HashMap};
 
-use crate::model::niseci::{AnagraficaNISECI, CampionamentoNISECI, ClassiEtaSpecieNISECI, EsemplariPerCattura, RecordNISECI, RiferimentoNISECI};
+use crate::model::niseci::{AnagraficaNISECI, CampionamentoNISECI, ClassiEtaSpecieNISECI, EsemplariPerCattura, RecordNISECI};
 
 use super::linear_regression::{calculate_quantita_with_regression, Point};
 
@@ -130,26 +130,9 @@ fn update_classi_eta(cl: &mut ClassiEtaSpecieNISECI, record: &RecordNISECI) -> (
   }
 }
 
+/// fn wrapper del calcolo della struttura di una popolazione
 pub(crate) fn calculate_x2_a(classe: &ClassiEtaSpecieNISECI) -> Result<f32, String> {
-  let criterio_a: u8 = classe.get_x2_a_criterio_a();
-  let criterio_b: u8 = classe.get_x2_a_criterio_b();
-
-  if criterio_a == 1 && criterio_b == 3 {
-    return Ok(0.5);
-  }
-  if criterio_a == 1 {
-    return Ok(1.0);
-  }
-  if criterio_a == 2 && criterio_b == 3 {
-    return Ok(0.0);
-  }
-  if criterio_a == 2 {
-    return Ok(0.5);
-  }
-  if criterio_a == 3 {
-    return Ok(0.0);
-  }
-  return Err(format!("Il Criterio A o B di x2a è diverso da 1 o 2 o 3. criterio A = {}, criterio B = {}", criterio_a, criterio_b));
+  return classe.calculate_struttura_popolazione();
 }
 
 pub(crate) fn calculate_x2_b(e: &EsemplariPerCattura, superficie: &f32) -> Result<f32, String> {

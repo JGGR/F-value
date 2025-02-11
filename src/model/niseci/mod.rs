@@ -143,6 +143,28 @@ impl CampionamentoNISECI {
             campionamento: campionamento,
         }
     }
+
+    pub fn get_numero_pesci_alieni_e_indigeni(&self) -> AlieniIndigeni {
+      let mut alieni_indigeni = AlieniIndigeni {
+        alieni: 0,
+        indigeni: 0
+      };
+
+      for pesce in &self.campionamento {
+        if pesce.specie.tipo_alloctono > 0 && pesce.specie.tipo_alloctono <= 3 {
+          alieni_indigeni.alieni += 1;
+        } else if pesce.specie.tipo_autoctono == 1 || pesce.specie.tipo_autoctono == 2  {
+          alieni_indigeni.indigeni += 1;
+        }
+      }
+
+      return alieni_indigeni
+    }
+}
+
+pub struct AlieniIndigeni {
+  pub alieni: u32,
+  pub indigeni: u32
 }
 
 #[derive(Clone)]
@@ -341,6 +363,30 @@ impl ClassiEtaSpecieNISECI {
     return 3;
   }
 
+  /// questa fn viene usata sia per x2_a che per x3
+  /// i suoi test sono esattamente quelli per calculate_x2_a
+  pub(crate) fn calculate_struttura_popolazione(&self) -> Result<f32, String> {
+    let criterio_a: u8 = self.get_x2_a_criterio_a();
+    let criterio_b: u8 = self.get_x2_a_criterio_b();
+
+    if criterio_a == 1 && criterio_b == 3 {
+      return Ok(0.5);
+    }
+    if criterio_a == 1 {
+      return Ok(1.0);
+    }
+    if criterio_a == 2 && criterio_b == 3 {
+      return Ok(0.0);
+    }
+    if criterio_a == 2 {
+      return Ok(0.5);
+    }
+    if criterio_a == 3 {
+      return Ok(0.0);
+    }
+    return Err(format!("Il Criterio A o B di x2a è diverso da 1 o 2 o 3. criterio A = {}, criterio B = {}", criterio_a, criterio_b));
+  }
+
 }
 
 pub enum ClassiEta {
@@ -363,6 +409,122 @@ impl ClassiEta {
       return ClassiEta::CL4;
     } else {
       return ClassiEta::CL5;
+    }
+  }
+}
+
+pub struct InfoPopolazioniNISECI {
+  pub popolazione_piu_strutt: f32,
+  pub species_strutt: u32,
+  pub species_mediamente_strutt: u32,
+  pub species_destrutt: u32,
+  pub tot_species: usize
+}
+
+impl InfoPopolazioniNISECI {
+  pub fn new() -> InfoPopolazioniNISECI {
+    InfoPopolazioniNISECI {
+      popolazione_piu_strutt: 0.0,
+      species_strutt: 0,
+      species_mediamente_strutt: 0,
+      species_destrutt: 0,
+      tot_species: 0
+    }
+  }
+
+  pub fn get_info_pop(map: &HashMap<String, ClassiEtaSpecieNISECI>) -> Result<InfoPopolazioniNISECI, Vec<String>> {
+    let mut errors: Vec<String> = Vec::with_capacity(map.len()); // prenoto ora e poi restringo dopo
+  
+    let mut info_pop = InfoPopolazioniNISECI::new();
+    info_pop.tot_species = map.len();
+    
+    for (_key, classe) in map {
+      match classe.calculate_struttura_popolazione() {
+        Ok(popolazione) => {
+          if info_pop.popolazione_piu_strutt < popolazione {
+            info_pop.popolazione_piu_strutt = popolazione;
+          }
+          if popolazione == 1.0 {
+            info_pop.species_strutt += 1;
+          }
+          if popolazione == 0.5 {
+            info_pop.species_mediamente_strutt += 1;
+          }
+          if popolazione == 0.0  {
+            info_pop.species_destrutt += 1;
+          }
+        },
+        Err(error) => errors.push(error),
+      }
+    }
+  
+    if errors.len() > 0 {
+      errors.shrink_to_fit();
+      return Err(errors);
+    }
+  
+    Ok(info_pop)
+  }
+}
+
+pub struct InfoPopolazioniAlieneNISECI {
+  pub tipo_1: InfoPopolazioniNISECI,
+  pub tipo_2: InfoPopolazioniNISECI,
+  pub tipo_3: InfoPopolazioniNISECI,
+  pub tot_specie_aliene: usize,
+  pub tot_specie_autoctone: usize,
+}
+
+impl InfoPopolazioniAlieneNISECI {
+  pub fn get_info_pop_aliene(classi_eta: &ClassiEtaAlieniNISECI) -> Result<InfoPopolazioniAlieneNISECI, Vec<String>> {
+    let tipo_1 = match InfoPopolazioniNISECI::get_info_pop(&classi_eta.map_tipo_1) {
+      Ok(info) => info,
+      Err(err) => return Err(err),
+    };
+    let tipo_2 = match InfoPopolazioniNISECI::get_info_pop(&classi_eta.map_tipo_2) {
+      Ok(info) => info,
+      Err(err) => return Err(err),
+    };
+    let tipo_3 = match InfoPopolazioniNISECI::get_info_pop(&classi_eta.map_tipo_3) {
+      Ok(info) => info,
+      Err(err) => return Err(err),
+    };
+    
+    let info_pop_aliene = InfoPopolazioniAlieneNISECI {
+      tipo_1,
+      tipo_2,
+      tipo_3,
+      tot_specie_aliene: classi_eta.tot_specie_aliene,
+      tot_specie_autoctone: classi_eta.tot_specie_autoctone
+    };
+    
+    Ok(info_pop_aliene)
+  }
+
+  pub fn get_species_mediamente_strutt(&self) -> u32 {
+    self.tipo_1.species_mediamente_strutt + self.tipo_2.species_mediamente_strutt + self.tipo_3.species_mediamente_strutt
+  }
+  pub fn get_species_destrutt(&self) -> u32 {
+    self.tipo_1.species_destrutt + self.tipo_2.species_destrutt + self.tipo_3.species_destrutt
+  }
+}
+
+pub struct ClassiEtaAlieniNISECI {
+  pub map_tipo_1: HashMap<String, ClassiEtaSpecieNISECI>,
+  pub map_tipo_2: HashMap<String, ClassiEtaSpecieNISECI>,
+  pub map_tipo_3: HashMap<String, ClassiEtaSpecieNISECI>,
+  pub tot_specie_aliene: usize,
+  pub tot_specie_autoctone: usize
+}
+
+impl ClassiEtaAlieniNISECI {
+  pub fn new() -> ClassiEtaAlieniNISECI {
+    ClassiEtaAlieniNISECI {
+      map_tipo_1: HashMap::with_capacity(10),
+      map_tipo_2: HashMap::with_capacity(10),
+      map_tipo_3: HashMap::with_capacity(10),
+      tot_specie_aliene: 0,
+      tot_specie_autoctone: 0
     }
   }
 }
