@@ -158,7 +158,7 @@ pub(crate) fn calculate_x2_b(e: &EsemplariPerCattura, superficie: &f32) -> Resul
 
 pub(crate) fn get_quantita_stimata(passaggi: &HashMap<u8, u32>) -> Result<u32, String> {
   if passaggi.len() == 1 {
-    return Ok(*passaggi.get(passaggi.keys().min().unwrap()).unwrap());
+    return Ok(*passaggi.values().next().unwrap()); // sempre valorizzato
   }
   if passaggi.len() == 2 && passaggi.contains_key(&1) && passaggi.contains_key(&2) {
     let c1 = *passaggi.get(&1).unwrap();
