@@ -4,7 +4,7 @@ mod core;
 #[cfg(test)]
 mod engines;
 #[cfg(test)]
-mod test_utils;
+pub mod test_utils;
 #[cfg(test)]
 mod model;
 
