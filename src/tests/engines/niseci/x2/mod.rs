@@ -6,7 +6,7 @@ use crate::{engines::niseci::x2::{calculate_passaggi_ripetuti, calculate_q_stima
 
 
 #[test]
-fn calculate_q_stimata_regression_test_1() {
+fn calcola_q_stimata_regression() {
   let mut passaggi: HashMap<u8, u32> = HashMap::new();
   passaggi.insert(1, 70);
   passaggi.insert(2, 60);
@@ -20,7 +20,7 @@ fn calculate_q_stimata_regression_test_1() {
 }
 
 #[test]
-fn calculate_q_stimata_regression_test_err() {
+fn calcola_q_stimata_regression_err() {
   let mut passaggi: HashMap<u8, u32> = HashMap::new();
   passaggi.insert(1, 50);
   passaggi.insert(2, 75);
@@ -32,25 +32,21 @@ fn calculate_q_stimata_regression_test_err() {
 }
 
 #[test]
-fn calculate_passaggi_ripetuti_test_1() {
+fn calcola_passaggi_ripetuti() {
 
-  let q_stimata = calculate_passaggi_ripetuti(30, 12);
+  let q_stimata_1 = calculate_passaggi_ripetuti(30, 12);
+  
+  assert!(q_stimata_1.is_ok());
+  assert_eq!(q_stimata_1.unwrap(), 50);
 
-  assert!(q_stimata.is_ok());
-  assert_eq!(q_stimata.unwrap(), 50);
+  let q_stimata_2 = calculate_passaggi_ripetuti(30, 15);
+  
+  assert!(q_stimata_2.is_ok());
+  assert_eq!(q_stimata_2.unwrap(), 60);
 }
 
 #[test]
-fn calculate_passaggi_ripetuti_test_2() {
-
-  let q_stimata = calculate_passaggi_ripetuti(30, 15);
-
-  assert!(q_stimata.is_ok());
-  assert_eq!(q_stimata.unwrap(), 60);
-}
-
-#[test]
-fn calculate_passaggi_ripetuti_test_negative() {
+fn calcola_passaggi_ripetuti_err_negative() {
 
   let q_stimata = calculate_passaggi_ripetuti(15, 30);
 
@@ -58,7 +54,7 @@ fn calculate_passaggi_ripetuti_test_negative() {
 }
 
 #[test]
-fn calculate_passaggi_ripetuti_test_same_values() {
+fn calcola_passaggi_ripetuti_err_same_values() {
 
   let q_stimata = calculate_passaggi_ripetuti(30, 30);
 
@@ -66,7 +62,7 @@ fn calculate_passaggi_ripetuti_test_same_values() {
 }
 
 #[test]
-fn get_quantita_stimata_test_1() {
+fn get_quantita_stimata_regression() {
   let mut passaggi: HashMap<u8, u32> = HashMap::new();
   passaggi.insert(1, 70);
   passaggi.insert(2, 60);
@@ -80,7 +76,7 @@ fn get_quantita_stimata_test_1() {
 }
 
 #[test]
-fn get_quantita_stimata_test_3() {
+fn get_quantita_stimata_passaggi_ripetuti() {
   let mut passaggi: HashMap<u8, u32> = HashMap::new();
   passaggi.insert(1, 30);
   passaggi.insert(2, 12);
@@ -89,22 +85,19 @@ fn get_quantita_stimata_test_3() {
 
   assert!(q_stimata.is_ok());
   assert_eq!(50, q_stimata.unwrap());
+  
+  let mut passaggi2: HashMap<u8, u32> = HashMap::new();
+  passaggi2.insert(1, 30);
+  passaggi2.insert(2, 15);
+  
+  let q_stimata2 = get_quantita_stimata(&passaggi2);
+  
+  assert!(q_stimata2.is_ok());
+  assert_eq!(60, q_stimata2.unwrap());
 }
 
 #[test]
-fn get_quantita_stimata_test_4() {
-  let mut passaggi: HashMap<u8, u32> = HashMap::new();
-  passaggi.insert(1, 30);
-  passaggi.insert(2, 15);
-
-  let q_stimata = get_quantita_stimata(&passaggi);
-
-  assert!(q_stimata.is_ok());
-  assert_eq!(60, q_stimata.unwrap());
-}
-
-#[test]
-fn get_quantita_stimata_test_negative() {
+fn get_quantita_stimata_err_passaggi_ripetuti_negative() {
   let mut passaggi: HashMap<u8, u32> = HashMap::new();
   passaggi.insert(1, 15);
   passaggi.insert(2, 30);
@@ -115,7 +108,7 @@ fn get_quantita_stimata_test_negative() {
 }
 
 #[test]
-fn get_quantita_stimata_test_err() {
+fn get_quantita_stimata_err_progression() {
   let mut passaggi: HashMap<u8, u32> = HashMap::new();
   passaggi.insert(1, 50);
   passaggi.insert(2, 75);
@@ -127,7 +120,7 @@ fn get_quantita_stimata_test_err() {
 }
 
 #[test]
-fn calculate_x2_b_test_1_0() {
+fn calculate_x2_b_buona() {
   let mut passaggi: HashMap<u8, u32> = HashMap::new();
   passaggi.insert(1, 30);
   passaggi.insert(2, 15);
@@ -147,7 +140,7 @@ fn calculate_x2_b_test_1_0() {
 }
 
 #[test]
-fn calculate_x2_b_test_0_5() {
+fn calculate_x2_b_test_intermedia() {
   let mut passaggi: HashMap<u8, u32> = HashMap::new();
   passaggi.insert(1, 30);
   passaggi.insert(2, 15);
@@ -169,7 +162,7 @@ fn calculate_x2_b_test_0_5() {
 }
 
 #[test]
-fn calculate_x2_b_test_0_0() {
+fn calculate_x2_b_test_scarsa() {
   let mut passaggi: HashMap<u8, u32> = HashMap::new();
   passaggi.insert(1, 30);
   passaggi.insert(2, 15);
@@ -442,7 +435,7 @@ fn calculate_x2_a_test_ca_2_cb_1() {
 }
 
 #[test]
-fn calculate_x2_a_test_ca_2_cb_2() {
+fn calculate_x2_a_test_ca_2_cb_2_adulti() {
   let classe = ClassiEtaSpecieNISECI {
     specie: get_ciaccio(),
     cl1: 0,
@@ -450,6 +443,24 @@ fn calculate_x2_a_test_ca_2_cb_2() {
     cl3: 2,
     cl4: 2,
     cl5: 2,
+  };
+
+  let x2_a = calculate_x2_a(&classe);
+
+  assert!(x2_a.is_ok());
+  assert_eq!(0.5, x2_a.unwrap());
+
+}
+
+#[test]
+fn calculate_x2_a_test_ca_2_cb_2_giovani() {
+  let classe = ClassiEtaSpecieNISECI {
+    specie: get_ciaccio(),
+    cl1: 0,
+    cl2: 2,
+    cl3: 2,
+    cl4: 2,
+    cl5: 0,
   };
 
   let x2_a = calculate_x2_a(&classe);
@@ -486,6 +497,24 @@ fn calculate_x2_a_test_ca_2_cb_3_giovani() {
     cl3: 6,
     cl4: 1,
     cl5: 1,
+  };
+
+  let x2_a = calculate_x2_a(&classe);
+
+  assert!(x2_a.is_ok());
+  assert_eq!(0.0, x2_a.unwrap());
+
+}
+
+#[test]
+fn calculate_x2_a_test_ca_3_cb_3_adulti() {
+  let classe = ClassiEtaSpecieNISECI {
+    specie: get_ciaccio(),
+    cl1: 0,
+    cl2: 0,
+    cl3: 1,
+    cl4: 0,
+    cl5: 6,
   };
 
   let x2_a = calculate_x2_a(&classe);
@@ -550,6 +579,24 @@ fn calculate_x2_a_test_ca_3_cb_2_giovani() {
 }
 
 #[test]
+fn calculate_x2_a_test_ca_3_cb_2_adulti() {
+  let classe = ClassiEtaSpecieNISECI {
+    specie: get_ciaccio(),
+    cl1: 0,
+    cl2: 0,
+    cl3: 1,
+    cl4: 0,
+    cl5: 2,
+  };
+
+  let x2_a = calculate_x2_a(&classe);
+
+  assert!(x2_a.is_ok());
+  assert_eq!(0.0, x2_a.unwrap());
+
+}
+
+#[test]
 fn calculate_x2_a_test_ca_1_cb_3_adulti_cl1_valorizzato() {
   let classe = ClassiEtaSpecieNISECI {
     specie: get_ciaccio(),
@@ -597,18 +644,17 @@ fn calculate_x2_test_1() {
 
   assert!(x2.is_ok());
   assert_eq!(1.0, x2.unwrap());
-}
 
-#[test]
-fn calculate_x2_test_2() {
+  // secondo test con valori alternativi
+
   let campionamento = create_massive_campionamento_ciacci_2();
-
+  
   let comunita = ComunitaNISECI {
     fonte: Some("hey".to_string()),
     numero_protocollo: None,
     tipo: TipoComunitaNISECI::Dm260_2010
   };
-
+  
   let anagrafica = AnagraficaNISECI {
     bacino_appartenenza: "dummy".to_string(),
     codice_stazione: 1,
@@ -622,10 +668,10 @@ fn calculate_x2_test_2() {
       provincia: "oristano".to_string()
     }
   };
-
-
+  
+  
   let x2 = calculate_x2(&campionamento, &anagrafica);
-
+  
   assert!(x2.is_ok());
   let epsilon: f32 = 1e-6;
   assert!((0.7 - x2.unwrap()).abs() < epsilon);
