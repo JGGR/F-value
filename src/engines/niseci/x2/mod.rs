@@ -160,6 +160,8 @@ pub(crate) fn get_quantita_stimata(passaggi: &HashMap<u8, u32>) -> Result<u32, S
   if passaggi.len() == 1 {
     return Ok(*passaggi.values().next().unwrap()); // sempre valorizzato
   }
+
+  // passaggi viene creata in calculate_sommatoria_x2_b()
   if passaggi.len() == 2 && passaggi.contains_key(&1) && passaggi.contains_key(&2) {
     let c1 = *passaggi.get(&1).unwrap();
     let c2 = *passaggi.get(&2).unwrap();
