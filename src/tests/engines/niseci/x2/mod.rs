@@ -191,7 +191,7 @@ fn calculate_x2_b_test_0_0() {
 }
 
 #[test]
-fn calculate_x2_a_criterio_a_1() {
+fn calculate_x2_a_criterio_a_5_classi_valorizzate() {
   let classe = ClassiEtaSpecieNISECI {
     specie: get_ciaccio(),
     cl1: 1,
@@ -207,7 +207,7 @@ fn calculate_x2_a_criterio_a_1() {
 }
 
 #[test]
-fn calculate_x2_a_criterio_a_2() {
+fn calculate_x2_a_criterio_a_3_classi_valorizzate() {
   let classe = ClassiEtaSpecieNISECI {
     specie: get_ciaccio(),
     cl1: 0,
@@ -222,7 +222,7 @@ fn calculate_x2_a_criterio_a_2() {
 }
 
 #[test]
-fn calculate_x2_a_criterio_a_3() {
+fn calculate_x2_a_criterio_a_2_classi_valorizzate() {
   let classe = ClassiEtaSpecieNISECI {
     specie: get_ciaccio(),
     cl1: 0,
@@ -238,7 +238,7 @@ fn calculate_x2_a_criterio_a_3() {
 }
 
 #[test]
-fn calculate_x2_a_criterio_b_cl_zero() {
+fn calculate_x2_a_criterio_b_zero_giovani() {
   let classe = ClassiEtaSpecieNISECI {
     specie: get_ciaccio(),
     cl1: 0,
@@ -254,7 +254,7 @@ fn calculate_x2_a_criterio_b_cl_zero() {
 }
 
 #[test]
-fn calculate_x2_a_criterio_b_1() {
+fn calculate_x2_a_criterio_b_1_bilanciato() {
   let classe = ClassiEtaSpecieNISECI {
     specie: get_ciaccio(),
     cl1: 0,
@@ -270,7 +270,7 @@ fn calculate_x2_a_criterio_b_1() {
 }
 
 #[test]
-fn calculate_x2_a_criterio_b_2_uno() {
+fn calculate_x2_a_criterio_b_2_medio_sbilanciato_adulti() {
   let classe = ClassiEtaSpecieNISECI {
     specie: get_ciaccio(),
     cl1: 0,
@@ -286,7 +286,7 @@ fn calculate_x2_a_criterio_b_2_uno() {
 }
 
 #[test]
-fn calculate_x2_a_criterio_b_2_due() {
+fn calculate_x2_a_criterio_b_2_medio_sbilanciato_giovani() {
   let classe = ClassiEtaSpecieNISECI {
     specie: get_ciaccio(),
     cl1: 0,
@@ -302,7 +302,7 @@ fn calculate_x2_a_criterio_b_2_due() {
 }
 
 #[test]
-fn calculate_x2_a_criterio_b_3_uno() {
+fn calculate_x2_a_criterio_b_3_molto_sbilanciato_adulti() {
   let classe = ClassiEtaSpecieNISECI {
     specie: get_ciaccio(),
     cl1: 0,
@@ -318,7 +318,7 @@ fn calculate_x2_a_criterio_b_3_uno() {
 }
 
 #[test]
-fn calculate_x2_a_criterio_b_3_due() {
+fn calculate_x2_a_criterio_b_3_molto_sbilanciato_giovani() {
   let classe = ClassiEtaSpecieNISECI {
     specie: get_ciaccio(),
     cl1: 0,
@@ -334,7 +334,7 @@ fn calculate_x2_a_criterio_b_3_due() {
 }
 
 #[test]
-fn calculate_x2_a_test_1() {
+fn calculate_x2_a_test_ca_1_cb_3_giovani() {
   let classe = ClassiEtaSpecieNISECI {
     specie: get_ciaccio(),
     cl1: 0,
@@ -352,7 +352,7 @@ fn calculate_x2_a_test_1() {
 }
 
 #[test]
-fn calculate_x2_a_test_2() {
+fn calculate_x2_a_test_ca_1_cb_3_adulti() {
   let classe = ClassiEtaSpecieNISECI {
     specie: get_ciaccio(),
     cl1: 0,
@@ -370,7 +370,7 @@ fn calculate_x2_a_test_2() {
 }
 
 #[test]
-fn calculate_x2_a_test_3() {
+fn calculate_x2_a_test_ca_1_cb_2_adulti() {
   let classe = ClassiEtaSpecieNISECI {
     specie: get_ciaccio(),
     cl1: 0,
@@ -388,7 +388,25 @@ fn calculate_x2_a_test_3() {
 }
 
 #[test]
-fn calculate_x2_a_test_4() {
+fn calculate_x2_a_test_ca_1_cb_2_giovani() {
+  let classe = ClassiEtaSpecieNISECI {
+    specie: get_ciaccio(),
+    cl1: 0,
+    cl2: 2,
+    cl3: 2,
+    cl4: 1,
+    cl5: 1,
+  };
+
+  let x2_a = calculate_x2_a(&classe);
+
+  assert!(x2_a.is_ok());
+  assert_eq!(1.0, x2_a.unwrap());
+
+}
+
+#[test]
+fn calculate_x2_a_test_ca_1_cb_1() {
   let classe = ClassiEtaSpecieNISECI {
     specie: get_ciaccio(),
     cl1: 0,
@@ -406,7 +424,7 @@ fn calculate_x2_a_test_4() {
 }
 
 #[test]
-fn calculate_x2_a_test_5() {
+fn calculate_x2_a_test_ca_2_cb_1() {
   let classe = ClassiEtaSpecieNISECI {
     specie: get_ciaccio(),
     cl1: 0,
@@ -424,7 +442,7 @@ fn calculate_x2_a_test_5() {
 }
 
 #[test]
-fn calculate_x2_a_test_6() {
+fn calculate_x2_a_test_ca_2_cb_2() {
   let classe = ClassiEtaSpecieNISECI {
     specie: get_ciaccio(),
     cl1: 0,
@@ -442,7 +460,7 @@ fn calculate_x2_a_test_6() {
 }
 
 #[test]
-fn calculate_x2_a_test_7() {
+fn calculate_x2_a_test_ca_2_cb_3_adulti() {
   let classe = ClassiEtaSpecieNISECI {
     specie: get_ciaccio(),
     cl1: 0,
@@ -460,7 +478,7 @@ fn calculate_x2_a_test_7() {
 }
 
 #[test]
-fn calculate_x2_a_test_8() {
+fn calculate_x2_a_test_ca_2_cb_3_giovani() {
   let classe = ClassiEtaSpecieNISECI {
     specie: get_ciaccio(),
     cl1: 0,
@@ -478,7 +496,7 @@ fn calculate_x2_a_test_8() {
 }
 
 #[test]
-fn calculate_x2_a_test_9() {
+fn calculate_x2_a_test_ca_3_cb_3_giovani() {
   let classe = ClassiEtaSpecieNISECI {
     specie: get_ciaccio(),
     cl1: 0,
@@ -496,7 +514,7 @@ fn calculate_x2_a_test_9() {
 }
 
 #[test]
-fn calculate_x2_a_test_10() {
+fn calculate_x2_a_test_ca_3_cb_1() {
   let classe = ClassiEtaSpecieNISECI {
     specie: get_ciaccio(),
     cl1: 0,
@@ -514,7 +532,7 @@ fn calculate_x2_a_test_10() {
 }
 
 #[test]
-fn calculate_x2_a_test_11() {
+fn calculate_x2_a_test_ca_3_cb_2_giovani() {
   let classe = ClassiEtaSpecieNISECI {
     specie: get_ciaccio(),
     cl1: 0,
@@ -532,7 +550,7 @@ fn calculate_x2_a_test_11() {
 }
 
 #[test]
-fn calculate_x2_a_test_12() {
+fn calculate_x2_a_test_ca_1_cb_3_adulti_cl1_valorizzato() {
   let classe = ClassiEtaSpecieNISECI {
     specie: get_ciaccio(),
     cl1: 5,
