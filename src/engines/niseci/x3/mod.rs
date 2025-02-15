@@ -4,7 +4,6 @@ use crate::model::niseci::{CampionamentoNISECI, ClassiEtaAlieniNISECI, ClassiEta
 
 
 
-
 pub fn calculate_x3(c: &CampionamentoNISECI) -> Result<f32, Vec<String>> {
 
   let alieni_indigeni = c.get_numero_pesci_alieni_e_indigeni();
@@ -16,6 +15,7 @@ pub fn calculate_x3(c: &CampionamentoNISECI) -> Result<f32, Vec<String>> {
 
   // condizione 2
   if alieni_indigeni.alieni >= alieni_indigeni.indigeni {
+    println!("entrato alieni>= indigeni {} >= {}", alieni_indigeni.alieni, alieni_indigeni.indigeni);
     return Ok(0.0);
   }
 
@@ -35,14 +35,20 @@ pub fn calculate_x3(c: &CampionamentoNISECI) -> Result<f32, Vec<String>> {
 
   // condizione 3
   if info_pop_aliene.tipo_1.popolazione_piu_strutt == 1.0 {
+    println!("entrato tipo 1 strutt");
     return Ok(0.0);
   }
+
+  println!("tipo 1 piu strutt {}", info_pop_aliene.tipo_1.popolazione_piu_strutt);
+  println!("tipo 2 piu strutt {}", info_pop_aliene.tipo_2.popolazione_piu_strutt);
 
   // se le condizioni precendenti non si sono verificate
   // allora uso la formula x3 = 0.5 * (a + b)
 
   let a = calculate_a(&info_pop_aliene);
+  println!("a {}", a);
   let b = calculate_b(&info_pop_aliene);
+  println!("b {}", b);
 
   let x3 = 0.5 * (a + b);
 
@@ -82,9 +88,8 @@ fn calculate_classi_eta_alieni(c: &CampionamentoNISECI) -> ClassiEtaAlieniNISECI
           entry.insert(ClassiEtaSpecieNISECI::new_cl_prevalorizzata(&cattura));
         }
       };
-    } else if cattura.specie.tipo_autoctono == 1 || cattura.specie.tipo_autoctono == 2 {
-      classi_eta.tot_specie_autoctone += 1;
     }
+    classi_eta.tot_specie_autoctone = c.get_tot_specie_autoctone();
   }
 
   classi_eta.tot_specie_aliene = classi_eta.map_tipo_1.len() + classi_eta.map_tipo_2.len() + classi_eta.map_tipo_3.len();
@@ -102,6 +107,7 @@ fn calculate_a(info: &InfoPopolazioniAlieneNISECI) -> f32 {
     return 0.5;
   }
   if info.tipo_2.tot_species != 0 && info.tipo_2.tot_species < info.tot_specie_autoctone {
+    println!("info.tipo_2.tot_species < info.tot_specie_autoctone {} < {}", info.tipo_2.tot_species, info.tot_specie_autoctone);
     return 0.75;
   }
   if info.tipo_3.tot_species >= info.tot_specie_autoctone {
@@ -110,7 +116,7 @@ fn calculate_a(info: &InfoPopolazioniAlieneNISECI) -> f32 {
   if info.tipo_3.tot_species != 0 && info.tipo_3.tot_species < info.tot_specie_autoctone {
     return 0.85;
   }
-
+  
   1.0
 }
 
@@ -119,9 +125,179 @@ fn calculate_b(info: &InfoPopolazioniAlieneNISECI) -> f32 {
   let specie_mediamente_strutt = info.get_species_mediamente_strutt();
   let species_destrutt = info.get_species_destrutt();
 
+  println!("mediam {}", specie_mediamente_strutt);
+  println!("destrutt {}", species_destrutt);
+
   let i2 = 0.5 * (specie_mediamente_strutt as f32 / info.tot_specie_aliene as f32);
-  let i3 = 0.5 * (species_destrutt as f32 / info.tot_specie_aliene as f32);
+  let i3 = species_destrutt as f32 / info.tot_specie_aliene as f32;
+
+  println!("i2 {}", i2);
+  println!("i3 {}", i3);
 
   i2 + i3
+}
+
+
+// tutte le fn private le mettiamo qua
+#[cfg(test)]
+pub mod tests {
+  use super::*;
+
+  #[test]
+  fn calculate_b_tutte_destrutt() {
+    let mut info_aliene = InfoPopolazioniAlieneNISECI::new();
+    info_aliene.tipo_3.species_destrutt = 10;
+    info_aliene.tipo_2.species_destrutt = 20;
+    info_aliene.tipo_3.species_strutt = 20;
+    info_aliene.tot_specie_aliene = 50;
+    
+    let b = calculate_b(&info_aliene);
+    
+    assert_eq!(b, 0.6);
+    
+    
+    info_aliene.tipo_3.species_strutt = 0;
+    info_aliene.tot_specie_aliene = 30;
+    
+    let b = calculate_b(&info_aliene);
+    
+    assert_eq!(b, 1.0);
+    
+  }
+  
+  #[test]
+  fn calculate_b_tutte_mediam_strutt() {
+    let mut info_aliene = InfoPopolazioniAlieneNISECI::new();
+    info_aliene.tipo_3.species_mediamente_strutt = 10;
+    info_aliene.tipo_2.species_mediamente_strutt = 20;
+    info_aliene.tipo_3.species_strutt = 20;
+    info_aliene.tot_specie_aliene = 50;
+    
+    let b = calculate_b(&info_aliene);
+    
+    assert_eq!(b, 0.3);
+    
+    
+    info_aliene.tipo_3.species_strutt = 0;
+    info_aliene.tot_specie_aliene = 30;
+    
+    let b = calculate_b(&info_aliene);
+    
+    assert_eq!(b, 0.5);
+  }
+  
+  #[test]
+  fn calculate_b_miscellaneous() {
+    let mut info_aliene = InfoPopolazioniAlieneNISECI::new();
+    info_aliene.tipo_3.species_mediamente_strutt = 10;
+    info_aliene.tipo_2.species_mediamente_strutt = 20;
+    info_aliene.tipo_3.species_destrutt = 10;
+    info_aliene.tipo_2.species_destrutt = 20;
+    info_aliene.tipo_3.species_strutt = 20;
+    info_aliene.tot_specie_aliene = 80;
+
+    let b = calculate_b(&info_aliene);
+    
+    assert_eq!(b, 0.5625);
+  }
+  
+  /// if info.tipo_1.tot_species > 0 && info.tipo_1.popolazione_piu_strutt < 1.0 {
+  ///   return 0.5;
+  /// }
+  #[test]
+  fn calculate_a_tipo_1_presente_ma_no_strutt() {
+    let mut info = InfoPopolazioniAlieneNISECI::new();
+    info.tipo_1.tot_species = 2;
+    info.tipo_1.species_mediamente_strutt = 2;
+    info.tipo_1.popolazione_piu_strutt = 0.5;
+
+    let a = calculate_a(&info);
+    assert_eq!(a, 0.5);
+    
+    info.tipo_1.species_destrutt = 1;
+    info.tipo_1.tot_species= 3;
+    
+    let a = calculate_a(&info);
+    assert_eq!(a, 0.5);
+
+  }
+
+  /// if info.tipo_2.tot_species >= info.tot_specie_autoctone {
+  ///   return 0.5;
+  /// }
+  #[test]
+  fn calculate_a_tipo_2_magg_autoctone() {
+    let mut info = InfoPopolazioniAlieneNISECI::new();
+    info.tipo_2.tot_species = 3;
+    info.tot_specie_autoctone = 2;
+
+    let a = calculate_a(&info);
+    assert_eq!(a, 0.5);
+  }
+
+  /// if info.tipo_2.tot_species != 0 && info.tipo_2.tot_species < info.tot_specie_autoctone {
+  ///   return 0.75;
+  /// }
+  #[test]
+  fn calculate_a_tipo_2_min_autoctone() {
+    let mut info = InfoPopolazioniAlieneNISECI::new();
+    info.tipo_2.tot_species = 2;
+    info.tot_specie_autoctone = 3;
+
+    let a = calculate_a(&info);
+    assert_eq!(a, 0.75);
+  }
+  
+  /// if info.tipo_3.tot_species >= info.tot_specie_autoctone {
+  ///   return 0.75;
+  /// }
+  #[test]
+  fn calculate_a_tipo_3_magg_autoctone() {
+    let mut info = InfoPopolazioniAlieneNISECI::new();
+    info.tipo_3.tot_species = 3;
+    info.tot_specie_autoctone = 2;
+
+    let a = calculate_a(&info);
+    assert_eq!(a, 0.75);
+  }
+
+  /// if info.tipo_3.tot_species != 0 && info.tipo_3.tot_species < info.tot_specie_autoctone {
+  ///   return 0.85;
+  /// }
+  #[test]
+  fn calculate_a_tipo_3_min_autoctone() {
+    let mut info = InfoPopolazioniAlieneNISECI::new();
+    info.tipo_3.tot_species = 2;
+    info.tot_specie_autoctone = 3;
+
+    let a = calculate_a(&info);
+    assert_eq!(a, 0.85);
+  }
+
+  #[test]
+  fn calculate_a_progressive_scaling() {
+    let mut info = InfoPopolazioniAlieneNISECI::new();
+
+    info.tipo_3.tot_species = 2;
+    info.tot_specie_autoctone = 3;
+    let a = calculate_a(&info);
+    assert_eq!(a, 0.85);
+
+    info.tipo_2.tot_species = 2;
+    let a = calculate_a(&info);
+    assert_eq!(a, 0.75);
+
+    info.tipo_1.tot_species = 2;
+    info.tipo_1.species_mediamente_strutt = 2;
+    info.tipo_1.popolazione_piu_strutt = 0.5;
+    let a = calculate_a(&info);
+    assert_eq!(a, 0.5);
+    
+    info.tipo_1.species_destrutt = 1;
+    info.tipo_1.tot_species= 3;
+    let a = calculate_a(&info);
+    assert_eq!(a, 0.5);
+  }
+
 }
 

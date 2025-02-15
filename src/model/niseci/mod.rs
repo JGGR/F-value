@@ -160,6 +160,23 @@ impl CampionamentoNISECI {
 
       return alieni_indigeni
     }
+
+    pub fn get_tot_specie_autoctone(&self) -> usize {
+      let mut map: HashMap<String, bool> = HashMap::new();
+
+      for cattura in &self.campionamento {
+        if cattura.specie.tipo_autoctono == 1 || cattura.specie.tipo_autoctono == 1 {
+          match map.entry(cattura.specie.id.clone()) {
+            Entry::Occupied(_) => {},
+            Entry::Vacant(entry) => {
+              entry.insert(true);
+            }
+          };
+        }
+      }
+
+      map.len()
+    }
 }
 
 pub struct AlieniIndigeni {
@@ -468,6 +485,17 @@ pub struct InfoPopolazioniAlieneNISECI {
 }
 
 impl InfoPopolazioniAlieneNISECI {
+
+  pub fn new() -> InfoPopolazioniAlieneNISECI {
+    InfoPopolazioniAlieneNISECI {
+      tipo_1: InfoPopolazioniNISECI::new(),
+      tipo_2: InfoPopolazioniNISECI::new(),
+      tipo_3: InfoPopolazioniNISECI::new(),
+      tot_specie_aliene: 0,
+      tot_specie_autoctone: 0
+    }
+  }
+
   pub fn get_info_pop_aliene(classi_eta: &ClassiEtaAlieniNISECI) -> Result<InfoPopolazioniAlieneNISECI, Vec<String>> {
     let tipo_1 = match InfoPopolazioniNISECI::get_info_pop(&classi_eta.map_tipo_1) {
       Ok(info) => info,
@@ -500,6 +528,7 @@ impl InfoPopolazioniAlieneNISECI {
     self.tipo_1.species_destrutt + self.tipo_2.species_destrutt + self.tipo_3.species_destrutt
   }
 }
+
 
 pub struct ClassiEtaAlieniNISECI {
   pub map_tipo_1: HashMap<String, ClassiEtaSpecieNISECI>,

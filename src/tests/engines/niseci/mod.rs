@@ -4,3 +4,5 @@ mod linear_regression;
 mod x1;
 #[cfg(test)]
 mod x2;
+#[cfg(test)]
+mod x3;
