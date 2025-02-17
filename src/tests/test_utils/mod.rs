@@ -636,141 +636,68 @@ pub fn create_massive_campionamento_solo_alloctoni_tipo_1_strutt() -> Campioname
   trocchio.dens_soglia1 = 3.0;
   trocchio.dens_soglia2 = 5.0;
   
-  let mut campionamento: Vec<RecordNISECI> = Vec::with_capacity(45);
-
-  // 10 trocchi cl5 in c1
-  let trocchio_cl5_c1 = RecordNISECI {
-    specie: trocchio.clone(),
-    lunghezza: 13,
-    passaggio_cattura: 1,
-    peso: 10
-  };
-  for _ in 0..10 {
-    campionamento.push(trocchio_cl5_c1.clone());
-  }
-  
-  // 10 trocchi cl4 in c1
-  let trocchio_cl4_c1 = RecordNISECI {
-    specie: trocchio.clone(),
-    lunghezza: 10,
-    passaggio_cattura: 1,
-    peso: 10
-  };
-  for _ in 0..10 {
-    campionamento.push(trocchio_cl4_c1.clone());
-  }
-
-  // 10 trocchi cl3 in c1
-  let trocchio_cl3_c1 = RecordNISECI {
-    specie: trocchio.clone(),
-    lunghezza: 7,
-    passaggio_cattura: 1,
-    peso: 10
-  };
-  for _ in 0..10 {
-    campionamento.push(trocchio_cl3_c1.clone());
-  }
-
-  // 10 trocchi cl2 in c2
-  let trocchio_cl2_c2 = RecordNISECI {
-    specie: trocchio.clone(),
-    lunghezza: 4,
-    passaggio_cattura: 2,
-    peso: 10
-  };
-  for _ in 0..10 {
-    campionamento.push(trocchio_cl2_c2.clone());
-  }
-
-  // 5 trocchi cl1 in c2
-  let trocchio_cl1_c2 = RecordNISECI {
-    specie: trocchio.clone(),
-    lunghezza: 4,
-    passaggio_cattura: 2,
-    peso: 10
-  };
-  for _ in 0..5 {
-    campionamento.push(trocchio_cl1_c2.clone());
-  }
-  
-  CampionamentoNISECI {
-    campionamento: campionamento
-  }
+  create_campionamento_strutturato_data_una_specie_1(trocchio)
 }
 
 /// In questo campionamento troverai: 
 /// -> C1
-///   -> 10 trocchi cl5
-///   -> 10 trocchi cl4
-///   -> 10 trocchi cl3
+///   -> 10 bronzi cl5
+///   -> 10 bronzi cl4
+///   -> 10 bronzi cl3
 /// -> C2
-///   -> 10 trocchi cl2
-///   -> 5 trocchi cl1
+///   -> 10 bronzi cl2
+///   -> 5 bronzi cl1
 pub fn create_massive_campionamento_solo_alloctoni_tipo_2_strutt() -> CampionamentoNISECI {
   let mut bronzo = get_bronzo();
   bronzo.dens_soglia1 = 3.0;
   bronzo.dens_soglia2 = 5.0;
   
-  let mut campionamento: Vec<RecordNISECI> = Vec::with_capacity(45);
+  create_campionamento_strutturato_data_una_specie_1(bronzo)
+}
 
-  // 10 bronzi cl5 in c1
-  let bronzo_cl5_c1 = RecordNISECI {
-    specie: bronzo.clone(),
-    lunghezza: 13,
-    passaggio_cattura: 1,
-    peso: 10
-  };
-  for _ in 0..10 {
-    campionamento.push(bronzo_cl5_c1.clone());
-  }
+/// In questo campionamento troverai: 
+/// -> C1
+///   -> 10 tappi cl5
+///   -> 10 tappi cl4
+///   -> 10 tappi cl3
+/// -> C2
+///   -> 10 tappi cl2
+///   -> 5 tappi cl1
+pub fn create_massive_campionamento_solo_alloctoni_tipo_3_strutt() -> CampionamentoNISECI {
+  let mut tappo = get_tappo();
+  tappo.dens_soglia1 = 3.0;
+  tappo.dens_soglia2 = 5.0;
   
-  // 10 bronzo cl4 in c1
-  let bronzo_cl4_c1 = RecordNISECI {
-    specie: bronzo.clone(),
-    lunghezza: 10,
-    passaggio_cattura: 1,
-    peso: 10
-  };
-  for _ in 0..10 {
-    campionamento.push(bronzo_cl4_c1.clone());
-  }
+  create_campionamento_strutturato_data_una_specie_1(tappo)
+}
 
-  // 10 bronzo cl3 in c1
-  let bronzo_cl3_c1 = RecordNISECI {
-    specie: bronzo.clone(),
-    lunghezza: 7,
-    passaggio_cattura: 1,
-    peso: 10
-  };
-  for _ in 0..10 {
-    campionamento.push(bronzo_cl3_c1.clone());
-  }
-
-  // 10 bronzo cl2 in c2
-  let bronzo_cl2_c2 = RecordNISECI {
-    specie: bronzo.clone(),
-    lunghezza: 4,
-    passaggio_cattura: 2,
-    peso: 10
-  };
-  for _ in 0..10 {
-    campionamento.push(bronzo_cl2_c2.clone());
-  }
-
-  // 5 bronzo cl1 in c2
-  let bronzo_cl1_c2 = RecordNISECI {
-    specie: bronzo.clone(),
-    lunghezza: 4,
-    passaggio_cattura: 2,
-    peso: 10
-  };
-  for _ in 0..5 {
-    campionamento.push(bronzo_cl1_c2.clone());
-  }
+/// In questo campionamento troverai: 
+/// -> C1
+///   -> 15 tappi cl5
+///   -> 20 tappi cl4
+/// -> C2
+///   -> 5 tappi cl2
+pub fn create_massive_campionamento_solo_alloctoni_tipo_3_destrutt() -> CampionamentoNISECI {
+  let mut tappo = get_tappo();
+  tappo.dens_soglia1 = 3.0;
+  tappo.dens_soglia2 = 5.0;
   
-  CampionamentoNISECI {
-    campionamento: campionamento
-  }
+  create_campionamento_destrutturato_data_una_specie(tappo)
+}
+
+/// In questo campionamento troverai: 
+/// -> C1
+///   -> 15 tappi cl5
+///   -> 20 tappi cl4
+/// -> C2
+///   -> 5 tappi cl2
+///   -> 5 tappi cl1
+pub fn create_massive_campionamento_solo_alloctoni_tipo_3_mediam_strutt() -> CampionamentoNISECI {
+  let mut tappo = get_tappo();
+  tappo.dens_soglia1 = 3.0;
+  tappo.dens_soglia2 = 5.0;
+  
+  create_campionamento_mediam_strutturato_data_una_specie(tappo)
 }
 
 
@@ -802,14 +729,14 @@ pub fn create_massive_campionamento_ciacci_con_trocchi_strutt() -> Campionamento
 ///   -> 10 ciacci cl5
 ///   -> 10 ciacci cl4
 ///   -> 10 ciacci cl3
-///   -> 10 trocchi cl5
-///   -> 10 trocchi cl4
-///   -> 10 trocchi cl3
+///   -> 10 bronzi cl5
+///   -> 10 bronzi cl4
+///   -> 10 bronzi cl3
 /// -> C2
 ///   -> 10 ciacci cl2
 ///   -> 5 ciacci cl1
-///   -> 10 trocchi cl2
-///   -> 5 trocchi cl1
+///   -> 10 bronzi cl2
+///   -> 5 bronzi cl1
 pub fn create_massive_campionamento_ciacci_con_bronzi_strutt() -> CampionamentoNISECI {
 
   let mut c_ciacci = create_massive_campionamento_ciacci_solo_autoctoni_1();
@@ -820,6 +747,249 @@ pub fn create_massive_campionamento_ciacci_con_bronzi_strutt() -> CampionamentoN
   c_bronzi
 }
 
+/// In questo campionamento troverai: 
+/// -> C1
+///   -> 10 ciacci cl5
+///   -> 10 ciacci cl4
+///   -> 10 ciacci cl3
+///   -> 10 tappi cl5
+///   -> 10 tappi cl4
+///   -> 10 tappi cl3
+/// -> C2
+///   -> 10 ciacci cl2
+///   -> 5 ciacci cl1
+///   -> 10 tappi cl2
+///   -> 5 tappi cl1
+pub fn create_massive_campionamento_ciacci_con_tappi_strutt() -> CampionamentoNISECI {
+
+  let mut c_ciacci = create_massive_campionamento_ciacci_solo_autoctoni_1();
+  let mut c_tappi = create_massive_campionamento_solo_alloctoni_tipo_3_strutt();
+  
+  c_tappi.campionamento.append(&mut c_ciacci.campionamento);
+
+  c_tappi
+}
+
+/// In questo campionamento troverai: 
+/// -> C1
+///   -> 10 ciacci cl5
+///   -> 10 ciacci cl4
+///   -> 10 ciacci cl3
+///   -> 15 tappi cl5
+///   -> 20 tappi cl4
+/// -> C2
+///   -> 10 ciacci cl2
+///   -> 5 ciacci cl1
+///   -> 5 tappi cl2
+pub fn create_massive_campionamento_ciacci_con_tappi_destrutt() -> CampionamentoNISECI {
+
+  let mut c_ciacci = create_massive_campionamento_ciacci_solo_autoctoni_1();
+  let mut c_tappi = create_massive_campionamento_solo_alloctoni_tipo_3_destrutt();
+  
+  c_tappi.campionamento.append(&mut c_ciacci.campionamento);
+
+  c_tappi
+}
+
+/// In questo campionamento troverai: 
+/// -> C1
+///   -> 10 ciacci cl5
+///   -> 10 ciacci cl4
+///   -> 10 ciacci cl3
+///   -> 15 tappi cl5
+///   -> 20 tappi cl4
+/// -> C2
+///   -> 10 ciacci cl2
+///   -> 5 ciacci cl1
+///   -> 5 tappi cl2
+///   -> 5 tappi cl1
+pub fn create_massive_campionamento_ciacci_con_tappi_mediam_strutt() -> CampionamentoNISECI {
+
+  let mut c_ciacci = create_massive_campionamento_ciacci_solo_autoctoni_1();
+  let mut c_tappi = create_massive_campionamento_solo_alloctoni_tipo_3_mediam_strutt();
+  
+  c_tappi.campionamento.append(&mut c_ciacci.campionamento);
+
+  c_tappi
+}
+
+/// In questo campionamento troverai: 
+/// -> C1
+///   -> 10 esemplari cl5
+///   -> 10 esemplari cl4
+///   -> 10 esemplari cl3
+/// -> C2
+///   -> 10 esemplari cl2
+///   -> 5 esemplari cl1
+fn create_campionamento_strutturato_data_una_specie_1(specie: SpecieNISECI) -> CampionamentoNISECI {
+  let mut campionamento: Vec<RecordNISECI> = Vec::with_capacity(45);
+
+  // 10 esemplari cl5 in c1
+  let cl5_c1 = RecordNISECI {
+    specie: specie.clone(),
+    lunghezza: 13,
+    passaggio_cattura: 1,
+    peso: 10
+  };
+  for _ in 0..10 {
+    campionamento.push(cl5_c1.clone());
+  }
+  
+  // 10 esemplari cl4 in c1
+  let cl4_c1 = RecordNISECI {
+    specie: specie.clone(),
+    lunghezza: 10,
+    passaggio_cattura: 1,
+    peso: 10
+  };
+  for _ in 0..10 {
+    campionamento.push(cl4_c1.clone());
+  }
+
+  // 10 esemplari cl3 in c1
+  let cl3_c1 = RecordNISECI {
+    specie: specie.clone(),
+    lunghezza: 7,
+    passaggio_cattura: 1,
+    peso: 10
+  };
+  for _ in 0..10 {
+    campionamento.push(cl3_c1.clone());
+  }
+
+  // 10 esemplari cl2 in c2
+  let cl2_c2 = RecordNISECI {
+    specie: specie.clone(),
+    lunghezza: 4,
+    passaggio_cattura: 2,
+    peso: 10
+  };
+  for _ in 0..10 {
+    campionamento.push(cl2_c2.clone());
+  }
+
+  // 5 esemplari cl1 in c2
+  let cl1_c2 = RecordNISECI {
+    specie: specie.clone(),
+    lunghezza: 4,
+    passaggio_cattura: 2,
+    peso: 10
+  };
+  for _ in 0..5 {
+    campionamento.push(cl1_c2.clone());
+  }
+  
+  CampionamentoNISECI {
+    campionamento: campionamento
+  }
+}
+
+/// In questo campionamento troverai: 
+/// -> C1
+///   -> 15 esemplari cl5
+///   -> 20 esemplari cl4
+/// -> C2
+///   -> 5 esemplari cl2
+fn create_campionamento_destrutturato_data_una_specie(specie: SpecieNISECI) -> CampionamentoNISECI {
+  let mut campionamento: Vec<RecordNISECI> = Vec::with_capacity(45);
+
+  // 10 esemplari cl5 in c1
+  let cl5_c1 = RecordNISECI {
+    specie: specie.clone(),
+    lunghezza: 13,
+    passaggio_cattura: 1,
+    peso: 10
+  };
+  for _ in 0..10 {
+    campionamento.push(cl5_c1.clone());
+  }
+  
+  // 10 esemplari cl4 in c1
+  let cl4_c1 = RecordNISECI {
+    specie: specie.clone(),
+    lunghezza: 10,
+    passaggio_cattura: 1,
+    peso: 10
+  };
+  for _ in 0..20 {
+    campionamento.push(cl4_c1.clone());
+  }
+
+  // 10 esemplari cl2 in c2
+  let cl2_c2 = RecordNISECI {
+    specie: specie.clone(),
+    lunghezza: 4,
+    passaggio_cattura: 2,
+    peso: 10
+  };
+  for _ in 0..10 {
+    campionamento.push(cl2_c2.clone());
+  }
+
+  
+  CampionamentoNISECI {
+    campionamento: campionamento
+  }
+}
+
+/// In questo campionamento troverai: 
+/// -> C1
+///   -> 15 esemplari cl5
+///   -> 20 esemplari cl4
+/// -> C2
+///   -> 5 esemplari cl2
+///   -> 5 esemplari cl1
+fn create_campionamento_mediam_strutturato_data_una_specie(specie: SpecieNISECI) -> CampionamentoNISECI {
+  let mut campionamento: Vec<RecordNISECI> = Vec::with_capacity(45);
+
+  // 10 esemplari cl5 in c1
+  let cl5_c1 = RecordNISECI {
+    specie: specie.clone(),
+    lunghezza: 13,
+    passaggio_cattura: 1,
+    peso: 10
+  };
+  for _ in 0..10 {
+    campionamento.push(cl5_c1.clone());
+  }
+  
+  // 10 esemplari cl4 in c1
+  let cl4_c1 = RecordNISECI {
+    specie: specie.clone(),
+    lunghezza: 10,
+    passaggio_cattura: 1,
+    peso: 10
+  };
+  for _ in 0..20 {
+    campionamento.push(cl4_c1.clone());
+  }
+
+  // 10 esemplari cl2 in c2
+  let cl2_c2 = RecordNISECI {
+    specie: specie.clone(),
+    lunghezza: 4,
+    passaggio_cattura: 2,
+    peso: 10
+  };
+  for _ in 0..10 {
+    campionamento.push(cl2_c2.clone());
+  }
+
+  // 5 esemplari cl1 in c2
+  let cl1_c2 = RecordNISECI {
+    specie: specie.clone(),
+    lunghezza: 4,
+    passaggio_cattura: 2,
+    peso: 10
+  };
+  for _ in 0..5 {
+    campionamento.push(cl1_c2.clone());
+  }
+  
+  CampionamentoNISECI {
+    campionamento: campionamento
+  }
+}
 
 /// id == 1
 pub fn get_ciaccio() -> SpecieNISECI {
@@ -862,6 +1032,7 @@ pub fn get_trocchio() -> SpecieNISECI {
     dens_soglia2: 2.0,
   }
 }
+
 /// id == 3
 pub fn get_bronzo() -> SpecieNISECI  {
   SpecieNISECI {
@@ -882,3 +1053,25 @@ pub fn get_bronzo() -> SpecieNISECI  {
     dens_soglia2: 2.0,
   }
 }
+
+/// id == 4
+pub fn get_tappo() -> SpecieNISECI  {
+  SpecieNISECI {
+    id: 4.to_string(),
+    specie_attesa: true,
+    nome: "Tappo sugheribus".to_string(),
+    tipo_autoctono: 0,
+    tipo_alloctono: 3,
+    cl_soglia1: 3,
+    cl_soglia2: 6,
+    cl_soglia3: 9,
+    cl_soglia4: 12,
+    ad_juv_soglia1: 0.5,
+    ad_juv_soglia2: 0.67,
+    ad_juv_soglia3: 1.5,
+    ad_juv_soglia4: 2.0,
+    dens_soglia1: 1.0,
+    dens_soglia2: 2.0,
+  }
+}
+

@@ -101,9 +101,13 @@ fn calculate_classi_eta_alieni(c: &CampionamentoNISECI) -> ClassiEtaAlieniNISECI
 fn calculate_a(info: &InfoPopolazioniAlieneNISECI) -> f32 {
 
   if info.tipo_1.tot_species > 0 && info.tipo_1.popolazione_piu_strutt < 1.0 {
+    println!("primo if");
     return 0.5;
   }
-  if info.tipo_2.tot_species >= info.tot_specie_autoctone {
+  if info.tipo_2.tot_species != 0 && info.tipo_2.tot_species >= info.tot_specie_autoctone {
+    println!("secondo if");
+    println!("info.tipo_2.tot_species {}", info.tipo_2.tot_species);
+    println!("info.tot_specie_autoctone {}", info.tot_specie_autoctone);
     return 0.5;
   }
   if info.tipo_2.tot_species != 0 && info.tipo_2.tot_species < info.tot_specie_autoctone {
