@@ -636,7 +636,7 @@ pub fn create_massive_campionamento_solo_alloctoni_tipo_1_strutt() -> Campioname
   trocchio.dens_soglia1 = 3.0;
   trocchio.dens_soglia2 = 5.0;
   
-  create_campionamento_strutturato_data_una_specie_1(trocchio)
+  create_campionamento_strutturato_data_una_specie(trocchio)
 }
 
 /// In questo campionamento troverai: 
@@ -652,7 +652,7 @@ pub fn create_massive_campionamento_solo_alloctoni_tipo_2_strutt() -> Campioname
   bronzo.dens_soglia1 = 3.0;
   bronzo.dens_soglia2 = 5.0;
   
-  create_campionamento_strutturato_data_una_specie_1(bronzo)
+  create_campionamento_strutturato_data_una_specie(bronzo)
 }
 
 /// In questo campionamento troverai: 
@@ -668,7 +668,7 @@ pub fn create_massive_campionamento_solo_alloctoni_tipo_3_strutt() -> Campioname
   tappo.dens_soglia1 = 3.0;
   tappo.dens_soglia2 = 5.0;
   
-  create_campionamento_strutturato_data_una_specie_1(tappo)
+  create_campionamento_strutturato_data_una_specie(tappo)
 }
 
 /// In questo campionamento troverai: 
@@ -821,7 +821,7 @@ pub fn create_massive_campionamento_ciacci_con_tappi_mediam_strutt() -> Campiona
 /// -> C2
 ///   -> 10 esemplari cl2
 ///   -> 5 esemplari cl1
-fn create_campionamento_strutturato_data_una_specie_1(specie: SpecieNISECI) -> CampionamentoNISECI {
+fn create_campionamento_strutturato_data_una_specie(specie: SpecieNISECI) -> CampionamentoNISECI {
   let mut campionamento: Vec<RecordNISECI> = Vec::with_capacity(45);
 
   // 10 esemplari cl5 in c1
