@@ -1,4 +1,4 @@
-use crate::{engines::niseci::x2::calculate_x2, model::{location::Location, niseci::{AnagraficaNISECI, ClassiEtaSpecieNISECI, ComunitaNISECI, IdroEcoRegioneNISECI, TipoComunitaNISECI}}, tests::test_utils::{create_massive_campionamento_ciacci_1, create_massive_campionamento_ciacci_2, get_ciaccio}};
+use crate::{engines::niseci::x2::calculate_x2, model::{location::Location, niseci::{AnagraficaNISECI, ClassiEtaSpecieNISECI, ComunitaNISECI, IdroEcoRegioneNISECI, TipoComunitaNISECI}}, tests::test_utils::{create_massive_campionamento_ciacci, create_massive_campionamento_ciacci_2, get_ciaccio}};
 
 
 #[test]
@@ -146,7 +146,7 @@ fn calculate_x2_a_criterio_b_3_molto_sbilanciato_giovani() {
 
 #[test]
 fn calculate_x2_test_1() {
-  let campionamento = create_massive_campionamento_ciacci_1();
+  let campionamento = create_massive_campionamento_ciacci();
 
   let comunita = ComunitaNISECI {
     fonte: Some("hey".to_string()),

@@ -430,7 +430,7 @@ pub fn create_dummy_campionamento_chopped() -> CampionamentoNISECI {
 ///   -> 5 ciacci cl1
 /// aggiungo in C2 anche una specie alloctono per testare la conta delle specie autoctone trovate
 /// x2a qua vale 1.0 e x2b 1.0
-pub fn create_massive_campionamento_ciacci_1() -> CampionamentoNISECI {
+pub fn create_massive_campionamento_ciacci() -> CampionamentoNISECI {
   let mut c = create_massive_campionamento_ciacci_solo_autoctoni_1();
 
   // pesce alloctono in C2
