@@ -631,7 +631,7 @@ pub fn create_massive_campionamento_ciacci_solo_autoctoni_1() -> CampionamentoNI
 /// -> C2
 ///   -> 10 trocchi cl2
 ///   -> 5 trocchi cl1
-pub fn create_massive_campionamento_solo_alloctoni_tipo_1_strutt() -> CampionamentoNISECI {
+pub fn create_massive_campionamento_solo_tipo_alloctono_1_strutt() -> CampionamentoNISECI {
   let mut trocchio = get_trocchio();
   trocchio.dens_soglia1 = 3.0;
   trocchio.dens_soglia2 = 5.0;
@@ -647,7 +647,7 @@ pub fn create_massive_campionamento_solo_alloctoni_tipo_1_strutt() -> Campioname
 /// -> C2
 ///   -> 10 bronzi cl2
 ///   -> 5 bronzi cl1
-pub fn create_massive_campionamento_solo_alloctoni_tipo_2_strutt() -> CampionamentoNISECI {
+pub fn create_massive_campionamento_solo_tipo_alloctono_2_strutt() -> CampionamentoNISECI {
   let mut bronzo = get_bronzo();
   bronzo.dens_soglia1 = 3.0;
   bronzo.dens_soglia2 = 5.0;
@@ -663,7 +663,7 @@ pub fn create_massive_campionamento_solo_alloctoni_tipo_2_strutt() -> Campioname
 /// -> C2
 ///   -> 10 tappi cl2
 ///   -> 5 tappi cl1
-pub fn create_massive_campionamento_solo_alloctoni_tipo_3_strutt() -> CampionamentoNISECI {
+pub fn create_massive_campionamento_solo_tipo_alloctono_3_strutt() -> CampionamentoNISECI {
   let mut tappo = get_tappo();
   tappo.dens_soglia1 = 3.0;
   tappo.dens_soglia2 = 5.0;
@@ -677,7 +677,7 @@ pub fn create_massive_campionamento_solo_alloctoni_tipo_3_strutt() -> Campioname
 ///   -> 20 tappi cl4
 /// -> C2
 ///   -> 5 tappi cl2
-pub fn create_massive_campionamento_solo_alloctoni_tipo_3_destrutt() -> CampionamentoNISECI {
+pub fn create_massive_campionamento_solo_tipo_alloctono_3_destrutt() -> CampionamentoNISECI {
   let mut tappo = get_tappo();
   tappo.dens_soglia1 = 3.0;
   tappo.dens_soglia2 = 5.0;
@@ -692,7 +692,7 @@ pub fn create_massive_campionamento_solo_alloctoni_tipo_3_destrutt() -> Campiona
 /// -> C2
 ///   -> 5 tappi cl2
 ///   -> 5 tappi cl1
-pub fn create_massive_campionamento_solo_alloctoni_tipo_3_mediam_strutt() -> CampionamentoNISECI {
+pub fn create_massive_campionamento_solo_tipo_alloctono_3_mediam_strutt() -> CampionamentoNISECI {
   let mut tappo = get_tappo();
   tappo.dens_soglia1 = 3.0;
   tappo.dens_soglia2 = 5.0;
@@ -717,7 +717,7 @@ pub fn create_massive_campionamento_solo_alloctoni_tipo_3_mediam_strutt() -> Cam
 pub fn create_massive_campionamento_ciacci_con_trocchi_strutt() -> CampionamentoNISECI {
 
   let mut c_ciacci = create_massive_campionamento_ciacci_solo_autoctoni_1();
-  let mut c_trocchi = create_massive_campionamento_solo_alloctoni_tipo_1_strutt();
+  let mut c_trocchi = create_massive_campionamento_solo_tipo_alloctono_1_strutt();
   
   c_trocchi.campionamento.append(&mut c_ciacci.campionamento);
 
@@ -740,7 +740,7 @@ pub fn create_massive_campionamento_ciacci_con_trocchi_strutt() -> Campionamento
 pub fn create_massive_campionamento_ciacci_con_bronzi_strutt() -> CampionamentoNISECI {
 
   let mut c_ciacci = create_massive_campionamento_ciacci_solo_autoctoni_1();
-  let mut c_bronzi = create_massive_campionamento_solo_alloctoni_tipo_2_strutt();
+  let mut c_bronzi = create_massive_campionamento_solo_tipo_alloctono_2_strutt();
   
   c_bronzi.campionamento.append(&mut c_ciacci.campionamento);
 
@@ -763,7 +763,7 @@ pub fn create_massive_campionamento_ciacci_con_bronzi_strutt() -> CampionamentoN
 pub fn create_massive_campionamento_ciacci_con_tappi_strutt() -> CampionamentoNISECI {
 
   let mut c_ciacci = create_massive_campionamento_ciacci_solo_autoctoni_1();
-  let mut c_tappi = create_massive_campionamento_solo_alloctoni_tipo_3_strutt();
+  let mut c_tappi = create_massive_campionamento_solo_tipo_alloctono_3_strutt();
   
   c_tappi.campionamento.append(&mut c_ciacci.campionamento);
 
@@ -784,7 +784,7 @@ pub fn create_massive_campionamento_ciacci_con_tappi_strutt() -> CampionamentoNI
 pub fn create_massive_campionamento_ciacci_con_tappi_destrutt() -> CampionamentoNISECI {
 
   let mut c_ciacci = create_massive_campionamento_ciacci_solo_autoctoni_1();
-  let mut c_tappi = create_massive_campionamento_solo_alloctoni_tipo_3_destrutt();
+  let mut c_tappi = create_massive_campionamento_solo_tipo_alloctono_3_destrutt();
   
   c_tappi.campionamento.append(&mut c_ciacci.campionamento);
 
@@ -806,7 +806,7 @@ pub fn create_massive_campionamento_ciacci_con_tappi_destrutt() -> Campionamento
 pub fn create_massive_campionamento_ciacci_con_tappi_mediam_strutt() -> CampionamentoNISECI {
 
   let mut c_ciacci = create_massive_campionamento_ciacci_solo_autoctoni_1();
-  let mut c_tappi = create_massive_campionamento_solo_alloctoni_tipo_3_mediam_strutt();
+  let mut c_tappi = create_massive_campionamento_solo_tipo_alloctono_3_mediam_strutt();
   
   c_tappi.campionamento.append(&mut c_ciacci.campionamento);
 
