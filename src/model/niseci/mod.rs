@@ -293,6 +293,10 @@ pub struct RisultatoNISECI {
   anagrafica: AnagraficaNISECI
 }
 
+
+/// le classi eta contengono il numero di esemplari trovati
+/// nel campionamento per ogni specie catturata
+/// suddivisi nelle loro classi di eta (in base alla lunghezza)
 pub struct ClassiEtaSpecieNISECI {
   pub specie: SpecieNISECI,
   pub cl1: u32,
@@ -398,6 +402,9 @@ impl ClassiEtaSpecieNISECI {
 
 }
 
+
+/// enum che aiuta a valorizzare ClassiEtaSpecieNISECI
+/// (vedi update_classi_eta)
 pub enum ClassiEta {
   CL1,
   CL2,
@@ -422,6 +429,8 @@ impl ClassiEta {
   }
 }
 
+
+/// struct che aiuta nel calcolo di x3
 pub struct InfoPopolazioniNISECI {
   pub popolazione_piu_strutt: f32,
   pub species_strutt: u32,
@@ -476,6 +485,10 @@ impl InfoPopolazioniNISECI {
   }
 }
 
+/// struct che aiuta nel calcolo di x3
+/// una volta valorizzata avremmo tutte le informazioni utili
+/// a calcolare x3
+/// per ogni tipo di alloctono abbiamo una InfoPopolazioniNISECI
 pub struct InfoPopolazioniAlieneNISECI {
   pub tipo_1: InfoPopolazioniNISECI,
   pub tipo_2: InfoPopolazioniNISECI,
@@ -530,6 +543,8 @@ impl InfoPopolazioniAlieneNISECI {
 }
 
 
+/// struct che aiuta nel calcolo x3
+/// ci aiuta a suddividere le specie aliene in base alla tipologia
 pub struct ClassiEtaAlieniNISECI {
   pub map_tipo_1: HashMap<String, ClassiEtaSpecieNISECI>,
   pub map_tipo_2: HashMap<String, ClassiEtaSpecieNISECI>,
@@ -550,6 +565,11 @@ impl ClassiEtaAlieniNISECI {
   }
 }
 
+
+/// struct che quando valorizzata
+/// esprime, data una SpecieNISECI,
+/// il numero di esemplari trovati
+/// suddivisi in base al numero di passaggio
 pub struct EsemplariPerCattura {
   pub specie: SpecieNISECI,
   pub mappa: HashMap<u8, u32> // la key è il numero del passaggio
