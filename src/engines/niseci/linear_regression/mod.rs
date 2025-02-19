@@ -75,7 +75,6 @@ pub fn calculate_quantita_with_regression(campionamenti: &[Point<i32>]) -> Resul
   };
 
   if m.abs() < f32::EPSILON {
-    println!("m è 0");
     return Err("Regression line is horizontal; no meaningful passaggi calculation possible.".to_string());
   }
 
