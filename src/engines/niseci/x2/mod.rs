@@ -173,8 +173,8 @@ fn get_quantita_stimata(passaggi: &HashMap<u8, u32>) -> Result<u32, String> {
 
 fn calculate_passaggi_ripetuti(c1: u32, c2: u32) -> Result<u32, String> {
   
-  match c1 == c2 {
-    true => return Err("Quantita stimata con metodo dei PASSAGGI RIPETUTI: stesso numero di esemplari per entrambi i passaggi".to_string()),
+  match c1 == c2 || c1 == 0 || c2 == 0 {
+    true => return Ok(c1 + c2),
     false => {},
   }
 
