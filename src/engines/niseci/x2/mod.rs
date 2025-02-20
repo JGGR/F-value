@@ -186,7 +186,7 @@ fn calculate_passaggi_ripetuti(c1: u32, c2: u32) -> Result<u32, String> {
 
   match result > 0 {
     true => return Ok(result as u32),
-    false => return Err("Quantita stimata con metodo dei PASSAGGI RIPETUTI è negativa".to_string()),
+    false => return Ok(c1 + c2), // ritorno somma come da accordi
   }
 
 
@@ -238,7 +238,7 @@ mod x2_private_tests {
   }
 
   #[test]
-  fn calcola_q_stimata_regression_err() {
+  fn calcola_q_stimata_regression_m_positive() {
     let mut passaggi: HashMap<u8, u32> = HashMap::new();
     passaggi.insert(1, 50);
     passaggi.insert(2, 75);
@@ -246,7 +246,21 @@ mod x2_private_tests {
 
     let q_stimata = calculate_q_stimata_regression(&passaggi);
 
-    assert!(q_stimata.is_err());
+    assert!(q_stimata.is_ok());
+    assert_eq!(225, q_stimata.unwrap());
+  }
+  
+  #[test]
+  fn calcola_q_stimata_regression_same_values() {
+    let mut passaggi: HashMap<u8, u32> = HashMap::new();
+    passaggi.insert(1, 50);
+    passaggi.insert(2, 50);
+    passaggi.insert(3, 50);
+
+    let q_stimata = calculate_q_stimata_regression(&passaggi);
+
+    assert!(q_stimata.is_ok());
+    assert_eq!(150, q_stimata.unwrap());
   }
 
   #[test]
@@ -264,19 +278,21 @@ mod x2_private_tests {
   }
 
   #[test]
-  fn calcola_passaggi_ripetuti_err_negative() {
+  fn calcola_passaggi_ripetuti_negative() {
 
     let q_stimata = calculate_passaggi_ripetuti(15, 30);
 
-    assert!(q_stimata.is_err());
+    assert!(q_stimata.is_ok());
+    assert_eq!(q_stimata.unwrap(), 45);
   }
 
   #[test]
-  fn calcola_passaggi_ripetuti_err_same_values() {
+  fn calcola_passaggi_ripetuti_same_values() {
 
     let q_stimata = calculate_passaggi_ripetuti(30, 30);
 
-    assert!(q_stimata.is_err());
+    assert!(q_stimata.is_ok());
+    assert_eq!(q_stimata.unwrap(), 60);
   }
 
   #[test]
@@ -315,18 +331,19 @@ mod x2_private_tests {
   }
 
   #[test]
-  fn get_quantita_stimata_err_passaggi_ripetuti_negative() {
+  fn get_quantita_stimata_passaggi_ripetuti_negative() {
     let mut passaggi: HashMap<u8, u32> = HashMap::new();
     passaggi.insert(1, 15);
     passaggi.insert(2, 30);
 
     let q_stimata = get_quantita_stimata(&passaggi);
 
-    assert!(q_stimata.is_err());
+    assert!(q_stimata.is_ok());
+    assert_eq!(q_stimata.unwrap(), 45);
   }
 
   #[test]
-  fn get_quantita_stimata_err_progression() {
+  fn get_quantita_stimata_progression_m_positive() {
     let mut passaggi: HashMap<u8, u32> = HashMap::new();
     passaggi.insert(1, 50);
     passaggi.insert(2, 75);
@@ -334,8 +351,9 @@ mod x2_private_tests {
 
     let q_stimata = get_quantita_stimata(&passaggi);
 
-    assert!(q_stimata.is_err());
-  }
+    assert!(q_stimata.is_ok());
+    assert_eq!(q_stimata.unwrap(), 225);
+}
 
   #[test]
   fn calculate_x2_b_buona() {

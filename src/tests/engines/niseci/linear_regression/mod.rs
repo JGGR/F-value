@@ -47,7 +47,7 @@ fn test_quantita_stimata_2() {
 }
 
 #[test]
-fn test_quantita_stimata_err() {
+fn test_quantita_stimata_m_positive() {
     let passaggi = [
         Point::new(1, 50),
         Point::new(2, 75),
@@ -55,6 +55,7 @@ fn test_quantita_stimata_err() {
     ];
     let quantita_stimata = calculate_quantita_with_regression(&passaggi);
 
-    assert!(quantita_stimata.is_err());
+    assert!(quantita_stimata.is_ok());
+    assert_eq!(quantita_stimata.unwrap(), 225);
 }
 

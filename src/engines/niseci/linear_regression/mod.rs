@@ -17,6 +17,11 @@ impl<T> Point<T> {
   }
 }
 
+#[derive(Debug)]
+pub enum LinearRegressionError {
+  SameValues
+}
+
 fn gradient_descent(m_now: f32, b_now: f32, points: &[Point<f32>], step: f32) -> (f32, f32) {
     let mut m_gradient: f32 = 0.0;
     let mut b_gradient: f32 = 0.0;
@@ -38,7 +43,7 @@ fn gradient_descent(m_now: f32, b_now: f32, points: &[Point<f32>], step: f32) ->
   
 }
 
-pub fn gradient_descent_iterate(points: &[Point<i32>]) -> Result<(f32, f32), String> {
+pub fn gradient_descent_iterate(points: &[Point<i32>]) -> Result<(f32, f32), LinearRegressionError> {
   
   let normalized_points = match normalize_points(points) {
     Ok(norm) => norm,
@@ -70,12 +75,19 @@ pub fn calculate_quantita_with_regression(campionamenti: &[Point<i32>]) -> Resul
   let (m, b) = match gradient_descent_iterate(campionamenti) {
     Ok((m, b)) => (m, b),
     Err(error) => {
-      return Err(error)
+      match error {
+        LinearRegressionError::SameValues => return Ok(get_sum(campionamenti)), // come da accordi ritorno la somma
+      }
     }
   };
-
+  
   if m.abs() < f32::EPSILON {
-    return Err("Regression line is horizontal; no meaningful passaggi calculation possible.".to_string());
+    // In questo caso, come da accordi, ritorniamo la somma dei campionamenti
+    return Ok(get_sum(campionamenti))
+  }
+
+  if m > 0.0 {
+    return Ok(get_sum(campionamenti));
   }
 
   // l'incorcio della retta con l'asse x ci da la quantita stimata
@@ -101,7 +113,7 @@ fn denormalize_retta(m_norm: f32, b_norm: f32, points: &[Point<i32>]) -> (f32, f
   (m, b)
 }
 
-fn normalize_points(points: &[Point<i32>]) -> Result<Vec<Point<f32>>, String> {
+fn normalize_points(points: &[Point<i32>]) -> Result<Vec<Point<f32>>, LinearRegressionError> {
   let max_x = points.iter().map(|p| p.x).max().unwrap() as f32;
   let min_x = points.iter().map(|p| p.x).min().unwrap() as f32;
 
@@ -109,7 +121,7 @@ fn normalize_points(points: &[Point<i32>]) -> Result<Vec<Point<f32>>, String> {
   let min_y = points.iter().map(|p| p.y).min().unwrap() as f32;
 
   if (max_y - min_y).abs() < f32::EPSILON {
-    return Err("All y values are the same; cannot perform linear regression.".to_string());
+    return Err(LinearRegressionError::SameValues);
   }
 
   let normalized_points = points
@@ -123,4 +135,14 @@ fn normalize_points(points: &[Point<i32>]) -> Result<Vec<Point<f32>>, String> {
 
   Ok(normalized_points)
 }
+
+
+fn get_sum(points: &[Point<i32>]) -> u32 {
+  let sum: i32 = points.iter().map(|point| point.y).sum();
+  
+  // le condizioni imposte prima di chiamare la fn garantiscono che sum >= 0 
+  // (il numero di esmplari in una cattura è >= 0)
+  sum as u32 
+}
+
 
