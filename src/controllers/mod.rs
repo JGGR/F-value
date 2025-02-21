@@ -22,7 +22,7 @@ use crate::model::niseci::{RiferimentoNISECI, CampionamentoNISECI, AnagraficaNIS
 use crate::state::GLOBAL_STATE;
 use crate::CurrentView;
 use crate::process_csv_errors;
-use crate::engines::niseci::full::calculate_niseci;
+use crate::engines::niseci::full::{calculate_niseci, calculate_rqe_niseci, calculate_stato_ecologico};
 use raylib::RaylibHandle;
 use std::path::PathBuf;
 use raylib::consts::KeyboardKey::*;
@@ -731,6 +731,11 @@ impl OutputController {
             match calculate_niseci(&campionamento, &riferimento, &anagrafica) {
                 Ok(niseci) => {
                     self.add_console_message(format!("NISECI: {niseci}"));
+
+                    let rqe_niseci = calculate_rqe_niseci(niseci);
+                    self.add_console_message(format!("RQE NISECI: {rqe_niseci}"));
+                    let stato_ecologico = calculate_stato_ecologico(niseci, &anagrafica.area);
+                    self.add_console_message(format!("Stato ecologico: {stato_ecologico}"));
                 },
                 Err(niseci_errors) => {
                     for e in niseci_errors {

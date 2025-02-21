@@ -15,7 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::model::niseci::{CampionamentoNISECI, RiferimentoNISECI, AnagraficaNISECI};
+use crate::model::niseci::{CampionamentoNISECI, RiferimentoNISECI, AnagraficaNISECI, AreaNISECI, StatoEcologicoNISECI};
 
 use super::x1::calculate_x1;
 use super::x2::calculate_x2;
@@ -23,6 +23,11 @@ use super::x3::calculate_x3;
 
 const RQE_NISECI_MAGIC_ADDEND: f32 = 1.1283;
 const RQE_NISECI_MAGIC_QUOTIENT: f32 = 1.0603;
+const STATO_ECOLOGICO_NISECI_SOGLIA_ELEVATO: f32 = 0.8;
+const STATO_ECOLOGICO_NISECI_SOGLIA_BUONO_AREA_ALPINA: f32 = 0.52;
+const STATO_ECOLOGICO_NISECI_SOGLIA_BUONO_AREA_MEDITERRANEA: f32 = 0.6;
+const STATO_ECOLOGICO_NISECI_SOGLIA_MODERATO: f32 = 0.4;
+const STATO_ECOLOGICO_NISECI_SOGLIA_SCADENTE: f32 = 0.2;
 
 pub fn calculate_niseci(campionamento: &CampionamentoNISECI, riferimento: &RiferimentoNISECI, anagrafica: &AnagraficaNISECI) -> Result<f32, Vec<String>> {
     let mut errors = Vec::new();
@@ -72,5 +77,31 @@ pub fn calculate_niseci(campionamento: &CampionamentoNISECI, riferimento: &Rifer
 }
 
 pub fn calculate_rqe_niseci(niseci: f32) -> f32 {
-    return (niseci.ln() +  RQE_NISECI_MAGIC_ADDEND ) / RQE_NISECI_MAGIC_QUOTIENT;
+    return (niseci.log(10.0) +  RQE_NISECI_MAGIC_ADDEND ) / RQE_NISECI_MAGIC_QUOTIENT;
+}
+
+pub fn calculate_stato_ecologico(niseci: f32, area: &AreaNISECI) -> StatoEcologicoNISECI {
+    let rqe_niseci = calculate_rqe_niseci(niseci);
+    if rqe_niseci >= STATO_ECOLOGICO_NISECI_SOGLIA_ELEVATO {
+        return StatoEcologicoNISECI::Elevato;
+    }
+    match area {
+        AreaNISECI::Alpina => {
+            if rqe_niseci >= STATO_ECOLOGICO_NISECI_SOGLIA_BUONO_AREA_ALPINA {
+                return StatoEcologicoNISECI::Buono;
+            }
+        },
+        AreaNISECI::Mediterranea => {
+            if rqe_niseci >= STATO_ECOLOGICO_NISECI_SOGLIA_BUONO_AREA_MEDITERRANEA {
+                return StatoEcologicoNISECI::Buono;
+            }
+        }
+    }
+    if rqe_niseci >= STATO_ECOLOGICO_NISECI_SOGLIA_MODERATO {
+        return StatoEcologicoNISECI::Moderato;
+    }
+    if rqe_niseci >= STATO_ECOLOGICO_NISECI_SOGLIA_SCADENTE {
+        return StatoEcologicoNISECI::Scadente;
+    }
+    return StatoEcologicoNISECI::Cattivo;
 }

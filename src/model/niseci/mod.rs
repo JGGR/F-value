@@ -667,3 +667,26 @@ impl EsemplariPerCattura {
     }
   }
 }
+
+/// enum per il risultato finale di un calcolo niseci
+/// (vedi calculate_stato_ecologico)
+pub enum StatoEcologicoNISECI {
+    Elevato,
+    Buono,
+    Moderato,
+    Scadente,
+    Cattivo
+}
+
+impl fmt::Display for StatoEcologicoNISECI {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let string_representation = match *self {
+            StatoEcologicoNISECI::Elevato => "Elevato",
+            StatoEcologicoNISECI::Buono => "Buono",
+            StatoEcologicoNISECI::Moderato => "Moderato",
+            StatoEcologicoNISECI::Scadente => "Scadente",
+            StatoEcologicoNISECI::Cattivo => "Cattivo",
+        };
+        write!(f, "{}", string_representation)
+    }
+}
