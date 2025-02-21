@@ -11,7 +11,7 @@ pub struct Point<T> {
 impl<T> Point<T> {
   pub fn new(x: T, y: T) -> Point<T> {
     Point {
-      x, 
+      x,
       y
     }
   }
@@ -40,11 +40,11 @@ fn gradient_descent(m_now: f32, b_now: f32, points: &[Point<f32>], step: f32) ->
     let b = b_now - b_gradient * step;
 
     (m, b)
-  
+
 }
 
 pub fn gradient_descent_iterate(points: &[Point<i32>]) -> Result<(f32, f32), LinearRegressionError> {
-  
+
   let normalized_points = match normalize_points(points) {
     Ok(norm) => norm,
     Err(error) => {
@@ -57,7 +57,7 @@ pub fn gradient_descent_iterate(points: &[Point<i32>]) -> Result<(f32, f32), Lin
 
   const STEP: f32 = 0.001;
   const ITERATIONS: i32 = 10000;
-  
+
   for _i in 0..ITERATIONS {
     (m_norm, b_norm) = gradient_descent(m_norm, b_norm, &normalized_points, STEP);
   }
@@ -80,7 +80,7 @@ pub fn calculate_quantita_with_regression(campionamenti: &[Point<i32>]) -> Resul
       }
     }
   };
-  
+
   if m.abs() < f32::EPSILON {
     // In questo caso, come da accordi, ritorniamo la somma dei campionamenti
     return Ok(get_sum(campionamenti))
@@ -107,7 +107,7 @@ fn denormalize_retta(m_norm: f32, b_norm: f32, points: &[Point<i32>]) -> (f32, f
 
   let max_y = points.iter().map(|p| p.y).max().unwrap() as f32;
   let min_y = points.iter().map(|p| p.y).min().unwrap() as f32;
-  
+
   let m = m_norm * (max_y - min_y) / (max_x - min_x);
   let b = b_norm * (max_y - min_y) + min_y - m * min_x;
   (m, b)
@@ -139,10 +139,10 @@ fn normalize_points(points: &[Point<i32>]) -> Result<Vec<Point<f32>>, LinearRegr
 
 fn get_sum(points: &[Point<i32>]) -> u32 {
   let sum: i32 = points.iter().map(|point| point.y).sum();
-  
-  // le condizioni imposte prima di chiamare la fn garantiscono che sum >= 0 
-  // (il numero di esmplari in una cattura è >= 0)
-  sum as u32 
+
+  // le condizioni imposte prima di chiamare la fn garantiscono che sum >= 0
+  // (il numero di esemplari in una cattura è >= 0)
+  sum as u32
 }
 
 
