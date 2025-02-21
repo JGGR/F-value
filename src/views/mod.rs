@@ -29,7 +29,7 @@ use crate::model::niseci::AnagraficaNISECI;
 use raylib::prelude::*;
 use rfd::FileDialog;
 use raylib::consts::GuiState::{STATE_NORMAL, STATE_DISABLED};
-use raylib::consts::GuiIconName::{ICON_FILE_OPEN, ICON_BIN};
+use raylib::consts::GuiIconName::{ICON_FILE_OPEN, ICON_BIN, ICON_OK_TICK, ICON_CROSS};
 use std::ffi::CString;
 
 // A view responsible for rendering the state
@@ -575,13 +575,15 @@ impl SelezioneInfoAggiuntiveView {
             Some(rstr!("Inserisci informazioni aggiuntive"))
         );
 
-        let submit_width = propwidth(&d, 50);
+        let submit_width = propwidth(&d, 100);
         let groupbox_x_end = groupbox_x + groupbox_width;
         let submit_x = groupbox_x_end + (d.get_screen_width() - groupbox_x_end)/2 - submit_width/2;
-        let submit_height = submit_width;
+        let submit_height = propheight(&d, 50);
         let submit_y = d.get_screen_height() /2 - submit_height /2;
 
-        if d.gui_button(rrect(submit_x, submit_y, submit_width, submit_height), Some(rstr!("Conferma"))) {
+        let confirm_itext = d.gui_icon_text(ICON_OK_TICK, Some(rstr!("Conferma")));
+        let confirm_itext = CString::new(confirm_itext).unwrap();
+        if d.gui_button(rrect(submit_x, submit_y, submit_width, submit_height), Some(confirm_itext.as_c_str())) {
 
             //TODO: impl TryInto<u32> for a new custom RegioneItaliana or smth ?
             //But this was request as a free string originally...
@@ -1284,6 +1286,8 @@ impl ValidazioneInfoAggiuntiveView {
             }
         }
 
+        let indietro_itext = d.gui_icon_text(ICON_CROSS, Some(rstr!("Indietro")));
+        let indietro_itext = CString::new(indietro_itext).unwrap();
         if d.gui_button(
             rrect(
                 button_backout_x,
@@ -1291,7 +1295,7 @@ impl ValidazioneInfoAggiuntiveView {
                 button_backout_width,
                 button_backout_height,
             ),
-            Some(rstr!("Indietro"))
+            Some(indietro_itext.as_c_str())
         ) {
             //Ask controller to go back and edit further
             match current_index {
