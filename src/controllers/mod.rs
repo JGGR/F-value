@@ -673,9 +673,16 @@ impl OutputController {
         Self
     }
 
-    pub fn update(&self, _rl: &RaylibHandle, _main_state: &mut MainState) {
+    pub fn update(&self, _rl: &RaylibHandle, main_state: &mut MainState) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.output_model.increment_frame_counter();
+        if state.data_model.get_errors_occurred() {
+            eprintln!("OutputController:  Errors occurred");
+            eprintln!("OutputController:  Let's update current view and go to CONSOLE.");
+            main_state.set_current_view(CurrentView::CONSOLE);
+            eprintln!("OutputController:  Clearing error state");
+            state.data_model.set_errors_occurred(false);
+        }
     }
 
     pub fn get_state(&self) -> OutputModel {
