@@ -276,7 +276,7 @@ pub struct AnagraficaNISECI {
   pub codice_stazione: u32,
   pub date_string: String, // Formato gg/mm/aaaa
   pub area: AreaNISECI,
-  pub nome_fiume: String,
+  pub corpo_idrico: String,
   pub bacino_appartenenza: String,
   pub idro_eco_regione: IdroEcoRegioneNISECI,
   pub posizione: Location,
@@ -295,8 +295,8 @@ impl AnagraficaNISECI {
 
 impl fmt::Display for AnagraficaNISECI {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    let string_representation = format!("AnagraficaNISECI: {{ comunita: {{{}}}, codice_stazione {{{}}}, area: {{{}}}, nome_fiume: {{{}}}, bacino_appartenenza: {{{}}}, idro_eco_regione: {{{}}}, posizione: {{{}}}, lunghezza_stazione: {{{}}}, larghezza_stazione: {{{}}} }}",
-        self.comunita, self.codice_stazione, self.area, self.nome_fiume, self.bacino_appartenenza, self.idro_eco_regione, self.posizione, self.lunghezza_media_stazione, self.larghezza_media_stazione);
+    let string_representation = format!("AnagraficaNISECI: {{ comunita: {{{}}}, codice_stazione {{{}}}, area: {{{}}}, corpo_idrico: {{{}}}, bacino_appartenenza: {{{}}}, idro_eco_regione: {{{}}}, posizione: {{{}}}, lunghezza_stazione: {{{}}}, larghezza_stazione: {{{}}} }}",
+        self.comunita, self.codice_stazione, self.area, self.corpo_idrico, self.bacino_appartenenza, self.idro_eco_regione, self.posizione, self.lunghezza_media_stazione, self.larghezza_media_stazione);
     write!(f, "{}", string_representation)
   }
 }

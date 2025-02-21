@@ -743,7 +743,7 @@ impl SelezioneInfoAggiuntiveView {
                 codice_stazione: codice_stazione as u32,
                 date_string: date_string,
                 area: area,
-                nome_fiume: corpo_idrico,
+                corpo_idrico: corpo_idrico,
                 bacino_appartenenza: bacino_niseci,
                 idro_eco_regione: idro_ecoregione_niseci,
                 posizione: posizione,

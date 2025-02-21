@@ -536,7 +536,7 @@ impl InfoAggiuntiveController {
 
             //TODO: check codice stazione after refactor
 
-            if anagrafica.nome_fiume.len() < 1 {
+            if anagrafica.corpo_idrico.len() < 1 {
                 errors.push(format!("Nome fiume troppo corto"));
             }
 

@@ -175,11 +175,12 @@ fn calculate_x2_test_1() {
     bacino_appartenenza: "dummy".to_string(),
     area: AreaNISECI::Alpina,
     codice_stazione: 1,
+    date_string: "Never".to_string(),
     comunita: comunita,
     idro_eco_regione: IdroEcoRegioneNISECI::AlpiCentroOrientali,
     larghezza_media_stazione: 1.0,
     lunghezza_media_stazione: 10.0,
-    nome_fiume: "canaletta".to_string(),
+    corpo_idrico: "canaletta".to_string(),
     posizione: Location {
       regione: "sardninaia".to_string(),
       provincia: "oristano".to_string()
@@ -206,11 +207,12 @@ fn calculate_x2_test_1() {
     bacino_appartenenza: "dummy".to_string(),
     area: AreaNISECI::Alpina,
     codice_stazione: 1,
+    date_string: "Never".to_string(),
     comunita: comunita,
     idro_eco_regione: IdroEcoRegioneNISECI::AlpiCentroOrientali,
     larghezza_media_stazione: 1.0,
     lunghezza_media_stazione: 10.0,
-    nome_fiume: "canaletta".to_string(),
+    corpo_idrico: "canaletta".to_string(),
     posizione: Location {
       regione: "sardninaia".to_string(),
       provincia: "oristano".to_string()
