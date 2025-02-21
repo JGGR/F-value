@@ -161,6 +161,7 @@ pub struct InfoAggiuntiveModel {
     frame_counter: u32,
     done_editing: bool,
     valid: bool,
+    errors_occurred: bool,
 }
 
 impl InfoAggiuntiveModel {
@@ -186,6 +187,14 @@ impl InfoAggiuntiveModel {
 
     pub fn set_valid(&mut self, val: bool) {
         self.valid = val;
+    }
+
+    pub fn get_errors_occurred(&self) -> bool {
+        return self.errors_occurred;
+    }
+
+    pub fn set_errors_occurred(&mut self, val: bool) {
+        self.errors_occurred = val;
     }
 }
 
@@ -304,6 +313,7 @@ impl Model {
                 frame_counter: 0,
                 done_editing: false,
                 valid: false,
+                errors_occurred: false,
             },
             output_model: OutputModel {
                 frame_counter: 0,

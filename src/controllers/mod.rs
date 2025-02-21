@@ -18,7 +18,7 @@
 use crate::model::core::*;
 use crate::core::{MainState, TipoRecordCsv, check_campionamento_niseci_path, check_riferimento_niseci_path, check_records_riferimento_niseci, check_records_campionamento_niseci};
 use crate::model::index::Indice;
-use crate::model::niseci::{RiferimentoNISECI, CampionamentoNISECI, AnagraficaNISECI};
+use crate::model::niseci::{RiferimentoNISECI, CampionamentoNISECI, AnagraficaNISECI, TipoComunitaNISECI};
 use crate::state::GLOBAL_STATE;
 use crate::CurrentView;
 use crate::process_csv_errors;
@@ -438,6 +438,14 @@ impl InfoAggiuntiveController {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.infoaggiuntive_model.increment_frame_counter();
 
+        if state.infoaggiuntive_model.get_errors_occurred() {
+            eprintln!("InfoAggiuntiveController:  Errors occurred");
+            eprintln!("InfoAggiuntiveController:  Let's update current view and go to CONSOLE.");
+            main_state.set_current_view(CurrentView::CONSOLE);
+            eprintln!("InfoAggiuntiveController:  Clearing error state");
+            state.infoaggiuntive_model.set_errors_occurred(false);
+        }
+
         let current_indice;
         if let Some(idx) = state.indice_model.get_selected_index() {
             current_indice = idx;
@@ -494,6 +502,11 @@ impl InfoAggiuntiveController {
         return state.indice_model.get_selected_index();
     }
 
+    pub fn get_data_anagrafica_niseci(&self) -> Option<AnagraficaNISECI> {
+        let state = GLOBAL_STATE.lock().unwrap();
+        return state.data_model.get_anagrafica_niseci();
+    }
+
     pub fn submit_anagrafica_niseci(&self, anagrafica: AnagraficaNISECI) {
         self.set_console_env(("anagrafica_niseci".to_string(), format!("{anagrafica}")));
         self.add_console_message("InfoAggiuntiveController: L'utente ha completato l'inserimento info aggiuntive.".to_string());
@@ -505,21 +518,83 @@ impl InfoAggiuntiveController {
     }
 
     pub fn valida_anagrafica_niseci(&self) {
-        let mut state = GLOBAL_STATE.lock().unwrap();
-        assert!(state.infoaggiuntive_model.is_done_editing());
 
-        if let Some(anagrafica) = state.data_model.get_anagrafica_niseci() {
-            //TODO: check validity
-            //let valid = true;
-            //if valid {
+        {
+            let mut state = GLOBAL_STATE.lock().unwrap();
+            assert!(state.infoaggiuntive_model.is_done_editing());
+        }
+
+        if let Some(anagrafica) = self.get_data_anagrafica_niseci() {
+            let mut errors: Vec<String> = Vec::new();
+
+            //TODO: check codice stazione after refactor
+
+            if anagrafica.nome_fiume.len() < 1 {
+                errors.push(format!("Nome fiume troppo corto"));
+            }
+
+            if anagrafica.posizione.regione.len() < 1 {
+                errors.push(format!("Nome regione troppo corto"));
+            }
+
+            if anagrafica.posizione.provincia.len() < 1 {
+                errors.push(format!("Nome provincia troppo corto"));
+            }
+
+            //TODO: check date format
+
+            if (anagrafica.get_lunghezza_media() - 0.0) < 1e-6 {
+                errors.push(format!("Lunghezza media troppo bassa: {}", anagrafica.get_lunghezza_media()));
+            }
+
+            if (anagrafica.get_larghezza_media() - 0.0) < 1e-6 {
+                errors.push(format!("Larghezza media troppo bassa: {}", anagrafica.get_larghezza_media()));
+            }
+
+            match anagrafica.comunita.tipo {
+                TipoComunitaNISECI::Recuperata => {
+                    if let Some(fonte) = anagrafica.comunita.fonte {
+                        if fonte.len() < 1 {
+                            errors.push(format!("Fonte troppo corta"));
+                        }
+                    } else {
+                        errors.push(format!("Fonte mancante"));
+                    }
+                }
+                TipoComunitaNISECI::AffinataDalMase => {
+                    if let Some(num_proto) = anagrafica.comunita.numero_protocollo {
+                        if num_proto.len() < 1 {
+                            errors.push(format!("Numero protocollo troppo corto"));
+                        }
+                    } else {
+                        errors.push(format!("Numero protocollo mancante"));
+                    }
+                }
+                _ => {}
+            }
+
+            if anagrafica.bacino_appartenenza.len() < 1 {
+                errors.push(format!("Nome bacino di appartenenza troppo corto"));
+            }
+
+            for e in &errors {
+                self.add_console_message(format!("InfoAggiuntiveController:  {e}"));
+            }
+
+            let mut state = GLOBAL_STATE.lock().unwrap();
+
+            if errors.len() == 0 {
                 state.infoaggiuntive_model.set_valid(true);
-            //} else {
+            } else {
                 //TODO: handle validation errors
                 //Will probably switch to ConsoleView using an errors_occurred flag like ValidazioneFileInput
-                //state.infoaggiuntive_model.set_valid(false);
-            //}
+                state.infoaggiuntive_model.set_valid(false);
+                state.infoaggiuntive_model.set_errors_occurred(true);
+            }
         } else {
-            eprintln!("InfoAggiuntiveController: valida_anagrafica_niseci() ha ricevuto uno stato spurio.");
+            let err_msg = "InfoAggiuntiveController: valida_anagrafica_niseci() ha ricevuto uno stato spurio.";
+            eprintln!("{}", err_msg);
+            self.add_console_message(format!("InfoAggiuntiveController:  {err_msg}"));
         };
     }
 
