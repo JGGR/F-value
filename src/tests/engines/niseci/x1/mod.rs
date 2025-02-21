@@ -1,3 +1,20 @@
+// SPDX-License-Identifier: GPL-3.0-only
+/*
+    Copyright (C) 2024-2025 jgabaut, gioninjo
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, version 3 of the License.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 use crate::engines::niseci::x1::calculate_x1;
 use crate::tests::test_utils::{create_dummy_campionamento_chopped, create_dummy_campionamento_full, create_dummy_riferimento};
 
@@ -24,6 +41,3 @@ fn test_calculate_x1_mixed_campionamento() {
   let x1_atteso = 10.0 / 13.0;
   assert!((x1_calcolato - x1_atteso).abs() <= f32::EPSILON);
 }
-
-
-
