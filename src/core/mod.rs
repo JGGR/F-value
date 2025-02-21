@@ -234,6 +234,7 @@ pub struct RecordCsvRiferimentoNISECI { //TODO: add position
     pub cl_soglia2: u32, // in mm
     pub cl_soglia3: u32, // in mm
     pub cl_soglia4: u32, // in mm
+    #[serde(deserialize_with = "deserialize_comma_f32")]
     pub ad_juv_soglia1: f32,
     #[serde(deserialize_with = "deserialize_comma_f32")]
     pub ad_juv_soglia2: f32,
@@ -525,13 +526,13 @@ pub fn parse_recordcsv_riferimento_niseci(records: Vec<RecordCsvRiferimentoNISEC
             errors.push(err);
             continue;
         }
-        
+
         if r.dens_soglia1 >= r.dens_soglia2 && specie_attesa {
             let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: dens_soglia1 maggiore di dens_soglia2 per una specie attesa") };
             errors.push(err);
             continue;
         }
-        
+
         if !check_soglie_cl(&r) {
             let err = RecordCsvRiferimentoNISECIError::SoglieCLNonCrescenti {
                 msg: format!("Record {idx}: soglie CL non crescenti" )
