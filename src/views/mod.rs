@@ -3,6 +3,12 @@ use std::process::exit;
 use crate::core::*;
 use crate::controllers::*;
 use crate::model::index::Indice;
+use crate::model::location::Location;
+use crate::model::niseci::TipoComunitaNISECI;
+use crate::model::niseci::ComunitaNISECI;
+use crate::model::niseci::AreaNISECI;
+use crate::model::niseci::IdroEcoRegioneNISECI;
+use crate::model::niseci::AnagraficaNISECI;
 use raylib::prelude::*;
 use rfd::FileDialog;
 use raylib::consts::GuiState::{STATE_NORMAL, STATE_DISABLED};
@@ -434,8 +440,8 @@ pub struct SelezioneInfoAggiuntiveView {
     valuebox_codice_stazione_value: i32,
     textbox_corpo_idrico_edit_mode: bool,
     textbox_corpo_idrico_buffer: [u8; 64],
-    textbox_regione_edit_mode: bool,
-    textbox_regione_buffer: [u8; 64],
+    listview_regione_value: i32,
+    listview_regione_scroll_value: i32,
     textbox_provincia_edit_mode: bool,
     textbox_provincia_buffer: [u8; 64],
     textbox_data_edit_mode: bool,
@@ -450,6 +456,9 @@ pub struct SelezioneInfoAggiuntiveView {
     textbox_fontecomunit_niseci_buffer: [u8; 64],
     textbox_protocollocomunit_niseci_edit_mode: bool,
     textbox_protocollocomunit_niseci_buffer: [u8; 64],
+    listview_idroecoregione_niseci_value: i32,
+    listview_idroecoregione_niseci_scroll_value: i32,
+    combobox_area_niseci_value: i32,
     textbox_bacino_niseci_edit_mode: bool,
     textbox_bacino_niseci_buffer: [u8; 64],
 }
@@ -496,8 +505,8 @@ impl SelezioneInfoAggiuntiveView {
             valuebox_codice_stazione_value: 0,
             textbox_corpo_idrico_edit_mode: false,
             textbox_corpo_idrico_buffer: corpo_idrico_buffer,
-            textbox_regione_edit_mode: false,
-            textbox_regione_buffer: regione_buffer,
+            listview_regione_value: 0,
+            listview_regione_scroll_value: 0,
             textbox_provincia_edit_mode: false,
             textbox_provincia_buffer: provincia_buffer,
             textbox_data_edit_mode: false,
@@ -512,6 +521,9 @@ impl SelezioneInfoAggiuntiveView {
             textbox_fontecomunit_niseci_buffer: fonte_comunit_buffer,
             textbox_protocollocomunit_niseci_edit_mode: false,
             textbox_protocollocomunit_niseci_buffer: protocollo_comunit_buffer,
+            listview_idroecoregione_niseci_value: 0,
+            listview_idroecoregione_niseci_scroll_value: 0,
+            combobox_area_niseci_value: 0,
             textbox_bacino_niseci_edit_mode: false,
             textbox_bacino_niseci_buffer: bacino_buffer,
         }
@@ -523,6 +535,14 @@ impl SelezioneInfoAggiuntiveView {
 
         let state = controller.get_state();
         let frame_counter = state.get_frame_counter();
+        let current_index = match controller.get_current_index() {
+            Some(index) => index,
+            None => {
+                eprintln!("SelezioneInfoAggiuntiveView: Per qualche assurdo motivo l'indice corrente non è validato. Uso NISECI.");
+                Indice::NISECI
+            }
+        };
+
         let groupbox_width = propwidth(&d, 600);
         let groupbox_x = d.get_screen_width() /2 - groupbox_width /2;
         let groupbox_height = propheight(&d, 450);
@@ -538,6 +558,172 @@ impl SelezioneInfoAggiuntiveView {
             Some(rstr!("Inserisci informazioni aggiuntive"))
         );
 
+        let submit_width = propwidth(&d, 50);
+        let groupbox_x_end = groupbox_x + groupbox_width;
+        let submit_x = groupbox_x_end + (d.get_screen_width() - groupbox_x_end)/2 - submit_width/2;
+        let submit_height = submit_width;
+        let submit_y = d.get_screen_height() /2 - submit_height /2;
+
+        if d.gui_button(rrect(submit_x, submit_y, submit_width, submit_height), Some(rstr!("Conferma"))) {
+
+            //TODO: impl TryInto<u32> for a new custom RegioneItaliana or smth ?
+            //But this was request as a free string originally...
+            let regione_string = match self.listview_regione_value {
+                0 => "Abruzzo".to_string(),
+                1 => "Basilicata".to_string(),
+                2 => "Calabria".to_string(),
+                3 => "Campania".to_string(),
+                4 => "Emilia-Romagna".to_string(),
+                5 => "Friuli-Venezia-Giulia".to_string(),
+                6 => "Lazio".to_string(),
+                7 => "Liguria".to_string(),
+                8 => "Lombardia".to_string(),
+                9 => "Marche".to_string(),
+                10 => "Molise".to_string(),
+                11 => "Piemonte".to_string(),
+                12 => "Puglia".to_string(),
+                13 => "Sardegna".to_string(),
+                14 => "Sicilia".to_string(),
+                15 => "Toscana".to_string(),
+                16 => "Trentino-Alto-Adige".to_string(),
+                17 => "Umbria".to_string(),
+                18 => "Valle d'Aosta".to_string(),
+                19 => "Veneto".to_string(),
+                _ => { panic!("Unexpected regione_string in SelezioneInfoAggiuntiveView::draw()"); }
+            };
+
+            // Raylib has trouble handling the string downstream if we don't ensure to do this
+            let end = self.textbox_provincia_buffer.iter().position(|&b| b == 0).unwrap_or(self.textbox_provincia_buffer.len());
+            let provincia_string = match String::from_utf8(self.textbox_provincia_buffer[..end].to_vec()) {
+                Ok(s) => s,
+                Err(_) => {
+                    //TODO: signal error: invalid UTF-8
+                    "ERROR".to_string()
+                }
+            };
+            let posizione = Location {
+                regione: regione_string,
+                provincia: provincia_string,
+            };
+            let larghezza_stazione = self.valuebox_larghezza_stazione_value;
+            let lunghezza_stazione = self.valuebox_lunghezza_stazione_value;
+            let codice_stazione = self.valuebox_codice_stazione_value;
+
+            // Raylib has trouble handling the string downstream if we don't ensure to do this
+            let end = self.textbox_corpo_idrico_buffer.iter().position(|&b| b == 0).unwrap_or(self.textbox_corpo_idrico_buffer.len());
+            let corpo_idrico = match String::from_utf8(self.textbox_corpo_idrico_buffer[..end].to_vec()) {
+                Ok(s) => s,
+                Err(_) => {
+                    //TODO: signal error: invalid UTF-8
+                    "ERROR".to_string()
+                }
+            };
+
+            //TODO: impl TryInto<u32> for TipoComunitaNISECI
+            //Which would also handle errors better than this crap
+            let tipo_comunita = match self.dropdownbox_tipocomunit_niseci_value {
+                0 => TipoComunitaNISECI::Redatta,
+                1 => TipoComunitaNISECI::Recuperata,
+                2 => TipoComunitaNISECI::Dm260_2010,
+                3 => TipoComunitaNISECI::AffinataDalMase,
+                _ => { panic!("Unexpected tipo_comunita in SelezioneInfoAggiuntiveView::draw()"); }
+            };
+            let mut opt_fonte: Option<String> = None;
+            let mut opt_num_protocollo: Option<String> = None;
+            match tipo_comunita {
+                TipoComunitaNISECI::Recuperata => {
+                    // Raylib has trouble handling the string downstream if we don't ensure to do this
+                    let end = self.textbox_fontecomunit_niseci_buffer.iter().position(|&b| b == 0).unwrap_or(self.textbox_fontecomunit_niseci_buffer.len());
+                    opt_fonte = Some(match String::from_utf8(self.textbox_fontecomunit_niseci_buffer[..end].to_vec()) {
+                        Ok(s) => s,
+                        Err(_) => {
+                            //TODO: signal error: invalid UTF-8
+                            "ERROR".to_string()
+                        }
+                    });
+                }
+                TipoComunitaNISECI::AffinataDalMase => {
+                    // Raylib has trouble handling the string downstream if we don't ensure to do this
+                    let end = self.textbox_protocollocomunit_niseci_buffer.iter().position(|&b| b == 0).unwrap_or(self.textbox_protocollocomunit_niseci_buffer.len());
+                    opt_num_protocollo = Some(match String::from_utf8(self.textbox_protocollocomunit_niseci_buffer[..end].to_vec()) {
+                        Ok(s) => s,
+                        Err(_) => {
+                            //TODO: signal error: invalid UTF-8
+                            "ERROR".to_string()
+                        }
+                    });
+                }
+                _ => {}
+            }
+            let comunita = ComunitaNISECI {
+                tipo: tipo_comunita,
+                fonte: opt_fonte,
+                numero_protocollo: opt_num_protocollo
+            };
+            //TODO: impl TryInto<u32> for AreaNISECI
+            //Which would also handle errors better than this crap
+            let area = match self.combobox_area_niseci_value {
+                0 => { // 0 == Alpina I guess
+                    AreaNISECI::Alpina
+                }
+                1 => { // 1 == Mediterranea I guess
+                    AreaNISECI::Mediterranea
+                }
+                _ => { panic!("Unexpected area_niseci in SelezioneInfoAggiuntiveView::draw()"); }
+            };
+
+            // Raylib has trouble handling the string downstream if we don't ensure to do this
+            let end = self.textbox_bacino_niseci_buffer.iter().position(|&b| b == 0).unwrap_or(self.textbox_bacino_niseci_buffer.len());
+            let bacino_niseci = match String::from_utf8(self.textbox_bacino_niseci_buffer[..end].to_vec()) {
+                Ok(s) => s,
+                Err(_) => {
+                    //TODO: signal error: invalid UTF-8
+                    "ERROR".to_string()
+                }
+            };
+
+            //TODO: impl TryInto<u32> for IdroEcoRegioneNISECI
+            //Which would also handle errors better than this crap
+            let idro_ecoregione_niseci = match self.listview_idroecoregione_niseci_value {
+                0 => IdroEcoRegioneNISECI::AlpiCentroOrientali,
+                1 => IdroEcoRegioneNISECI::AlpiMediterranee,
+                2 => IdroEcoRegioneNISECI::AlpiMeridionali,
+                3 => IdroEcoRegioneNISECI::AlpiOccidentali,
+                4 => IdroEcoRegioneNISECI::AppenninoCentrale,
+                5 => IdroEcoRegioneNISECI::AppenninoMeridionale,
+                6 => IdroEcoRegioneNISECI::AppenninoPiemontese,
+                7 => IdroEcoRegioneNISECI::AppenninoSettentrionale,
+                8 => IdroEcoRegioneNISECI::BasilicataTavoliere,
+                9 => IdroEcoRegioneNISECI::BassoLazio,
+                10 => IdroEcoRegioneNISECI::CalabriaNebrodi,
+                11 => IdroEcoRegioneNISECI::Carso,
+                12 => IdroEcoRegioneNISECI::CostaAdriatica,
+                13 => IdroEcoRegioneNISECI::Monferrato,
+                14 => IdroEcoRegioneNISECI::PianuraPadana,
+                15 => IdroEcoRegioneNISECI::PrealpiDolomiti,
+                16 => IdroEcoRegioneNISECI::PugliaGargano,
+                17 => IdroEcoRegioneNISECI::RomaViterbeseVesuvio,
+                18 => IdroEcoRegioneNISECI::Sardegna,
+                19 => IdroEcoRegioneNISECI::Sicilia,
+                20 => IdroEcoRegioneNISECI::Toscana,
+                _ => { panic!("Unexpected idroecoregione_niseci in SelezioneInfoAggiuntiveView::draw()"); }
+            };
+
+            let anagrafica = AnagraficaNISECI {
+                comunita: comunita,
+                codice_stazione: codice_stazione as u32,
+                area: area,
+                nome_fiume: corpo_idrico,
+                bacino_appartenenza: bacino_niseci,
+                idro_eco_regione: idro_ecoregione_niseci,
+                posizione: posizione,
+                lunghezza_media_stazione: lunghezza_stazione as f32,
+                larghezza_media_stazione: larghezza_stazione as f32,
+            };
+
+            controller.submit_anagrafica_niseci(anagrafica);
+        }
+
         let x_padding = groupbox_width / 20;
         let y_padding = groupbox_height / 15;
 
@@ -549,23 +735,22 @@ impl SelezioneInfoAggiuntiveView {
         let column_2_y = column_1_y;
         // 1 padding on top, 2 below
         let column_1_height = groupbox_height - y_padding*3;
-        // 1 padding on top, 1 below
-        let column_2_height = groupbox_height - y_padding*2;
+        // 1 padding on top, 0 below
+        let column_2_height = groupbox_height - y_padding;
 
         // Column 1
 
         let column_1_labels_width = column_width / 2;
         let column_1_fields_y_spacing = y_padding / 3;
-        let column_1_big_y_spacing = y_padding*2;
         let column_1_labels_count = 7;
         let column_1_labels_x = column_1_x;
-        let column_1_labels_height = (column_1_height - (column_1_fields_y_spacing*5) - column_1_big_y_spacing) / column_1_labels_count;
+        let column_1_labels_height = (column_1_height - (column_1_fields_y_spacing*13) ) / column_1_labels_count;
 
         let column_1_label_stazione_y = column_1_y;
         let column_1_label_corpo_idrico_y = column_1_label_stazione_y + column_1_labels_height + column_1_fields_y_spacing;
         let column_1_label_regione_y = column_1_label_corpo_idrico_y + column_1_labels_height + column_1_fields_y_spacing;
-        let column_1_label_provincia_y = column_1_label_regione_y + column_1_labels_height + column_1_fields_y_spacing;
-        let column_1_label_data_y = column_1_label_provincia_y + column_1_labels_height + column_1_big_y_spacing;
+        let column_1_label_provincia_y = column_1_label_regione_y + column_1_labels_height + column_1_fields_y_spacing*8;
+        let column_1_label_data_y = column_1_label_provincia_y + column_1_labels_height + column_1_fields_y_spacing;
         let column_1_label_lunghezza_stazione_y = column_1_label_data_y + column_1_labels_height + column_1_fields_y_spacing;
         let column_1_label_larghezza_stazione_y = column_1_label_lunghezza_stazione_y + column_1_labels_height + column_1_fields_y_spacing;
 
@@ -670,18 +855,24 @@ impl SelezioneInfoAggiuntiveView {
         ) {
             self.textbox_corpo_idrico_edit_mode = !self.textbox_corpo_idrico_edit_mode;
         }
-        if d.gui_text_box(
+
+        let mut _listview_regione_italiana_pick = -1;
+        _listview_regione_italiana_pick = d.gui_list_view(
             rrect(
                 column_1_boxes_x,
                 column_1_label_regione_y,
                 column_1_boxes_width,
-                column_1_boxes_height
+                column_1_boxes_height*3
             ),
-            &mut self.textbox_regione_buffer,
-            self.textbox_regione_edit_mode
-        ) {
-            self.textbox_regione_edit_mode = !self.textbox_regione_edit_mode;
-        }
+            Some(rstr!(
+                "Abruzzo;Basilicata;Calabria;Campania;Emilia-Romagna;\
+                Friuli-Venezia-Giulia;Lazio;Liguria;Lombardia;Marche;\
+                Molise;Piemonte;Puglia;Sardegna;Sicilia;Toscana;\
+                Trentino-Alto-Adige;Umbria;Valle d'Aosta;Veneto"
+            )),
+            &mut self.listview_regione_scroll_value,
+            &mut self.listview_regione_value,
+        );
         if d.gui_text_box(
             rrect(
                 column_1_boxes_x,
@@ -743,11 +934,13 @@ impl SelezioneInfoAggiuntiveView {
         let column_2_groupbox_niseci_width = column_width;
         let column_2_groupbox_niseci_x = column_2_x;
         let column_2_groupbox_niseci_y = column_2_y;
-        let column_2_groupbox_niseci_height = column_2_height - column_2_groupbox_y_padding - y_padding*4;
+        let column_2_groupbox_niseci_height = column_2_height - column_2_groupbox_y_padding/2;// - y_padding;
         let column_2_groupbox_hfbi_width = column_2_groupbox_niseci_width;
         let column_2_groupbox_hfbi_x = column_2_groupbox_niseci_x;
-        let column_2_groupbox_hfbi_y = column_2_groupbox_niseci_y + column_2_groupbox_niseci_height + column_2_groupbox_y_padding;
-        let column_2_groupbox_hfbi_height = column_2_height - column_2_groupbox_niseci_height;
+        //let column_2_groupbox_hfbi_y = column_2_groupbox_niseci_y + column_2_groupbox_niseci_height + column_2_groupbox_y_padding;
+        //let column_2_groupbox_hfbi_height = column_2_height - column_2_groupbox_niseci_height;
+        let column_2_groupbox_hfbi_y = column_2_groupbox_niseci_y;
+        let column_2_groupbox_hfbi_height = column_2_groupbox_niseci_height - column_2_groupbox_y_padding - y_padding;
 
         let column_2_comunit_x_padding = x_padding/4;
         let column_2_comunit_y_padding = column_2_groupbox_y_padding;
@@ -756,35 +949,41 @@ impl SelezioneInfoAggiuntiveView {
         let column_2_groupbox_comunit_width = column_2_groupbox_niseci_width - column_2_comunit_x_padding*2;
         let column_2_groupbox_comunit_height = column_1_labels_height*3 + column_1_fields_y_spacing*4;
 
-        d.gui_group_box(
-            rrect(
-                column_2_groupbox_niseci_x,
-                column_2_groupbox_niseci_y,
-                column_2_groupbox_niseci_width,
-                column_2_groupbox_niseci_height
-            ),
-            Some(rstr!("NISECI"))
-        );
+        match current_index {
+            Indice::NISECI => {
+                d.gui_group_box(
+                    rrect(
+                        column_2_groupbox_niseci_x,
+                        column_2_groupbox_niseci_y,
+                        column_2_groupbox_niseci_width,
+                        column_2_groupbox_niseci_height
+                    ),
+                    Some(rstr!("NISECI"))
+                );
 
-        d.gui_group_box(
-            rrect(
-                column_2_groupbox_comunit_x,
-                column_2_groupbox_comunit_y,
-                column_2_groupbox_comunit_width,
-                column_2_groupbox_comunit_height
-            ),
-            Some(rstr!("Comunità NISECI"))
-        );
+                d.gui_group_box(
+                    rrect(
+                        column_2_groupbox_comunit_x,
+                        column_2_groupbox_comunit_y,
+                        column_2_groupbox_comunit_width,
+                        column_2_groupbox_comunit_height
+                    ),
+                    Some(rstr!("Comunità NISECI"))
+                );
 
-        d.gui_group_box(
-            rrect(
-                column_2_groupbox_hfbi_x,
-                column_2_groupbox_hfbi_y,
-                column_2_groupbox_hfbi_width,
-                column_2_groupbox_hfbi_height
-            ),
-            Some(rstr!("HFBI"))
-        );
+            }
+            Indice::HFBI => {
+                d.gui_group_box(
+                    rrect(
+                        column_2_groupbox_hfbi_x,
+                        column_2_groupbox_hfbi_y,
+                        column_2_groupbox_hfbi_width,
+                        column_2_groupbox_hfbi_height
+                    ),
+                    Some(rstr!("HFBI"))
+                );
+            }
+        }
 
         let column_2_groupbox_labels_x_spacing = column_2_comunit_x_padding;
         let column_2_groupbox_labels_width = (column_2_groupbox_comunit_width - column_2_groupbox_labels_x_spacing*2) / 2;
@@ -792,118 +991,205 @@ impl SelezioneInfoAggiuntiveView {
         let column_2_groupbox_labels_x = column_2_groupbox_comunit_x + column_2_groupbox_labels_x_spacing;
         let column_2_labels_height = column_1_labels_height;
 
-        let column_2_label_tipo_comunit_y = column_2_groupbox_comunit_y + column_2_groupbox_fields_y_spacing;
-        let column_2_label_fonte_comunit_y = column_2_label_tipo_comunit_y + column_2_labels_height + column_2_groupbox_fields_y_spacing;
-        let column_2_label_protocollo_comunit_y = column_2_label_fonte_comunit_y + column_2_labels_height + column_2_groupbox_fields_y_spacing;
-        let column_2_label_bacino_y = column_2_groupbox_comunit_y + column_2_groupbox_comunit_height + column_2_groupbox_fields_y_spacing*2;
+        match current_index {
+            Indice::NISECI => {
+                let column_2_label_tipo_comunit_y = column_2_groupbox_comunit_y + column_2_groupbox_fields_y_spacing;
+                let column_2_label_fonte_comunit_y = column_2_label_tipo_comunit_y + column_2_labels_height + column_2_groupbox_fields_y_spacing;
+                let column_2_label_protocollo_comunit_y = column_2_label_fonte_comunit_y + column_2_labels_height + column_2_groupbox_fields_y_spacing;
+                let column_2_label_idroecoregione_y = column_2_groupbox_comunit_y + column_2_groupbox_comunit_height + column_2_groupbox_fields_y_spacing;
+                let column_2_label_area_niseci_y = column_2_label_idroecoregione_y + column_2_labels_height*4 + column_2_groupbox_fields_y_spacing;
+                let column_2_label_bacino_y = column_2_label_area_niseci_y + column_2_labels_height + column_2_groupbox_fields_y_spacing;
 
-        d.gui_label(
-            rrect(
-                column_2_groupbox_labels_x,
-                column_2_label_tipo_comunit_y,
-                column_2_groupbox_labels_width,
-                column_2_labels_height
-            ),
-            Some(rstr!("Tipo"))
-        );
+                d.gui_label(
+                    rrect(
+                        column_2_groupbox_labels_x,
+                        column_2_label_tipo_comunit_y,
+                        column_2_groupbox_labels_width,
+                        column_2_labels_height
+                    ),
+                    Some(rstr!("Tipo"))
+                );
 
-        d.gui_label(
-            rrect(
-                column_2_groupbox_labels_x,
-                column_2_label_fonte_comunit_y,
-                column_2_groupbox_labels_width,
-                column_2_labels_height
-            ),
-            Some(rstr!("Fonte"))
-        );
+                d.gui_label(
+                    rrect(
+                        column_2_groupbox_labels_x,
+                        column_2_label_fonte_comunit_y,
+                        column_2_groupbox_labels_width,
+                        column_2_labels_height
+                    ),
+                    Some(rstr!("Fonte"))
+                );
 
-        d.gui_label(
-            rrect(
-                column_2_groupbox_labels_x,
-                column_2_label_protocollo_comunit_y,
-                column_2_groupbox_labels_width,
-                column_2_labels_height
-            ),
-            Some(rstr!("Protocollo"))
-        );
+                d.gui_label(
+                    rrect(
+                        column_2_groupbox_labels_x,
+                        column_2_label_protocollo_comunit_y,
+                        column_2_groupbox_labels_width,
+                        column_2_labels_height
+                    ),
+                    Some(rstr!("Protocollo"))
+                );
 
-        d.gui_label(
-            rrect(
-                column_2_groupbox_labels_x,
-                column_2_label_bacino_y,
-                column_2_groupbox_labels_width,
-                column_2_labels_height
-            ),
-            Some(rstr!("Bacino"))
-        );
+                d.gui_label(
+                    rrect(
+                        column_2_groupbox_labels_x,
+                        column_2_label_idroecoregione_y,
+                        column_2_groupbox_labels_width,
+                        column_2_labels_height
+                    ),
+                    Some(rstr!("Idroecoregione"))
+                );
 
-        let column_2_groupbox_boxes_width = column_2_groupbox_labels_width;
-        let column_2_groupbox_boxes_height = column_2_labels_height;
-        let column_2_groupbox_boxes_x = column_2_groupbox_labels_x + column_2_groupbox_labels_width;
+                d.gui_label(
+                    rrect(
+                        column_2_groupbox_labels_x,
+                        column_2_label_area_niseci_y,
+                        column_2_groupbox_labels_width,
+                        column_2_labels_height
+                    ),
+                    Some(rstr!("Area"))
+                );
 
-        if d.gui_text_box(
-            rrect(
-                column_2_groupbox_boxes_x,
-                column_2_label_fonte_comunit_y,
-                column_2_groupbox_boxes_width,
-                column_2_groupbox_boxes_height
-            ),
-            &mut self.textbox_fontecomunit_niseci_buffer,
-            self.textbox_fontecomunit_niseci_edit_mode
-        ) {
-            self.textbox_fontecomunit_niseci_edit_mode = !self.textbox_fontecomunit_niseci_edit_mode;
+
+                d.gui_label(
+                    rrect(
+                        column_2_groupbox_labels_x,
+                        column_2_label_bacino_y,
+                        column_2_groupbox_labels_width,
+                        column_2_labels_height
+                    ),
+                    Some(rstr!("Bacino"))
+                );
+
+                let column_2_groupbox_boxes_width = column_2_groupbox_labels_width;
+                let column_2_groupbox_boxes_height = column_2_labels_height;
+                let column_2_groupbox_boxes_x = column_2_groupbox_labels_x + column_2_groupbox_labels_width;
+
+                match self.dropdownbox_tipocomunit_niseci_value {
+                    1 => { /* 1 == Fonte I guess */ }
+                    _ => { // Not fonte I guess
+                        d.gui_lock();
+                        d.gui_set_state(STATE_DISABLED);
+                    }
+                }
+                if d.gui_text_box(
+                    rrect(
+                        column_2_groupbox_boxes_x,
+                        column_2_label_fonte_comunit_y,
+                        column_2_groupbox_boxes_width,
+                        column_2_groupbox_boxes_height
+                    ),
+                    &mut self.textbox_fontecomunit_niseci_buffer,
+                    self.textbox_fontecomunit_niseci_edit_mode
+                ) {
+                    self.textbox_fontecomunit_niseci_edit_mode = !self.textbox_fontecomunit_niseci_edit_mode;
+                }
+                match self.dropdownbox_tipocomunit_niseci_value {
+                    1 => { /* 1 == Fonte I guess */ }
+                    _ => { // Not fonte I guess
+                        d.gui_set_state(STATE_NORMAL);
+                        d.gui_unlock();
+                    }
+                }
+
+                match self.dropdownbox_tipocomunit_niseci_value {
+                    3 => { /* 3 == Mase I guess */ }
+                    _ => { // Not Mase I guess
+                        d.gui_lock();
+                        d.gui_set_state(STATE_DISABLED);
+                    }
+                }
+                if d.gui_text_box(
+                    rrect(
+                        column_2_groupbox_boxes_x,
+                        column_2_label_protocollo_comunit_y,
+                        column_2_groupbox_boxes_width,
+                        column_2_groupbox_boxes_height
+                    ),
+                    &mut self.textbox_protocollocomunit_niseci_buffer,
+                    self.textbox_protocollocomunit_niseci_edit_mode
+                ) {
+                    self.textbox_protocollocomunit_niseci_edit_mode = !self.textbox_protocollocomunit_niseci_edit_mode;
+                }
+                match self.dropdownbox_tipocomunit_niseci_value {
+                    3 => { /* 3 == Mase I guess */ }
+                    _ => { // Not Mase I guess
+                        d.gui_set_state(STATE_NORMAL);
+                        d.gui_unlock();
+                    }
+                }
+
+                let mut _listview_idroecoregione_pick = -1;
+                _listview_idroecoregione_pick = d.gui_list_view(
+                    rrect(
+                        column_2_groupbox_boxes_x,
+                        column_2_label_idroecoregione_y,
+                        column_2_groupbox_boxes_width,
+                        column_2_groupbox_boxes_height*4
+                    ),
+                    Some(rstr!(
+                        "AlpiCentroOrientali;AlpiMediterranee;AlpiMeridionali;\
+                        AlpiOccidentali;AppenninoCentrale;AppenninoMeridionale;\
+                        AppenninoPiemontese;AppenninoSettentrionale;BasilicataTavoliere;\
+                        BassoLazio;CalabriaNebrodi;Carso;CostaAdriatica;Monferrato;\
+                        PianuraPadana;PrealpiDolomiti;PugliaGargano;RomaViterbeseVesuvio;\
+                        Sardegna;Sicilia;Toscana"
+                    )),
+                    &mut self.listview_idroecoregione_niseci_scroll_value,
+                    &mut self.listview_idroecoregione_niseci_value,
+                );
+                let mut _comboBoxPick = -1;
+                _comboBoxPick = d.gui_combo_box(
+                    rrect(
+                        column_2_groupbox_boxes_x,
+                        column_2_label_area_niseci_y,
+                        column_2_groupbox_boxes_width,
+                        column_2_groupbox_boxes_height
+                    ),
+                    Some(rstr!("Alpina;Mediterranea")),
+                    &mut self.combobox_area_niseci_value,
+                );
+
+                if d.gui_text_box(
+                    rrect(
+                        column_2_groupbox_boxes_x,
+                        column_2_label_bacino_y,
+                        column_2_groupbox_boxes_width,
+                        column_2_groupbox_boxes_height
+                    ),
+                    &mut self.textbox_bacino_niseci_buffer,
+                    self.textbox_bacino_niseci_edit_mode
+                ) {
+                    self.textbox_bacino_niseci_edit_mode = !self.textbox_bacino_niseci_edit_mode;
+                }
+
+                if d.gui_dropdown_box(
+                    rrect(
+                        column_2_groupbox_boxes_x,
+                        column_2_label_tipo_comunit_y,
+                        column_2_groupbox_boxes_width,
+                        column_2_groupbox_boxes_height,
+                    ),
+                    Some(rstr!("Redatta;Fonti;DM260/2010;Mase")),
+                    &mut self.dropdownbox_tipocomunit_niseci_value,
+                    self.dropdownbox_tipocomunit_niseci_edit_mode,
+                ) {
+                    self.dropdownbox_tipocomunit_niseci_edit_mode = !self.dropdownbox_tipocomunit_niseci_edit_mode;
+                }
+            }
+            Indice::HFBI => {
+                let rainbow_speed = 0.03;
+                let todo_hfbi_font_scale = 2;
+                let todo_hfbi_font_height = main_state.current_font_height * todo_hfbi_font_scale;
+
+                let todo_hfbi_txt = "TODO: HFBI controls";
+                let todo_hfbi_txt_bounds = main_state.current_font.measure_text(todo_hfbi_txt, todo_hfbi_font_height as f32, main_state.default_txt_spacing as f32);
+                let todo_hfbi_txt_x = column_2_groupbox_hfbi_x + (column_2_groupbox_hfbi_width / 2) - (todo_hfbi_txt_bounds.x as i32 / 2);
+                let todo_hfbi_txt_y = column_2_groupbox_hfbi_y + (column_2_groupbox_hfbi_height / 2) - (todo_hfbi_txt_bounds.y as i32 / 2);
+
+                draw_rainbow_text(d, todo_hfbi_txt_x, todo_hfbi_txt_y, "TODO: HFBI controls", frame_counter, rainbow_speed, &main_state.current_font, main_state.default_txt_spacing, main_state.current_font_height, todo_hfbi_font_scale);
+            }
         }
-
-        if d.gui_text_box(
-            rrect(
-                column_2_groupbox_boxes_x,
-                column_2_label_protocollo_comunit_y,
-                column_2_groupbox_boxes_width,
-                column_2_groupbox_boxes_height
-            ),
-            &mut self.textbox_protocollocomunit_niseci_buffer,
-            self.textbox_protocollocomunit_niseci_edit_mode
-        ) {
-            self.textbox_protocollocomunit_niseci_edit_mode = !self.textbox_protocollocomunit_niseci_edit_mode;
-        }
-
-        if d.gui_text_box(
-            rrect(
-                column_2_groupbox_boxes_x,
-                column_2_label_bacino_y,
-                column_2_groupbox_boxes_width,
-                column_2_groupbox_boxes_height
-            ),
-            &mut self.textbox_bacino_niseci_buffer,
-            self.textbox_bacino_niseci_edit_mode
-        ) {
-            self.textbox_bacino_niseci_edit_mode = !self.textbox_bacino_niseci_edit_mode;
-        }
-
-        if d.gui_dropdown_box(
-            rrect(
-                column_2_groupbox_boxes_x,
-                column_2_label_tipo_comunit_y,
-                column_2_groupbox_boxes_width,
-                column_2_groupbox_boxes_height,
-            ),
-            Some(rstr!("Redatta;Fonti;DM260/2010;Mase")),
-            &mut self.dropdownbox_tipocomunit_niseci_value,
-            self.dropdownbox_tipocomunit_niseci_edit_mode,
-        ) {
-            self.dropdownbox_tipocomunit_niseci_edit_mode = !self.dropdownbox_tipocomunit_niseci_edit_mode;
-        }
-
-        let rainbow_speed = 0.03;
-        let todo_hfbi_font_scale = 2;
-        let todo_hfbi_font_height = main_state.current_font_height * todo_hfbi_font_scale;
-
-        let todo_hfbi_txt = "TODO: HFBI controls";
-        let todo_hfbi_txt_bounds = main_state.current_font.measure_text(todo_hfbi_txt, todo_hfbi_font_height as f32, main_state.default_txt_spacing as f32);
-        let todo_hfbi_txt_x = column_2_groupbox_hfbi_x + (column_2_groupbox_hfbi_width / 2) - (todo_hfbi_txt_bounds.x as i32 / 2);
-        let todo_hfbi_txt_y = column_2_groupbox_hfbi_y + (column_2_groupbox_hfbi_height / 2) - (todo_hfbi_txt_bounds.y as i32 / 2);
-
-        draw_rainbow_text(d, todo_hfbi_txt_x, todo_hfbi_txt_y, "TODO: HFBI controls", frame_counter, rainbow_speed, &main_state.current_font, main_state.default_txt_spacing, main_state.current_font_height, todo_hfbi_font_scale);
 
     }
 }
@@ -925,14 +1211,29 @@ impl ValidazioneInfoAggiuntiveView {
         d.clear_background(main_state.default_bg_color);
 
         let _state = controller.get_state();
+
+        let current_index = match controller.get_current_index() {
+            Some(index) => index,
+            None => {
+                eprintln!("ValidazioneInfoAggiuntiveView: Per qualche assurdo motivo l'indice corrente non è validato. Uso NISECI.");
+                Indice::NISECI
+            }
+        };
+
         let button_valida_width = propwidth(&d, 200);
         let button_valida_x = d.get_screen_width() / 2 - button_valida_width /2;
         let button_valida_height = propwidth(&d, 50);
         let button_valida_y = d.get_screen_height() / 2 - button_valida_height/2;
 
+        let y_spacing = button_valida_height;
+        let button_backout_width = button_valida_width;
+        let button_backout_x = button_valida_x;
+        let button_backout_height = button_valida_height;
+        let button_backout_y = button_valida_y + button_valida_height + y_spacing;
+
         let groupbox_width = button_valida_width + propwidth(&d, 100);
         let groupbox_x = button_valida_x - propwidth(&d, 50);
-        let groupbox_height = button_valida_height + propheight(&d, 100);
+        let groupbox_height = button_valida_height * 3 + propheight(&d, 100);
         let groupbox_y = button_valida_y - propheight(&d, 50);
 
         d.gui_group_box(
@@ -954,8 +1255,37 @@ impl ValidazioneInfoAggiuntiveView {
             ),
             Some(rstr!("Valida info aggiuntive"))
         ) {
-            //TODO: valida info aggiuntive indice
-            println!("TODO: call controller to update model. Controller can update main_state.current_view on next frame in update()");
+            //Ask controller to validate info aggiuntive indice
+            match current_index {
+                Indice::NISECI => {
+                    controller.valida_anagrafica_niseci();
+                }
+                Indice::HFBI => {
+                    //TODO: implement this
+                    //controller.valida_anagrafica_hfbi()
+                }
+            }
+        }
+
+        if d.gui_button(
+            rrect(
+                button_backout_x,
+                button_backout_y,
+                button_backout_width,
+                button_backout_height,
+            ),
+            Some(rstr!("Indietro"))
+        ) {
+            //Ask controller to go back and edit further
+            match current_index {
+                Indice::NISECI => {
+                    controller.backout_anagrafica_niseci();
+                }
+                Indice::HFBI => {
+                    //TODO: implement this
+                    //controller.backout_anagrafica_hfbi();
+                }
+            }
         }
     }
 }

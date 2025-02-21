@@ -1,4 +1,4 @@
-use crate::{engines::niseci::x2::calculate_x2, model::{location::Location, niseci::{AnagraficaNISECI, ClassiEtaSpecieNISECI, ComunitaNISECI, IdroEcoRegioneNISECI, TipoComunitaNISECI}}, tests::test_utils::{create_massive_campionamento_ciacci, create_massive_campionamento_ciacci_2, get_ciaccio}};
+use crate::{engines::niseci::x2::calculate_x2, model::{location::Location, niseci::{AnagraficaNISECI, ClassiEtaSpecieNISECI, ComunitaNISECI, IdroEcoRegioneNISECI, TipoComunitaNISECI, AreaNISECI}}, tests::test_utils::{create_massive_campionamento_ciacci, create_massive_campionamento_ciacci_2, get_ciaccio}};
 
 
 #[test]
@@ -156,6 +156,7 @@ fn calculate_x2_test_1() {
 
   let anagrafica = AnagraficaNISECI {
     bacino_appartenenza: "dummy".to_string(),
+    area: AreaNISECI::Alpina,
     codice_stazione: 1,
     comunita: comunita,
     idro_eco_regione: IdroEcoRegioneNISECI::AlpiCentroOrientali,
@@ -177,15 +178,16 @@ fn calculate_x2_test_1() {
   // secondo test con valori alternativi
 
   let campionamento = create_massive_campionamento_ciacci_2();
-  
+
   let comunita = ComunitaNISECI {
     fonte: Some("hey".to_string()),
     numero_protocollo: None,
     tipo: TipoComunitaNISECI::Dm260_2010
   };
-  
+
   let anagrafica = AnagraficaNISECI {
     bacino_appartenenza: "dummy".to_string(),
+    area: AreaNISECI::Alpina,
     codice_stazione: 1,
     comunita: comunita,
     idro_eco_regione: IdroEcoRegioneNISECI::AlpiCentroOrientali,
@@ -197,10 +199,10 @@ fn calculate_x2_test_1() {
       provincia: "oristano".to_string()
     }
   };
-  
-  
+
+
   let x2 = calculate_x2(&campionamento, &anagrafica);
-  
+
   assert!(x2.is_ok());
   let epsilon: f32 = 1e-6;
   assert!((0.7 - x2.unwrap()).abs() < epsilon);

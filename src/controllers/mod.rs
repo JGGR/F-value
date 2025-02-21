@@ -1,7 +1,7 @@
 use crate::model::core::*;
 use crate::core::{MainState, TipoRecordCsv, check_campionamento_niseci_path, check_riferimento_niseci_path, check_records_riferimento_niseci, check_records_campionamento_niseci};
 use crate::model::index::Indice;
-use crate::model::niseci::{RiferimentoNISECI, CampionamentoNISECI};
+use crate::model::niseci::{RiferimentoNISECI, CampionamentoNISECI, AnagraficaNISECI};
 use crate::state::GLOBAL_STATE;
 use crate::CurrentView;
 use crate::process_csv_errors;
@@ -417,19 +417,120 @@ impl InfoAggiuntiveController {
         Self
     }
 
-    pub fn update(&self, _rl: &RaylibHandle, _main_state: &mut MainState) {
+    pub fn update(&self, _rl: &RaylibHandle, main_state: &mut MainState) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.infoaggiuntive_model.increment_frame_counter();
+
+        let current_indice;
+        if let Some(idx) = state.indice_model.get_selected_index() {
+            current_indice = idx;
+        } else {
+            eprintln!("InfoAggiuntiveController:  User did not select an index");
+            eprintln!("InfoAggiuntiveController:  Let's update current view and go back to SelezioneIndice.");
+            main_state.set_current_view(CurrentView::SelezioneIndice);
+            return;
+        }
+        match main_state.current_view {
+            CurrentView::SelezioneInfoAggiuntive => {
+                match current_indice {
+                    Indice::NISECI => {
+                        if state.infoaggiuntive_model.is_done_editing() {
+                            eprintln!("InfoAggiuntiveController:  Let's update current view and go to ValidaInfoAggiuntive");
+                            main_state.set_current_view(CurrentView::ValidazioneInfoAggiuntive);
+                            return;
+                        }
+                    }
+                    Indice::HFBI => {
+                    }
+                }
+            }
+            CurrentView::ValidazioneInfoAggiuntive => {
+                match current_indice {
+                    Indice::NISECI => {
+                        if !state.infoaggiuntive_model.is_done_editing() {
+                            eprintln!("InfoAggiuntiveController:  Let's update current view and go back to SelezionaInfoAggiuntive");
+                            main_state.set_current_view(CurrentView::SelezioneInfoAggiuntive);
+                            return;
+                        }
+                        if state.infoaggiuntive_model.is_valid() {
+                            eprintln!("InfoAggiuntiveController:  Let's update current view and go to ProduzioneOutput");
+                            main_state.set_current_view(CurrentView::ProduzioneOutput);
+                            return;
+                        }
+                    }
+                    Indice::HFBI => {
+                    }
+                }
+            }
+            _ => {}
+        }
+
     }
 
     pub fn get_state(&self) -> InfoAggiuntiveModel {
         let state = GLOBAL_STATE.lock().unwrap();
         return state.infoaggiuntive_model.clone();
     }
+
+    pub fn get_current_index(&self) -> Option<Indice> {
+        let state = GLOBAL_STATE.lock().unwrap();
+        return state.indice_model.get_selected_index();
+    }
+
+    pub fn submit_anagrafica_niseci(&self, anagrafica: AnagraficaNISECI) {
+        self.set_console_env(("anagrafica_niseci".to_string(), format!("{anagrafica}")));
+        self.add_console_message("InfoAggiuntiveController: L'utente ha completato l'inserimento info aggiuntive.".to_string());
+        let mut state = GLOBAL_STATE.lock().unwrap();
+        assert!(state.data_model.get_anagrafica_niseci().is_none());
+        state.data_model.set_anagrafica_niseci(Some(anagrafica));
+        state.infoaggiuntive_model.set_done_editing(true);
+        state.infoaggiuntive_model.set_valid(false);
+    }
+
+    pub fn valida_anagrafica_niseci(&self) {
+        let mut state = GLOBAL_STATE.lock().unwrap();
+        assert!(state.infoaggiuntive_model.is_done_editing());
+
+        if let Some(anagrafica) = state.data_model.get_anagrafica_niseci() {
+            //TODO: check validity
+            //let valid = true;
+            //if valid {
+                state.infoaggiuntive_model.set_valid(true);
+            //} else {
+                //TODO: handle validation errors
+                //Will probably switch to ConsoleView using an errors_occurred flag like ValidazioneFileInput
+                //state.infoaggiuntive_model.set_valid(false);
+            //}
+        } else {
+            eprintln!("InfoAggiuntiveController: valida_anagrafica_niseci() ha ricevuto uno stato spurio.");
+        };
+    }
+
+    pub fn backout_anagrafica_niseci(&self) {
+        self.unset_console_env("anagrafica_niseci".to_string());
+        self.add_console_message("InfoAggiuntiveController: L'utente ha annullato l'inserimento info aggiuntive.".to_string());
+        let mut state = GLOBAL_STATE.lock().unwrap();
+        assert!(state.data_model.get_anagrafica_niseci().is_some());
+        state.data_model.set_anagrafica_niseci(None);
+        state.infoaggiuntive_model.set_done_editing(false);
+        state.infoaggiuntive_model.set_valid(false);
+    }
+
     pub fn add_console_message(&self, msg: String) {
         let mut state = GLOBAL_STATE.lock().unwrap();
 
         state.console_model.console.add_message(msg);
+    }
+
+    pub fn set_console_env(&self, (key, val): (String,String)) {
+        let mut state = GLOBAL_STATE.lock().unwrap();
+
+        state.console_model.console.set_env((key,val));
+    }
+
+    pub fn unset_console_env(&self, key: String) {
+        let mut state = GLOBAL_STATE.lock().unwrap();
+        state.console_model.console.remove_env(key);
     }
 }
 
