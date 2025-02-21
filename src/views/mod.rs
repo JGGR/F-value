@@ -440,8 +440,8 @@ pub struct SelezioneInfoAggiuntiveView {
     valuebox_codice_stazione_value: i32,
     textbox_corpo_idrico_edit_mode: bool,
     textbox_corpo_idrico_buffer: [u8; 64],
-    textbox_regione_edit_mode: bool,
-    textbox_regione_buffer: [u8; 64],
+    listview_regione_value: i32,
+    listview_regione_scroll_value: i32,
     textbox_provincia_edit_mode: bool,
     textbox_provincia_buffer: [u8; 64],
     textbox_data_edit_mode: bool,
@@ -505,8 +505,8 @@ impl SelezioneInfoAggiuntiveView {
             valuebox_codice_stazione_value: 0,
             textbox_corpo_idrico_edit_mode: false,
             textbox_corpo_idrico_buffer: corpo_idrico_buffer,
-            textbox_regione_edit_mode: false,
-            textbox_regione_buffer: regione_buffer,
+            listview_regione_value: 0,
+            listview_regione_scroll_value: 0,
             textbox_provincia_edit_mode: false,
             textbox_provincia_buffer: provincia_buffer,
             textbox_data_edit_mode: false,
@@ -566,14 +566,30 @@ impl SelezioneInfoAggiuntiveView {
 
         if d.gui_button(rrect(submit_x, submit_y, submit_width, submit_height), Some(rstr!("Conferma"))) {
 
-            // Raylib has trouble handling the string downstream if we don't ensure to do this
-            let end = self.textbox_regione_buffer.iter().position(|&b| b == 0).unwrap_or(self.textbox_regione_buffer.len());
-            let regione_string = match String::from_utf8(self.textbox_regione_buffer[..end].to_vec()) {
-                Ok(s) => s,
-                Err(_) => {
-                    //TODO: signal error: invalid UTF-8
-                    "ERROR".to_string()
-                }
+            //TODO: impl TryInto<u32> for a new custom RegioneItaliana or smth ?
+            //But this was request as a free string originally...
+            let regione_string = match self.listview_regione_value {
+                0 => "Abruzzo".to_string(),
+                1 => "Basilicata".to_string(),
+                2 => "Calabria".to_string(),
+                3 => "Campania".to_string(),
+                4 => "Emilia-Romagna".to_string(),
+                5 => "Friuli-Venezia-Giulia".to_string(),
+                6 => "Lazio".to_string(),
+                7 => "Liguria".to_string(),
+                8 => "Lombardia".to_string(),
+                9 => "Marche".to_string(),
+                10 => "Molise".to_string(),
+                11 => "Piemonte".to_string(),
+                12 => "Puglia".to_string(),
+                13 => "Sardegna".to_string(),
+                14 => "Sicilia".to_string(),
+                15 => "Toscana".to_string(),
+                16 => "Trentino-Alto-Adige".to_string(),
+                17 => "Umbria".to_string(),
+                18 => "Valle d'Aosta".to_string(),
+                19 => "Veneto".to_string(),
+                _ => { panic!("Unexpected regione_string in SelezioneInfoAggiuntiveView::draw()"); }
             };
 
             // Raylib has trouble handling the string downstream if we don't ensure to do this
@@ -726,16 +742,15 @@ impl SelezioneInfoAggiuntiveView {
 
         let column_1_labels_width = column_width / 2;
         let column_1_fields_y_spacing = y_padding / 3;
-        let column_1_big_y_spacing = y_padding*2;
         let column_1_labels_count = 7;
         let column_1_labels_x = column_1_x;
-        let column_1_labels_height = (column_1_height - (column_1_fields_y_spacing*5) - column_1_big_y_spacing) / column_1_labels_count;
+        let column_1_labels_height = (column_1_height - (column_1_fields_y_spacing*13) ) / column_1_labels_count;
 
         let column_1_label_stazione_y = column_1_y;
         let column_1_label_corpo_idrico_y = column_1_label_stazione_y + column_1_labels_height + column_1_fields_y_spacing;
         let column_1_label_regione_y = column_1_label_corpo_idrico_y + column_1_labels_height + column_1_fields_y_spacing;
-        let column_1_label_provincia_y = column_1_label_regione_y + column_1_labels_height + column_1_fields_y_spacing;
-        let column_1_label_data_y = column_1_label_provincia_y + column_1_labels_height + column_1_big_y_spacing;
+        let column_1_label_provincia_y = column_1_label_regione_y + column_1_labels_height + column_1_fields_y_spacing*8;
+        let column_1_label_data_y = column_1_label_provincia_y + column_1_labels_height + column_1_fields_y_spacing;
         let column_1_label_lunghezza_stazione_y = column_1_label_data_y + column_1_labels_height + column_1_fields_y_spacing;
         let column_1_label_larghezza_stazione_y = column_1_label_lunghezza_stazione_y + column_1_labels_height + column_1_fields_y_spacing;
 
@@ -840,18 +855,24 @@ impl SelezioneInfoAggiuntiveView {
         ) {
             self.textbox_corpo_idrico_edit_mode = !self.textbox_corpo_idrico_edit_mode;
         }
-        if d.gui_text_box(
+
+        let mut _listview_regione_italiana_pick = -1;
+        _listview_regione_italiana_pick = d.gui_list_view(
             rrect(
                 column_1_boxes_x,
                 column_1_label_regione_y,
                 column_1_boxes_width,
-                column_1_boxes_height
+                column_1_boxes_height*3
             ),
-            &mut self.textbox_regione_buffer,
-            self.textbox_regione_edit_mode
-        ) {
-            self.textbox_regione_edit_mode = !self.textbox_regione_edit_mode;
-        }
+            Some(rstr!(
+                "Abruzzo;Basilicata;Calabria;Campania;Emilia-Romagna;\
+                Friuli-Venezia-Giulia;Lazio;Liguria;Lombardia;Marche;\
+                Molise;Piemonte;Puglia;Sardegna;Sicilia;Toscana;\
+                Trentino-Alto-Adige;Umbria;Valle d'Aosta;Veneto"
+            )),
+            &mut self.listview_regione_scroll_value,
+            &mut self.listview_regione_value,
+        );
         if d.gui_text_box(
             rrect(
                 column_1_boxes_x,
