@@ -21,6 +21,9 @@ use super::x1::calculate_x1;
 use super::x2::calculate_x2;
 use super::x3::calculate_x3;
 
+const RQE_NISECI_MAGIC_ADDEND: f32 = 1.1283;
+const RQE_NISECI_MAGIC_QUOTIENT: f32 = 1.0603;
+
 pub fn calculate_niseci(campionamento: &CampionamentoNISECI, riferimento: &RiferimentoNISECI, anagrafica: &AnagraficaNISECI) -> Result<f32, Vec<String>> {
     let mut errors = Vec::new();
     let x1 = calculate_x1(campionamento, riferimento);
@@ -66,4 +69,8 @@ pub fn calculate_niseci(campionamento: &CampionamentoNISECI, riferimento: &Rifer
           ((0.1 * x1.sqrt()) + (0.1 * x2.sqrt()) + (0.8 * (x1 * x2)))
         );
     return Ok(niseci);
+}
+
+pub fn calculate_rqe_niseci(niseci: f32) -> f32 {
+    return (niseci.ln() +  RQE_NISECI_MAGIC_ADDEND ) / RQE_NISECI_MAGIC_QUOTIENT;
 }
