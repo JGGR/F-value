@@ -274,6 +274,7 @@ impl fmt::Display for AreaNISECI {
 pub struct AnagraficaNISECI {
   pub comunita: ComunitaNISECI,
   pub codice_stazione: u32,
+  pub date_string: String, // Formato gg/mm/aaaa
   pub area: AreaNISECI,
   pub nome_fiume: String,
   pub bacino_appartenenza: String,

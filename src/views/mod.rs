@@ -629,6 +629,16 @@ impl SelezioneInfoAggiuntiveView {
             let codice_stazione = self.valuebox_codice_stazione_value;
 
             // Raylib has trouble handling the string downstream if we don't ensure to do this
+            let end = self.textbox_data_buffer.iter().position(|&b| b == 0).unwrap_or(self.textbox_data_buffer.len());
+            let date_string = match String::from_utf8(self.textbox_data_buffer[..end].to_vec()) {
+                Ok(s) => s,
+                Err(_) => {
+                    //TODO: signal error: invalid UTF-8
+                    "ERROR".to_string()
+                }
+            };
+
+            // Raylib has trouble handling the string downstream if we don't ensure to do this
             let end = self.textbox_corpo_idrico_buffer.iter().position(|&b| b == 0).unwrap_or(self.textbox_corpo_idrico_buffer.len());
             let corpo_idrico = match String::from_utf8(self.textbox_corpo_idrico_buffer[..end].to_vec()) {
                 Ok(s) => s,
@@ -731,6 +741,7 @@ impl SelezioneInfoAggiuntiveView {
             let anagrafica = AnagraficaNISECI {
                 comunita: comunita,
                 codice_stazione: codice_stazione as u32,
+                date_string: date_string,
                 area: area,
                 nome_fiume: corpo_idrico,
                 bacino_appartenenza: bacino_niseci,

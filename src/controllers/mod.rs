@@ -25,6 +25,8 @@ use crate::process_csv_errors;
 use raylib::RaylibHandle;
 use std::path::PathBuf;
 use raylib::consts::KeyboardKey::*;
+use chrono::NaiveDate;
+use chrono::format::ParseErrorKind;
 
 // Controller to update and access the state
 pub struct HomeController;
@@ -517,6 +519,11 @@ impl InfoAggiuntiveController {
         state.infoaggiuntive_model.set_valid(false);
     }
 
+    fn parse_date(date_str: &str) -> Result<NaiveDate, chrono::format::ParseError> {
+        let normalized = date_str.replace("/", "-"); // Replace all / with -
+        NaiveDate::parse_from_str(&normalized, "%d-%m-%Y")
+    }
+
     pub fn valida_anagrafica_niseci(&self) {
 
         {
@@ -541,7 +548,37 @@ impl InfoAggiuntiveController {
                 errors.push(format!("Nome provincia troppo corto"));
             }
 
-            //TODO: check date format
+            match Self::parse_date(&anagrafica.date_string) {
+                Ok(_) => {},
+                Err(e) => {
+                    match e.kind() {
+                        ParseErrorKind::OutOfRange => {
+                            errors.push(format!("Data fornita non valida: fuori range"));
+                        },
+                        ParseErrorKind::Impossible => {
+                            errors.push(format!("Data fornita non valida: valori non possibili"));
+                        },
+                        ParseErrorKind::NotEnough => {
+                            errors.push(format!("Data fornita non valida: specifica insufficiente"));
+                        },
+                        ParseErrorKind::Invalid => {
+                            errors.push(format!("Data fornita non valida: presenza di caratteri non attesi"));
+                        },
+                        ParseErrorKind::TooShort => {
+                            errors.push(format!("Data fornita non valida: terminazione prematura dell'input"));
+                        },
+                        ParseErrorKind::TooLong => {
+                            errors.push(format!("Data fornita non valida: input in eccesso"));
+                        },
+                        ParseErrorKind::BadFormat => {
+                            errors.push(format!("Data fornita non valida: errore nella specifica di formattazione"));
+                        },
+                        _ => {
+                            errors.push(format!("Data fornita non valida: errore sconosciuto"));
+                        }
+                    }
+                }
+            }
 
             if (anagrafica.get_lunghezza_media() - 0.0) < 1e-6 {
                 errors.push(format!("Lunghezza media troppo bassa: {}", anagrafica.get_lunghezza_media()));
