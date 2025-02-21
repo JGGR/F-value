@@ -1,3 +1,20 @@
+// SPDX-License-Identifier: GPL-3.0-only
+/*
+    Copyright (C) 2024-2025 jgabaut, gioninjo
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, version 3 of the License.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 use std::collections::HashMap;
 
 use crate::model::niseci::{CampionamentoNISECI, RecordNISECI, RiferimentoNISECI, SpecieNISECI};
@@ -49,4 +66,3 @@ pub fn calculate_x1(campionamento: &CampionamentoNISECI, riferimento: &Riferimen
   // this is the formula use in the NISECI docs
   return (1.2 * n_i + 0.8 * n_a ) / (1.2 * m_i + 0.8 * m_a )
 }
-

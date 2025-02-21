@@ -1,3 +1,20 @@
+// SPDX-License-Identifier: GPL-3.0-only
+/*
+    Copyright (C) 2024-2025 jgabaut, gioninjo
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, version 3 of the License.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 use crate::{engines::niseci::x2::calculate_x2, model::{location::Location, niseci::{AnagraficaNISECI, ClassiEtaSpecieNISECI, ComunitaNISECI, IdroEcoRegioneNISECI, TipoComunitaNISECI, AreaNISECI}}, tests::test_utils::{create_massive_campionamento_ciacci, create_massive_campionamento_ciacci_2, get_ciaccio}};
 
 
@@ -207,4 +224,3 @@ fn calculate_x2_test_1() {
   let epsilon: f32 = 1e-6;
   assert!((0.7 - x2.unwrap()).abs() < epsilon);
 }
-

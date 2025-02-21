@@ -1,3 +1,20 @@
+// SPDX-License-Identifier: GPL-3.0-only
+/*
+    Copyright (C) 2024-2025 jgabaut, gioninjo
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, version 3 of the License.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 use crate::{engines::niseci::x3::calculate_x3, model::niseci::RecordNISECI, tests::test_utils::{create_massive_campionamento_ciacci_2, create_massive_campionamento_ciacci_con_bronzi_strutt, create_massive_campionamento_ciacci_con_tappi_destrutt, create_massive_campionamento_ciacci_con_tappi_mediam_strutt, create_massive_campionamento_ciacci_con_tappi_strutt, create_massive_campionamento_ciacci_con_trocchi_strutt, create_massive_campionamento_ciacci_solo_autoctoni_1, get_ciaccio}};
 
 
@@ -118,5 +135,3 @@ fn calculate_x3_alieni_tipo_3_mediam_strutt() {
   assert!(x3.is_ok());
   assert_eq!(x3.unwrap(), 0.625);
 }
-
-
