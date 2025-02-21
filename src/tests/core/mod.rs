@@ -83,6 +83,24 @@ fn test_csv_riferimento_niseci_found_float_expect_int() {
 }
 
 #[test]
+fn test_csv_riferimento_niseci_err_found_cl_negative() {
+    let csv_data = format!(
+        "{}\nCervo;Cervus elaphus;1234;Italia;1;0;1;10;20;30;40;0.1;0.2;0.3;0.4;0.01;0.02
+        Cervo;Cervus elaphus;abc;Italia;1;0;1;-10;20;30;40;0.1;0.2;0.3;0.4;0.01;0.02
+        Cervo;Cervus elaphus;1234;Italia;1;0;1;10;20;30;40;1;0.2;0.3;0.4;0.01;0.02",
+        RIFERIMENTO_NISECI_HEADER
+    );
+    let reader = Cursor::new(csv_data);
+    let result = check_riferimento_niseci_reader(reader);
+
+    assert!(result.is_err());
+    let errors = result.err().unwrap();
+    assert_eq!(errors.len(), 1); // One invalid record
+    let translated_error = translate_error_message(&errors[0].to_string());
+    assert!(translated_error.contains("tipo non valido"));
+}
+
+#[test]
 fn test_csv_riferimento_niseci_lessfields() {
     let csv_data = format!(
         "{}\nCervo;Cervus elaphus;1234;Italia;1;0;1;10;20;30;40;0.1;0.2;0.3;0.4;0.01",
@@ -149,6 +167,66 @@ fn test_valid_recordcsv_riferimento_niseci() {
     let result = check_records_riferimento_niseci(recordcsv_data);
 
     assert!(!result.is_err());
+}
+
+#[test]
+fn test_recordcsv_riferimento_niseci_soglie_cl_error() {
+    let record_1 = RecordCsvRiferimentoNISECI {
+        nome_comune: "Cervo".to_string(),
+        nome_latino: "Cervus elaphus".to_string(),
+        codice_specie: "1234".to_string(),
+        origine: "AUT".to_string(),
+        tipo_autoctono: 1,
+        allo_nocivita: 0,
+        specie_attesa: 1,
+        cl_soglia1: 10,
+        cl_soglia2: 50,
+        cl_soglia3: 30,
+        cl_soglia4: 40,
+        ad_juv_soglia1: 0.1,
+        ad_juv_soglia2: 0.2,
+        ad_juv_soglia3: 0.3,
+        ad_juv_soglia4: 0.4,
+        dens_soglia1: 0.1,
+        dens_soglia2: 0.2,
+    };
+    let recordcsv_data = vec![record_1];
+    let result = check_records_riferimento_niseci(recordcsv_data);
+
+    assert!(result.is_err());
+
+    let errors = result.err().unwrap();
+    assert_eq!(errors.len(), 1);
+}
+
+#[test]
+fn test_recordcsv_riferimento_niseci_soglie_ad_juv_error() {
+    let record_1 = RecordCsvRiferimentoNISECI {
+        nome_comune: "Cervo".to_string(),
+        nome_latino: "Cervus elaphus".to_string(),
+        codice_specie: "1234".to_string(),
+        origine: "AUT".to_string(),
+        tipo_autoctono: 1,
+        allo_nocivita: 0,
+        specie_attesa: 1,
+        cl_soglia1: 10,
+        cl_soglia2: 20,
+        cl_soglia3: 30,
+        cl_soglia4: 40,
+        ad_juv_soglia1: 0.1,
+        ad_juv_soglia2: 0.7,
+        ad_juv_soglia3: 0.3,
+        ad_juv_soglia4: 0.4,
+        dens_soglia1: 0.1,
+        dens_soglia2: 0.2,
+    };
+    let recordcsv_data = vec![record_1];
+    let result = check_records_riferimento_niseci(recordcsv_data);
+
+    assert!(result.is_err());
+
+    let errors = result.err().unwrap();
+    assert_eq!(errors.len(), 1);
 }
 
 #[test]
@@ -248,7 +326,17 @@ fn test_valid_recordcsv_campionamento_niseci() {
         nome: "Cervus elaphus".to_string(),
         tipo_autoctono: 1,
         tipo_alloctono: 0,
-        specie_attesa: true
+        specie_attesa: true,
+        cl_soglia1: 0, // in cm
+        cl_soglia2: 0, // in cm
+        cl_soglia3: 0, // in cm
+        cl_soglia4: 0, // in cm
+        ad_juv_soglia1: 0.0,
+        ad_juv_soglia2: 0.0,
+        ad_juv_soglia3: 0.0,
+        ad_juv_soglia4: 0.0,
+        dens_soglia1: 1.0,
+        dens_soglia2: 2.0,
     };
 
     let riferimento_specie = vec![specie_1];

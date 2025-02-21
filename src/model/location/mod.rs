@@ -1,5 +1,5 @@
 #[derive(Clone)]
 pub struct Location {
-  regione: String,
-  provincia: String
+  pub regione: String,
+  pub provincia: String
 }

@@ -8,7 +8,17 @@ fn test_calcolo_pesci_per_passaggio() {
         nome: "Cervus elaphus".to_string(),
         tipo_autoctono: 1,
         tipo_alloctono: 0,
-        specie_attesa: true
+        specie_attesa: true,
+        cl_soglia1: 1,
+        cl_soglia2: 2,
+        cl_soglia3: 3,
+        cl_soglia4: 4,
+        ad_juv_soglia1: 1.0,
+        ad_juv_soglia2: 2.0,
+        ad_juv_soglia3: 3.0,
+        ad_juv_soglia4: 4.0,
+        dens_soglia1: 1.0,
+        dens_soglia2: 2.0,
     };
 
     let record_1 = RecordNISECI {

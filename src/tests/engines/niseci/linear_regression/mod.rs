@@ -1,4 +1,4 @@
-use crate::engines::niseci::linear_regression::{calculate_quantita_stimata, gradient_descent_iterate, Point};
+use crate::engines::niseci::linear_regression::{calculate_quantita_with_regression, gradient_descent_iterate, Point};
 
 
 #[test]
@@ -25,7 +25,7 @@ fn test_quantita_stimata() {
         Point::new(3, 50),
     ];
 
-    let quantita_stimata = calculate_quantita_stimata(&passaggi);
+    let quantita_stimata = calculate_quantita_with_regression(&passaggi);
 
     assert!(quantita_stimata.is_ok());
     assert_eq!(quantita_stimata.unwrap(), 5);
@@ -40,21 +40,22 @@ fn test_quantita_stimata_2() {
         Point::new(160, 10),
     ];
 
-    let quantita_stimata = calculate_quantita_stimata(&passaggi);
+    let quantita_stimata = calculate_quantita_with_regression(&passaggi);
 
     assert!(quantita_stimata.is_ok());
     assert_eq!(quantita_stimata.unwrap(), 190);
 }
 
 #[test]
-fn test_quantita_stimata_err() {
+fn test_quantita_stimata_m_positive() {
     let passaggi = [
         Point::new(1, 50),
         Point::new(2, 75),
         Point::new(3, 100),
     ];
-    let quantita_stimata = calculate_quantita_stimata(&passaggi);
+    let quantita_stimata = calculate_quantita_with_regression(&passaggi);
 
-    assert!(quantita_stimata.is_err());
+    assert!(quantita_stimata.is_ok());
+    assert_eq!(quantita_stimata.unwrap(), 225);
 }
 
