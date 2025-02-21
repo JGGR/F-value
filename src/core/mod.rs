@@ -24,7 +24,8 @@ use std::fmt;
 use std::path::PathBuf;
 use std::io::Read;
 use std::fs::File;
-use crate::model::niseci::{SpecieNISECI, RecordNISECI};
+use crate::model::niseci::{SpecieNISECI, RecordNISECI, AnagraficaNISECI, AreaNISECI, TipoComunitaNISECI, ComunitaNISECI, IdroEcoRegioneNISECI};
+use crate::model::location::Location;
 use serde::Deserialize;
 use serde::de::{self, Deserializer};
 
@@ -587,6 +588,149 @@ pub fn parse_recordcsv_riferimento_niseci(records: Vec<RecordCsvRiferimentoNISEC
     }
 
     (specie, errors)
+}
+
+#[derive(Debug, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RecordCsvAnagraficaNISECI {
+    pub codice_stazione: String,
+    pub corpo_idrico: String,
+    pub regione: String,
+    pub provincia: String,
+    pub data: String,
+    pub lunghezza_stazione: u32,
+    pub larghezza_stazione: u32,
+    pub tipo_comunita: u32,
+    pub fonte: String,
+    pub numero_protocollo: String,
+    pub codice_specie: String,
+    pub idro_eco_regione: u32,
+    pub area_alpina: u32,
+    pub nome_bacino: String,
+}
+
+impl fmt::Display for RecordCsvAnagraficaNISECI {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let string_representation = format!(
+            "RecordAnagraficaNISECI: {{ codice_stazione: [{}], corpo_idrico: [{}],\
+            regione: [{}], provincia: [{}], data: [{}], lunghezza_stazione: [{}],\
+            larghezza_stazione: [{}], tipo_comunita [{}], fonte [{}],\
+            numero_protocollo: [{}], codice_specie: [{}], idro_eco_regione: [{}],\
+            area_alpina: [{}], nome_bacino: [{}]}}",
+            self.codice_stazione, self.corpo_idrico, self.regione, self.provincia,
+            self.data, self.lunghezza_stazione, self.larghezza_stazione,
+            self.tipo_comunita, self.fonte, self.numero_protocollo, self.codice_specie,
+            self.idro_eco_regione, self.area_alpina, self.nome_bacino
+        );
+        write!(f, "{}", string_representation)
+    }
+}
+
+pub fn parse_csv_anagrafica_niseci<R>(mut rdr: csv::Reader<R>) -> (Vec<RecordCsvAnagraficaNISECI>, Vec<csv::Error>) where R: std::io::Read {
+    let mut records = Vec::new();
+    let mut errors = Vec::new();
+
+    for result in rdr.deserialize() {
+        match result {
+            Ok(record) => records.push(record),
+            Err(e) => errors.push(e),
+        }
+    }
+
+    (records, errors)
+}
+
+pub enum RecordCsvAnagraficaNISECIError {
+    ValoreInvalido { msg : String },
+}
+
+impl fmt::Display for RecordCsvAnagraficaNISECIError {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    let string_representation = match self {
+      RecordCsvAnagraficaNISECIError::ValoreInvalido { msg } => format!("Errore record anagrafica NISECI: {}", msg),
+    };
+    write!(f, "{}", string_representation)
+  }
+}
+
+pub fn parse_recordcsv_anagrafica_niseci(records: Vec<RecordCsvAnagraficaNISECI>) -> Result<AnagraficaNISECI, Vec<String>> {
+    let mut errors = Vec::new();
+    if records.len() > 1 {
+        errors.push(format!("Too many records"));
+    }
+
+
+    let r = records.get(1).unwrap();
+    let mut area = AreaNISECI::Mediterranea;
+    if r.area_alpina > 0 {
+        area = AreaNISECI::Alpina;
+    }
+    let mut tipo_comunita = TipoComunitaNISECI::Redatta;
+    match r.tipo_comunita {
+        0 => { /* Redatta */ },
+        1 => {
+            tipo_comunita = TipoComunitaNISECI::Recuperata;
+        },
+        2 => {
+            tipo_comunita = TipoComunitaNISECI::Dm260_2010;
+        },
+        3 => {
+            tipo_comunita = TipoComunitaNISECI::AffinataDalMase;
+        },
+        _ => { errors.push(format!("Tipo comunita NISECI non valido: {}, atteso [0, 3]", r.tipo_comunita)); },
+    }
+
+    let mut idro_eco_regione = IdroEcoRegioneNISECI::Toscana;
+    idro_eco_regione = match r.idro_eco_regione {
+        0 => IdroEcoRegioneNISECI::AlpiCentroOrientali,
+        1 => IdroEcoRegioneNISECI::AlpiMediterranee,
+        2 => IdroEcoRegioneNISECI::AlpiMeridionali,
+        3 => IdroEcoRegioneNISECI::AlpiOccidentali,
+        4 => IdroEcoRegioneNISECI::AppenninoCentrale,
+        5 => IdroEcoRegioneNISECI::AppenninoMeridionale,
+        6 => IdroEcoRegioneNISECI::AppenninoPiemontese,
+        7 => IdroEcoRegioneNISECI::AppenninoSettentrionale,
+        8 => IdroEcoRegioneNISECI::BasilicataTavoliere,
+        9 => IdroEcoRegioneNISECI::BassoLazio,
+        10 => IdroEcoRegioneNISECI::CalabriaNebrodi,
+        11 => IdroEcoRegioneNISECI::Carso,
+        12 => IdroEcoRegioneNISECI::CostaAdriatica,
+        13 => IdroEcoRegioneNISECI::Monferrato,
+        14 => IdroEcoRegioneNISECI::PianuraPadana,
+        15 => IdroEcoRegioneNISECI::PrealpiDolomiti,
+        16 => IdroEcoRegioneNISECI::PugliaGargano,
+        17 => IdroEcoRegioneNISECI::RomaViterbeseVesuvio,
+        18 => IdroEcoRegioneNISECI::Sardegna,
+        19 => IdroEcoRegioneNISECI::Sicilia,
+        20 => IdroEcoRegioneNISECI::Toscana,
+        _ => { errors.push(format!("IdroEcoRegioneNISECI non valido: {}, atteso [0, 20]", r.idro_eco_regione)); IdroEcoRegioneNISECI::Toscana },
+    };
+
+    if errors.len() > 0 {
+        return Err(errors);
+    }
+
+    let res = AnagraficaNISECI {
+        comunita: ComunitaNISECI {
+            tipo: tipo_comunita,
+            fonte: Some(r.fonte.clone()),
+            numero_protocollo: Some(r.numero_protocollo.clone()),
+        },
+        codice_stazione: r.codice_stazione.clone(),
+        date_string: r.data.clone(), // Formato gg/mm/aaaa
+        area: area,
+        corpo_idrico: r.corpo_idrico.clone(),
+        bacino_appartenenza: r.nome_bacino.clone(),
+        idro_eco_regione: idro_eco_regione,
+        posizione: Location {
+            regione: r.regione.clone(),
+            provincia: r.provincia.clone()
+        },
+        lunghezza_media_stazione: r.lunghezza_stazione as f32,
+        larghezza_media_stazione: r.larghezza_stazione as f32,
+    };
+    return Ok(res);
+
 }
 
 pub fn translate_error_message(msg: &str) -> String {
