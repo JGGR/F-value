@@ -226,8 +226,8 @@ impl SelezioneFileInputView {
         let current_index = match controller.get_current_index() {
             Some(index) => index,
             None => {
-                eprintln!("Indice non selezionato");
-                exit(1)
+                eprintln!("SelezioneFileInputView: Per qualche assurdo motivo l'indice corrente non è validato. Uso NISECI.");
+                Indice::NISECI
             }
         };
 
@@ -1350,6 +1350,15 @@ impl ProduzioneOutputView {
         d.clear_background(main_state.default_bg_color);
 
         let _state = controller.get_state();
+        let current_index = match controller.get_current_index() {
+            Some(index) => index,
+            None => {
+                eprintln!("ProduzioneOutputView: Per qualche assurdo motivo l'indice corrente non è validato. Uso NISECI.");
+                Indice::NISECI
+            }
+        };
+
+        let groupbox_width = propwidth(&d, 600);
         let button_calcola_width = propwidth(&d, 200);
         let button_calcola_x = d.get_screen_width() / 2 - button_calcola_width /2;
         let button_calcola_height = propwidth(&d, 50);
@@ -1385,7 +1394,16 @@ impl ProduzioneOutputView {
             Some(rstr!("Calcola"))
         ) {
             //TODO: calcola indice
-            println!("TODO: call controller to update model.");
+            match current_index {
+                Indice::NISECI => {
+                    controller.calc_niseci();
+                },
+                Indice::HFBI => {
+                    //TODO: add this
+                    println!("TODO: add this.");
+                    //controller.calc_hfbi();
+                }
+            }
         }
 
         d.gui_panel(

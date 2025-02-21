@@ -239,13 +239,15 @@ pub struct DataModelNISECI {
 
 #[derive(Clone)]
 pub struct DataModel {
+    pub errors_occurred: bool,
     pub niseci: DataModelNISECI,
 }
 
 impl DataModel {
     pub fn new(niseci: DataModelNISECI) -> Self {
         Self {
-            niseci: niseci
+            errors_occurred: false,
+            niseci: niseci,
         }
     }
     pub fn get_riferimento_niseci(&self) -> Option<RiferimentoNISECI> {
@@ -271,6 +273,14 @@ impl DataModel {
     }
     pub fn set_risultato_niseci(&mut self, risultato: Option<RisultatoNISECI>) {
         self.niseci.risultato = risultato;
+    }
+
+    pub fn get_errors_occurred(&self) -> bool {
+        return self.errors_occurred;
+    }
+
+    pub fn set_errors_occurred(&mut self, val: bool) {
+        self.errors_occurred = val;
     }
 }
 
@@ -333,6 +343,7 @@ impl Model {
                 name: "Initial".to_string(),
             },
             data_model: DataModel {
+                errors_occurred: false,
                 niseci: DataModelNISECI {
                     riferimento: None,
                     campionamento: None,

@@ -22,6 +22,9 @@ use crate::model::niseci::{RiferimentoNISECI, CampionamentoNISECI, AnagraficaNIS
 use crate::state::GLOBAL_STATE;
 use crate::CurrentView;
 use crate::process_csv_errors;
+use crate::engines::niseci::x1::calculate_x1;
+use crate::engines::niseci::x2::calculate_x2;
+use crate::engines::niseci::x3::calculate_x3;
 use raylib::RaylibHandle;
 use std::path::PathBuf;
 use raylib::consts::KeyboardKey::*;
@@ -681,6 +684,105 @@ impl OutputController {
         let state = GLOBAL_STATE.lock().unwrap();
         return state.output_model.clone();
     }
+
+    pub fn get_current_index(&self) -> Option<Indice> {
+        let state = GLOBAL_STATE.lock().unwrap();
+        return state.indice_model.get_selected_index();
+    }
+
+    pub fn calc_niseci(&self) {
+        let mut riferimento = None;
+        let mut campionamento = None;
+        let mut anagrafica = None;
+        {
+            let state = GLOBAL_STATE.lock().unwrap();
+            riferimento = state.data_model.get_riferimento_niseci();
+            campionamento = state.data_model.get_campionamento_niseci();
+            anagrafica = state.data_model.get_anagrafica_niseci();
+        }
+
+        let mut valid = true;
+
+        if riferimento.is_none() {
+            // Implementation error, this should never happen
+            valid = false;
+            self.add_console_message(format!("IMPLEMENTATION ERROR: riferimento niseci was None in calc_niseci()"));
+        }
+        if campionamento.is_none() {
+            // Implementation error, this should never happen
+            valid = false;
+            self.add_console_message(format!("IMPLEMENTATION ERROR: campionamento niseci was None in calc_niseci()"));
+        }
+        if anagrafica.is_none() {
+            // Implementation error, this should never happen
+            valid = false;
+            self.add_console_message(format!("IMPLEMENTATION ERROR: anagrafica niseci was None in calc_niseci()"));
+        }
+        if valid {
+            let riferimento = riferimento.expect("calc_niseci() checked is_none() before");
+            let campionamento = campionamento.expect("calc_niseci() checked is_none() before");
+            let anagrafica = anagrafica.expect("calc_niseci() checked is_none() before");
+
+            let x1 = calculate_x1(&campionamento, &riferimento);
+
+            let x2 = calculate_x2(&campionamento, &anagrafica);
+            match x2 {
+                Ok(_) => {},
+                Err(errors) => {
+                    for e in errors {
+                        self.add_console_message(format!("Errore durante calcolo x2: {}", e));
+                    }
+                    let mut state = GLOBAL_STATE.lock().unwrap();
+                    state.data_model.set_errors_occurred(true);
+                    return;
+                }
+            }
+            let x2 = x2.expect("calc_niseci() returned earlier on Err match");
+
+            let x3 = calculate_x3(&campionamento);
+            match x3 {
+                Ok(_) => {},
+                Err(errors) => {
+                    for e in errors {
+                        self.add_console_message(format!("Errore durante calcolo x3: {}", e));
+                    }
+                    let mut state = GLOBAL_STATE.lock().unwrap();
+                    state.data_model.set_errors_occurred(true);
+                    return;
+                }
+            }
+            let x3 = x3.expect("calc_niseci() returned earlier on Err match");
+
+            self.add_console_message(format!("calc_niseci(): x1 {x1}, x2 {x2}, x3 {x3}"));
+
+            let mut x1_x2_valid = true;
+            if x1 < 0.0 {
+                self.add_console_message(format!("Errore risultato x1: valore negativo: {}", x1));
+                x1_x2_valid = false;
+            }
+            if x2 < 0.0 {
+                self.add_console_message(format!("Errore risultato x2: valore negativo: {}", x2));
+                x1_x2_valid = false;
+            }
+            if !x1_x2_valid {
+                let mut state = GLOBAL_STATE.lock().unwrap();
+                state.data_model.set_errors_occurred(true);
+                return;
+            }
+            let niseci = (0.1 * x1.sqrt()) +
+                (0.1 * x2.sqrt()) +
+                (0.8 * (x1 * x2)) -
+                ( (0.1 * (1.0 - x3)) *
+                  ((0.1 * x1.sqrt()) + (0.1 * x2.sqrt()) + (0.8 * (x1 * x2)))
+                );
+            self.add_console_message(format!("NISECI: {niseci}"));
+        } else {
+            self.add_console_message(format!("IMPLEMENTATION ERROR: spurious state in calc_niseci()"));
+            let mut state = GLOBAL_STATE.lock().unwrap();
+            state.data_model.set_errors_occurred(true);
+        }
+    }
+
     pub fn add_console_message(&self, msg: String) {
         let mut state = GLOBAL_STATE.lock().unwrap();
 
