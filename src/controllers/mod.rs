@@ -534,7 +534,9 @@ impl InfoAggiuntiveController {
         if let Some(anagrafica) = self.get_data_anagrafica_niseci() {
             let mut errors: Vec<String> = Vec::new();
 
-            //TODO: check codice stazione after refactor
+            if anagrafica.codice_stazione.len() < 1 {
+                errors.push(format!("Codice stazione troppo corto"));
+            }
 
             if anagrafica.corpo_idrico.len() < 1 {
                 errors.push(format!("Nome fiume troppo corto"));

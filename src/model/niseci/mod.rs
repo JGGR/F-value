@@ -273,7 +273,7 @@ impl fmt::Display for AreaNISECI {
 #[derive(Clone)]
 pub struct AnagraficaNISECI {
   pub comunita: ComunitaNISECI,
-  pub codice_stazione: u32,
+  pub codice_stazione: String,
   pub date_string: String, // Formato gg/mm/aaaa
   pub area: AreaNISECI,
   pub corpo_idrico: String,

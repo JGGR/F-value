@@ -174,7 +174,7 @@ fn calculate_x2_test_1() {
   let anagrafica = AnagraficaNISECI {
     bacino_appartenenza: "dummy".to_string(),
     area: AreaNISECI::Alpina,
-    codice_stazione: 1,
+    codice_stazione: "Foo".to_string(),
     date_string: "Never".to_string(),
     comunita: comunita,
     idro_eco_regione: IdroEcoRegioneNISECI::AlpiCentroOrientali,
@@ -206,7 +206,7 @@ fn calculate_x2_test_1() {
   let anagrafica = AnagraficaNISECI {
     bacino_appartenenza: "dummy".to_string(),
     area: AreaNISECI::Alpina,
-    codice_stazione: 1,
+    codice_stazione: "Foo".to_string(),
     date_string: "Never".to_string(),
     comunita: comunita,
     idro_eco_regione: IdroEcoRegioneNISECI::AlpiCentroOrientali,

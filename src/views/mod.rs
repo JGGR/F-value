@@ -453,8 +453,8 @@ impl ValidazioneFileInputView {
 }
 
 pub struct SelezioneInfoAggiuntiveView {
-    valuebox_codice_stazione_edit_mode: bool,
-    valuebox_codice_stazione_value: i32,
+    textbox_codice_stazione_edit_mode: bool,
+    textbox_codice_stazione_buffer: [u8; 64],
     textbox_corpo_idrico_edit_mode: bool,
     textbox_corpo_idrico_buffer: [u8; 64],
     listview_regione_value: i32,
@@ -483,6 +483,11 @@ pub struct SelezioneInfoAggiuntiveView {
 impl SelezioneInfoAggiuntiveView {
 
     pub fn new() -> Self {
+        let mut codice_stazione_buffer = [0u8; 64];
+        let codice_stazione_buffer_bytes = "Inserisci codice stazione".as_bytes();
+        let codice_stazione_buffer_len = codice_stazione_buffer_bytes.len().min(64);
+        codice_stazione_buffer[..codice_stazione_buffer_len].copy_from_slice(&codice_stazione_buffer_bytes[..codice_stazione_buffer_len]);
+
         let mut corpo_idrico_buffer = [0u8; 64];
         let corpo_idrico_buffer_bytes = "Inserisci nome".as_bytes();
         let corpo_idrico_buffer_len = corpo_idrico_buffer_bytes.len().min(64);
@@ -518,8 +523,8 @@ impl SelezioneInfoAggiuntiveView {
         bacino_buffer[..bacino_buffer_len].copy_from_slice(&bacino_buffer_bytes[..bacino_buffer_len]);
 
         Self {
-            valuebox_codice_stazione_edit_mode: false,
-            valuebox_codice_stazione_value: 0,
+            textbox_codice_stazione_edit_mode: false,
+            textbox_codice_stazione_buffer: codice_stazione_buffer,
             textbox_corpo_idrico_edit_mode: false,
             textbox_corpo_idrico_buffer: corpo_idrico_buffer,
             listview_regione_value: 0,
@@ -626,7 +631,16 @@ impl SelezioneInfoAggiuntiveView {
             };
             let larghezza_stazione = self.valuebox_larghezza_stazione_value;
             let lunghezza_stazione = self.valuebox_lunghezza_stazione_value;
-            let codice_stazione = self.valuebox_codice_stazione_value;
+
+            // Raylib has trouble handling the string downstream if we don't ensure to do this
+            let end = self.textbox_codice_stazione_buffer.iter().position(|&b| b == 0).unwrap_or(self.textbox_codice_stazione_buffer.len());
+            let codice_stazione = match String::from_utf8(self.textbox_codice_stazione_buffer[..end].to_vec()) {
+                Ok(s) => s,
+                Err(_) => {
+                    //TODO: signal error: invalid UTF-8
+                    "ERROR".to_string()
+                }
+            };
 
             // Raylib has trouble handling the string downstream if we don't ensure to do this
             let end = self.textbox_data_buffer.iter().position(|&b| b == 0).unwrap_or(self.textbox_data_buffer.len());
@@ -740,7 +754,7 @@ impl SelezioneInfoAggiuntiveView {
 
             let anagrafica = AnagraficaNISECI {
                 comunita: comunita,
-                codice_stazione: codice_stazione as u32,
+                codice_stazione: codice_stazione,
                 date_string: date_string,
                 area: area,
                 corpo_idrico: corpo_idrico,
@@ -858,20 +872,17 @@ impl SelezioneInfoAggiuntiveView {
         let column_1_boxes_height = column_1_labels_height;
         let column_1_boxes_x = column_1_labels_x + column_1_labels_width;
 
-        if d.gui_value_box(
+        if d.gui_text_box(
             rrect(
                 column_1_boxes_x,
                 column_1_label_stazione_y,
                 column_1_boxes_width,
                 column_1_boxes_height
             ),
-            None,
-            &mut self.valuebox_codice_stazione_value,
-            0,
-            100000, //TODO: ask a reasonable max for this
-            self.valuebox_codice_stazione_edit_mode
+            &mut self.textbox_codice_stazione_buffer,
+            self.textbox_codice_stazione_edit_mode
         ) {
-            self.valuebox_codice_stazione_edit_mode = !self.valuebox_codice_stazione_edit_mode;
+            self.textbox_codice_stazione_edit_mode = !self.textbox_codice_stazione_edit_mode;
         }
         if d.gui_text_box(
             rrect(
