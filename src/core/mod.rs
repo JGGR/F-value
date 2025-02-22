@@ -632,6 +632,19 @@ impl fmt::Display for RecordCsvAnagraficaNISECI {
     }
 }
 
+pub enum RecordCsvAnagraficaNISECIError {
+    ValoreInvalido { msg : String }, //TODO: add position?
+}
+
+impl fmt::Display for RecordCsvAnagraficaNISECIError {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    let string_representation = match self {
+      RecordCsvAnagraficaNISECIError::ValoreInvalido { msg } => format!("Errore record anagrafica NISECI: {}", msg),
+    };
+    write!(f, "{}", string_representation)
+  }
+}
+
 pub fn parse_csv_anagrafica_niseci<R>(mut rdr: csv::Reader<R>) -> (Vec<RecordCsvAnagraficaNISECI>, Vec<csv::Error>) where R: std::io::Read {
     let mut records = Vec::new();
     let mut errors = Vec::new();
@@ -646,25 +659,17 @@ pub fn parse_csv_anagrafica_niseci<R>(mut rdr: csv::Reader<R>) -> (Vec<RecordCsv
     (records, errors)
 }
 
-pub enum RecordCsvAnagraficaNISECIError {
-    ValoreInvalido { msg : String },
-}
-
-impl fmt::Display for RecordCsvAnagraficaNISECIError {
-  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    let string_representation = match self {
-      RecordCsvAnagraficaNISECIError::ValoreInvalido { msg } => format!("Errore record anagrafica NISECI: {}", msg),
-    };
-    write!(f, "{}", string_representation)
-  }
-}
-
-pub fn parse_recordcsv_anagrafica_niseci(records: Vec<RecordCsvAnagraficaNISECI>) -> Result<AnagraficaNISECI, Vec<String>> {
+pub fn parse_recordcsv_anagrafica_niseci(records: Vec<RecordCsvAnagraficaNISECI>) -> Result<AnagraficaNISECI, Vec<RecordCsvAnagraficaNISECIError>> {
     let mut errors = Vec::new();
     if records.len() > 1 {
-        errors.push(format!("Too many records"));
+        let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Troppi record: {}, atteso 1", records.len()) };
+        errors.push(err);
     }
-
+    if records.len() < 1 {
+        let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Nessun record trovato: atteso 1") };
+        errors.push(err);
+        return Err(errors);
+    }
 
     let r = records.get(1).unwrap();
     let mut area = AreaNISECI::Mediterranea;
@@ -683,7 +688,10 @@ pub fn parse_recordcsv_anagrafica_niseci(records: Vec<RecordCsvAnagraficaNISECI>
         3 => {
             tipo_comunita = TipoComunitaNISECI::AffinataDalMase;
         },
-        _ => { errors.push(format!("Tipo comunita NISECI non valido: {}, atteso [0, 3]", r.tipo_comunita)); },
+        _ => {
+            let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Tipo comunita NISECI non valido: {}, atteso [0, 3]", r.tipo_comunita) };
+            errors.push(err);
+        }
     }
 
     let mut idro_eco_regione = IdroEcoRegioneNISECI::Toscana;
@@ -709,7 +717,11 @@ pub fn parse_recordcsv_anagrafica_niseci(records: Vec<RecordCsvAnagraficaNISECI>
         18 => IdroEcoRegioneNISECI::Sardegna,
         19 => IdroEcoRegioneNISECI::Sicilia,
         20 => IdroEcoRegioneNISECI::Toscana,
-        _ => { errors.push(format!("IdroEcoRegioneNISECI non valido: {}, atteso [0, 20]", r.idro_eco_regione)); IdroEcoRegioneNISECI::Toscana },
+        _ => {
+            let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("IdroEcoRegioneNISECI non valido: {}, atteso [0, 20]", r.idro_eco_regione) };
+            errors.push(err);
+            IdroEcoRegioneNISECI::Toscana // To still assign something by default
+        }
     };
 
     if errors.len() > 0 {
@@ -769,6 +781,34 @@ pub fn check_anagrafica_niseci_reader<R: Read>(reader: R) -> Result<Vec<RecordCs
         }
         */
         return Ok(records);
+    }
+}
+
+pub fn check_records_anagrafica_niseci(records: Vec<RecordCsvAnagraficaNISECI>) -> Result<AnagraficaNISECI,Vec<RecordCsvAnagraficaNISECIError>> {
+
+    let res = parse_recordcsv_anagrafica_niseci(records);
+
+    match res {
+        Ok(anagrafica) => {
+            println!("Anagrafica NISECI: {}", anagrafica);
+            println!("Tutti i record dell'anagrafica NISECI sono stati processati con successo!");
+            /*
+            for record in &records {
+                println!("  Record: {{{record}}}");
+            }
+            */
+            return Ok(anagrafica);
+        }
+        Err(errors) => {
+            println!("Anagrafica NISECI: Numero record non validi: {}", errors.len());
+            eprintln!("Errori incontrati durante l'elaborazione dei record per anagrafica NISECI: {{");
+            //TODO: add process_record_anagraficaNISECI_errors()
+            for error in &errors {
+                eprintln!("  {}", error);
+            }
+            eprintln!("}}");
+            return Err(errors);
+        }
     }
 }
 

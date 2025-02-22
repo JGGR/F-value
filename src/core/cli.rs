@@ -198,6 +198,7 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) -> bool {
 
 
         let mut anagrafica_csv_failed = false;
+        let mut anagrafica_valueparse_failed = false;
         if !had_failures {
             for s in riferimento_specie {
                 println!("Specie:  {:?}", s);
@@ -213,22 +214,45 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) -> bool {
                         println!("  {r}");
                     }
                     println!("}}");
-                }
-                Err(_errs) => {
-                    /* Assuming they were printed before this point
-                    eprintln!("Anagrafica errors in run_headless(): {{");
-                    for e in errs {
-                        eprintln!("  {e}");
+                    let anagrafica_records_check_res = check_records_anagrafica_niseci(csv_recs);
+                    match anagrafica_records_check_res {
+                        Ok(anagrafica) => {
+                            //anagrafica_specie = campioni;
+                        }
+                        Err(value_errs) => {
+                            /* Assuming they were printed before this point
+                            eprintln!("Anagrafica value errors in run_headless(): {{");
+                            for e in value_errors {
+                                let error_txt;
+                                match e {
+                                    RecordCsvAnagraficaNISECIError::ValoreInvalido{ msg } => {
+                                        error_txt = msg;
+                                    }
+                                }
+                                eprintln!("  {}", error_txt);
+                            }
+                            eprintln!("}}");
+                            */
+                            anagrafica_valueparse_failed = true;
+                            //return; We keep running and return later
                     }
-                    eprintln!("}}");
-                    */
-                    anagrafica_csv_failed = true;
-                    //return; We keep running and return later
-                }
+                        }
+                    }
+                    Err(_errs) => {
+                        /* Assuming they were printed before this point
+                        eprintln!("Anagrafica errors in run_headless(): {{");
+                        for e in errs {
+                            eprintln!("  {e}");
+                        }
+                        eprintln!("}}");
+                        */
+                        anagrafica_csv_failed = true;
+                        //return; We keep running and return later
+                    }
             }
             println!("TODO: apply parsed data to calc");
         }
-        let final_res = !had_failures && !anagrafica_csv_failed;
+        let final_res = !had_failures && !anagrafica_csv_failed && !anagrafica_valueparse_failed;
         return final_res;
     } else {
         let campionamento_check_res = check_campionamento_hfbi_path(campionamento_path);
