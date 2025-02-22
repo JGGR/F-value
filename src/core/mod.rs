@@ -68,6 +68,11 @@ pub const CAMPIONAMENTO_NISECI_HEADER_FIELDS: [&str; 7] = [ "data", "stazione", 
 pub const CAMPIONAMENTO_NISECI_HEADER: &str = "\
 data;stazione;superficie;numPassaggio;codiceSpecie;lunghezza;peso";
 
+pub const ANAGRAFICA_NISECI_HEADER_FIELDS: [&str; 14] = [
+"codiceStazione", "corpoIdrico", "regione", "provincia", "data", "lunghezzaStazione", "larghezzaStazione", "tipoComunita", "fonte", "numeroProtocollo", "codiceSpecie", "idroEcoRegione", "areaAlpina", "nomeBacino" ];
+pub const ANAGRAFICA_NISECI_HEADER: &str = "\
+codiceStazione;corpoIdrico;regione;provincia;data;lunghezzaStazione;larghezzaStazione;tipoComunita;fonte;numeroProtocollo;codiceSpecie;idroEcoRegione;areaAlpina;nomeBacino";
+
 //TODO: add test to check if this string respects the discriminant ordering in GuiTheme
 pub const GUI_THEME_COMBOBOX_STR: &str = "Light;Dark;Bluish;Candy;Cherry;Cyber;Jungle;Lavanda;Terminal;Ashes";
 
@@ -226,6 +231,7 @@ pub fn propheight(d: &RaylibDrawHandle<'_>, to_scale: i32) -> i32
 pub enum TipoRecordCsv {
     RiferimentoNISECI,
     CampionamentoNISECI,
+    AnagraficaNISECI,
     CampionamentoHFBI,
 }
 
@@ -733,6 +739,48 @@ pub fn parse_recordcsv_anagrafica_niseci(records: Vec<RecordCsvAnagraficaNISECI>
 
 }
 
+pub fn check_anagrafica_niseci_reader<R: Read>(reader: R) -> Result<Vec<RecordCsvAnagraficaNISECI>,Vec<csv::Error>> {
+    let rdr = csv::ReaderBuilder::new()
+        .delimiter(b';')
+        .from_reader(reader);
+    let (records, errors) = parse_csv_anagrafica_niseci(rdr);
+
+    println!("Anagrafica NISECI: Numero record csv validi: {}", records.len());
+    println!("Anagrafica NISECI: Numero record csv non validi: {}", errors.len());
+
+    if !errors.is_empty() {
+        /*
+        for error in &errors {
+            eprintln!("  {}", error);
+        }
+        */
+        let processed_errors = process_csv_errors(&errors, TipoRecordCsv::CampionamentoNISECI);
+        eprintln!("Errori incontrati durante l'elaborazione csv del campionamento NISECI: {{");
+        for e in processed_errors {
+            eprintln!("{e}");
+        }
+        eprintln!("}}");
+        return Err(errors);
+    } else {
+        println!("Tutti i record csv dell'anagrafica NISECI sono stati processati con successo!");
+        /*
+        for record in &records {
+            println!("  Record: {{{record}}}");
+        }
+        */
+        return Ok(records);
+    }
+}
+
+pub fn check_anagrafica_niseci_path(path: PathBuf) -> Result<Vec<RecordCsvAnagraficaNISECI>,Vec<csv::Error>> {
+    if !check_path_is_file_ends_with_csv(&path) {
+        eprintln!("Il file {} non è un .csv", path.display());
+        return Err(Vec::new());
+    }
+    let file = File::open(path).expect("Unable to open file");
+    return check_anagrafica_niseci_reader(file);
+}
+
 pub fn translate_error_message(msg: &str) -> String {
     if msg.starts_with("missing field") {
         msg.replace("missing field", "campo mancante")
@@ -815,6 +863,13 @@ pub fn process_csv_errors(errors: &Vec<csv::Error>, tipo_csv: TipoRecordCsv) -> 
                             TipoRecordCsv::CampionamentoNISECI => {
                                 if field_idx < CAMPIONAMENTO_NISECI_HEADER_FIELDS.len() {
                                     field_str = format!("{} ({})", field_idx, CAMPIONAMENTO_NISECI_HEADER_FIELDS[field_idx]);
+                                } else {
+                                    field_str = "???".to_string();
+                                }
+                            }
+                            TipoRecordCsv::AnagraficaNISECI => {
+                                if field_idx < ANAGRAFICA_NISECI_HEADER_FIELDS.len() {
+                                    field_str = format!("{} ({})", field_idx, ANAGRAFICA_NISECI_HEADER_FIELDS[field_idx]);
                                 } else {
                                     field_str = "???".to_string();
                                 }
