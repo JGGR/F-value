@@ -19,7 +19,8 @@ use crate::core::*;
 
 pub fn esox_usage() {
     println!("{PROJECT_NAME} v{SHORT_PROJECT_VERSION}");
-    println!("Usage: {PROJECT_NAME} [--headless [--hfbi]] <campionamento.csv> <riferimento.csv>");
+    println!("Usage: {PROJECT_NAME} [--headless] <campionamento.csv> <riferimento.csv> <anagrafica.csv>");
+    println!("       {PROJECT_NAME} [--headless] --hfbi <campionamento.csv> <anagrafica.csv>");
     println!(
         "Flags:
   --headless               Run without GUI
@@ -33,6 +34,7 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) -> bool {
     let mut arg_i = 0;
     let mut campionamento_path_str = "";
     let mut riferimento_path_str = "";
+    let mut anagrafica_path_str = "";
     for arg in &args[1..] {
         arg_i += 1;
         match arg_i {
@@ -43,7 +45,13 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) -> bool {
                 if do_niseci {
                     riferimento_path_str = arg;
                 } else {
-                    eprintln!("Ignoring riferimento since we're doing HFBI: {riferimento_path_str}");
+                    // Doing HFBI so we don't have a riferimento
+                    anagrafica_path_str = arg;
+                }
+            }
+            3 => {
+                if do_niseci {
+                    anagrafica_path_str = arg;
                 }
             }
             _ => {
@@ -56,6 +64,7 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) -> bool {
 
     let campionamento_path = PathBuf::from(campionamento_path_str);
     let riferimento_path = PathBuf::from(riferimento_path_str);
+    let anagrafica_path = PathBuf::from(anagrafica_path_str);
 
     if !check_path_is_file_ends_with_csv(&campionamento_path) {
         eprintln!("Fallito controllo path campionamento");
@@ -187,6 +196,8 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) -> bool {
             riferimento_valueparse_failed ||
             campionamento_valueparse_failed );
 
+
+        let mut anagrafica_csv_failed = false;
         if !had_failures {
             for s in riferimento_specie {
                 println!("Specie:  {:?}", s);
@@ -194,9 +205,31 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) -> bool {
             for c in campionamento_specie {
                 println!("Campione:  {:?}", c);
             }
-            println!("TODO:  Implement anagrafica loading, full calc");
+            let anagrafica_csv_check_res = check_anagrafica_niseci_path(anagrafica_path);
+            match anagrafica_csv_check_res {
+                Ok(csv_recs) => {
+                    println!("Anagrafica result: {{");
+                    for r in &csv_recs {
+                        println!("  {r}");
+                    }
+                    println!("}}");
+                }
+                Err(_errs) => {
+                    /* Assuming they were printed before this point
+                    eprintln!("Anagrafica errors in run_headless(): {{");
+                    for e in errs {
+                        eprintln!("  {e}");
+                    }
+                    eprintln!("}}");
+                    */
+                    anagrafica_csv_failed = true;
+                    //return; We keep running and return later
+                }
+            }
+            println!("TODO: apply parsed data to calc");
         }
-        return !had_failures;
+        let final_res = !had_failures && !anagrafica_csv_failed;
+        return final_res;
     } else {
         let campionamento_check_res = check_campionamento_hfbi_path(campionamento_path);
         println!("Result: {campionamento_check_res}");
