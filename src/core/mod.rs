@@ -68,10 +68,10 @@ pub const CAMPIONAMENTO_NISECI_HEADER_FIELDS: [&str; 7] = [ "data", "stazione", 
 pub const CAMPIONAMENTO_NISECI_HEADER: &str = "\
 data;stazione;superficie;numPassaggio;codiceSpecie;lunghezza;peso";
 
-pub const ANAGRAFICA_NISECI_HEADER_FIELDS: [&str; 14] = [
-"codiceStazione", "corpoIdrico", "regione", "provincia", "data", "lunghezzaStazione", "larghezzaStazione", "tipoComunita", "fonte", "numeroProtocollo", "codiceSpecie", "idroEcoRegione", "areaAlpina", "nomeBacino" ];
+pub const ANAGRAFICA_NISECI_HEADER_FIELDS: [&str; 13] = [
+"codiceStazione", "corpoIdrico", "regione", "provincia", "data", "lunghezzaStazione", "larghezzaStazione", "tipoComunita", "fonte", "numeroProtocollo", "idroEcoRegione", "areaAlpina", "nomeBacino" ];
 pub const ANAGRAFICA_NISECI_HEADER: &str = "\
-codiceStazione;corpoIdrico;regione;provincia;data;lunghezzaStazione;larghezzaStazione;tipoComunita;fonte;numeroProtocollo;codiceSpecie;idroEcoRegione;areaAlpina;nomeBacino";
+codiceStazione;corpoIdrico;regione;provincia;data;lunghezzaStazione;larghezzaStazione;tipoComunita;fonte;numeroProtocollo;idroEcoRegione;areaAlpina;nomeBacino";
 
 //TODO: add test to check if this string respects the discriminant ordering in GuiTheme
 pub const GUI_THEME_COMBOBOX_STR: &str = "Light;Dark;Bluish;Candy;Cherry;Cyber;Jungle;Lavanda;Terminal;Ashes";
@@ -609,7 +609,6 @@ pub struct RecordCsvAnagraficaNISECI {
     pub tipo_comunita: u32,
     pub fonte: String,
     pub numero_protocollo: String,
-    pub codice_specie: String,
     pub idro_eco_regione: u32,
     pub area_alpina: u32,
     pub nome_bacino: String,
@@ -621,11 +620,11 @@ impl fmt::Display for RecordCsvAnagraficaNISECI {
             "RecordAnagraficaNISECI: {{ codice_stazione: [{}], corpo_idrico: [{}],\
             regione: [{}], provincia: [{}], data: [{}], lunghezza_stazione: [{}],\
             larghezza_stazione: [{}], tipo_comunita [{}], fonte [{}],\
-            numero_protocollo: [{}], codice_specie: [{}], idro_eco_regione: [{}],\
+            numero_protocollo: [{}], idro_eco_regione: [{}],\
             area_alpina: [{}], nome_bacino: [{}]}}",
             self.codice_stazione, self.corpo_idrico, self.regione, self.provincia,
             self.data, self.lunghezza_stazione, self.larghezza_stazione,
-            self.tipo_comunita, self.fonte, self.numero_protocollo, self.codice_specie,
+            self.tipo_comunita, self.fonte, self.numero_protocollo,
             self.idro_eco_regione, self.area_alpina, self.nome_bacino
         );
         write!(f, "{}", string_representation)
@@ -671,7 +670,7 @@ pub fn parse_recordcsv_anagrafica_niseci(records: Vec<RecordCsvAnagraficaNISECI>
         return Err(errors);
     }
 
-    let r = records.get(1).unwrap();
+    let r = records.get(0).unwrap();
     let mut area = AreaNISECI::Mediterranea;
     if r.area_alpina > 0 {
         area = AreaNISECI::Alpina;
@@ -767,7 +766,7 @@ pub fn check_anagrafica_niseci_reader<R: Read>(reader: R) -> Result<Vec<RecordCs
         }
         */
         let processed_errors = process_csv_errors(&errors, TipoRecordCsv::CampionamentoNISECI);
-        eprintln!("Errori incontrati durante l'elaborazione csv del campionamento NISECI: {{");
+        eprintln!("Errori incontrati durante l'elaborazione csv dell' anagrafica NISECI: {{");
         for e in processed_errors {
             eprintln!("{e}");
         }

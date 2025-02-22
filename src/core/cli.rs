@@ -16,6 +16,8 @@
 */
 
 use crate::core::*;
+use crate::engines::niseci::full::calculate_niseci;
+use crate::model::niseci::{ CampionamentoNISECI, RiferimentoNISECI };
 
 pub fn esox_usage() {
     println!("{PROJECT_NAME} v{SHORT_PROJECT_VERSION}");
@@ -199,11 +201,30 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) -> bool {
 
         let mut anagrafica_csv_failed = false;
         let mut anagrafica_valueparse_failed = false;
+        let mut anagrafica = AnagraficaNISECI {
+            comunita: ComunitaNISECI {
+                tipo: TipoComunitaNISECI::Redatta,
+                fonte: None,
+                numero_protocollo: None,
+            },
+            codice_stazione: "foo".to_string(),
+            date_string: "foo".to_string(),
+            area: AreaNISECI::Alpina,
+            corpo_idrico: "foo".to_string(),
+            bacino_appartenenza: "foo".to_string(),
+            idro_eco_regione: IdroEcoRegioneNISECI::Toscana,
+            posizione: Location {
+                regione: "foo".to_string(),
+                provincia: "foo".to_string(),
+            },
+            lunghezza_media_stazione: 0.0,
+            larghezza_media_stazione: 0.0,
+        };
         if !had_failures {
-            for s in riferimento_specie {
+            for s in &riferimento_specie {
                 println!("Specie:  {:?}", s);
             }
-            for c in campionamento_specie {
+            for c in &campionamento_specie {
                 println!("Campione:  {:?}", c);
             }
             let anagrafica_csv_check_res = check_anagrafica_niseci_path(anagrafica_path);
@@ -216,8 +237,8 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) -> bool {
                     println!("}}");
                     let anagrafica_records_check_res = check_records_anagrafica_niseci(csv_recs);
                     match anagrafica_records_check_res {
-                        Ok(anagrafica) => {
-                            //anagrafica_specie = campioni;
+                        Ok(a) => {
+                            anagrafica = a;
                         }
                         Err(value_errs) => {
                             /* Assuming they were printed before this point
@@ -250,9 +271,35 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) -> bool {
                         //return; We keep running and return later
                     }
             }
-            println!("TODO: apply parsed data to calc");
         }
-        let final_res = !had_failures && !anagrafica_csv_failed && !anagrafica_valueparse_failed;
+
+        let had_failures = ( had_failures ||
+            ( anagrafica_csv_failed || anagrafica_valueparse_failed ) );
+
+        let mut niseci_calc_failed = false;
+        if !had_failures {
+            let campionamento = CampionamentoNISECI {
+                campionamento: campionamento_specie
+            };
+            let riferimento = RiferimentoNISECI {
+                elenco_specie: riferimento_specie
+            };
+            match calculate_niseci(&campionamento, &riferimento, &anagrafica) {
+                Ok(niseci) => {
+                    println!("NISECI: {niseci}");
+                }
+                Err(errors) => {
+                    /* Assuming they were printed before this point
+                    for e in errs {
+                        eprintln!("  {e}");
+                    }
+                    */
+                    niseci_calc_failed = true;
+                }
+            }
+
+        }
+        let final_res = !had_failures && !niseci_calc_failed;
         return final_res;
     } else {
         let campionamento_check_res = check_campionamento_hfbi_path(campionamento_path);
