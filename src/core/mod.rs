@@ -28,6 +28,8 @@ use crate::model::niseci::{SpecieNISECI, RecordNISECI, AnagraficaNISECI, AreaNIS
 use crate::model::location::Location;
 use serde::Deserialize;
 use serde::de::{self, Deserializer};
+use chrono::NaiveDate;
+use chrono::format::ParseErrorKind;
 
 pub const EXIT_KEY: raylib::consts::KeyboardKey = raylib::consts::KeyboardKey::KEY_ESCAPE;
 pub const PROJECT_NAME: &'static str = env!("CARGO_PKG_NAME");
@@ -225,6 +227,11 @@ pub fn propheight(d: &RaylibDrawHandle<'_>, to_scale: i32) -> i32
     }
     let current_screen_height = d.get_screen_height();
     return current_screen_height * to_scale / ESOX_SCREEN_HEIGHT;
+}
+
+pub fn parse_date(date_str: &str) -> Result<NaiveDate, chrono::format::ParseError> {
+        let normalized = date_str.replace("/", "-"); // Replace all / with -
+        NaiveDate::parse_from_str(&normalized, "%d-%m-%Y")
 }
 
 #[derive(Copy,Clone)]
@@ -671,10 +678,77 @@ pub fn parse_recordcsv_anagrafica_niseci(records: Vec<RecordCsvAnagraficaNISECI>
     }
 
     let r = records.get(0).unwrap();
-    let mut area = AreaNISECI::Mediterranea;
-    if r.area_alpina > 0 {
-        area = AreaNISECI::Alpina;
+
+    if r.codice_stazione.len() < 1 {
+        let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Codice stazione troppo corto: {}", r.codice_stazione) };
+        errors.push(err);
     }
+
+    if r.corpo_idrico.len() < 1 {
+        let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Corpo idrico troppo corto: {}", r.corpo_idrico) };
+        errors.push(err);
+    }
+
+    if r.regione.len() < 1 {
+        let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Regione troppo corta: {}", r.regione) };
+        errors.push(err);
+    }
+
+    if r.provincia.len() < 1 {
+        let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Provincia troppo corta: {}", r.provincia) };
+        errors.push(err);
+    }
+
+    match parse_date(&r.data) {
+        Ok(_) => {},
+        Err(e) => {
+            match e.kind() {
+                ParseErrorKind::OutOfRange => {
+                    let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Data fornita non valida: fuori range") };
+                    errors.push(err);
+                },
+                ParseErrorKind::Impossible => {
+                    let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Data fornita non valida: valori non possibili") };
+                    errors.push(err);
+                },
+                ParseErrorKind::NotEnough => {
+                    let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Data fornita non valida: specifica insufficiente") };
+                    errors.push(err);
+                },
+                ParseErrorKind::Invalid => {
+                    let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Data fornita non valida: presenza di caratteri non attesi") };
+                    errors.push(err);
+                },
+                ParseErrorKind::TooShort => {
+                    let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Data fornita non valida: terminazione prematura dell'input") };
+                    errors.push(err);
+                },
+                ParseErrorKind::TooLong => {
+                    let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Data fornita non valida: input in eccesso") };
+                    errors.push(err);
+                },
+                ParseErrorKind::BadFormat => {
+                    let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Data fornita non valida: errore nella specifica di formattazione") };
+                    errors.push(err);
+                },
+                _ => {
+                    let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Data fornita non valida: errore sconosciuto") };
+                    errors.push(err);
+                }
+            }
+        }
+    }
+
+    if r.lunghezza_stazione < 1 {
+        let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Lunghezza stazione troppo bassa: {}", r.lunghezza_stazione) };
+        errors.push(err);
+    }
+
+    if r.larghezza_stazione < 1 {
+        let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Larghezza stazione troppo bassa: {}", r.larghezza_stazione) };
+        errors.push(err);
+    }
+
     let mut tipo_comunita = TipoComunitaNISECI::Redatta;
     match r.tipo_comunita {
         0 => { /* Redatta */ },
@@ -691,6 +765,22 @@ pub fn parse_recordcsv_anagrafica_niseci(records: Vec<RecordCsvAnagraficaNISECI>
             let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Tipo comunita NISECI non valido: {}, atteso [0, 3]", r.tipo_comunita) };
             errors.push(err);
         }
+    }
+
+    match tipo_comunita {
+        TipoComunitaNISECI::Recuperata => {
+            if r.fonte.len() < 1 {
+                let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Fonte troppo corta: {}", r.fonte) };
+                errors.push(err);
+            }
+        }
+        TipoComunitaNISECI::AffinataDalMase => {
+            if r.numero_protocollo.len() < 1 {
+                let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Numero protocollo troppo corto: {}", r.numero_protocollo) };
+                errors.push(err);
+            }
+        }
+        _ => {}
     }
 
     let mut idro_eco_regione = IdroEcoRegioneNISECI::Toscana;
@@ -722,6 +812,16 @@ pub fn parse_recordcsv_anagrafica_niseci(records: Vec<RecordCsvAnagraficaNISECI>
             IdroEcoRegioneNISECI::Toscana // To still assign something by default
         }
     };
+
+    let mut area = AreaNISECI::Mediterranea;
+    if r.area_alpina > 0 {
+        area = AreaNISECI::Alpina;
+    }
+
+    if r.nome_bacino.len() < 1 {
+        let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Nome bacino troppo corto: {}", r.nome_bacino) };
+        errors.push(err);
+    }
 
     if errors.len() > 0 {
         return Err(errors);

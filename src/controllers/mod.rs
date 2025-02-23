@@ -16,7 +16,7 @@
 */
 
 use crate::model::core::*;
-use crate::core::{MainState, TipoRecordCsv, check_campionamento_niseci_path, check_riferimento_niseci_path, check_records_riferimento_niseci, check_records_campionamento_niseci};
+use crate::core::{MainState, parse_date, TipoRecordCsv, check_campionamento_niseci_path, check_riferimento_niseci_path, check_records_riferimento_niseci, check_records_campionamento_niseci};
 use crate::model::index::Indice;
 use crate::model::niseci::{RiferimentoNISECI, CampionamentoNISECI, AnagraficaNISECI, TipoComunitaNISECI};
 use crate::state::GLOBAL_STATE;
@@ -26,7 +26,6 @@ use crate::engines::niseci::full::{calculate_niseci, calculate_rqe_niseci, calcu
 use raylib::RaylibHandle;
 use std::path::PathBuf;
 use raylib::consts::KeyboardKey::*;
-use chrono::NaiveDate;
 use chrono::format::ParseErrorKind;
 
 // Controller to update and access the state
@@ -520,11 +519,6 @@ impl InfoAggiuntiveController {
         state.infoaggiuntive_model.set_valid(false);
     }
 
-    fn parse_date(date_str: &str) -> Result<NaiveDate, chrono::format::ParseError> {
-        let normalized = date_str.replace("/", "-"); // Replace all / with -
-        NaiveDate::parse_from_str(&normalized, "%d-%m-%Y")
-    }
-
     pub fn valida_anagrafica_niseci(&self) {
 
         {
@@ -551,7 +545,7 @@ impl InfoAggiuntiveController {
                 errors.push(format!("Nome provincia troppo corto"));
             }
 
-            match Self::parse_date(&anagrafica.date_string) {
+            match parse_date(&anagrafica.date_string) {
                 Ok(_) => {},
                 Err(e) => {
                     match e.kind() {
