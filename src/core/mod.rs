@@ -532,6 +532,8 @@ pub fn parse_recordcsv_riferimento_niseci(records: Vec<RecordCsvRiferimentoNISEC
 
         //TODO: update when SpecieNISECI has the missing fields
 
+        let epsilon: f32 = 1e-6;
+
         // Check dens_soglia
         if r.dens_soglia1 < 0.0 {
             let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: dens_soglia1 non valido (< 0)") };
@@ -539,7 +541,7 @@ pub fn parse_recordcsv_riferimento_niseci(records: Vec<RecordCsvRiferimentoNISEC
             continue;
         }
 
-        if r.dens_soglia1 == 0.0 && specie_attesa {
+        if r.dens_soglia1.abs() < epsilon && specie_attesa {
             let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: dens_soglia1 non valido (== 0) per una specie attesa") };
             errors.push(err);
             continue;
@@ -551,7 +553,7 @@ pub fn parse_recordcsv_riferimento_niseci(records: Vec<RecordCsvRiferimentoNISEC
             continue;
         }
 
-        if r.dens_soglia2 == 0.0 && specie_attesa {
+        if r.dens_soglia2.abs() < epsilon && specie_attesa {
             let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: dens_soglia2 non valido (== 0) per una specie attesa") };
             errors.push(err);
             continue;
