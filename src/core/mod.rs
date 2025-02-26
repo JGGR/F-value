@@ -865,7 +865,7 @@ pub fn check_anagrafica_niseci_reader<R: Read>(reader: R) -> Result<Vec<RecordCs
             eprintln!("  {}", error);
         }
         */
-        let processed_errors = process_csv_errors(&errors, TipoRecordCsv::CampionamentoNISECI);
+        let processed_errors = process_csv_errors(&errors, TipoRecordCsv::AnagraficaNISECI);
         eprintln!("Errori incontrati durante l'elaborazione csv dell' anagrafica NISECI: {{");
         for e in processed_errors {
             eprintln!("{e}");
