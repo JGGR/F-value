@@ -22,7 +22,7 @@ use crate::model::niseci::{RiferimentoNISECI, CampionamentoNISECI, AnagraficaNIS
 use crate::state::GLOBAL_STATE;
 use crate::CurrentView;
 use crate::process_csv_errors;
-use crate::engines::niseci::full::{calculate_niseci, calculate_rqe_niseci, calculate_stato_ecologico};
+use crate::engines::niseci::{full::{calculate_niseci, calculate_rqe_niseci, calculate_stato_ecologico}, x1::calculate_x1, x2::calculate_x2, x3::calculate_x3};
 use raylib::RaylibHandle;
 use std::path::PathBuf;
 use raylib::consts::KeyboardKey::*;
@@ -730,6 +730,12 @@ impl OutputController {
                     self.add_console_message(format!("RQE NISECI: {rqe_niseci}"));
                     let stato_ecologico = calculate_stato_ecologico(niseci, &anagrafica.area);
                     self.add_console_message(format!("Stato ecologico: {stato_ecologico}"));
+                    let x1 = calculate_x1(&campionamento, &riferimento);
+                    let x2 = calculate_x2(&campionamento, &anagrafica).unwrap();
+                    let x3 = calculate_x3(&campionamento).unwrap();
+                    self.add_console_message(format!("x1: {x1}"));
+                    self.add_console_message(format!("x2: {x2}"));
+                    self.add_console_message(format!("x3: {x3}"));
                 },
                 Err(niseci_errors) => {
                     for e in niseci_errors {
