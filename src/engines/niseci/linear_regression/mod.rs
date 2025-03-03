@@ -96,7 +96,8 @@ pub fn calculate_quantita_with_regression(campionamenti: &[Point<i32>]) -> Resul
     }
   };
 
-  if m.abs() < f32::EPSILON {
+  let epsilon: f32 = 1e-6;
+  if m.abs() < epsilon {
     // In questo caso, come da accordi, ritorniamo la somma dei campionamenti
     return Ok(get_sum(campionamenti))
   }
@@ -135,7 +136,9 @@ fn normalize_points(points: &[Point<i32>]) -> Result<Vec<Point<f32>>, LinearRegr
   let max_y = points.iter().map(|p| p.y).max().unwrap() as f32;
   let min_y = points.iter().map(|p| p.y).min().unwrap() as f32;
 
-  if (max_y - min_y).abs() < f32::EPSILON {
+
+  let epsilon: f32 = 1e-6;
+  if (max_y - min_y).abs() < epsilon {
     return Err(LinearRegressionError::SameValues);
   }
 

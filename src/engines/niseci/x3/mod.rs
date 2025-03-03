@@ -50,7 +50,8 @@ pub fn calculate_x3(c: &CampionamentoNISECI) -> Result<f32, Vec<String>> {
   };
 
   // condizione 3
-  if info_pop_aliene.tipo_1.popolazione_piu_strutt == 1.0 {
+  let epsilon: f32 = 1e-6;
+  if (info_pop_aliene.tipo_1.popolazione_piu_strutt - 1.0).abs() < epsilon {
     return Ok(0.0);
   }
 

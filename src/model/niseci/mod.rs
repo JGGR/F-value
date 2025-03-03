@@ -541,20 +541,20 @@ impl InfoPopolazioniNISECI {
 
     let mut info_pop = InfoPopolazioniNISECI::new();
     info_pop.tot_species = map.len();
-
+    let epsilon: f32 = 1e-6;
     for (_key, classe) in map {
       match classe.calculate_struttura_popolazione() {
         Ok(popolazione) => {
           if info_pop.popolazione_piu_strutt < popolazione {
             info_pop.popolazione_piu_strutt = popolazione;
           }
-          if popolazione == 1.0 {
+          if (popolazione - 1.0).abs() < epsilon {
             info_pop.species_strutt += 1;
           }
-          if popolazione == 0.5 {
+          if (popolazione - 0.5).abs() < epsilon {
             info_pop.species_mediamente_strutt += 1;
           }
-          if popolazione == 0.0  {
+          if popolazione.abs() < epsilon  {
             info_pop.species_destrutt += 1;
           }
         },
