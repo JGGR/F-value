@@ -1,3 +1,60 @@
+## [0.0.10] - Unreleased
+
+### Added
+
+- Calc x2
+- Calc x3
+- `ClassiEtaSpecieNISECI`
+- `ClassiEta`
+- `InfoPopolazioniNISECI`
+- `InfoPopolazioniAlieneNISECI`
+- `ClassiEtaAlieniNISECI`
+- `EsemplariPerCattura`
+- More tests
+  - `x2` (also private methods tests)
+  - `x3`
+  - `niseci::full` (minimal)
+- Add `templates/riferimento_niseci.csv`
+- Add list_view for `IdroEcoRegioneNISECI` in `SelezionaInfoAggiuntiveView`
+  - Closes #7
+- Add `AreaNISECI`
+  - Closes #8
+- Add `console.unset_env()` to drop anagrafica_niseci on user backout
+- Add submit for `Anagrafica`
+  - Ensures no stray nullbytes in strings
+- Adds heading on all source files with copyright info
+- Adds `GPL-3.0-only` license
+- `InfoAggiuntiveView` collects `date_string`
+  - Previously, the text buffer contents were unused
+  - Format expected: `dd/mm/yyyy`
+- `InfoAggiuntiveController` handles `AnagraficaNISECI` validation
+- `OutputController` goes to `Console` on errors
+- Add `calculate_niseci()`
+- Add `calculate_stato_ecologico()`, use `log(10.0)` for rqe_niseci
+- Add `calculate_rqe_niseci()`
+- Add parsing funcs for anagrafica niseci csv
+- Check anagrafica file in `run_headless()`
+- Add full niseci calc in `run_headless()`
+- Add `templates/anagrafica_niseci.csv` to support full headless run
+- Store niseci result, display it in view
+  - Adds handling of user confirm in `ProduzioneOutput` view to show output
+there
+- Add `CHANGELOG.md`
+- Adds a note in `ConsoleView` suggesting users to click up to return
+- Print splash on stdout
+- Handle `-W` to print warranty notice
+
+### Changed
+
+* `RecordCsvRiferimentoNISECI` ora ha i campi `cl_soglia_N` dove `N = 1, 2, 3 , 4`
+- Refactor `InfoAggiuntiveView`
+- Add list_view for `regione` in `SelezionaInfoAggiuntiveView`
+- Renamed `templates/campionamento_NISECI.csv` to `templates/campionamento_niseci.csv`
+- Refactor `codice_stazione` handling
+- Rename field `nome_fiume` to `corpo_idrico` in `AnagraficaNISECI`
+- Minor refactor to resolve all warnings
+- Some functions/includes which were only needed for test builds are not correctly marked with `#[cfg(test)]`
+
 ## [0.0.9] - 2025-01-23
 
 ### Added
