@@ -51,7 +51,6 @@ fn main() {
 
     let mut indice_niseci = true;
 
-
     match args.len() {
         1 => {},
         _ => {
@@ -95,6 +94,9 @@ fn main() {
                         indice_niseci = false;
                         mutargs.remove(arg_i);
                     }
+                    "-W" | "--warranty" | "-warranty" => {
+                        return print_warranty_info();
+                    }
                     _ => {
                         if arg.starts_with("--") {
                             eprintln!("Unknown flag: {arg}");
@@ -107,6 +109,10 @@ fn main() {
     }
 
     eprintln!("{PROJECT_VERSION_FULL}");
+
+    let splash: String = format!("{}, version {}\nCopyright (C) 2025  jgabaut, gioninjo\n\n  This program comes with ABSOLUTELY NO WARRANTY; for details type `{} -W`.\n  This is free software, and you are welcome to redistribute it\n  under certain conditions; see file `LICENSE` for details.\n\n", PROJECT_NAME, PROJECT_VERSION, PROJECT_NAME);
+
+    println!("{splash}");
 
     if headless {
         let res = run_headless(indice_niseci, &mutargs);
