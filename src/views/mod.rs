@@ -1179,8 +1179,8 @@ impl SelezioneInfoAggiuntiveView {
                     &mut self.listview_idroecoregione_niseci_scroll_value,
                     &mut self.listview_idroecoregione_niseci_value,
                 );
-                let mut _comboBoxPick = -1;
-                _comboBoxPick = d.gui_combo_box(
+                let mut _combo_box_pick = -1;
+                _combo_box_pick = d.gui_combo_box(
                     rrect(
                         column_2_groupbox_boxes_x,
                         column_2_label_area_niseci_y,
@@ -1349,7 +1349,7 @@ impl ProduzioneOutputView {
 
         d.clear_background(main_state.default_bg_color);
 
-        let state = controller.get_state();
+        let _state = controller.get_state();
         let current_index = match controller.get_current_index() {
             Some(index) => index,
             None => {
@@ -1358,7 +1358,6 @@ impl ProduzioneOutputView {
             }
         };
 
-        let groupbox_width = propwidth(&d, 600);
         let button_calcola_width = propwidth(&d, 200);
         let button_calcola_x = d.get_screen_width() / 2 - button_calcola_width /2;
         let button_calcola_height = propwidth(&d, 50);
@@ -1601,7 +1600,7 @@ fn draw_rainbow_text(d: &mut RaylibDrawHandle, x: i32, y: i32, text: &str, frame
 pub struct ConsoleView {
     font : Font,
     current_font_size : i32,
-    default_font_size : i32,
+    _default_font_size : i32,
     font_spacing : i32,
 }
 
@@ -1613,7 +1612,7 @@ impl ConsoleView {
                 CONSOLE_FONT_DATA,
                 font_size,// *2,
                 None).expect("failed loading console font"),
-            default_font_size : font_size,
+            _default_font_size : font_size,
             current_font_size : font_size,
             font_spacing : font_spacing,
         }

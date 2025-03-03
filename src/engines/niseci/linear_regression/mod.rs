@@ -16,8 +16,6 @@
 */
 
 use core::f32;
-use std::process::exit;
-
 
 #[derive(Debug, PartialEq)]
 pub struct Point<T> {

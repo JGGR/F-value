@@ -95,7 +95,7 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) -> bool {
                     Ok(recs_specie) => {
                         riferimento_specie = recs_specie;
                     }
-                    Err(value_errors) => {
+                    Err(_value_errors) => {
                         /* Assuming they were printed before this point
                         eprintln!("Riferimento value errors in run_headless(): {{");
                         for e in value_errors {
@@ -148,7 +148,7 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) -> bool {
                     Ok(campioni) => {
                         campionamento_specie = campioni;
                     }
-                    Err(value_errors) => {
+                    Err(_value_errors) => {
                         /* Assuming they were printed before this point
                         eprintln!("Campionamento value errors in run_headless(): {{");
                         for e in value_errors {
@@ -240,7 +240,7 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) -> bool {
                         Ok(a) => {
                             anagrafica = a;
                         }
-                        Err(value_errs) => {
+                        Err(_value_errs) => {
                             /* Assuming they were printed before this point
                             eprintln!("Anagrafica value errors in run_headless(): {{");
                             for e in value_errors {
@@ -273,8 +273,8 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) -> bool {
             }
         }
 
-        let had_failures = ( had_failures ||
-            ( anagrafica_csv_failed || anagrafica_valueparse_failed ) );
+        let had_failures = had_failures ||
+            ( anagrafica_csv_failed || anagrafica_valueparse_failed );
 
         let mut niseci_calc_failed = false;
         if !had_failures {
@@ -292,7 +292,7 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) -> bool {
                     println!("RQE NISECI: {rqe_niseci}");
                     println!("STATO ECOLOGICO NISECI: {stato_eco_niseci}");
                 }
-                Err(errors) => {
+                Err(_errors) => {
                     /* Assuming they were printed before this point
                     for e in errs {
                         eprintln!("  {e}");

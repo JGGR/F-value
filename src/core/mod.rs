@@ -239,7 +239,6 @@ pub enum TipoRecordCsv {
     RiferimentoNISECI,
     CampionamentoNISECI,
     AnagraficaNISECI,
-    CampionamentoHFBI,
 }
 
 fn deserialize_comma_f32<'de, D>(deserializer: D) -> Result<f32, D::Error>
@@ -783,7 +782,7 @@ pub fn parse_recordcsv_anagrafica_niseci(records: Vec<RecordCsvAnagraficaNISECI>
         _ => {}
     }
 
-    let mut idro_eco_regione = IdroEcoRegioneNISECI::Toscana;
+    let idro_eco_regione;
     idro_eco_regione = match r.idro_eco_regione {
         0 => IdroEcoRegioneNISECI::AlpiCentroOrientali,
         1 => IdroEcoRegioneNISECI::AlpiMediterranee,
@@ -985,7 +984,7 @@ pub fn process_csv_errors(errors: &Vec<csv::Error>, tipo_csv: TipoRecordCsv) -> 
     for error in errors {
         match error.kind() {
             csv::ErrorKind::Deserialize { pos, err } => {
-                let mut field_str;
+                let field_str;
                 match err.field() {
                     Some(f) => {
                         // Deduce name for field from index in the header
@@ -1012,11 +1011,6 @@ pub fn process_csv_errors(errors: &Vec<csv::Error>, tipo_csv: TipoRecordCsv) -> 
                                 } else {
                                     field_str = "???".to_string();
                                 }
-                            }
-                            TipoRecordCsv::CampionamentoHFBI => {
-                                // TODO: implement this for HFBI
-                                todo!("Implement this for HFBI");
-                                field_str = field_idx.to_string();
                             }
                         }
                     }

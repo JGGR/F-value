@@ -75,6 +75,9 @@ fn main() {
                         println!("Header campionamento NISECI: {{");
                         println!("  {CAMPIONAMENTO_NISECI_HEADER}");
                         println!("}}");
+                        println!("Header anagrafica NISECI: {{");
+                        println!("  {ANAGRAFICA_NISECI_HEADER}");
+                        println!("}}");
                         return;
                     }
                     "-h" | "-help" | "--help" => {

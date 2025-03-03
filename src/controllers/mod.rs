@@ -110,7 +110,7 @@ impl IndiceController {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.indice_model.set_selected_index(index);
     }
-    pub fn add_console_message(&self, msg: String) {
+    pub fn _add_console_message(&self, msg: String) {
         let mut state = GLOBAL_STATE.lock().unwrap();
 
         state.console_model.console.add_message(msg);
@@ -338,7 +338,7 @@ impl FileInputController {
         state.fileinput_model.set_campionamento_path_valid(false); // Refresh the validity
     }
 
-    pub fn get_campionamento_path_valid(&self) -> bool {
+    pub fn _get_campionamento_path_valid(&self) -> bool {
         let state = GLOBAL_STATE.lock().unwrap();
         return state.fileinput_model.get_campionamento_path_valid();
     }
@@ -350,7 +350,7 @@ impl FileInputController {
         state.fileinput_model.set_campionamento_path_valid(true);
     }
 
-    pub fn get_data_campionamento_niseci(&self) -> Option<CampionamentoNISECI> {
+    pub fn _get_data_campionamento_niseci(&self) -> Option<CampionamentoNISECI> {
         let state = GLOBAL_STATE.lock().unwrap();
         return state.data_model.get_campionamento_niseci();
     }
@@ -521,8 +521,9 @@ impl InfoAggiuntiveController {
 
     pub fn valida_anagrafica_niseci(&self) {
 
+        //We grab the state in a scope to ensure we don't get lock problems
         {
-            let mut state = GLOBAL_STATE.lock().unwrap();
+            let state = GLOBAL_STATE.lock().unwrap();
             assert!(state.infoaggiuntive_model.is_done_editing());
         }
 
@@ -725,7 +726,7 @@ impl OutputController {
             let opt_res = state.data_model.get_risultato_niseci();
             match opt_res {
                 Some(r) => {
-                    return Some(calculate_rqe_niseci(r.get_valore()));
+                    return Some(r.get_rqe());
                 }
                 None => {
                     return None;
@@ -767,9 +768,9 @@ impl OutputController {
     }
 
     pub fn calc_niseci(&self) {
-        let mut riferimento = None;
-        let mut campionamento = None;
-        let mut anagrafica = None;
+        let riferimento;
+        let campionamento;
+        let anagrafica;
         {
             let state = GLOBAL_STATE.lock().unwrap();
             riferimento = state.data_model.get_riferimento_niseci();
@@ -820,8 +821,7 @@ impl OutputController {
 
                     let risultato_niseci = RisultatoNISECI::new(
                         niseci,
-                        rqe_niseci,
-                        anagrafica
+                        rqe_niseci
                     );
 
                     let mut state = GLOBAL_STATE.lock().unwrap();
@@ -859,14 +859,14 @@ impl OutputController {
     }
 }
 
-pub struct LogController;
+pub struct _LogController;
 
-impl LogController {
-    pub fn new() -> Self {
+impl _LogController {
+    pub fn _new() -> Self {
         Self
     }
 
-    pub fn update(&self, _rl: &RaylibHandle) {
+    pub fn _update(&self, _rl: &RaylibHandle) {
         //let mut state = GLOBAL_STATE.lock().unwrap();
         //state.second_model.set_name("Updated".to_string());
     }
@@ -923,13 +923,13 @@ impl ConsoleController {
         return state.console_model.clone();
     }
 
-    pub fn add_console_message(&self, msg: String) {
+    pub fn _add_console_message(&self, msg: String) {
         let mut state = GLOBAL_STATE.lock().unwrap();
 
         state.console_model.console.add_message(msg);
     }
 
-    pub fn set_console_env(&self, (key, val): (String,String)) {
+    pub fn _set_console_env(&self, (key, val): (String,String)) {
         let mut state = GLOBAL_STATE.lock().unwrap();
 
         state.console_model.console.set_env((key,val));

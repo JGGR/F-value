@@ -15,14 +15,14 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-enum LogLevel {
+enum _LogLevel {
   Debug,
   Info,
   Warning,
   Error
 }
 
-pub struct LogMessage {
-  level: LogLevel,
+pub struct _LogMessage {
+  level: _LogLevel,
   message: String
 }
