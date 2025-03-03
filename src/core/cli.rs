@@ -16,7 +16,7 @@
 */
 
 use crate::core::*;
-use crate::engines::niseci::full::calculate_niseci;
+use crate::engines::niseci::full::{calculate_niseci, calculate_rqe_niseci, calculate_stato_ecologico};
 use crate::model::niseci::{ CampionamentoNISECI, RiferimentoNISECI };
 
 pub fn esox_usage() {
@@ -286,7 +286,11 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) -> bool {
             };
             match calculate_niseci(&campionamento, &riferimento, &anagrafica) {
                 Ok(niseci) => {
+                    let rqe_niseci = calculate_rqe_niseci(niseci);
+                    let stato_eco_niseci = calculate_stato_ecologico(niseci, &anagrafica.area);
                     println!("NISECI: {niseci}");
+                    println!("RQE NISECI: {rqe_niseci}");
+                    println!("STATO ECOLOGICO NISECI: {stato_eco_niseci}");
                 }
                 Err(errors) => {
                     /* Assuming they were printed before this point
