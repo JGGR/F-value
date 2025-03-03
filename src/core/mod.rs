@@ -24,9 +24,12 @@ use std::fmt;
 use std::path::PathBuf;
 use std::io::Read;
 use std::fs::File;
-use crate::model::niseci::{SpecieNISECI, RecordNISECI};
+use crate::model::niseci::{SpecieNISECI, RecordNISECI, AnagraficaNISECI, AreaNISECI, TipoComunitaNISECI, ComunitaNISECI, IdroEcoRegioneNISECI};
+use crate::model::location::Location;
 use serde::Deserialize;
 use serde::de::{self, Deserializer};
+use chrono::NaiveDate;
+use chrono::format::ParseErrorKind;
 
 pub const EXIT_KEY: raylib::consts::KeyboardKey = raylib::consts::KeyboardKey::KEY_ESCAPE;
 pub const PROJECT_NAME: &'static str = env!("CARGO_PKG_NAME");
@@ -66,6 +69,11 @@ nomeComune;nomeLatino;codiceSpecie;origine;tipoAutoctono;alloNocivita;specieAtte
 pub const CAMPIONAMENTO_NISECI_HEADER_FIELDS: [&str; 7] = [ "data", "stazione", "superficie", "numPassaggio", "codiceSpecie", "lunghezza", "peso" ];
 pub const CAMPIONAMENTO_NISECI_HEADER: &str = "\
 data;stazione;superficie;numPassaggio;codiceSpecie;lunghezza;peso";
+
+pub const ANAGRAFICA_NISECI_HEADER_FIELDS: [&str; 13] = [
+"codiceStazione", "corpoIdrico", "regione", "provincia", "data", "lunghezzaStazione", "larghezzaStazione", "tipoComunita", "fonte", "numeroProtocollo", "idroEcoRegione", "areaAlpina", "nomeBacino" ];
+pub const ANAGRAFICA_NISECI_HEADER: &str = "\
+codiceStazione;corpoIdrico;regione;provincia;data;lunghezzaStazione;larghezzaStazione;tipoComunita;fonte;numeroProtocollo;idroEcoRegione;areaAlpina;nomeBacino";
 
 //TODO: add test to check if this string respects the discriminant ordering in GuiTheme
 pub const GUI_THEME_COMBOBOX_STR: &str = "Light;Dark;Bluish;Candy;Cherry;Cyber;Jungle;Lavanda;Terminal;Ashes";
@@ -221,10 +229,16 @@ pub fn propheight(d: &RaylibDrawHandle<'_>, to_scale: i32) -> i32
     return current_screen_height * to_scale / ESOX_SCREEN_HEIGHT;
 }
 
+pub fn parse_date(date_str: &str) -> Result<NaiveDate, chrono::format::ParseError> {
+        let normalized = date_str.replace("/", "-"); // Replace all / with -
+        NaiveDate::parse_from_str(&normalized, "%d-%m-%Y")
+}
+
 #[derive(Copy,Clone)]
 pub enum TipoRecordCsv {
     RiferimentoNISECI,
     CampionamentoNISECI,
+    AnagraficaNISECI,
     CampionamentoHFBI,
 }
 
@@ -589,6 +603,323 @@ pub fn parse_recordcsv_riferimento_niseci(records: Vec<RecordCsvRiferimentoNISEC
     (specie, errors)
 }
 
+#[derive(Debug, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RecordCsvAnagraficaNISECI {
+    pub codice_stazione: String,
+    pub corpo_idrico: String,
+    pub regione: String,
+    pub provincia: String,
+    pub data: String,
+    pub lunghezza_stazione: u32,
+    pub larghezza_stazione: u32,
+    pub tipo_comunita: u32,
+    pub fonte: String,
+    pub numero_protocollo: String,
+    pub idro_eco_regione: u32,
+    pub area_alpina: u32,
+    pub nome_bacino: String,
+}
+
+impl fmt::Display for RecordCsvAnagraficaNISECI {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let string_representation = format!(
+            "RecordAnagraficaNISECI: {{ codice_stazione: [{}], corpo_idrico: [{}],\
+            regione: [{}], provincia: [{}], data: [{}], lunghezza_stazione: [{}],\
+            larghezza_stazione: [{}], tipo_comunita [{}], fonte [{}],\
+            numero_protocollo: [{}], idro_eco_regione: [{}],\
+            area_alpina: [{}], nome_bacino: [{}]}}",
+            self.codice_stazione, self.corpo_idrico, self.regione, self.provincia,
+            self.data, self.lunghezza_stazione, self.larghezza_stazione,
+            self.tipo_comunita, self.fonte, self.numero_protocollo,
+            self.idro_eco_regione, self.area_alpina, self.nome_bacino
+        );
+        write!(f, "{}", string_representation)
+    }
+}
+
+pub enum RecordCsvAnagraficaNISECIError {
+    ValoreInvalido { msg : String }, //TODO: add position?
+}
+
+impl fmt::Display for RecordCsvAnagraficaNISECIError {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    let string_representation = match self {
+      RecordCsvAnagraficaNISECIError::ValoreInvalido { msg } => format!("Errore record anagrafica NISECI: {}", msg),
+    };
+    write!(f, "{}", string_representation)
+  }
+}
+
+pub fn parse_csv_anagrafica_niseci<R>(mut rdr: csv::Reader<R>) -> (Vec<RecordCsvAnagraficaNISECI>, Vec<csv::Error>) where R: std::io::Read {
+    let mut records = Vec::new();
+    let mut errors = Vec::new();
+
+    for result in rdr.deserialize() {
+        match result {
+            Ok(record) => records.push(record),
+            Err(e) => errors.push(e),
+        }
+    }
+
+    (records, errors)
+}
+
+pub fn parse_recordcsv_anagrafica_niseci(records: Vec<RecordCsvAnagraficaNISECI>) -> Result<AnagraficaNISECI, Vec<RecordCsvAnagraficaNISECIError>> {
+    let mut errors = Vec::new();
+    if records.len() > 1 {
+        let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Troppi record: {}, atteso 1", records.len()) };
+        errors.push(err);
+    }
+    if records.len() < 1 {
+        let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Nessun record trovato: atteso 1") };
+        errors.push(err);
+        return Err(errors);
+    }
+
+    let r = records.get(0).unwrap();
+
+    if r.codice_stazione.len() < 1 {
+        let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Codice stazione troppo corto: {}", r.codice_stazione) };
+        errors.push(err);
+    }
+
+    if r.corpo_idrico.len() < 1 {
+        let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Corpo idrico troppo corto: {}", r.corpo_idrico) };
+        errors.push(err);
+    }
+
+    if r.regione.len() < 1 {
+        let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Regione troppo corta: {}", r.regione) };
+        errors.push(err);
+    }
+
+    if r.provincia.len() < 1 {
+        let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Provincia troppo corta: {}", r.provincia) };
+        errors.push(err);
+    }
+
+    match parse_date(&r.data) {
+        Ok(_) => {},
+        Err(e) => {
+            match e.kind() {
+                ParseErrorKind::OutOfRange => {
+                    let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Data fornita non valida: fuori range") };
+                    errors.push(err);
+                },
+                ParseErrorKind::Impossible => {
+                    let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Data fornita non valida: valori non possibili") };
+                    errors.push(err);
+                },
+                ParseErrorKind::NotEnough => {
+                    let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Data fornita non valida: specifica insufficiente") };
+                    errors.push(err);
+                },
+                ParseErrorKind::Invalid => {
+                    let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Data fornita non valida: presenza di caratteri non attesi") };
+                    errors.push(err);
+                },
+                ParseErrorKind::TooShort => {
+                    let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Data fornita non valida: terminazione prematura dell'input") };
+                    errors.push(err);
+                },
+                ParseErrorKind::TooLong => {
+                    let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Data fornita non valida: input in eccesso") };
+                    errors.push(err);
+                },
+                ParseErrorKind::BadFormat => {
+                    let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Data fornita non valida: errore nella specifica di formattazione") };
+                    errors.push(err);
+                },
+                _ => {
+                    let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Data fornita non valida: errore sconosciuto") };
+                    errors.push(err);
+                }
+            }
+        }
+    }
+
+    if r.lunghezza_stazione < 1 {
+        let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Lunghezza stazione troppo bassa: {}", r.lunghezza_stazione) };
+        errors.push(err);
+    }
+
+    if r.larghezza_stazione < 1 {
+        let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Larghezza stazione troppo bassa: {}", r.larghezza_stazione) };
+        errors.push(err);
+    }
+
+    let mut tipo_comunita = TipoComunitaNISECI::Redatta;
+    match r.tipo_comunita {
+        0 => { /* Redatta */ },
+        1 => {
+            tipo_comunita = TipoComunitaNISECI::Recuperata;
+        },
+        2 => {
+            tipo_comunita = TipoComunitaNISECI::Dm260_2010;
+        },
+        3 => {
+            tipo_comunita = TipoComunitaNISECI::AffinataDalMase;
+        },
+        _ => {
+            let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Tipo comunita NISECI non valido: {}, atteso [0, 3]", r.tipo_comunita) };
+            errors.push(err);
+        }
+    }
+
+    match tipo_comunita {
+        TipoComunitaNISECI::Recuperata => {
+            if r.fonte.len() < 1 {
+                let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Fonte troppo corta: {}", r.fonte) };
+                errors.push(err);
+            }
+        }
+        TipoComunitaNISECI::AffinataDalMase => {
+            if r.numero_protocollo.len() < 1 {
+                let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Numero protocollo troppo corto: {}", r.numero_protocollo) };
+                errors.push(err);
+            }
+        }
+        _ => {}
+    }
+
+    let mut idro_eco_regione = IdroEcoRegioneNISECI::Toscana;
+    idro_eco_regione = match r.idro_eco_regione {
+        0 => IdroEcoRegioneNISECI::AlpiCentroOrientali,
+        1 => IdroEcoRegioneNISECI::AlpiMediterranee,
+        2 => IdroEcoRegioneNISECI::AlpiMeridionali,
+        3 => IdroEcoRegioneNISECI::AlpiOccidentali,
+        4 => IdroEcoRegioneNISECI::AppenninoCentrale,
+        5 => IdroEcoRegioneNISECI::AppenninoMeridionale,
+        6 => IdroEcoRegioneNISECI::AppenninoPiemontese,
+        7 => IdroEcoRegioneNISECI::AppenninoSettentrionale,
+        8 => IdroEcoRegioneNISECI::BasilicataTavoliere,
+        9 => IdroEcoRegioneNISECI::BassoLazio,
+        10 => IdroEcoRegioneNISECI::CalabriaNebrodi,
+        11 => IdroEcoRegioneNISECI::Carso,
+        12 => IdroEcoRegioneNISECI::CostaAdriatica,
+        13 => IdroEcoRegioneNISECI::Monferrato,
+        14 => IdroEcoRegioneNISECI::PianuraPadana,
+        15 => IdroEcoRegioneNISECI::PrealpiDolomiti,
+        16 => IdroEcoRegioneNISECI::PugliaGargano,
+        17 => IdroEcoRegioneNISECI::RomaViterbeseVesuvio,
+        18 => IdroEcoRegioneNISECI::Sardegna,
+        19 => IdroEcoRegioneNISECI::Sicilia,
+        20 => IdroEcoRegioneNISECI::Toscana,
+        _ => {
+            let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("IdroEcoRegioneNISECI non valido: {}, atteso [0, 20]", r.idro_eco_regione) };
+            errors.push(err);
+            IdroEcoRegioneNISECI::Toscana // To still assign something by default
+        }
+    };
+
+    let mut area = AreaNISECI::Mediterranea;
+    if r.area_alpina > 0 {
+        area = AreaNISECI::Alpina;
+    }
+
+    if r.nome_bacino.len() < 1 {
+        let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Nome bacino troppo corto: {}", r.nome_bacino) };
+        errors.push(err);
+    }
+
+    if errors.len() > 0 {
+        return Err(errors);
+    }
+
+    let res = AnagraficaNISECI {
+        comunita: ComunitaNISECI {
+            tipo: tipo_comunita,
+            fonte: Some(r.fonte.clone()),
+            numero_protocollo: Some(r.numero_protocollo.clone()),
+        },
+        codice_stazione: r.codice_stazione.clone(),
+        date_string: r.data.clone(), // Formato gg/mm/aaaa
+        area: area,
+        corpo_idrico: r.corpo_idrico.clone(),
+        bacino_appartenenza: r.nome_bacino.clone(),
+        idro_eco_regione: idro_eco_regione,
+        posizione: Location {
+            regione: r.regione.clone(),
+            provincia: r.provincia.clone()
+        },
+        lunghezza_media_stazione: r.lunghezza_stazione as f32,
+        larghezza_media_stazione: r.larghezza_stazione as f32,
+    };
+    return Ok(res);
+
+}
+
+pub fn check_anagrafica_niseci_reader<R: Read>(reader: R) -> Result<Vec<RecordCsvAnagraficaNISECI>,Vec<csv::Error>> {
+    let rdr = csv::ReaderBuilder::new()
+        .delimiter(b';')
+        .from_reader(reader);
+    let (records, errors) = parse_csv_anagrafica_niseci(rdr);
+
+    println!("Anagrafica NISECI: Numero record csv validi: {}", records.len());
+    println!("Anagrafica NISECI: Numero record csv non validi: {}", errors.len());
+
+    if !errors.is_empty() {
+        /*
+        for error in &errors {
+            eprintln!("  {}", error);
+        }
+        */
+        let processed_errors = process_csv_errors(&errors, TipoRecordCsv::AnagraficaNISECI);
+        eprintln!("Errori incontrati durante l'elaborazione csv dell' anagrafica NISECI: {{");
+        for e in processed_errors {
+            eprintln!("{e}");
+        }
+        eprintln!("}}");
+        return Err(errors);
+    } else {
+        println!("Tutti i record csv dell'anagrafica NISECI sono stati processati con successo!");
+        /*
+        for record in &records {
+            println!("  Record: {{{record}}}");
+        }
+        */
+        return Ok(records);
+    }
+}
+
+pub fn check_records_anagrafica_niseci(records: Vec<RecordCsvAnagraficaNISECI>) -> Result<AnagraficaNISECI,Vec<RecordCsvAnagraficaNISECIError>> {
+
+    let res = parse_recordcsv_anagrafica_niseci(records);
+
+    match res {
+        Ok(anagrafica) => {
+            println!("Anagrafica NISECI: {}", anagrafica);
+            println!("Tutti i record dell'anagrafica NISECI sono stati processati con successo!");
+            /*
+            for record in &records {
+                println!("  Record: {{{record}}}");
+            }
+            */
+            return Ok(anagrafica);
+        }
+        Err(errors) => {
+            println!("Anagrafica NISECI: Numero record non validi: {}", errors.len());
+            eprintln!("Errori incontrati durante l'elaborazione dei record per anagrafica NISECI: {{");
+            //TODO: add process_record_anagraficaNISECI_errors()
+            for error in &errors {
+                eprintln!("  {}", error);
+            }
+            eprintln!("}}");
+            return Err(errors);
+        }
+    }
+}
+
+pub fn check_anagrafica_niseci_path(path: PathBuf) -> Result<Vec<RecordCsvAnagraficaNISECI>,Vec<csv::Error>> {
+    if !check_path_is_file_ends_with_csv(&path) {
+        eprintln!("Il file {} non è un .csv", path.display());
+        return Err(Vec::new());
+    }
+    let file = File::open(path).expect("Unable to open file");
+    return check_anagrafica_niseci_reader(file);
+}
+
 pub fn translate_error_message(msg: &str) -> String {
     if msg.starts_with("missing field") {
         msg.replace("missing field", "campo mancante")
@@ -671,6 +1002,13 @@ pub fn process_csv_errors(errors: &Vec<csv::Error>, tipo_csv: TipoRecordCsv) -> 
                             TipoRecordCsv::CampionamentoNISECI => {
                                 if field_idx < CAMPIONAMENTO_NISECI_HEADER_FIELDS.len() {
                                     field_str = format!("{} ({})", field_idx, CAMPIONAMENTO_NISECI_HEADER_FIELDS[field_idx]);
+                                } else {
+                                    field_str = "???".to_string();
+                                }
+                            }
+                            TipoRecordCsv::AnagraficaNISECI => {
+                                if field_idx < ANAGRAFICA_NISECI_HEADER_FIELDS.len() {
+                                    field_str = format!("{} ({})", field_idx, ANAGRAFICA_NISECI_HEADER_FIELDS[field_idx]);
                                 } else {
                                     field_str = "???".to_string();
                                 }

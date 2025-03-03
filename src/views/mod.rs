@@ -29,7 +29,7 @@ use crate::model::niseci::AnagraficaNISECI;
 use raylib::prelude::*;
 use rfd::FileDialog;
 use raylib::consts::GuiState::{STATE_NORMAL, STATE_DISABLED};
-use raylib::consts::GuiIconName::{ICON_FILE_OPEN, ICON_BIN};
+use raylib::consts::GuiIconName::{ICON_FILE_OPEN, ICON_BIN, ICON_OK_TICK, ICON_CROSS};
 use std::ffi::CString;
 
 // A view responsible for rendering the state
@@ -226,8 +226,8 @@ impl SelezioneFileInputView {
         let current_index = match controller.get_current_index() {
             Some(index) => index,
             None => {
-                eprintln!("Indice non selezionato");
-                exit(1)
+                eprintln!("SelezioneFileInputView: Per qualche assurdo motivo l'indice corrente non è validato. Uso NISECI.");
+                Indice::NISECI
             }
         };
 
@@ -453,8 +453,8 @@ impl ValidazioneFileInputView {
 }
 
 pub struct SelezioneInfoAggiuntiveView {
-    valuebox_codice_stazione_edit_mode: bool,
-    valuebox_codice_stazione_value: i32,
+    textbox_codice_stazione_edit_mode: bool,
+    textbox_codice_stazione_buffer: [u8; 64],
     textbox_corpo_idrico_edit_mode: bool,
     textbox_corpo_idrico_buffer: [u8; 64],
     listview_regione_value: i32,
@@ -483,6 +483,11 @@ pub struct SelezioneInfoAggiuntiveView {
 impl SelezioneInfoAggiuntiveView {
 
     pub fn new() -> Self {
+        let mut codice_stazione_buffer = [0u8; 64];
+        let codice_stazione_buffer_bytes = "Inserisci codice stazione".as_bytes();
+        let codice_stazione_buffer_len = codice_stazione_buffer_bytes.len().min(64);
+        codice_stazione_buffer[..codice_stazione_buffer_len].copy_from_slice(&codice_stazione_buffer_bytes[..codice_stazione_buffer_len]);
+
         let mut corpo_idrico_buffer = [0u8; 64];
         let corpo_idrico_buffer_bytes = "Inserisci nome".as_bytes();
         let corpo_idrico_buffer_len = corpo_idrico_buffer_bytes.len().min(64);
@@ -518,8 +523,8 @@ impl SelezioneInfoAggiuntiveView {
         bacino_buffer[..bacino_buffer_len].copy_from_slice(&bacino_buffer_bytes[..bacino_buffer_len]);
 
         Self {
-            valuebox_codice_stazione_edit_mode: false,
-            valuebox_codice_stazione_value: 0,
+            textbox_codice_stazione_edit_mode: false,
+            textbox_codice_stazione_buffer: codice_stazione_buffer,
             textbox_corpo_idrico_edit_mode: false,
             textbox_corpo_idrico_buffer: corpo_idrico_buffer,
             listview_regione_value: 0,
@@ -575,13 +580,15 @@ impl SelezioneInfoAggiuntiveView {
             Some(rstr!("Inserisci informazioni aggiuntive"))
         );
 
-        let submit_width = propwidth(&d, 50);
+        let submit_width = propwidth(&d, 100);
         let groupbox_x_end = groupbox_x + groupbox_width;
         let submit_x = groupbox_x_end + (d.get_screen_width() - groupbox_x_end)/2 - submit_width/2;
-        let submit_height = submit_width;
+        let submit_height = propheight(&d, 50);
         let submit_y = d.get_screen_height() /2 - submit_height /2;
 
-        if d.gui_button(rrect(submit_x, submit_y, submit_width, submit_height), Some(rstr!("Conferma"))) {
+        let confirm_itext = d.gui_icon_text(ICON_OK_TICK, Some(rstr!("Conferma")));
+        let confirm_itext = CString::new(confirm_itext).unwrap();
+        if d.gui_button(rrect(submit_x, submit_y, submit_width, submit_height), Some(confirm_itext.as_c_str())) {
 
             //TODO: impl TryInto<u32> for a new custom RegioneItaliana or smth ?
             //But this was request as a free string originally...
@@ -624,7 +631,26 @@ impl SelezioneInfoAggiuntiveView {
             };
             let larghezza_stazione = self.valuebox_larghezza_stazione_value;
             let lunghezza_stazione = self.valuebox_lunghezza_stazione_value;
-            let codice_stazione = self.valuebox_codice_stazione_value;
+
+            // Raylib has trouble handling the string downstream if we don't ensure to do this
+            let end = self.textbox_codice_stazione_buffer.iter().position(|&b| b == 0).unwrap_or(self.textbox_codice_stazione_buffer.len());
+            let codice_stazione = match String::from_utf8(self.textbox_codice_stazione_buffer[..end].to_vec()) {
+                Ok(s) => s,
+                Err(_) => {
+                    //TODO: signal error: invalid UTF-8
+                    "ERROR".to_string()
+                }
+            };
+
+            // Raylib has trouble handling the string downstream if we don't ensure to do this
+            let end = self.textbox_data_buffer.iter().position(|&b| b == 0).unwrap_or(self.textbox_data_buffer.len());
+            let date_string = match String::from_utf8(self.textbox_data_buffer[..end].to_vec()) {
+                Ok(s) => s,
+                Err(_) => {
+                    //TODO: signal error: invalid UTF-8
+                    "ERROR".to_string()
+                }
+            };
 
             // Raylib has trouble handling the string downstream if we don't ensure to do this
             let end = self.textbox_corpo_idrico_buffer.iter().position(|&b| b == 0).unwrap_or(self.textbox_corpo_idrico_buffer.len());
@@ -728,9 +754,10 @@ impl SelezioneInfoAggiuntiveView {
 
             let anagrafica = AnagraficaNISECI {
                 comunita: comunita,
-                codice_stazione: codice_stazione as u32,
+                codice_stazione: codice_stazione,
+                date_string: date_string,
                 area: area,
-                nome_fiume: corpo_idrico,
+                corpo_idrico: corpo_idrico,
                 bacino_appartenenza: bacino_niseci,
                 idro_eco_regione: idro_ecoregione_niseci,
                 posizione: posizione,
@@ -845,20 +872,17 @@ impl SelezioneInfoAggiuntiveView {
         let column_1_boxes_height = column_1_labels_height;
         let column_1_boxes_x = column_1_labels_x + column_1_labels_width;
 
-        if d.gui_value_box(
+        if d.gui_text_box(
             rrect(
                 column_1_boxes_x,
                 column_1_label_stazione_y,
                 column_1_boxes_width,
                 column_1_boxes_height
             ),
-            None,
-            &mut self.valuebox_codice_stazione_value,
-            0,
-            100000, //TODO: ask a reasonable max for this
-            self.valuebox_codice_stazione_edit_mode
+            &mut self.textbox_codice_stazione_buffer,
+            self.textbox_codice_stazione_edit_mode
         ) {
-            self.valuebox_codice_stazione_edit_mode = !self.valuebox_codice_stazione_edit_mode;
+            self.textbox_codice_stazione_edit_mode = !self.textbox_codice_stazione_edit_mode;
         }
         if d.gui_text_box(
             rrect(
@@ -1284,6 +1308,8 @@ impl ValidazioneInfoAggiuntiveView {
             }
         }
 
+        let indietro_itext = d.gui_icon_text(ICON_CROSS, Some(rstr!("Indietro")));
+        let indietro_itext = CString::new(indietro_itext).unwrap();
         if d.gui_button(
             rrect(
                 button_backout_x,
@@ -1291,7 +1317,7 @@ impl ValidazioneInfoAggiuntiveView {
                 button_backout_width,
                 button_backout_height,
             ),
-            Some(rstr!("Indietro"))
+            Some(indietro_itext.as_c_str())
         ) {
             //Ask controller to go back and edit further
             match current_index {
@@ -1323,7 +1349,16 @@ impl ProduzioneOutputView {
 
         d.clear_background(main_state.default_bg_color);
 
-        let _state = controller.get_state();
+        let state = controller.get_state();
+        let current_index = match controller.get_current_index() {
+            Some(index) => index,
+            None => {
+                eprintln!("ProduzioneOutputView: Per qualche assurdo motivo l'indice corrente non è validato. Uso NISECI.");
+                Indice::NISECI
+            }
+        };
+
+        let groupbox_width = propwidth(&d, 600);
         let button_calcola_width = propwidth(&d, 200);
         let button_calcola_x = d.get_screen_width() / 2 - button_calcola_width /2;
         let button_calcola_height = propwidth(&d, 50);
@@ -1359,7 +1394,39 @@ impl ProduzioneOutputView {
             Some(rstr!("Calcola"))
         ) {
             //TODO: calcola indice
-            println!("TODO: call controller to update model.");
+            match current_index {
+                Indice::NISECI => {
+                    controller.calc_niseci();
+                },
+                Indice::HFBI => {
+                    //TODO: add this
+                    println!("TODO: add this.");
+                    //controller.calc_hfbi();
+                }
+            }
+        }
+
+        let submit_width = propwidth(&d, 100);
+        let groupbox_x_end = groupbox_x + groupbox_width;
+        let submit_x = groupbox_x_end + (d.get_screen_width() - groupbox_x_end)/2 - submit_width/2;
+        let submit_height = propheight(&d, 50);
+        let submit_y = d.get_screen_height() /2 - submit_height /2;
+
+        let confirm_itext = d.gui_icon_text(ICON_OK_TICK, Some(rstr!("Conferma")));
+        let confirm_itext = CString::new(confirm_itext).unwrap();
+
+        let done_calc = controller.get_is_done_calc();
+
+        if !done_calc {
+            d.gui_lock();
+            d.gui_set_state(STATE_DISABLED);
+        }
+        if d.gui_button(rrect(submit_x, submit_y, submit_width, submit_height), Some(confirm_itext.as_c_str())) {
+            controller.user_confirm_calc();
+        }
+        if !done_calc {
+            d.gui_set_state(STATE_NORMAL);
+            d.gui_unlock();
         }
 
         d.gui_panel(
@@ -1369,8 +1436,77 @@ impl ProduzioneOutputView {
                 panel_width,
                 panel_height
             ),
-            Some(rstr!("TODO: Output qui"))
+            Some(rstr!("Output"))
         );
+
+        match current_index {
+            Indice::NISECI => {
+                let y_spacing = main_state.current_font_height *2;
+                let niseci_opt = controller.get_niseci_value();
+                let niseci_str = match niseci_opt {
+                    Some(v) => {
+                        format!("{}", v)
+                    }
+                    None => {
+                        format!("Non calcolato")
+                    }
+                };
+                let niseci_line = format!("NISECI: {}", niseci_str);
+                d.draw_text_ex(
+                    &main_state.current_font,
+                    &niseci_line,
+                    // We use propwidth/height for the text starting position:
+                    // this is not the bound
+                    Vector2::new((panel_x + propwidth(&d, 25)) as f32, (panel_y + (y_spacing * 2)) as f32),
+                    main_state.current_font_height as f32,
+                    main_state.default_txt_spacing as f32,
+                    main_state.default_txt_color
+                );
+                let rqe_niseci_opt = controller.get_rqe_niseci_value();
+                let rqe_niseci_str = match rqe_niseci_opt {
+                    Some(v) => {
+                        format!("{}", v)
+                    }
+                    None => {
+                        format!("Non calcolato")
+                    }
+                };
+                let rqe_line = format!("RQE NISECI: {}", rqe_niseci_str);
+                d.draw_text_ex(
+                    &main_state.current_font,
+                    &rqe_line,
+                    // We use propwidth/height for the text starting position:
+                    // this is not the bound
+                    Vector2::new((panel_x + propwidth(&d, 25)) as f32, (panel_y + (y_spacing * 3)) as f32),
+                    main_state.current_font_height as f32,
+                    main_state.default_txt_spacing as f32,
+                    main_state.default_txt_color
+                );
+                let stato_eco_niseci_opt = controller.get_stato_eco_niseci_value();
+                let stato_eco_niseci_str = match stato_eco_niseci_opt {
+                    Some(v) => {
+                        format!("{}", v)
+                    }
+                    None => {
+                        format!("Non calcolato")
+                    }
+                };
+                let stato_eco_line = format!("STATO ECOLOGICO NISECI: {}", stato_eco_niseci_str);
+                d.draw_text_ex(
+                    &main_state.current_font,
+                    &stato_eco_line,
+                    // We use propwidth/height for the text starting position:
+                    // this is not the bound
+                    Vector2::new((panel_x + propwidth(&d, 25)) as f32, (panel_y + (y_spacing * 4)) as f32),
+                    main_state.current_font_height as f32,
+                    main_state.default_txt_spacing as f32,
+                    main_state.default_txt_color
+                );
+            },
+            Indice::HFBI => {
+                todo!("Implement this!");
+            }
+        }
     }
 }
 

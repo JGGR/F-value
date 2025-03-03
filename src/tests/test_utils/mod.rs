@@ -15,9 +15,29 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::model::niseci::{CampionamentoNISECI, RecordNISECI, RiferimentoNISECI, SpecieNISECI};
+use crate::model::{niseci::{CampionamentoNISECI, RecordNISECI, RiferimentoNISECI, SpecieNISECI, TipoComunitaNISECI, ComunitaNISECI, AreaNISECI, IdroEcoRegioneNISECI, AnagraficaNISECI}, location::Location};
 
-
+pub fn create_dummy_anagrafica() -> AnagraficaNISECI {
+    return AnagraficaNISECI {
+        comunita: ComunitaNISECI {
+            tipo: TipoComunitaNISECI::Redatta,
+            fonte: None,
+            numero_protocollo: None,
+        },
+        codice_stazione: "foo".to_string(),
+        date_string: "foo".to_string(),
+        area: AreaNISECI::Alpina,
+        corpo_idrico: "foo".to_string(),
+        bacino_appartenenza: "foo".to_string(),
+        idro_eco_regione: IdroEcoRegioneNISECI::Toscana,
+        posizione: Location {
+            regione: "foo".to_string(),
+            provincia: "foo".to_string(),
+        },
+        lunghezza_media_stazione: 0.0,
+        larghezza_media_stazione: 0.0,
+    };
+}
 
 pub fn create_dummy_riferimento() -> RiferimentoNISECI {
   let importante_1 = SpecieNISECI {
@@ -437,7 +457,7 @@ pub fn create_dummy_campionamento_chopped() -> CampionamentoNISECI {
   }
 }
 
-/// In questo campionamento troverai: 
+/// In questo campionamento troverai:
 /// -> C1
 ///   -> 10 ciacci cl5
 ///   -> 10 ciacci cl4
@@ -458,11 +478,11 @@ pub fn create_massive_campionamento_ciacci() -> CampionamentoNISECI {
     peso: 2
   };
   c.campionamento.push(trocchio);
-  
+
   c
 }
 
-/// In questo campionamento troverai: 
+/// In questo campionamento troverai:
 /// -> C1
 ///   -> 10 ciacci cl5
 ///   -> 10 ciacci cl4
@@ -484,11 +504,11 @@ pub fn create_massive_campionamento_ciacci_2() -> CampionamentoNISECI {
     peso: 2
   };
   c.campionamento.push(trocchio);
-  
+
   c
 }
 
-/// In questo campionamento troverai: 
+/// In questo campionamento troverai:
 /// -> C1
 ///   -> 10 ciacci cl5
 ///   -> 10 ciacci cl4
@@ -501,7 +521,7 @@ pub fn create_massive_campionamento_ciacci_solo_autoctoni_2() -> CampionamentoNI
   let mut ciaccio = get_ciaccio();
   ciaccio.dens_soglia1 = 3.0;
   ciaccio.dens_soglia2 = 5.0;
-  
+
   let mut campionamento: Vec<RecordNISECI> = Vec::with_capacity(45);
 
   // 10 ciacci cl5 in c1
@@ -514,7 +534,7 @@ pub fn create_massive_campionamento_ciacci_solo_autoctoni_2() -> CampionamentoNI
   for _ in 0..10 {
     campionamento.push(ciaccio_cl5_c1.clone());
   }
-  
+
   // 10 ciacci cl4 in c1
   let ciaccio_cl4_c1 = RecordNISECI {
     specie: ciaccio.clone(),
@@ -558,13 +578,13 @@ pub fn create_massive_campionamento_ciacci_solo_autoctoni_2() -> CampionamentoNI
   for _ in 0..5 {
     campionamento.push(ciaccio_cl1_c2.clone());
   }
-  
+
   CampionamentoNISECI {
     campionamento: campionamento
   }
 }
 
-/// In questo campionamento troverai: 
+/// In questo campionamento troverai:
 /// -> C1
 ///   -> 10 ciacci cl5
 ///   -> 10 ciacci cl4
@@ -577,7 +597,7 @@ pub fn create_massive_campionamento_ciacci_solo_autoctoni_1() -> CampionamentoNI
   let mut ciaccio = get_ciaccio();
   ciaccio.dens_soglia1 = 3.0;
   ciaccio.dens_soglia2 = 5.0;
-  
+
   let mut campionamento: Vec<RecordNISECI> = Vec::with_capacity(45);
 
   // 10 ciacci cl5 in c1
@@ -590,7 +610,7 @@ pub fn create_massive_campionamento_ciacci_solo_autoctoni_1() -> CampionamentoNI
   for _ in 0..10 {
     campionamento.push(ciaccio_cl5_c1.clone());
   }
-  
+
   // 10 ciacci cl4 in c1
   let ciaccio_cl4_c1 = RecordNISECI {
     specie: ciaccio.clone(),
@@ -634,13 +654,13 @@ pub fn create_massive_campionamento_ciacci_solo_autoctoni_1() -> CampionamentoNI
   for _ in 0..5 {
     campionamento.push(ciaccio_cl1_c2.clone());
   }
-  
+
   CampionamentoNISECI {
     campionamento: campionamento
   }
 }
 
-/// In questo campionamento troverai: 
+/// In questo campionamento troverai:
 /// -> C1
 ///   -> 10 trocchi cl5
 ///   -> 10 trocchi cl4
@@ -652,11 +672,11 @@ pub fn create_massive_campionamento_solo_tipo_alloctono_1_strutt() -> Campioname
   let mut trocchio = get_trocchio();
   trocchio.dens_soglia1 = 3.0;
   trocchio.dens_soglia2 = 5.0;
-  
+
   create_campionamento_strutturato_data_una_specie(trocchio)
 }
 
-/// In questo campionamento troverai: 
+/// In questo campionamento troverai:
 /// -> C1
 ///   -> 10 bronzi cl5
 ///   -> 10 bronzi cl4
@@ -668,11 +688,11 @@ pub fn create_massive_campionamento_solo_tipo_alloctono_2_strutt() -> Campioname
   let mut bronzo = get_bronzo();
   bronzo.dens_soglia1 = 3.0;
   bronzo.dens_soglia2 = 5.0;
-  
+
   create_campionamento_strutturato_data_una_specie(bronzo)
 }
 
-/// In questo campionamento troverai: 
+/// In questo campionamento troverai:
 /// -> C1
 ///   -> 10 tappi cl5
 ///   -> 10 tappi cl4
@@ -684,11 +704,11 @@ pub fn create_massive_campionamento_solo_tipo_alloctono_3_strutt() -> Campioname
   let mut tappo = get_tappo();
   tappo.dens_soglia1 = 3.0;
   tappo.dens_soglia2 = 5.0;
-  
+
   create_campionamento_strutturato_data_una_specie(tappo)
 }
 
-/// In questo campionamento troverai: 
+/// In questo campionamento troverai:
 /// -> C1
 ///   -> 15 tappi cl5
 ///   -> 20 tappi cl4
@@ -698,11 +718,11 @@ pub fn create_massive_campionamento_solo_tipo_alloctono_3_destrutt() -> Campiona
   let mut tappo = get_tappo();
   tappo.dens_soglia1 = 3.0;
   tappo.dens_soglia2 = 5.0;
-  
+
   create_campionamento_destrutturato_data_una_specie(tappo)
 }
 
-/// In questo campionamento troverai: 
+/// In questo campionamento troverai:
 /// -> C1
 ///   -> 15 tappi cl5
 ///   -> 20 tappi cl4
@@ -713,12 +733,12 @@ pub fn create_massive_campionamento_solo_tipo_alloctono_3_mediam_strutt() -> Cam
   let mut tappo = get_tappo();
   tappo.dens_soglia1 = 3.0;
   tappo.dens_soglia2 = 5.0;
-  
+
   create_campionamento_mediam_strutturato_data_una_specie(tappo)
 }
 
 
-/// In questo campionamento troverai: 
+/// In questo campionamento troverai:
 /// -> C1
 ///   -> 10 ciacci cl5
 ///   -> 10 ciacci cl4
@@ -735,13 +755,13 @@ pub fn create_massive_campionamento_ciacci_con_trocchi_strutt() -> Campionamento
 
   let mut c_ciacci = create_massive_campionamento_ciacci_solo_autoctoni_1();
   let mut c_trocchi = create_massive_campionamento_solo_tipo_alloctono_1_strutt();
-  
+
   c_trocchi.campionamento.append(&mut c_ciacci.campionamento);
 
   c_trocchi
 }
 
-/// In questo campionamento troverai: 
+/// In questo campionamento troverai:
 /// -> C1
 ///   -> 10 ciacci cl5
 ///   -> 10 ciacci cl4
@@ -758,13 +778,13 @@ pub fn create_massive_campionamento_ciacci_con_bronzi_strutt() -> CampionamentoN
 
   let mut c_ciacci = create_massive_campionamento_ciacci_solo_autoctoni_1();
   let mut c_bronzi = create_massive_campionamento_solo_tipo_alloctono_2_strutt();
-  
+
   c_bronzi.campionamento.append(&mut c_ciacci.campionamento);
 
   c_bronzi
 }
 
-/// In questo campionamento troverai: 
+/// In questo campionamento troverai:
 /// -> C1
 ///   -> 10 ciacci cl5
 ///   -> 10 ciacci cl4
@@ -781,13 +801,13 @@ pub fn create_massive_campionamento_ciacci_con_tappi_strutt() -> CampionamentoNI
 
   let mut c_ciacci = create_massive_campionamento_ciacci_solo_autoctoni_1();
   let mut c_tappi = create_massive_campionamento_solo_tipo_alloctono_3_strutt();
-  
+
   c_tappi.campionamento.append(&mut c_ciacci.campionamento);
 
   c_tappi
 }
 
-/// In questo campionamento troverai: 
+/// In questo campionamento troverai:
 /// -> C1
 ///   -> 10 ciacci cl5
 ///   -> 10 ciacci cl4
@@ -802,13 +822,13 @@ pub fn create_massive_campionamento_ciacci_con_tappi_destrutt() -> Campionamento
 
   let mut c_ciacci = create_massive_campionamento_ciacci_solo_autoctoni_1();
   let mut c_tappi = create_massive_campionamento_solo_tipo_alloctono_3_destrutt();
-  
+
   c_tappi.campionamento.append(&mut c_ciacci.campionamento);
 
   c_tappi
 }
 
-/// In questo campionamento troverai: 
+/// In questo campionamento troverai:
 /// -> C1
 ///   -> 10 ciacci cl5
 ///   -> 10 ciacci cl4
@@ -824,13 +844,13 @@ pub fn create_massive_campionamento_ciacci_con_tappi_mediam_strutt() -> Campiona
 
   let mut c_ciacci = create_massive_campionamento_ciacci_solo_autoctoni_1();
   let mut c_tappi = create_massive_campionamento_solo_tipo_alloctono_3_mediam_strutt();
-  
+
   c_tappi.campionamento.append(&mut c_ciacci.campionamento);
 
   c_tappi
 }
 
-/// In questo campionamento troverai: 
+/// In questo campionamento troverai:
 /// -> C1
 ///   -> 10 esemplari cl5
 ///   -> 10 esemplari cl4
@@ -851,7 +871,7 @@ fn create_campionamento_strutturato_data_una_specie(specie: SpecieNISECI) -> Cam
   for _ in 0..10 {
     campionamento.push(cl5_c1.clone());
   }
-  
+
   // 10 esemplari cl4 in c1
   let cl4_c1 = RecordNISECI {
     specie: specie.clone(),
@@ -895,13 +915,13 @@ fn create_campionamento_strutturato_data_una_specie(specie: SpecieNISECI) -> Cam
   for _ in 0..5 {
     campionamento.push(cl1_c2.clone());
   }
-  
+
   CampionamentoNISECI {
     campionamento: campionamento
   }
 }
 
-/// In questo campionamento troverai: 
+/// In questo campionamento troverai:
 /// -> C1
 ///   -> 15 esemplari cl5
 ///   -> 20 esemplari cl4
@@ -920,7 +940,7 @@ fn create_campionamento_destrutturato_data_una_specie(specie: SpecieNISECI) -> C
   for _ in 0..10 {
     campionamento.push(cl5_c1.clone());
   }
-  
+
   // 10 esemplari cl4 in c1
   let cl4_c1 = RecordNISECI {
     specie: specie.clone(),
@@ -943,13 +963,13 @@ fn create_campionamento_destrutturato_data_una_specie(specie: SpecieNISECI) -> C
     campionamento.push(cl2_c2.clone());
   }
 
-  
+
   CampionamentoNISECI {
     campionamento: campionamento
   }
 }
 
-/// In questo campionamento troverai: 
+/// In questo campionamento troverai:
 /// -> C1
 ///   -> 15 esemplari cl5
 ///   -> 20 esemplari cl4
@@ -969,7 +989,7 @@ fn create_campionamento_mediam_strutturato_data_una_specie(specie: SpecieNISECI)
   for _ in 0..10 {
     campionamento.push(cl5_c1.clone());
   }
-  
+
   // 10 esemplari cl4 in c1
   let cl4_c1 = RecordNISECI {
     specie: specie.clone(),
@@ -1002,7 +1022,7 @@ fn create_campionamento_mediam_strutturato_data_una_specie(specie: SpecieNISECI)
   for _ in 0..5 {
     campionamento.push(cl1_c2.clone());
   }
-  
+
   CampionamentoNISECI {
     campionamento: campionamento
   }

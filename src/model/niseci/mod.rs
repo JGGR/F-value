@@ -273,9 +273,10 @@ impl fmt::Display for AreaNISECI {
 #[derive(Clone)]
 pub struct AnagraficaNISECI {
   pub comunita: ComunitaNISECI,
-  pub codice_stazione: u32,
+  pub codice_stazione: String,
+  pub date_string: String, // Formato gg/mm/aaaa
   pub area: AreaNISECI,
-  pub nome_fiume: String,
+  pub corpo_idrico: String,
   pub bacino_appartenenza: String,
   pub idro_eco_regione: IdroEcoRegioneNISECI,
   pub posizione: Location,
@@ -294,8 +295,8 @@ impl AnagraficaNISECI {
 
 impl fmt::Display for AnagraficaNISECI {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    let string_representation = format!("AnagraficaNISECI: {{ comunita: {{{}}}, codice_stazione {{{}}}, area: {{{}}}, nome_fiume: {{{}}}, bacino_appartenenza: {{{}}}, idro_eco_regione: {{{}}}, posizione: {{{}}}, lunghezza_stazione: {{{}}}, larghezza_stazione: {{{}}} }}",
-        self.comunita, self.codice_stazione, self.area, self.nome_fiume, self.bacino_appartenenza, self.idro_eco_regione, self.posizione, self.lunghezza_media_stazione, self.larghezza_media_stazione);
+    let string_representation = format!("AnagraficaNISECI: {{ comunita: {{{}}}, codice_stazione {{{}}}, area: {{{}}}, corpo_idrico: {{{}}}, bacino_appartenenza: {{{}}}, idro_eco_regione: {{{}}}, posizione: {{{}}}, lunghezza_stazione: {{{}}}, larghezza_stazione: {{{}}} }}",
+        self.comunita, self.codice_stazione, self.area, self.corpo_idrico, self.bacino_appartenenza, self.idro_eco_regione, self.posizione, self.lunghezza_media_stazione, self.larghezza_media_stazione);
     write!(f, "{}", string_representation)
   }
 }
@@ -359,6 +360,25 @@ pub struct RisultatoNISECI {
   valore: f32,
   rqe: f32,
   anagrafica: AnagraficaNISECI
+}
+
+impl RisultatoNISECI {
+    pub fn new(valore: f32, rqe: f32, anagrafica: AnagraficaNISECI) -> Self {
+        Self {
+            valore: valore,
+            rqe: rqe,
+            anagrafica: anagrafica,
+        }
+    }
+    pub fn get_valore(&self) -> f32 {
+        return self.valore;
+    }
+    pub fn get_rqe(&self) -> f32 {
+        return self.rqe;
+    }
+    pub fn get_anagrafica(&self) -> AnagraficaNISECI {
+        return self.anagrafica.clone();
+    }
 }
 
 
@@ -665,4 +685,27 @@ impl EsemplariPerCattura {
         }
     }
   }
+}
+
+/// enum per il risultato finale di un calcolo niseci
+/// (vedi calculate_stato_ecologico)
+pub enum StatoEcologicoNISECI {
+    Elevato,
+    Buono,
+    Moderato,
+    Scadente,
+    Cattivo
+}
+
+impl fmt::Display for StatoEcologicoNISECI {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let string_representation = match *self {
+            StatoEcologicoNISECI::Elevato => "Elevato",
+            StatoEcologicoNISECI::Buono => "Buono",
+            StatoEcologicoNISECI::Moderato => "Moderato",
+            StatoEcologicoNISECI::Scadente => "Scadente",
+            StatoEcologicoNISECI::Cattivo => "Cattivo",
+        };
+        write!(f, "{}", string_representation)
+    }
 }

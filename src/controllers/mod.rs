@@ -16,15 +16,17 @@
 */
 
 use crate::model::core::*;
-use crate::core::{MainState, TipoRecordCsv, check_campionamento_niseci_path, check_riferimento_niseci_path, check_records_riferimento_niseci, check_records_campionamento_niseci};
+use crate::core::{MainState, parse_date, TipoRecordCsv, check_campionamento_niseci_path, check_riferimento_niseci_path, check_records_riferimento_niseci, check_records_campionamento_niseci};
 use crate::model::index::Indice;
-use crate::model::niseci::{RiferimentoNISECI, CampionamentoNISECI, AnagraficaNISECI};
+use crate::model::niseci::{RiferimentoNISECI, CampionamentoNISECI, AnagraficaNISECI, TipoComunitaNISECI, RisultatoNISECI, StatoEcologicoNISECI};
 use crate::state::GLOBAL_STATE;
 use crate::CurrentView;
 use crate::process_csv_errors;
+use crate::engines::niseci::{full::{calculate_niseci, calculate_rqe_niseci, calculate_stato_ecologico}, x1::calculate_x1, x2::calculate_x2, x3::calculate_x3};
 use raylib::RaylibHandle;
 use std::path::PathBuf;
 use raylib::consts::KeyboardKey::*;
+use chrono::format::ParseErrorKind;
 
 // Controller to update and access the state
 pub struct HomeController;
@@ -438,6 +440,14 @@ impl InfoAggiuntiveController {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.infoaggiuntive_model.increment_frame_counter();
 
+        if state.infoaggiuntive_model.get_errors_occurred() {
+            eprintln!("InfoAggiuntiveController:  Errors occurred");
+            eprintln!("InfoAggiuntiveController:  Let's update current view and go to CONSOLE.");
+            main_state.set_current_view(CurrentView::CONSOLE);
+            eprintln!("InfoAggiuntiveController:  Clearing error state");
+            state.infoaggiuntive_model.set_errors_occurred(false);
+        }
+
         let current_indice;
         if let Some(idx) = state.indice_model.get_selected_index() {
             current_indice = idx;
@@ -494,6 +504,11 @@ impl InfoAggiuntiveController {
         return state.indice_model.get_selected_index();
     }
 
+    pub fn get_data_anagrafica_niseci(&self) -> Option<AnagraficaNISECI> {
+        let state = GLOBAL_STATE.lock().unwrap();
+        return state.data_model.get_anagrafica_niseci();
+    }
+
     pub fn submit_anagrafica_niseci(&self, anagrafica: AnagraficaNISECI) {
         self.set_console_env(("anagrafica_niseci".to_string(), format!("{anagrafica}")));
         self.add_console_message("InfoAggiuntiveController: L'utente ha completato l'inserimento info aggiuntive.".to_string());
@@ -505,21 +520,115 @@ impl InfoAggiuntiveController {
     }
 
     pub fn valida_anagrafica_niseci(&self) {
-        let mut state = GLOBAL_STATE.lock().unwrap();
-        assert!(state.infoaggiuntive_model.is_done_editing());
 
-        if let Some(anagrafica) = state.data_model.get_anagrafica_niseci() {
-            //TODO: check validity
-            //let valid = true;
-            //if valid {
+        {
+            let mut state = GLOBAL_STATE.lock().unwrap();
+            assert!(state.infoaggiuntive_model.is_done_editing());
+        }
+
+        if let Some(anagrafica) = self.get_data_anagrafica_niseci() {
+            let mut errors: Vec<String> = Vec::new();
+
+            if anagrafica.codice_stazione.len() < 1 {
+                errors.push(format!("Codice stazione troppo corto"));
+            }
+
+            if anagrafica.corpo_idrico.len() < 1 {
+                errors.push(format!("Nome fiume troppo corto"));
+            }
+
+            if anagrafica.posizione.regione.len() < 1 {
+                errors.push(format!("Nome regione troppo corto"));
+            }
+
+            if anagrafica.posizione.provincia.len() < 1 {
+                errors.push(format!("Nome provincia troppo corto"));
+            }
+
+            match parse_date(&anagrafica.date_string) {
+                Ok(_) => {},
+                Err(e) => {
+                    match e.kind() {
+                        ParseErrorKind::OutOfRange => {
+                            errors.push(format!("Data fornita non valida: fuori range"));
+                        },
+                        ParseErrorKind::Impossible => {
+                            errors.push(format!("Data fornita non valida: valori non possibili"));
+                        },
+                        ParseErrorKind::NotEnough => {
+                            errors.push(format!("Data fornita non valida: specifica insufficiente"));
+                        },
+                        ParseErrorKind::Invalid => {
+                            errors.push(format!("Data fornita non valida: presenza di caratteri non attesi"));
+                        },
+                        ParseErrorKind::TooShort => {
+                            errors.push(format!("Data fornita non valida: terminazione prematura dell'input"));
+                        },
+                        ParseErrorKind::TooLong => {
+                            errors.push(format!("Data fornita non valida: input in eccesso"));
+                        },
+                        ParseErrorKind::BadFormat => {
+                            errors.push(format!("Data fornita non valida: errore nella specifica di formattazione"));
+                        },
+                        _ => {
+                            errors.push(format!("Data fornita non valida: errore sconosciuto"));
+                        }
+                    }
+                }
+            }
+
+            if (anagrafica.get_lunghezza_media() - 0.0) < 1e-6 {
+                errors.push(format!("Lunghezza media troppo bassa: {}", anagrafica.get_lunghezza_media()));
+            }
+
+            if (anagrafica.get_larghezza_media() - 0.0) < 1e-6 {
+                errors.push(format!("Larghezza media troppo bassa: {}", anagrafica.get_larghezza_media()));
+            }
+
+            match anagrafica.comunita.tipo {
+                TipoComunitaNISECI::Recuperata => {
+                    if let Some(fonte) = anagrafica.comunita.fonte {
+                        if fonte.len() < 1 {
+                            errors.push(format!("Fonte troppo corta"));
+                        }
+                    } else {
+                        errors.push(format!("Fonte mancante"));
+                    }
+                }
+                TipoComunitaNISECI::AffinataDalMase => {
+                    if let Some(num_proto) = anagrafica.comunita.numero_protocollo {
+                        if num_proto.len() < 1 {
+                            errors.push(format!("Numero protocollo troppo corto"));
+                        }
+                    } else {
+                        errors.push(format!("Numero protocollo mancante"));
+                    }
+                }
+                _ => {}
+            }
+
+            if anagrafica.bacino_appartenenza.len() < 1 {
+                errors.push(format!("Nome bacino di appartenenza troppo corto"));
+            }
+
+            for e in &errors {
+                self.add_console_message(format!("InfoAggiuntiveController:  {e}"));
+            }
+
+            let mut state = GLOBAL_STATE.lock().unwrap();
+
+            if errors.len() == 0 {
                 state.infoaggiuntive_model.set_valid(true);
-            //} else {
+            } else {
                 //TODO: handle validation errors
                 //Will probably switch to ConsoleView using an errors_occurred flag like ValidazioneFileInput
-                //state.infoaggiuntive_model.set_valid(false);
-            //}
+                state.infoaggiuntive_model.set_valid(false);
+                state.infoaggiuntive_model.set_errors_occurred(true);
+            }
         } else {
-            eprintln!("InfoAggiuntiveController: valida_anagrafica_niseci() ha ricevuto uno stato spurio.");
+            let err_msg = "InfoAggiuntiveController: valida_anagrafica_niseci() ha ricevuto uno stato spurio.";
+            eprintln!("{}", err_msg);
+            self.add_console_message(format!("InfoAggiuntiveController:  {err_msg}"));
         };
     }
 
@@ -558,15 +667,191 @@ impl OutputController {
         Self
     }
 
-    pub fn update(&self, _rl: &RaylibHandle, _main_state: &mut MainState) {
+    pub fn update(&self, _rl: &RaylibHandle, main_state: &mut MainState) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.output_model.increment_frame_counter();
+        if state.data_model.get_errors_occurred() {
+            eprintln!("OutputController:  Errors occurred");
+            eprintln!("OutputController:  Let's update current view and go to CONSOLE.");
+            main_state.set_current_view(CurrentView::CONSOLE);
+            eprintln!("OutputController:  Clearing error state");
+            state.data_model.set_errors_occurred(false);
+        }
+        match main_state.current_view {
+            CurrentView::ProduzioneOutput => {
+                if state.output_model.is_done_user_confirm() {
+                    eprintln!("OutputController:  User confirmed");
+                    eprintln!("OutputController:  Let's update current view and go to ProduzionePDF.");
+                    main_state.set_current_view(CurrentView::ProduzionePDF);
+                }
+            }
+            CurrentView::ProduzionePDF => {
+
+            }
+            _ => {}
+        }
     }
 
     pub fn get_state(&self) -> OutputModel {
         let state = GLOBAL_STATE.lock().unwrap();
         return state.output_model.clone();
     }
+
+    pub fn get_is_done_calc(&self) -> bool {
+        let state = GLOBAL_STATE.lock().unwrap();
+        return state.output_model.is_done_calc();
+    }
+
+    pub fn get_niseci_value(&self) -> Option<f32> {
+        if self.get_is_done_calc() {
+            let state = GLOBAL_STATE.lock().unwrap();
+            let opt_res = state.data_model.get_risultato_niseci();
+            match opt_res {
+                Some(r) => {
+                    return Some(r.get_valore());
+                }
+                None => {
+                    return None;
+                }
+            }
+        } else {
+            return None;
+        }
+    }
+
+    pub fn get_rqe_niseci_value(&self) -> Option<f32> {
+        if self.get_is_done_calc() {
+            let state = GLOBAL_STATE.lock().unwrap();
+            let opt_res = state.data_model.get_risultato_niseci();
+            match opt_res {
+                Some(r) => {
+                    return Some(calculate_rqe_niseci(r.get_valore()));
+                }
+                None => {
+                    return None;
+                }
+            }
+        } else {
+            return None;
+        }
+    }
+
+    pub fn get_stato_eco_niseci_value(&self) -> Option<StatoEcologicoNISECI> {
+        if self.get_is_done_calc() {
+            let state = GLOBAL_STATE.lock().unwrap();
+            let opt_res = state.data_model.get_risultato_niseci();
+            match opt_res {
+                Some(r) => {
+                    let opt_anagrafica = state.data_model.get_anagrafica_niseci();
+                    match opt_anagrafica {
+                        Some(anagr) => {
+                            return Some(calculate_stato_ecologico(r.get_valore(), &anagr.area));
+                        }
+                        None => {
+                            return None;
+                        }
+                    }
+                }
+                None => {
+                    return None;
+                }
+            }
+        } else {
+            return None;
+        }
+    }
+
+    pub fn get_current_index(&self) -> Option<Indice> {
+        let state = GLOBAL_STATE.lock().unwrap();
+        return state.indice_model.get_selected_index();
+    }
+
+    pub fn calc_niseci(&self) {
+        let mut riferimento = None;
+        let mut campionamento = None;
+        let mut anagrafica = None;
+        {
+            let state = GLOBAL_STATE.lock().unwrap();
+            riferimento = state.data_model.get_riferimento_niseci();
+            campionamento = state.data_model.get_campionamento_niseci();
+            anagrafica = state.data_model.get_anagrafica_niseci();
+        }
+
+        let mut valid = true;
+
+        if riferimento.is_none() {
+            // Implementation error, this should never happen
+            valid = false;
+            self.add_console_message(format!("IMPLEMENTATION ERROR: riferimento niseci was None in calc_niseci()"));
+        }
+        if campionamento.is_none() {
+            // Implementation error, this should never happen
+            valid = false;
+            self.add_console_message(format!("IMPLEMENTATION ERROR: campionamento niseci was None in calc_niseci()"));
+        }
+        if anagrafica.is_none() {
+            // Implementation error, this should never happen
+            valid = false;
+            self.add_console_message(format!("IMPLEMENTATION ERROR: anagrafica niseci was None in calc_niseci()"));
+        }
+        if valid {
+            let riferimento = riferimento.expect("calc_niseci() checked is_none() before");
+            let campionamento = campionamento.expect("calc_niseci() checked is_none() before");
+            let anagrafica = anagrafica.expect("calc_niseci() checked is_none() before");
+
+            match calculate_niseci(&campionamento, &riferimento, &anagrafica) {
+                Ok(niseci) => {
+                    self.add_console_message(format!("NISECI: {niseci}"));
+
+                    let rqe_niseci = calculate_rqe_niseci(niseci);
+                    self.add_console_message(format!("RQE NISECI: {rqe_niseci}"));
+
+                    let stato_ecologico = calculate_stato_ecologico(niseci, &anagrafica.area);
+                    self.add_console_message(format!("Stato ecologico: {stato_ecologico}"));
+
+                    //TODO: recalculation of x1, x2, x3 is only used for richer console output ATM
+                    //Maybe should be removed later
+                    let x1 = calculate_x1(&campionamento, &riferimento);
+                    let x2 = calculate_x2(&campionamento, &anagrafica).unwrap();
+                    let x3 = calculate_x3(&campionamento).unwrap();
+                    self.add_console_message(format!("x1: {x1}"));
+                    self.add_console_message(format!("x2: {x2}"));
+                    self.add_console_message(format!("x3: {x3}"));
+
+                    let risultato_niseci = RisultatoNISECI::new(
+                        niseci,
+                        rqe_niseci,
+                        anagrafica
+                    );
+
+                    let mut state = GLOBAL_STATE.lock().unwrap();
+                    state.data_model.set_risultato_niseci(Some(risultato_niseci));
+                    state.output_model.set_done_calc(true);
+                    println!("OutputController: Finished NISECI calc");
+                },
+                Err(niseci_errors) => {
+                    for e in niseci_errors {
+                        self.add_console_message(format!("Errore durante il calcolo NISECI: {}", e));
+                    }
+                    let mut state = GLOBAL_STATE.lock().unwrap();
+                    state.data_model.set_errors_occurred(true);
+                    state.output_model.set_done_calc(false);
+                    state.data_model.set_risultato_niseci(None);
+                }
+            }
+        } else {
+            self.add_console_message(format!("IMPLEMENTATION ERROR: spurious state in calc_niseci()"));
+            let mut state = GLOBAL_STATE.lock().unwrap();
+            state.data_model.set_errors_occurred(true);
+        }
+    }
+
+    pub fn user_confirm_calc(&self) {
+        let mut state = GLOBAL_STATE.lock().unwrap();
+
+        state.output_model.set_done_user_confirm(true);
+    }
+
     pub fn add_console_message(&self, msg: String) {
         let mut state = GLOBAL_STATE.lock().unwrap();
 

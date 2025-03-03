@@ -161,6 +161,7 @@ pub struct InfoAggiuntiveModel {
     frame_counter: u32,
     done_editing: bool,
     valid: bool,
+    errors_occurred: bool,
 }
 
 impl InfoAggiuntiveModel {
@@ -187,12 +188,22 @@ impl InfoAggiuntiveModel {
     pub fn set_valid(&mut self, val: bool) {
         self.valid = val;
     }
+
+    pub fn get_errors_occurred(&self) -> bool {
+        return self.errors_occurred;
+    }
+
+    pub fn set_errors_occurred(&mut self, val: bool) {
+        self.errors_occurred = val;
+    }
 }
 
 // State struct holding non-`Copy` types
 #[derive(Clone)]
 pub struct OutputModel {
     frame_counter: u32,
+    done_calc: bool,
+    done_user_confirm: bool,
 }
 
 impl OutputModel {
@@ -201,6 +212,22 @@ impl OutputModel {
     }
     pub fn increment_frame_counter(&mut self) {
         self.frame_counter += 1;
+    }
+
+    pub fn is_done_calc(&self) -> bool {
+        return self.done_calc;
+    }
+
+    pub fn set_done_calc(&mut self, val: bool) {
+        self.done_calc = val;
+    }
+
+    pub fn is_done_user_confirm(&self) -> bool {
+        return self.done_user_confirm;
+    }
+
+    pub fn set_done_user_confirm(&mut self, val: bool) {
+        self.done_user_confirm = val;
     }
 }
 
@@ -230,13 +257,15 @@ pub struct DataModelNISECI {
 
 #[derive(Clone)]
 pub struct DataModel {
+    pub errors_occurred: bool,
     pub niseci: DataModelNISECI,
 }
 
 impl DataModel {
     pub fn new(niseci: DataModelNISECI) -> Self {
         Self {
-            niseci: niseci
+            errors_occurred: false,
+            niseci: niseci,
         }
     }
     pub fn get_riferimento_niseci(&self) -> Option<RiferimentoNISECI> {
@@ -262,6 +291,14 @@ impl DataModel {
     }
     pub fn set_risultato_niseci(&mut self, risultato: Option<RisultatoNISECI>) {
         self.niseci.risultato = risultato;
+    }
+
+    pub fn get_errors_occurred(&self) -> bool {
+        return self.errors_occurred;
+    }
+
+    pub fn set_errors_occurred(&mut self, val: bool) {
+        self.errors_occurred = val;
     }
 }
 
@@ -304,9 +341,12 @@ impl Model {
                 frame_counter: 0,
                 done_editing: false,
                 valid: false,
+                errors_occurred: false,
             },
             output_model: OutputModel {
                 frame_counter: 0,
+                done_calc: false,
+                done_user_confirm: false,
             },
             console_model: ConsoleModel {
                 console: Console::new(
@@ -323,6 +363,7 @@ impl Model {
                 name: "Initial".to_string(),
             },
             data_model: DataModel {
+                errors_occurred: false,
                 niseci: DataModelNISECI {
                     riferimento: None,
                     campionamento: None,

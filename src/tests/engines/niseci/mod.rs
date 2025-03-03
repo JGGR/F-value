@@ -23,3 +23,5 @@ mod x1;
 mod x2;
 #[cfg(test)]
 mod x3;
+#[cfg(test)]
+mod full;
