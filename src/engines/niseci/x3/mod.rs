@@ -15,16 +15,16 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use std::collections::{hash_map::Entry, HashMap};
+use std::collections::hash_map::Entry;
 
-use crate::model::niseci::{CampionamentoNISECI, ClassiEtaAlieniNISECI, ClassiEtaSpecieNISECI, InfoPopolazioniAlieneNISECI, InfoPopolazioniNISECI};
+use crate::model::niseci::{CampionamentoNISECI, ClassiEtaAlieniNISECI, ClassiEtaSpecieNISECI, InfoPopolazioniAlieneNISECI};
 
 
 
 pub fn calculate_x3(c: &CampionamentoNISECI) -> Result<f32, Vec<String>> {
 
   let alieni_indigeni = c.get_numero_pesci_alieni_e_indigeni();
-  
+
   // condizione 1
   if alieni_indigeni.alieni == 0 {
     return Ok(1.0);
@@ -67,7 +67,7 @@ pub fn calculate_x3(c: &CampionamentoNISECI) -> Result<f32, Vec<String>> {
 }
 
 fn calculate_classi_eta_alieni(c: &CampionamentoNISECI) -> ClassiEtaAlieniNISECI {
-  
+
   let mut classi_eta = ClassiEtaAlieniNISECI::new();
 
   // riempo l'hashmap con solo le specie alloctone campionate
@@ -126,12 +126,12 @@ fn calculate_a(info: &InfoPopolazioniAlieneNISECI) -> f32 {
   if info.tipo_3.tot_species != 0 && info.tipo_3.tot_species < info.tot_specie_autoctone {
     return 0.85;
   }
-  
+
   1.0
 }
 
 fn calculate_b(info: &InfoPopolazioniAlieneNISECI) -> f32 {
-  
+
   let specie_mediamente_strutt = info.get_species_mediamente_strutt();
   let species_destrutt = info.get_species_destrutt();
 
@@ -154,21 +154,21 @@ pub mod tests {
     info_aliene.tipo_2.species_destrutt = 20;
     info_aliene.tipo_3.species_strutt = 20;
     info_aliene.tot_specie_aliene = 50;
-    
+
     let b = calculate_b(&info_aliene);
-    
+
     assert_eq!(b, 0.6);
-    
-    
+
+
     info_aliene.tipo_3.species_strutt = 0;
     info_aliene.tot_specie_aliene = 30;
-    
+
     let b = calculate_b(&info_aliene);
-    
+
     assert_eq!(b, 1.0);
-    
+
   }
-  
+
   #[test]
   fn calculate_b_tutte_mediam_strutt() {
     let mut info_aliene = InfoPopolazioniAlieneNISECI::new();
@@ -176,20 +176,20 @@ pub mod tests {
     info_aliene.tipo_2.species_mediamente_strutt = 20;
     info_aliene.tipo_3.species_strutt = 20;
     info_aliene.tot_specie_aliene = 50;
-    
+
     let b = calculate_b(&info_aliene);
-    
+
     assert_eq!(b, 0.3);
-    
-    
+
+
     info_aliene.tipo_3.species_strutt = 0;
     info_aliene.tot_specie_aliene = 30;
-    
+
     let b = calculate_b(&info_aliene);
-    
+
     assert_eq!(b, 0.5);
   }
-  
+
   #[test]
   fn calculate_b_miscellaneous() {
     let mut info_aliene = InfoPopolazioniAlieneNISECI::new();
@@ -201,10 +201,10 @@ pub mod tests {
     info_aliene.tot_specie_aliene = 80;
 
     let b = calculate_b(&info_aliene);
-    
+
     assert_eq!(b, 0.5625);
   }
-  
+
   /// if info.tipo_1.tot_species > 0 && info.tipo_1.popolazione_piu_strutt < 1.0 {
   ///   return 0.5;
   /// }
@@ -217,10 +217,10 @@ pub mod tests {
 
     let a = calculate_a(&info);
     assert_eq!(a, 0.5);
-    
+
     info.tipo_1.species_destrutt = 1;
     info.tipo_1.tot_species= 3;
-    
+
     let a = calculate_a(&info);
     assert_eq!(a, 0.5);
 
@@ -251,7 +251,7 @@ pub mod tests {
     let a = calculate_a(&info);
     assert_eq!(a, 0.75);
   }
-  
+
   /// if info.tipo_3.tot_species >= info.tot_specie_autoctone {
   ///   return 0.75;
   /// }
@@ -296,7 +296,7 @@ pub mod tests {
     info.tipo_1.popolazione_piu_strutt = 0.5;
     let a = calculate_a(&info);
     assert_eq!(a, 0.5);
-    
+
     info.tipo_1.species_destrutt = 1;
     info.tipo_1.tot_species= 3;
     let a = calculate_a(&info);

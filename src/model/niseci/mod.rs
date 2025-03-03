@@ -20,9 +20,11 @@ use std::collections::HashMap;
 use std::vec::Vec;
 use std::fmt;
 
-use crate::engines::niseci::linear_regression::Point;
-
 use super::location::Location;
+
+#[cfg(test)]
+use crate::engines::niseci::linear_regression::Point; // Needed by fishes_for_every_passage() only
+                                                      // in test builds
 
 #[derive(Debug, Clone)]
 pub struct SpecieNISECI {
@@ -130,6 +132,8 @@ impl fmt::Display for CampionamentoNISECI {
 }
 
 impl CampionamentoNISECI {
+
+    #[cfg(test)]
     pub fn fishes_for_every_passage(&self) -> Vec<Point<i32>> {
     let mut max_pass = 0;
     for record in self.campionamento.iter() {
@@ -261,10 +265,9 @@ pub enum AreaNISECI {
 
 impl fmt::Display for AreaNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut string_representation = format!("AreaNISECI: {{");
         let string_representation = match *self {
-            AreaNISECI::Alpina => "Alpina",
-            AreaNISECI::Mediterranea => "Mediterranea",
+            AreaNISECI::Alpina => format!("AreaNISECI: {{ Alpina }}"),
+            AreaNISECI::Mediterranea => format!("AreaNISECI: {{ Mediterranea }}"),
         };
         write!(f, "{}", string_representation)
     }
@@ -359,15 +362,13 @@ impl fmt::Display for IdroEcoRegioneNISECI {
 pub struct RisultatoNISECI {
   valore: f32,
   rqe: f32,
-  anagrafica: AnagraficaNISECI
 }
 
 impl RisultatoNISECI {
-    pub fn new(valore: f32, rqe: f32, anagrafica: AnagraficaNISECI) -> Self {
+    pub fn new(valore: f32, rqe: f32) -> Self {
         Self {
             valore: valore,
             rqe: rqe,
-            anagrafica: anagrafica,
         }
     }
     pub fn get_valore(&self) -> f32 {
@@ -375,9 +376,6 @@ impl RisultatoNISECI {
     }
     pub fn get_rqe(&self) -> f32 {
         return self.rqe;
-    }
-    pub fn get_anagrafica(&self) -> AnagraficaNISECI {
-        return self.anagrafica.clone();
     }
 }
 
@@ -587,6 +585,7 @@ pub struct InfoPopolazioniAlieneNISECI {
 
 impl InfoPopolazioniAlieneNISECI {
 
+  #[cfg(test)]
   pub fn new() -> InfoPopolazioniAlieneNISECI {
     InfoPopolazioniAlieneNISECI {
       tipo_1: InfoPopolazioniNISECI::new(),

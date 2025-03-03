@@ -238,7 +238,7 @@ pub struct ConsoleModel {
 }
 
 impl ConsoleModel {
-    pub fn get_name(&self) -> String {
+    pub fn _get_name(&self) -> String {
         return self.name.clone();
     }
 
@@ -262,7 +262,7 @@ pub struct DataModel {
 }
 
 impl DataModel {
-    pub fn new(niseci: DataModelNISECI) -> Self {
+    pub fn _new(niseci: DataModelNISECI) -> Self {
         Self {
             errors_occurred: false,
             niseci: niseci,

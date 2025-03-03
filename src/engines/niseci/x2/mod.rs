@@ -133,7 +133,7 @@ fn calculate_sommatoria_x2_b(c: &CampionamentoNISECI, anagrafica: &AnagraficaNIS
   Ok(sommatoria_x2_b) // finally
 }
 
-fn update_classi_eta(cl: &mut ClassiEtaSpecieNISECI, record: &RecordNISECI) -> () {
+fn _update_classi_eta(cl: &mut ClassiEtaSpecieNISECI, record: &RecordNISECI) -> () {
   if record.lunghezza < record.specie.cl_soglia1 {
     cl.cl1 += 1;
   } else if record.lunghezza < record.specie.cl_soglia2 {

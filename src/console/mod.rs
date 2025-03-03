@@ -18,7 +18,6 @@
 use std::collections::{VecDeque, HashMap};
 use raylib::prelude::*;
 use crate::{propwidth, propheight};
-use crate::SHORT_PROJECT_VERSION;
 
 #[derive(Clone)]
 pub struct Console {
@@ -54,7 +53,7 @@ impl Console {
         return self.env.remove(&key);
     }
 
-    pub fn get_len(&self) -> usize {
+    pub fn _get_len(&self) -> usize {
         return self.messages.len();
     }
 
@@ -62,7 +61,7 @@ impl Console {
         self.view_offset = self.messages.len().saturating_sub(self.max_lines_visible);
     }
 
-    fn is_at_bottom(&self) -> bool {
+    fn _is_at_bottom(&self) -> bool {
         self.view_offset == self.messages.len().saturating_sub(self.max_lines_visible)
     }
 
@@ -240,6 +239,27 @@ impl Console {
         d.draw_rectangle_lines(
             sidebox_x, sidebox_y, sidebox_width, sidebox_height, txt_color,
         );
+
+        let userinfo_lines: Vec<String> = vec!(
+            format!("CONSOLE: ^"),
+            format!("Torna    |"),
+            format!("indietro |")
+        );
+        let userinfo_line_height = font_size + propheight(&d, 10);
+        let userinfo_x_padding = propheight(&d, 10);
+        for (i, line) in userinfo_lines
+            .iter()
+            .enumerate()
+        {
+            d.draw_text_ex(
+                font,
+                &line,
+                Vector2::new((sidebox_x + userinfo_x_padding) as f32, (sidebox_y + top_y_padding + (i as i32 * userinfo_line_height)) as f32),
+                font_size as f32,
+                0.0,
+                txt_color
+            );
+        }
 
         for (i, line) in self
             .messages
