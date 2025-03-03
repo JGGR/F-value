@@ -1349,7 +1349,7 @@ impl ProduzioneOutputView {
 
         d.clear_background(main_state.default_bg_color);
 
-        let _state = controller.get_state();
+        let state = controller.get_state();
         let current_index = match controller.get_current_index() {
             Some(index) => index,
             None => {
@@ -1406,6 +1406,29 @@ impl ProduzioneOutputView {
             }
         }
 
+        let submit_width = propwidth(&d, 100);
+        let groupbox_x_end = groupbox_x + groupbox_width;
+        let submit_x = groupbox_x_end + (d.get_screen_width() - groupbox_x_end)/2 - submit_width/2;
+        let submit_height = propheight(&d, 50);
+        let submit_y = d.get_screen_height() /2 - submit_height /2;
+
+        let confirm_itext = d.gui_icon_text(ICON_OK_TICK, Some(rstr!("Conferma")));
+        let confirm_itext = CString::new(confirm_itext).unwrap();
+
+        let done_calc = controller.get_is_done_calc();
+
+        if !done_calc {
+            d.gui_lock();
+            d.gui_set_state(STATE_DISABLED);
+        }
+        if d.gui_button(rrect(submit_x, submit_y, submit_width, submit_height), Some(confirm_itext.as_c_str())) {
+            controller.user_confirm_calc();
+        }
+        if !done_calc {
+            d.gui_set_state(STATE_NORMAL);
+            d.gui_unlock();
+        }
+
         d.gui_panel(
             rrect(
                 panel_x,
@@ -1413,8 +1436,77 @@ impl ProduzioneOutputView {
                 panel_width,
                 panel_height
             ),
-            Some(rstr!("TODO: Output qui"))
+            Some(rstr!("Output"))
         );
+
+        match current_index {
+            Indice::NISECI => {
+                let y_spacing = main_state.current_font_height *2;
+                let niseci_opt = controller.get_niseci_value();
+                let niseci_str = match niseci_opt {
+                    Some(v) => {
+                        format!("{}", v)
+                    }
+                    None => {
+                        format!("Non calcolato")
+                    }
+                };
+                let niseci_line = format!("NISECI: {}", niseci_str);
+                d.draw_text_ex(
+                    &main_state.current_font,
+                    &niseci_line,
+                    // We use propwidth/height for the text starting position:
+                    // this is not the bound
+                    Vector2::new((panel_x + propwidth(&d, 25)) as f32, (panel_y + (y_spacing * 2)) as f32),
+                    main_state.current_font_height as f32,
+                    main_state.default_txt_spacing as f32,
+                    main_state.default_txt_color
+                );
+                let rqe_niseci_opt = controller.get_rqe_niseci_value();
+                let rqe_niseci_str = match rqe_niseci_opt {
+                    Some(v) => {
+                        format!("{}", v)
+                    }
+                    None => {
+                        format!("Non calcolato")
+                    }
+                };
+                let rqe_line = format!("RQE NISECI: {}", rqe_niseci_str);
+                d.draw_text_ex(
+                    &main_state.current_font,
+                    &rqe_line,
+                    // We use propwidth/height for the text starting position:
+                    // this is not the bound
+                    Vector2::new((panel_x + propwidth(&d, 25)) as f32, (panel_y + (y_spacing * 3)) as f32),
+                    main_state.current_font_height as f32,
+                    main_state.default_txt_spacing as f32,
+                    main_state.default_txt_color
+                );
+                let stato_eco_niseci_opt = controller.get_stato_eco_niseci_value();
+                let stato_eco_niseci_str = match stato_eco_niseci_opt {
+                    Some(v) => {
+                        format!("{}", v)
+                    }
+                    None => {
+                        format!("Non calcolato")
+                    }
+                };
+                let stato_eco_line = format!("STATO ECOLOGICO NISECI: {}", stato_eco_niseci_str);
+                d.draw_text_ex(
+                    &main_state.current_font,
+                    &stato_eco_line,
+                    // We use propwidth/height for the text starting position:
+                    // this is not the bound
+                    Vector2::new((panel_x + propwidth(&d, 25)) as f32, (panel_y + (y_spacing * 4)) as f32),
+                    main_state.current_font_height as f32,
+                    main_state.default_txt_spacing as f32,
+                    main_state.default_txt_color
+                );
+            },
+            Indice::HFBI => {
+                todo!("Implement this!");
+            }
+        }
     }
 }
 

@@ -362,6 +362,25 @@ pub struct RisultatoNISECI {
   anagrafica: AnagraficaNISECI
 }
 
+impl RisultatoNISECI {
+    pub fn new(valore: f32, rqe: f32, anagrafica: AnagraficaNISECI) -> Self {
+        Self {
+            valore: valore,
+            rqe: rqe,
+            anagrafica: anagrafica,
+        }
+    }
+    pub fn get_valore(&self) -> f32 {
+        return self.valore;
+    }
+    pub fn get_rqe(&self) -> f32 {
+        return self.rqe;
+    }
+    pub fn get_anagrafica(&self) -> AnagraficaNISECI {
+        return self.anagrafica.clone();
+    }
+}
+
 
 /// le classi eta contengono il numero di esemplari trovati
 /// nel campionamento per ogni specie catturata

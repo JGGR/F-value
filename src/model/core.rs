@@ -202,6 +202,8 @@ impl InfoAggiuntiveModel {
 #[derive(Clone)]
 pub struct OutputModel {
     frame_counter: u32,
+    done_calc: bool,
+    done_user_confirm: bool,
 }
 
 impl OutputModel {
@@ -210,6 +212,22 @@ impl OutputModel {
     }
     pub fn increment_frame_counter(&mut self) {
         self.frame_counter += 1;
+    }
+
+    pub fn is_done_calc(&self) -> bool {
+        return self.done_calc;
+    }
+
+    pub fn set_done_calc(&mut self, val: bool) {
+        self.done_calc = val;
+    }
+
+    pub fn is_done_user_confirm(&self) -> bool {
+        return self.done_user_confirm;
+    }
+
+    pub fn set_done_user_confirm(&mut self, val: bool) {
+        self.done_user_confirm = val;
     }
 }
 
@@ -327,6 +345,8 @@ impl Model {
             },
             output_model: OutputModel {
                 frame_counter: 0,
+                done_calc: false,
+                done_user_confirm: false,
             },
             console_model: ConsoleModel {
                 console: Console::new(
