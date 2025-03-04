@@ -1,4 +1,4 @@
-## [0.0.10] - Unreleased
+## [0.0.10] - 2025-03-04
 
 ### Added
 
@@ -42,6 +42,11 @@ there
 - Adds a note in `ConsoleView` suggesting users to click up to return
 - Print splash on stdout
 - Handle `-W` to print warranty notice
+- Update infobox
+  - Add link to spdx for gpl-3.0-only
+  - Add author github links
+- Add `README.md`
+- Add `NormalizerReader` to handle accented vowels
 
 ### Changed
 
@@ -55,6 +60,8 @@ there
 - Some functions/includes which were only needed for test builds are not correctly marked with `#[cfg(test)]`
 - Updated float comparisons to always use an inlined epsilon
 - Use crate uuid to randomise tempfile names
+- Accept `.CSV` files
+- Fix empty error when filepicker gets a non-csv file
 
 ## [0.0.9] - 2025-01-23
 

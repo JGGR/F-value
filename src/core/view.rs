@@ -97,7 +97,7 @@ pub fn draw_info_box(d: &mut RaylibDrawHandle, showing_info_box: &mut bool, font
             Some(itext.as_c_str()),
         );
 
-        let text_y_spacing = propheight(&d, 15);
+        let text_y_spacing = propheight(&d, 12);
         let text_x_spacing = propwidth(&d, 70);
         let proj_info_str_y = infobox_y + bar_height + text_y_spacing;
         let proj_info_str_x = infobox_x + text_x_spacing;
@@ -142,11 +142,31 @@ pub fn draw_info_box(d: &mut RaylibDrawHandle, showing_info_box: &mut bool, font
             default_txt_color
         );
 
+        let copyright_display_link = "Copyright (C) 2024-2025 jgabaut, gioninjo";
+        let copyright_actual_link = "https://spdx.org/licenses/GPL-3.0-only.html";
+        let copyright_link_str = CString::new(copyright_display_link).unwrap();
+        let copyright_link_x = infobox_x + propwidth(&d, 10);
+        let copyright_link_y = proj_name_str2_y + proj_name_str2_txt_bounds.y as i32 + text_y_spacing*2;
+        let copyright_link_width = infobox_width - text_x_spacing;
+        let copyright_link_height = propheight(&d, 25);
+
+        if d.gui_label_button(
+            rrect(
+                copyright_link_x,
+                copyright_link_y,
+                copyright_link_width,
+                copyright_link_height
+            ),
+            Some(copyright_link_str.as_c_str())
+        ) {
+            raylib::core::misc::open_url(copyright_actual_link);
+        }
+
         let display_link = "Example: esox-website.it";
         let actual_link = "https://duckduckgo.com/?t=h_&q=esox+lucius";
         let link_str = CString::new(display_link).unwrap();
         let link_x = proj_name_str2_x;
-        let link_y = proj_name_str2_y + proj_name_str2_txt_bounds.y as i32 + text_y_spacing*3;
+        let link_y = copyright_link_y + copyright_link_height;
         let link_width = infobox_width - text_x_spacing;
         let link_height = propheight(&d, 25);
 
@@ -201,6 +221,41 @@ pub fn draw_info_box(d: &mut RaylibDrawHandle, showing_info_box: &mut bool, font
             Some(mail_link_str.as_c_str())
         ) {
             raylib::core::misc::open_url(&mail_actual_link);
+        }
+
+        let author_display_links: Vec<String> = vec!(format!("{AUTHOR_JGABAUT}"), format!("{AUTHOR_GIONINJO}"));
+        let author_actual_links: Vec<String> = vec!(format!("{AUTHOR_JGABAUT_LINK}"), format!("h{AUTHOR_GIONINJO_LINK}"));
+        let author_links_str: Vec<CString> = vec!(CString::new(author_display_links[0].clone()).unwrap(), CString::new(author_display_links[1].clone()).unwrap());
+        let author_display_links_width: Vec<i32> = vec!(
+            font.measure_text(&format!("{}, ", author_display_links[0]), current_font_height as f32, default_txt_spacing as f32).x as i32,
+            font.measure_text(&format!("{}, ", author_display_links[1]), current_font_height as f32, default_txt_spacing as f32).x as i32,
+        );
+
+        let author_links_x: Vec<i32> = vec!(link_x, link_x + font.measure_text(&format!("{}, ", author_display_links[0]), current_font_height as f32, default_txt_spacing as f32).x as i32);
+        let author_links_y = mail_link_y + mail_link_height;
+        let author_links_height = link_height;
+
+        d.gui_label(
+            rrect(
+                infobox_x + propwidth(&d, 10),
+                author_links_y,
+                text_x_spacing,
+                author_links_height
+            ),
+            Some(rstr!("Authors:"))
+        );
+        for (i, link_str) in author_links_str.iter().enumerate() {
+            if d.gui_label_button(
+                rrect(
+                    author_links_x[i],
+                    author_links_y,
+                    author_display_links_width[i],
+                    author_links_height
+                ),
+                Some(link_str.as_c_str())
+            ) {
+                raylib::core::misc::open_url(&author_actual_links[i]);
+            }
         }
 
         if result == true {

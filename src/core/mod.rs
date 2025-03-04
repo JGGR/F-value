@@ -30,7 +30,12 @@ use serde::Deserialize;
 use serde::de::{self, Deserializer};
 use chrono::NaiveDate;
 use chrono::format::ParseErrorKind;
+use std::io::{self, Error, ErrorKind};
 
+pub const AUTHOR_JGABAUT: &'static str = "jgabaut";
+pub const AUTHOR_GIONINJO: &'static str = "gioninjo";
+pub const AUTHOR_GIONINJO_LINK: &'static str = "https://github.com/gioninjo";
+pub const AUTHOR_JGABAUT_LINK: &'static str = "https://github.com/jgabaut";
 pub const EXIT_KEY: raylib::consts::KeyboardKey = raylib::consts::KeyboardKey::KEY_ESCAPE;
 pub const PROJECT_NAME: &'static str = env!("CARGO_PKG_NAME");
 pub const PROJECT_VERSION: &'static str = env!("CARGO_PKG_VERSION");
@@ -248,6 +253,36 @@ where
     let s: &str = Deserialize::deserialize(deserializer)?;
     let s = s.replace(',', "."); // Replace comma with dot
     s.parse::<f32>().map_err(de::Error::custom)
+}
+
+struct NormalizerReader<R: Read> {
+    inner: R,
+}
+
+impl<R: Read> NormalizerReader<R> {
+    fn new(inner: R) -> Self {
+        Self { inner }
+    }
+}
+
+impl<R: Read> Read for NormalizerReader<R> {
+    fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
+        let size = self.inner.read(buf)?;
+
+        // Change very italian accented characters in place
+        for byte in buf.iter_mut().take(size) {
+            match *byte {
+                b'\xF2' => *byte = b'o',
+                b'\xE0' => *byte = b'a',
+                b'\xE8' => *byte = b'e',
+                b'\xF9' => *byte = b'u',
+                b'\xEC' => *byte = b'i',
+                _ => {}
+            }
+        }
+
+        Ok(size)
+    }
 }
 
 #[derive(Debug, serde::Deserialize)]
@@ -852,9 +887,11 @@ pub fn parse_recordcsv_anagrafica_niseci(records: Vec<RecordCsvAnagraficaNISECI>
 }
 
 pub fn check_anagrafica_niseci_reader<R: Read>(reader: R) -> Result<Vec<RecordCsvAnagraficaNISECI>,Vec<csv::Error>> {
+    let normalizing_reader = NormalizerReader::new(reader);
+
     let rdr = csv::ReaderBuilder::new()
         .delimiter(b';')
-        .from_reader(reader);
+        .from_reader(normalizing_reader);
     let (records, errors) = parse_csv_anagrafica_niseci(rdr);
 
     println!("Anagrafica NISECI: Numero record csv validi: {}", records.len());
@@ -915,7 +952,9 @@ pub fn check_records_anagrafica_niseci(records: Vec<RecordCsvAnagraficaNISECI>) 
 pub fn check_anagrafica_niseci_path(path: PathBuf) -> Result<Vec<RecordCsvAnagraficaNISECI>,Vec<csv::Error>> {
     if !check_path_is_file_ends_with_csv(&path) {
         eprintln!("Il file {} non è un .csv", path.display());
-        return Err(Vec::new());
+        let err = csv::Error::from(Error::new(ErrorKind::Other, "Errore anagrafica NISECI: il file non è un .csv"));
+        let err_vec: Vec<csv::Error> = vec!(err);
+        return Err(err_vec);
     }
     let file = File::open(path).expect("Unable to open file");
     return check_anagrafica_niseci_reader(file);
@@ -1091,7 +1130,7 @@ fn check_path_is_file_ends_with_csv(path: &PathBuf) -> bool {
         let ext = path.extension();
         match ext {
             Some(ex) => {
-                if ! (ex == "csv") {
+                if ! (ex == "csv" || ex == "CSV") {
                     eprintln!("Error: Passed path does not end with .csv");
                     return false;
                 }
@@ -1106,9 +1145,11 @@ fn check_path_is_file_ends_with_csv(path: &PathBuf) -> bool {
 }
 
 pub fn check_campionamento_niseci_reader<R: Read>(reader: R) -> Result<Vec<RecordCsvCampionamentoNISECI>,Vec<csv::Error>> {
+    let normalizing_reader = NormalizerReader::new(reader);
+
     let rdr = csv::ReaderBuilder::new()
         .delimiter(b';')
-        .from_reader(reader);
+        .from_reader(normalizing_reader);
     let (records, errors) = parse_csv_campionamento_niseci(rdr);
 
     println!("Campionamento NISECI: Numero record csv validi: {}", records.len());
@@ -1141,7 +1182,9 @@ pub fn check_campionamento_niseci_reader<R: Read>(reader: R) -> Result<Vec<Recor
 pub fn check_campionamento_niseci_path(path: PathBuf) -> Result<Vec<RecordCsvCampionamentoNISECI>,Vec<csv::Error>> {
     if !check_path_is_file_ends_with_csv(&path) {
         eprintln!("Il file {} non è un .csv", path.display());
-        return Err(Vec::new());
+        let err = csv::Error::from(Error::new(ErrorKind::Other, "Errore campionamento NISECI: il file non è un .csv"));
+        let err_vec: Vec<csv::Error> = vec!(err);
+        return Err(err_vec);
     }
     let file = File::open(path).expect("Unable to open file");
     return check_campionamento_niseci_reader(file);
@@ -1175,9 +1218,11 @@ pub fn check_records_campionamento_niseci(records: Vec<RecordCsvCampionamentoNIS
 
 pub fn check_riferimento_niseci_reader<R: Read>(reader: R) -> Result<Vec<RecordCsvRiferimentoNISECI>,Vec<csv::Error>> {
 
+    let normalizing_reader = NormalizerReader::new(reader);
+
     let rdr = csv::ReaderBuilder::new()
         .delimiter(b';')
-        .from_reader(reader);
+        .from_reader(normalizing_reader);
     let (records, errors) = parse_csv_riferimento_niseci(rdr);
 
     println!("Riferimento NISECI: Numero record csv validi: {}", records.len());
@@ -1211,7 +1256,9 @@ pub fn check_riferimento_niseci_reader<R: Read>(reader: R) -> Result<Vec<RecordC
 pub fn check_riferimento_niseci_path(path: PathBuf) -> Result<Vec<RecordCsvRiferimentoNISECI>,Vec<csv::Error>> {
     if !check_path_is_file_ends_with_csv(&path) {
         eprintln!("Il file {} non è un .csv", path.display());
-        return Err(Vec::new());
+        let err = csv::Error::from(Error::new(ErrorKind::Other, "Errore riferimento NISECI: il file non è un .csv"));
+        let err_vec: Vec<csv::Error> = vec!(err);
+        return Err(err_vec);
     }
     let file = File::open(path).expect("Unable to open file");
     return check_riferimento_niseci_reader(file);
