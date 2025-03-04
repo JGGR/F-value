@@ -46,6 +46,7 @@ there
   - Add link to spdx for gpl-3.0-only
   - Add author github links
 - Add `README.md`
+- Add `NormalizerReader` to handle accented vowels
 
 ### Changed
 
@@ -59,6 +60,8 @@ there
 - Some functions/includes which were only needed for test builds are not correctly marked with `#[cfg(test)]`
 - Updated float comparisons to always use an inlined epsilon
 - Use crate uuid to randomise tempfile names
+- Accept `.CSV` files
+- Fix empty error when filepicker gets a non-csv file
 
 ## [0.0.9] - 2025-01-23
 

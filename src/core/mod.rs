@@ -30,7 +30,7 @@ use serde::Deserialize;
 use serde::de::{self, Deserializer};
 use chrono::NaiveDate;
 use chrono::format::ParseErrorKind;
-use std::io::{Error, ErrorKind};
+use std::io::{self, Error, ErrorKind};
 
 pub const AUTHOR_JGABAUT: &'static str = "jgabaut";
 pub const AUTHOR_GIONINJO: &'static str = "gioninjo";
@@ -253,6 +253,36 @@ where
     let s: &str = Deserialize::deserialize(deserializer)?;
     let s = s.replace(',', "."); // Replace comma with dot
     s.parse::<f32>().map_err(de::Error::custom)
+}
+
+struct NormalizerReader<R: Read> {
+    inner: R,
+}
+
+impl<R: Read> NormalizerReader<R> {
+    fn new(inner: R) -> Self {
+        Self { inner }
+    }
+}
+
+impl<R: Read> Read for NormalizerReader<R> {
+    fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
+        let size = self.inner.read(buf)?;
+
+        // Change very italian accented characters in place
+        for byte in buf.iter_mut().take(size) {
+            match *byte {
+                b'\xF2' => *byte = b'o',
+                b'\xE0' => *byte = b'a',
+                b'\xE8' => *byte = b'e',
+                b'\xF9' => *byte = b'u',
+                b'\xEC' => *byte = b'i',
+                _ => {}
+            }
+        }
+
+        Ok(size)
+    }
 }
 
 #[derive(Debug, serde::Deserialize)]
@@ -857,9 +887,11 @@ pub fn parse_recordcsv_anagrafica_niseci(records: Vec<RecordCsvAnagraficaNISECI>
 }
 
 pub fn check_anagrafica_niseci_reader<R: Read>(reader: R) -> Result<Vec<RecordCsvAnagraficaNISECI>,Vec<csv::Error>> {
+    let normalizing_reader = NormalizerReader::new(reader);
+
     let rdr = csv::ReaderBuilder::new()
         .delimiter(b';')
-        .from_reader(reader);
+        .from_reader(normalizing_reader);
     let (records, errors) = parse_csv_anagrafica_niseci(rdr);
 
     println!("Anagrafica NISECI: Numero record csv validi: {}", records.len());
@@ -1113,9 +1145,11 @@ fn check_path_is_file_ends_with_csv(path: &PathBuf) -> bool {
 }
 
 pub fn check_campionamento_niseci_reader<R: Read>(reader: R) -> Result<Vec<RecordCsvCampionamentoNISECI>,Vec<csv::Error>> {
+    let normalizing_reader = NormalizerReader::new(reader);
+
     let rdr = csv::ReaderBuilder::new()
         .delimiter(b';')
-        .from_reader(reader);
+        .from_reader(normalizing_reader);
     let (records, errors) = parse_csv_campionamento_niseci(rdr);
 
     println!("Campionamento NISECI: Numero record csv validi: {}", records.len());
@@ -1184,9 +1218,11 @@ pub fn check_records_campionamento_niseci(records: Vec<RecordCsvCampionamentoNIS
 
 pub fn check_riferimento_niseci_reader<R: Read>(reader: R) -> Result<Vec<RecordCsvRiferimentoNISECI>,Vec<csv::Error>> {
 
+    let normalizing_reader = NormalizerReader::new(reader);
+
     let rdr = csv::ReaderBuilder::new()
         .delimiter(b';')
-        .from_reader(reader);
+        .from_reader(normalizing_reader);
     let (records, errors) = parse_csv_riferimento_niseci(rdr);
 
     println!("Riferimento NISECI: Numero record csv validi: {}", records.len());
