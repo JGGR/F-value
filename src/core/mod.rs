@@ -30,6 +30,7 @@ use serde::Deserialize;
 use serde::de::{self, Deserializer};
 use chrono::NaiveDate;
 use chrono::format::ParseErrorKind;
+use std::io::{Error, ErrorKind};
 
 pub const AUTHOR_JGABAUT: &'static str = "jgabaut";
 pub const AUTHOR_GIONINJO: &'static str = "gioninjo";
@@ -919,7 +920,9 @@ pub fn check_records_anagrafica_niseci(records: Vec<RecordCsvAnagraficaNISECI>) 
 pub fn check_anagrafica_niseci_path(path: PathBuf) -> Result<Vec<RecordCsvAnagraficaNISECI>,Vec<csv::Error>> {
     if !check_path_is_file_ends_with_csv(&path) {
         eprintln!("Il file {} non è un .csv", path.display());
-        return Err(Vec::new());
+        let err = csv::Error::from(Error::new(ErrorKind::Other, "Errore anagrafica NISECI: il file non è un .csv"));
+        let err_vec: Vec<csv::Error> = vec!(err);
+        return Err(err_vec);
     }
     let file = File::open(path).expect("Unable to open file");
     return check_anagrafica_niseci_reader(file);
@@ -1095,7 +1098,7 @@ fn check_path_is_file_ends_with_csv(path: &PathBuf) -> bool {
         let ext = path.extension();
         match ext {
             Some(ex) => {
-                if ! (ex == "csv") {
+                if ! (ex == "csv" || ex == "CSV") {
                     eprintln!("Error: Passed path does not end with .csv");
                     return false;
                 }
@@ -1145,7 +1148,9 @@ pub fn check_campionamento_niseci_reader<R: Read>(reader: R) -> Result<Vec<Recor
 pub fn check_campionamento_niseci_path(path: PathBuf) -> Result<Vec<RecordCsvCampionamentoNISECI>,Vec<csv::Error>> {
     if !check_path_is_file_ends_with_csv(&path) {
         eprintln!("Il file {} non è un .csv", path.display());
-        return Err(Vec::new());
+        let err = csv::Error::from(Error::new(ErrorKind::Other, "Errore campionamento NISECI: il file non è un .csv"));
+        let err_vec: Vec<csv::Error> = vec!(err);
+        return Err(err_vec);
     }
     let file = File::open(path).expect("Unable to open file");
     return check_campionamento_niseci_reader(file);
@@ -1215,7 +1220,9 @@ pub fn check_riferimento_niseci_reader<R: Read>(reader: R) -> Result<Vec<RecordC
 pub fn check_riferimento_niseci_path(path: PathBuf) -> Result<Vec<RecordCsvRiferimentoNISECI>,Vec<csv::Error>> {
     if !check_path_is_file_ends_with_csv(&path) {
         eprintln!("Il file {} non è un .csv", path.display());
-        return Err(Vec::new());
+        let err = csv::Error::from(Error::new(ErrorKind::Other, "Errore riferimento NISECI: il file non è un .csv"));
+        let err_vec: Vec<csv::Error> = vec!(err);
+        return Err(err_vec);
     }
     let file = File::open(path).expect("Unable to open file");
     return check_riferimento_niseci_reader(file);
