@@ -4,21 +4,20 @@
 
 - Calc x2
 - Calc x3
-- `ClassiEtaSpecieNISECI`
-- `ClassiEta`
-- `InfoPopolazioniNISECI`
-- `InfoPopolazioniAlieneNISECI`
-- `ClassiEtaAlieniNISECI`
-- `EsemplariPerCattura`
+- New utility structs for engines
+  - `ClassiEtaSpecieNISECI`
+  - `ClassiEta`
+  - `InfoPopolazioniNISECI`
+  - `InfoPopolazioniAlieneNISECI`
+  - `ClassiEtaAlieniNISECI`
+  - `EsemplariPerCattura`
 - More tests
   - `x2` (also private methods tests)
   - `x3`
   - `niseci::full` (minimal)
 - Add `templates/riferimento_niseci.csv`
 - Add list_view for `IdroEcoRegioneNISECI` in `SelezionaInfoAggiuntiveView`
-  - Closes #7
 - Add `AreaNISECI`
-  - Closes #8
 - Add `console.unset_env()` to drop anagrafica_niseci on user backout
 - Add submit for `Anagrafica`
   - Ensures no stray nullbytes in strings
@@ -30,7 +29,7 @@
 - `InfoAggiuntiveController` handles `AnagraficaNISECI` validation
 - `OutputController` goes to `Console` on errors
 - Add `calculate_niseci()`
-- Add `calculate_stato_ecologico()`, use `log(10.0)` for rqe_niseci
+- Add `calculate_stato_ecologico()`
 - Add `calculate_rqe_niseci()`
 - Add parsing funcs for anagrafica niseci csv
 - Check anagrafica file in `run_headless()`
@@ -54,6 +53,8 @@ there
 - Rename field `nome_fiume` to `corpo_idrico` in `AnagraficaNISECI`
 - Minor refactor to resolve all warnings
 - Some functions/includes which were only needed for test builds are not correctly marked with `#[cfg(test)]`
+- Updated float comparisons to always use an inlined epsilon
+- Use crate uuid to randomise tempfile names
 
 ## [0.0.9] - 2025-01-23
 

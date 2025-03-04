@@ -25,7 +25,7 @@ use std::fs::File;
 use std::io::Write;
 use std::path::PathBuf;
 use std::ffi::CString;
-
+use uuid::Uuid;
 
 pub fn update_main(rl: &mut RaylibHandle, main_state: &mut MainState) {
     main_state.should_quit = rl.window_should_close();
@@ -102,8 +102,12 @@ pub fn update_main(rl: &mut RaylibHandle, main_state: &mut MainState) {
 }
 
 fn write_temp_style_file(data: &[u8]) -> Result<(CString, PathBuf), Box<dyn std::error::Error>> {
+    // We employ a UUID to randomise the filename, as required
+    // to avoid insecure temporary files vulnerabilities
+    // See: https://doc.rust-lang.org/nightly/std/env/fn.temp_dir.html
     let mut temp_path = std::env::temp_dir();
-    temp_path.push("temp_style.rgs");
+    let id = Uuid::new_v4();
+    temp_path.push(format!("{}.rgs", id));
 
     let mut file = File::create(&temp_path)?;
     file.write_all(data)?;
