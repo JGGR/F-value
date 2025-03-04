@@ -31,6 +31,10 @@ use serde::de::{self, Deserializer};
 use chrono::NaiveDate;
 use chrono::format::ParseErrorKind;
 
+pub const AUTHOR_JGABAUT: &'static str = "jgabaut";
+pub const AUTHOR_GIONINJO: &'static str = "gioninjo";
+pub const AUTHOR_GIONINJO_LINK: &'static str = "https://github.com/gioninjo";
+pub const AUTHOR_JGABAUT_LINK: &'static str = "https://github.com/jgabaut";
 pub const EXIT_KEY: raylib::consts::KeyboardKey = raylib::consts::KeyboardKey::KEY_ESCAPE;
 pub const PROJECT_NAME: &'static str = env!("CARGO_PKG_NAME");
 pub const PROJECT_VERSION: &'static str = env!("CARGO_PKG_VERSION");

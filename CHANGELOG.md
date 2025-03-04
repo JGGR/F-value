@@ -42,6 +42,9 @@ there
 - Adds a note in `ConsoleView` suggesting users to click up to return
 - Print splash on stdout
 - Handle `-W` to print warranty notice
+- Update infobox
+  - Add link to spdx for gpl-3.0-only
+  - Add author github links
 
 ### Changed
 
