@@ -1,4 +1,4 @@
-## [0.0.10] - Unreleased
+## [0.0.10] - 2025-03-04
 
 ### Added
 
@@ -45,6 +45,7 @@ there
 - Update infobox
   - Add link to spdx for gpl-3.0-only
   - Add author github links
+- Add `README.md`
 
 ### Changed
 
