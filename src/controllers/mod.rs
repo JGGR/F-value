@@ -707,8 +707,7 @@ impl OutputController {
 
     pub fn get_niseci_value(&self) -> Option<f32> {
         if self.get_is_done_calc() {
-            let state = GLOBAL_STATE.lock().unwrap();
-            let opt_res = state.data_model.get_risultato_niseci();
+            let opt_res = self.get_data_risultato_niseci();
             match opt_res {
                 Some(r) => {
                     return Some(r.get_valore());
@@ -724,8 +723,7 @@ impl OutputController {
 
     pub fn get_rqe_niseci_value(&self) -> Option<f32> {
         if self.get_is_done_calc() {
-            let state = GLOBAL_STATE.lock().unwrap();
-            let opt_res = state.data_model.get_risultato_niseci();
+            let opt_res = self.get_data_risultato_niseci();
             match opt_res {
                 Some(r) => {
                     return Some(r.get_rqe());
@@ -741,10 +739,10 @@ impl OutputController {
 
     pub fn get_stato_eco_niseci_value(&self) -> Option<StatoEcologicoNISECI> {
         if self.get_is_done_calc() {
-            let state = GLOBAL_STATE.lock().unwrap();
-            let opt_res = state.data_model.get_risultato_niseci();
+            let opt_res = self.get_data_risultato_niseci();
             match opt_res {
                 Some(r) => {
+                    let state = GLOBAL_STATE.lock().unwrap();
                     let opt_anagrafica = state.data_model.get_anagrafica_niseci();
                     match opt_anagrafica {
                         Some(anagr) => {
@@ -767,6 +765,18 @@ impl OutputController {
     pub fn get_current_index(&self) -> Option<Indice> {
         let state = GLOBAL_STATE.lock().unwrap();
         return state.indice_model.get_selected_index();
+    }
+
+    fn set_data_risultato_niseci(&self, risultato: RisultatoNISECI) {
+        self.set_console_env(("risultato_niseci".to_string(), format!("{risultato}")));
+        let mut state = GLOBAL_STATE.lock().unwrap();
+        state.data_model.set_risultato_niseci(Some(risultato));
+        state.output_model.set_done_calc(true);
+    }
+
+    pub fn get_data_risultato_niseci(&self) -> Option<RisultatoNISECI> {
+        let state = GLOBAL_STATE.lock().unwrap();
+        return state.data_model.get_risultato_niseci();
     }
 
     pub fn calc_niseci(&self) {
@@ -826,9 +836,7 @@ impl OutputController {
                         rqe_niseci
                     );
 
-                    let mut state = GLOBAL_STATE.lock().unwrap();
-                    state.data_model.set_risultato_niseci(Some(risultato_niseci));
-                    state.output_model.set_done_calc(true);
+                    self.set_data_risultato_niseci(risultato_niseci);
                     println!("OutputController: Finished NISECI calc");
                 },
                 Err(niseci_errors) => {
@@ -858,6 +866,12 @@ impl OutputController {
         let mut state = GLOBAL_STATE.lock().unwrap();
 
         state.console_model.console.add_message(msg);
+    }
+
+    pub fn set_console_env(&self, (key, val): (String,String)) {
+        let mut state = GLOBAL_STATE.lock().unwrap();
+
+        state.console_model.console.set_env((key,val));
     }
 }
 

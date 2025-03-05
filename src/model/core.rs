@@ -375,6 +375,7 @@ impl Model {
                         ("riferimento_niseci".to_string(), "Vuoto".to_string()),
                         ("campionamento_niseci".to_string(), "Vuoto".to_string()),
                         ("anagrafica_niseci".to_string(), "Vuoto".to_string()),
+                        ("risultato_niseci".to_string(), "Vuoto".to_string()),
                     ]),
                 ),
                 name: "Initial".to_string(),

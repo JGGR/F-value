@@ -364,6 +364,13 @@ pub struct RisultatoNISECI {
   rqe: f32,
 }
 
+impl fmt::Display for RisultatoNISECI {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    let string_representation = format!("RisultatoNISECI: {{ valore NISECI: {{{}}}, valore RQE NISECI: {{{}}} }}", self.valore, self.rqe);
+    write!(f, "{}", string_representation)
+  }
+}
+
 impl RisultatoNISECI {
     pub fn new(valore: f32, rqe: f32) -> Self {
         Self {
