@@ -29,7 +29,7 @@ use crate::model::niseci::AnagraficaNISECI;
 use raylib::prelude::*;
 use rfd::FileDialog;
 use raylib::consts::GuiState::{STATE_NORMAL, STATE_DISABLED};
-use raylib::consts::GuiIconName::{ICON_FILE_OPEN, ICON_BIN, ICON_OK_TICK, ICON_CROSS};
+use raylib::consts::GuiIconName::{ICON_FILE_OPEN, ICON_BIN, ICON_OK_TICK, ICON_CROSS, ICON_PLAYER_NEXT};
 use std::ffi::CString;
 
 // A view responsible for rendering the state
@@ -82,6 +82,44 @@ impl HomeView {
         // to the View and ensure to set them on all frames to the model via
         // the controller.
         controller.set_value(self.spinner_value);
+
+
+        let next_itext = d.gui_icon_text(ICON_PLAYER_NEXT, Some(rstr!(": Prossimo")));
+        let next_itext = CString::new(next_itext).unwrap();
+        let userinfo_x_padding = d.get_screen_width() - propwidth(&d, 200);
+        let userinfo_y_padding = propheight(&d, 100);
+
+        d.gui_label(
+            rrect(
+                userinfo_x_padding,
+                userinfo_y_padding,
+                propwidth(&d, 200),
+                propheight(&d, 50),
+            ),
+            Some(next_itext.as_c_str())
+        );
+
+        let labels_width = propwidth(&d, 200);
+        let labels_x = userinfo_x_padding;
+        let labels_y = propheight(&d, 300);
+        let labels_height = propheight(&d, 25);
+
+        let labels: Vec<CString> = vec!(
+            CString::new(format!("Version:   {}", SHORT_PROJECT_VERSION)).unwrap(),
+            CString::new(format!("Target:    {}-{}", std::env::consts::ARCH, std::env::consts::OS)).unwrap(),
+        );
+
+        for (i, label) in labels.iter().enumerate() {
+            d.gui_label(
+                rrect(
+                    labels_x,
+                    labels_y + (i as i32 * labels_height),
+                    labels_width,
+                    labels_height
+                ),
+                Some(label.as_c_str())
+            );
+        }
     }
 }
 
@@ -133,6 +171,43 @@ impl SecondView {
         // to the View and ensure to set them on all frames to the model via
         // the controller.
         controller.set_value(self.spinner_value);
+
+        let next_itext = d.gui_icon_text(ICON_PLAYER_NEXT, Some(rstr!(": Prossimo")));
+        let next_itext = CString::new(next_itext).unwrap();
+        let userinfo_x_padding = d.get_screen_width() - propwidth(&d, 200);
+        let userinfo_y_padding = propheight(&d, 100);
+
+        d.gui_label(
+            rrect(
+                userinfo_x_padding,
+                userinfo_y_padding,
+                propwidth(&d, 200),
+                propheight(&d, 50),
+            ),
+            Some(next_itext.as_c_str())
+        );
+
+        let labels_width = propwidth(&d, 200);
+        let labels_x = userinfo_x_padding;
+        let labels_y = propheight(&d, 300);
+        let labels_height = propheight(&d, 25);
+
+        let labels: Vec<CString> = vec!(
+            CString::new(format!("Version:   {}", SHORT_PROJECT_VERSION)).unwrap(),
+            CString::new(format!("Target:    {}-{}", std::env::consts::ARCH, std::env::consts::OS)).unwrap(),
+        );
+
+        for (i, label) in labels.iter().enumerate() {
+            d.gui_label(
+                rrect(
+                    labels_x,
+                    labels_y + (i as i32 * labels_height),
+                    labels_width,
+                    labels_height
+                ),
+                Some(label.as_c_str())
+            );
+        }
     }
 }
 
