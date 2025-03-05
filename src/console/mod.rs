@@ -246,14 +246,15 @@ impl Console {
         let back_itext = d.gui_icon_text(ICON_MONITOR, Some(rstr!(": Indietro")));
         let back_itext = CString::new(back_itext).unwrap();
         let userinfo_x_padding = propwidth(&d, 10);
-        let userinfo_y_padding = propheight(&d, 10);
+        let userinfo_y_padding = propheight(&d, 50);
+        let userinfo_height = propheight(&d, 25);
 
         d.gui_label(
             rrect(
                 sidebox_x + userinfo_x_padding,
-                sidebox_y + userinfo_y_padding,
+                userinfo_y_padding,
                 sidebox_width,
-                sidebox_height
+                userinfo_height
             ),
             Some(back_itext.as_c_str())
         );
