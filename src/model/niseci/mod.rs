@@ -359,23 +359,64 @@ impl fmt::Display for IdroEcoRegioneNISECI {
 }
 
 #[derive(Clone)]
+pub struct ValoriIntermediSpecieNISECI {
+    pub densita_stimata: f32,
+    pub classi_eta: ClassiEtaSpecieNISECI,
+    pub rapporto_ad_juv: f32,
+    pub x2_a_a: u8,
+    pub x2_a_b: u8,
+}
+
+impl fmt::Display for ValoriIntermediSpecieNISECI {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    let string_representation = format!("ValoriIntermediSpecieNISECI: {{ densita stimata: {{{}}}, classi eta: {{{}}}, rapport ad/juv: {{{}}}, x2a_a: {{{}}}, x2a_b: {{{}}} }}",
+        self.densita_stimata, self.classi_eta, self.rapporto_ad_juv, self.x2_a_a, self.x2_a_b);
+    write!(f, "{}", string_representation)
+  }
+}
+
+#[derive(Clone)]
+pub struct ValoriIntermediNISECI {
+    pub specie_specifici: HashMap<String, ValoriIntermediSpecieNISECI>,
+    pub x2_a: f32,
+    pub x2_b: f32,
+    pub x3_a: f32,
+    pub x3_b: f32,
+}
+
+impl fmt::Display for ValoriIntermediNISECI {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    let mut string_representation = format!("ValoriIntermediNISECI: {{\n    x2_a: {{{}}}, x2_b: {{{}}}, x3_a: {{{}}}, x3_b: {{{}}}\n    specie specifici:\n",
+        self.x2_a, self.x2_b, self.x3_a, self.x3_b);
+
+    for (k, v) in self.specie_specifici.iter() {
+        string_representation = format!("{}\n    specie: {{{}}}, valori: {{{}}}", string_representation, k, v);
+    }
+    string_representation = format!("{}\n}}", string_representation);
+    write!(f, "{}", string_representation)
+  }
+}
+
+#[derive(Clone)]
 pub struct RisultatoNISECI {
   valore: f32,
   rqe: f32,
+  valori_intermedi: ValoriIntermediNISECI,
 }
 
 impl fmt::Display for RisultatoNISECI {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    let string_representation = format!("RisultatoNISECI: {{ valore NISECI: {{{}}}, valore RQE NISECI: {{{}}} }}", self.valore, self.rqe);
+    let string_representation = format!("RisultatoNISECI: {{ valore NISECI: {{{}}}, valore RQE NISECI: {{{}}}, valori intermedi: {{{}}} }}", self.valore, self.rqe, self.valori_intermedi);
     write!(f, "{}", string_representation)
   }
 }
 
 impl RisultatoNISECI {
-    pub fn new(valore: f32, rqe: f32) -> Self {
+    pub fn new(valore: f32, rqe: f32, valori_intermedi: ValoriIntermediNISECI) -> Self {
         Self {
             valore: valore,
             rqe: rqe,
+            valori_intermedi: valori_intermedi,
         }
     }
     pub fn get_valore(&self) -> f32 {
@@ -390,6 +431,7 @@ impl RisultatoNISECI {
 /// le classi eta contengono il numero di esemplari trovati
 /// nel campionamento per ogni specie catturata
 /// suddivisi nelle loro classi di eta (in base alla lunghezza)
+#[derive(Clone)]
 pub struct ClassiEtaSpecieNISECI {
   pub specie: SpecieNISECI,
   pub cl1: u32,
@@ -399,6 +441,13 @@ pub struct ClassiEtaSpecieNISECI {
   pub cl5: u32,
 }
 
+impl fmt::Display for ClassiEtaSpecieNISECI {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    let string_representation = format!("ClassiEtaSpecieNISECI: {{ specie: {{{}}}, cl1: {{{}}}, cl2: {{{}}}, cl3: {{{}}}, cl4: {{{}}}, cl5: {{{}}} }}",
+        self.specie, self.cl1, self.cl2, self.cl3, self.cl4, self.cl5);
+    write!(f, "{}", string_representation)
+  }
+}
 
 impl ClassiEtaSpecieNISECI {
   pub fn new() -> ClassiEtaSpecieNISECI {
@@ -724,12 +773,4 @@ impl fmt::Display for StatoEcologicoNISECI {
         };
         write!(f, "{}", string_representation)
     }
-}
-
-pub struct ValoriIntermediSpecieNISECI {
-    pub densita_stimata: f32,
-    pub classi_eta: ClassiEtaSpecieNISECI,
-    pub rapporto_ad_juv: f32,
-    pub x2_a_a: u8,
-    pub x2_a_b: u8,
 }

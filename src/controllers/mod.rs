@@ -813,7 +813,7 @@ impl OutputController {
             let anagrafica = anagrafica.expect("calc_niseci() checked is_none() before");
 
             match calculate_niseci(&campionamento, &riferimento, &anagrafica) {
-                Ok((niseci, _intermediates)) => {
+                Ok((niseci, intermediates)) => {
                     self.add_console_message(format!("NISECI: {niseci}"));
 
                     let rqe_niseci = calculate_rqe_niseci(niseci);
@@ -833,7 +833,8 @@ impl OutputController {
 
                     let risultato_niseci = RisultatoNISECI::new(
                         niseci,
-                        rqe_niseci
+                        rqe_niseci,
+                        intermediates
                     );
 
                     self.set_data_risultato_niseci(risultato_niseci);

@@ -16,7 +16,7 @@
 */
 
 use std::collections::{hash_map::Entry, HashMap};
-use crate::model::niseci::{CampionamentoNISECI, RiferimentoNISECI, AnagraficaNISECI, AreaNISECI, StatoEcologicoNISECI, ValoriIntermediSpecieNISECI};
+use crate::model::niseci::{CampionamentoNISECI, RiferimentoNISECI, AnagraficaNISECI, AreaNISECI, StatoEcologicoNISECI, ValoriIntermediSpecieNISECI, ValoriIntermediNISECI};
 
 use super::x1::calculate_x1;
 use super::x2::calculate_x2;
@@ -29,14 +29,6 @@ const STATO_ECOLOGICO_NISECI_SOGLIA_BUONO_AREA_ALPINA: f32 = 0.52;
 const STATO_ECOLOGICO_NISECI_SOGLIA_BUONO_AREA_MEDITERRANEA: f32 = 0.6;
 const STATO_ECOLOGICO_NISECI_SOGLIA_MODERATO: f32 = 0.4;
 const STATO_ECOLOGICO_NISECI_SOGLIA_SCADENTE: f32 = 0.2;
-
-pub struct ValoriIntermediNISECI {
-    pub specie_specifici: HashMap<String, ValoriIntermediSpecieNISECI>,
-    pub x2_a: f32,
-    pub x2_b: f32,
-    pub x3_a: f32,
-    pub x3_b: f32,
-}
 
 pub fn calculate_niseci(campionamento: &CampionamentoNISECI, riferimento: &RiferimentoNISECI, anagrafica: &AnagraficaNISECI) -> Result<(f32, ValoriIntermediNISECI), Vec<String>> {
     let mut errors = Vec::new();
