@@ -19,20 +19,18 @@ use std::collections::hash_map::Entry;
 
 use crate::model::niseci::{CampionamentoNISECI, ClassiEtaAlieniNISECI, ClassiEtaSpecieNISECI, InfoPopolazioniAlieneNISECI};
 
-
-
-pub fn calculate_x3(c: &CampionamentoNISECI) -> Result<f32, Vec<String>> {
+pub fn calculate_x3(c: &CampionamentoNISECI) -> Result<(f32, (f32, f32)), Vec<String>> {
 
   let alieni_indigeni = c.get_numero_pesci_alieni_e_indigeni();
 
   // condizione 1
   if alieni_indigeni.alieni == 0 {
-    return Ok(1.0);
+    return Ok((1.0, (-1.0, -1.0)));
   }
 
   // condizione 2
   if alieni_indigeni.alieni >= alieni_indigeni.indigeni {
-    return Ok(0.0);
+    return Ok((0.0, (-1.0, -1.0)));
   }
 
 
@@ -52,7 +50,7 @@ pub fn calculate_x3(c: &CampionamentoNISECI) -> Result<f32, Vec<String>> {
   // condizione 3
   let epsilon: f32 = 1e-6;
   if (info_pop_aliene.tipo_1.popolazione_piu_strutt - 1.0).abs() < epsilon {
-    return Ok(0.0);
+    return Ok((0.0, (-1.0, -1.0)));
   }
 
 
@@ -64,7 +62,7 @@ pub fn calculate_x3(c: &CampionamentoNISECI) -> Result<f32, Vec<String>> {
 
   let x3 = 0.5 * (a + b);
 
-  Ok(x3)
+  Ok((x3, (a, b)))
 }
 
 fn calculate_classi_eta_alieni(c: &CampionamentoNISECI) -> ClassiEtaAlieniNISECI {

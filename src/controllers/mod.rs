@@ -803,7 +803,7 @@ impl OutputController {
             let anagrafica = anagrafica.expect("calc_niseci() checked is_none() before");
 
             match calculate_niseci(&campionamento, &riferimento, &anagrafica) {
-                Ok(niseci) => {
+                Ok((niseci, _intermediates)) => {
                     self.add_console_message(format!("NISECI: {niseci}"));
 
                     let rqe_niseci = calculate_rqe_niseci(niseci);
@@ -815,8 +815,8 @@ impl OutputController {
                     //TODO: recalculation of x1, x2, x3 is only used for richer console output ATM
                     //Maybe should be removed later
                     let x1 = calculate_x1(&campionamento, &riferimento);
-                    let x2 = calculate_x2(&campionamento, &anagrafica).unwrap();
-                    let x3 = calculate_x3(&campionamento).unwrap();
+                    let (x2, (_x2_a, _x2_b), _criteri_map, _densita_vec) = calculate_x2(&campionamento, &anagrafica).unwrap();
+                    let (x3, (_x3_a, _x3_b)) = calculate_x3(&campionamento).unwrap();
                     self.add_console_message(format!("x1: {x1}"));
                     self.add_console_message(format!("x2: {x2}"));
                     self.add_console_message(format!("x3: {x3}"));

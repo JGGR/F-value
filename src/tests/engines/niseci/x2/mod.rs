@@ -76,7 +76,7 @@ fn calculate_x2_a_criterio_b_zero_giovani() {
     cl5: 1,
   };
 
-  let x2_a_criterio_b = classe.get_x2_a_criterio_b();
+  let (x2_a_criterio_b, _ad_juv) = classe.get_x2_a_criterio_b();
   assert_eq!(3, x2_a_criterio_b)
 
 }
@@ -92,7 +92,7 @@ fn calculate_x2_a_criterio_b_1_bilanciato() {
     cl5: 1,
   };
 
-  let x2_a_criterio_b = classe.get_x2_a_criterio_b();
+  let (x2_a_criterio_b, _ad_juv) = classe.get_x2_a_criterio_b();
   assert_eq!(1, x2_a_criterio_b)
 
 }
@@ -108,7 +108,7 @@ fn calculate_x2_a_criterio_b_2_medio_sbilanciato_adulti() {
     cl5: 2,
   };
 
-  let x2_a_criterio_b = classe.get_x2_a_criterio_b();
+  let (x2_a_criterio_b, _ad_juv) = classe.get_x2_a_criterio_b();
   assert_eq!(2, x2_a_criterio_b)
 
 }
@@ -124,7 +124,7 @@ fn calculate_x2_a_criterio_b_2_medio_sbilanciato_giovani() {
     cl5: 1,
   };
 
-  let x2_a_criterio_b = classe.get_x2_a_criterio_b();
+  let (x2_a_criterio_b, _ad_juv) = classe.get_x2_a_criterio_b();
   assert_eq!(2, x2_a_criterio_b)
 
 }
@@ -140,7 +140,7 @@ fn calculate_x2_a_criterio_b_3_molto_sbilanciato_adulti() {
     cl5: 3,
   };
 
-  let x2_a_criterio_b = classe.get_x2_a_criterio_b();
+  let (x2_a_criterio_b, _ad_juv) = classe.get_x2_a_criterio_b();
   assert_eq!(3, x2_a_criterio_b)
 
 }
@@ -156,7 +156,7 @@ fn calculate_x2_a_criterio_b_3_molto_sbilanciato_giovani() {
     cl5: 1,
   };
 
-  let x2_a_criterio_b = classe.get_x2_a_criterio_b();
+  let (x2_a_criterio_b, _ad_juv) = classe.get_x2_a_criterio_b();
   assert_eq!(3, x2_a_criterio_b)
 
 }
@@ -191,7 +191,9 @@ fn calculate_x2_test_1() {
   let x2 = calculate_x2(&campionamento, &anagrafica);
 
   assert!(x2.is_ok());
-  assert_eq!(1.0, x2.unwrap());
+
+  let (x2, (_x2_a, _x2_b), _criteri_vec, _densita_vec) = x2.unwrap();
+  assert_eq!(1.0, x2);
 
   // secondo test con valori alternativi
 
@@ -224,5 +226,6 @@ fn calculate_x2_test_1() {
 
   assert!(x2.is_ok());
   let epsilon: f32 = 1e-6;
-  assert!((0.7 - x2.unwrap()).abs() < epsilon);
+  let (x2, (_x2_a, _x2_b), _criteri_vec, _densita_vec) = x2.unwrap();
+  assert!((0.7 - x2).abs() < epsilon);
 }

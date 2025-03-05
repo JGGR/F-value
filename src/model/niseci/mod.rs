@@ -441,47 +441,47 @@ impl ClassiEtaSpecieNISECI {
     return 3;
   }
 
-  pub fn get_x2_a_criterio_b(&self) -> u8 {
+  pub fn get_x2_a_criterio_b(&self) -> (u8, f32) {
     if (self.cl2 + self.cl3) == 0 {
-      return 3;
+      return (3, -1.0);
     }
 
     let ad_juv = (self.cl4 + self.cl5) as f32 / (self.cl2 + self.cl3) as f32;
     if ad_juv < self.specie.ad_juv_soglia1 {
-      return 3;
+      return (3, ad_juv);
     }
     if ad_juv <= self.specie.ad_juv_soglia2 {
-      return 2;
+      return (2, ad_juv);
     }
     if ad_juv <= self.specie.ad_juv_soglia3 {
-      return 1;
+      return (1, ad_juv);
     }
     if ad_juv <= self.specie.ad_juv_soglia4 {
-      return 2;
+      return (2, ad_juv);
     }
-    return 3;
+    return (3, ad_juv);
   }
 
   /// questa fn viene usata sia per x2_a che per x3
   /// i suoi test sono esattamente quelli per calculate_x2_a
-  pub(crate) fn calculate_struttura_popolazione(&self) -> Result<f32, String> {
+  pub(crate) fn calculate_struttura_popolazione(&self) -> Result<(f32, u8, (u8, f32)), String> {
     let criterio_a: u8 = self.get_x2_a_criterio_a();
-    let criterio_b: u8 = self.get_x2_a_criterio_b();
+    let (criterio_b, ad_juv): (u8, f32) = self.get_x2_a_criterio_b();
 
     if criterio_a == 1 && criterio_b == 3 {
-      return Ok(0.5);
+      return Ok((0.5, criterio_a, (criterio_b, ad_juv)));
     }
     if criterio_a == 1 {
-      return Ok(1.0);
+      return Ok((1.0, criterio_a, (criterio_b, ad_juv)));
     }
     if criterio_a == 2 && criterio_b == 3 {
-      return Ok(0.0);
+      return Ok((0.0, criterio_a, (criterio_b, ad_juv)));
     }
     if criterio_a == 2 {
-      return Ok(0.5);
+      return Ok((0.5, criterio_a, (criterio_b, ad_juv)));
     }
     if criterio_a == 3 {
-      return Ok(0.0);
+      return Ok((0.0, criterio_a, (criterio_b, ad_juv)));
     }
     return Err(format!("Il Criterio A o B di x2a è diverso da 1 o 2 o 3. criterio A = {}, criterio B = {}", criterio_a, criterio_b));
   }
@@ -522,7 +522,10 @@ pub struct InfoPopolazioniNISECI {
   pub species_strutt: u32,
   pub species_mediamente_strutt: u32,
   pub species_destrutt: u32,
-  pub tot_species: usize
+  pub tot_species: usize,
+  pub criterio_a: u8,
+  pub criterio_b: u8,
+  pub rapporto_ad_juv: f32,
 }
 
 impl InfoPopolazioniNISECI {
@@ -532,7 +535,10 @@ impl InfoPopolazioniNISECI {
       species_strutt: 0,
       species_mediamente_strutt: 0,
       species_destrutt: 0,
-      tot_species: 0
+      tot_species: 0,
+      criterio_a: 0,
+      criterio_b: 0,
+      rapporto_ad_juv: 0.0,
     }
   }
 
@@ -544,7 +550,7 @@ impl InfoPopolazioniNISECI {
     let epsilon: f32 = 1e-6;
     for (_key, classe) in map {
       match classe.calculate_struttura_popolazione() {
-        Ok(popolazione) => {
+        Ok((popolazione, crit_a, (crit_b, ad_juv))) => {
           if info_pop.popolazione_piu_strutt < popolazione {
             info_pop.popolazione_piu_strutt = popolazione;
           }
@@ -557,6 +563,10 @@ impl InfoPopolazioniNISECI {
           if popolazione.abs() < epsilon  {
             info_pop.species_destrutt += 1;
           }
+
+          info_pop.criterio_a = crit_a;
+          info_pop.criterio_b = crit_b;
+          info_pop.rapporto_ad_juv = ad_juv;
         },
         Err(error) => errors.push(error),
       }
@@ -707,4 +717,12 @@ impl fmt::Display for StatoEcologicoNISECI {
         };
         write!(f, "{}", string_representation)
     }
+}
+
+pub struct ValoriIntermediSpecieNISECI {
+    pub densita_stimata: f32,
+    pub classi_eta: ClassiEtaSpecieNISECI,
+    pub rapporto_ad_juv: f32,
+    pub x2_a_a: u8,
+    pub x2_a_b: u8,
 }

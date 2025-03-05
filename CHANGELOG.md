@@ -8,6 +8,8 @@
 
 - Fixed broken author link
 - Improved console backout hint
+- Refactored engines to return niseci intermediate values
+- Update tests
 
 ## [0.0.10] - 2025-03-04
 

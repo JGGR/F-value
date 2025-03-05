@@ -15,7 +15,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::model::niseci::{CampionamentoNISECI, RiferimentoNISECI, AnagraficaNISECI, AreaNISECI, StatoEcologicoNISECI};
+use std::collections::{hash_map::Entry, HashMap};
+use crate::model::niseci::{CampionamentoNISECI, RiferimentoNISECI, AnagraficaNISECI, AreaNISECI, StatoEcologicoNISECI, ValoriIntermediSpecieNISECI};
 
 use super::x1::calculate_x1;
 use super::x2::calculate_x2;
@@ -29,7 +30,15 @@ const STATO_ECOLOGICO_NISECI_SOGLIA_BUONO_AREA_MEDITERRANEA: f32 = 0.6;
 const STATO_ECOLOGICO_NISECI_SOGLIA_MODERATO: f32 = 0.4;
 const STATO_ECOLOGICO_NISECI_SOGLIA_SCADENTE: f32 = 0.2;
 
-pub fn calculate_niseci(campionamento: &CampionamentoNISECI, riferimento: &RiferimentoNISECI, anagrafica: &AnagraficaNISECI) -> Result<f32, Vec<String>> {
+pub struct ValoriIntermediNISECI {
+    pub specie_specifici: HashMap<String, ValoriIntermediSpecieNISECI>,
+    pub x2_a: f32,
+    pub x2_b: f32,
+    pub x3_a: f32,
+    pub x3_b: f32,
+}
+
+pub fn calculate_niseci(campionamento: &CampionamentoNISECI, riferimento: &RiferimentoNISECI, anagrafica: &AnagraficaNISECI) -> Result<(f32, ValoriIntermediNISECI), Vec<String>> {
     let mut errors = Vec::new();
     let x1 = calculate_x1(campionamento, riferimento);
 
@@ -43,7 +52,42 @@ pub fn calculate_niseci(campionamento: &CampionamentoNISECI, riferimento: &Rifer
             return Err(errors);
         }
     }
-    let x2 = x2.expect("calc_niseci() returned earlier on Err match");
+    //pub fn calculate_x2(campionamento: &CampionamentoNISECI, anagrafica: &AnagraficaNISECI) -> Result<(f32, (f32, f32), Vec<(String, (u8, (u8, f32)), ClassiEtaSpecieNISECI)>, Vec<(String, f32)>), Vec<String>> {
+    let (x2, (x2_a, x2_b), criteri_vec, densita_vec) = x2.expect("calc_niseci() returned earlier on Err match");
+
+    let mut valori_intermedi_specie: HashMap<String, ValoriIntermediSpecieNISECI> = HashMap::new();
+
+    for (specie, (x2_a_a, (x2_a_b, ad_juv)), classi_eta) in criteri_vec {
+        let val = ValoriIntermediSpecieNISECI {
+            classi_eta: classi_eta,
+            densita_stimata: -1.0, // We fill it later
+            x2_a_a: x2_a_a,
+            x2_a_b: x2_a_b,
+            rapporto_ad_juv: ad_juv
+        };
+        match valori_intermedi_specie.entry(specie) {
+            Entry::Occupied(_) => {},
+            Entry::Vacant(vacant_entry) => {
+                vacant_entry.insert(val);
+            }
+        }
+    }
+
+    for (id, densita) in densita_vec {
+        match valori_intermedi_specie.entry(id.clone()) {
+            Entry::Occupied(mut entry) => {
+                let interm = entry.get_mut();
+                interm.densita_stimata = densita;
+            },
+            Entry::Vacant(_) => {
+                errors.push(format!("Errore: specie {} ha una densita stimata ma manca degli altri valori intermedi", id));
+            }
+        }
+    }
+
+    if errors.len() > 0 { // In case the densita_vec had some problems
+        return Err(errors);
+    }
 
     let x3 = calculate_x3(campionamento);
     match x3 {
@@ -55,7 +99,7 @@ pub fn calculate_niseci(campionamento: &CampionamentoNISECI, riferimento: &Rifer
             return Err(errors);
         }
     }
-    let x3 = x3.expect("calc_niseci() returned earlier on Err match");
+    let (x3, (x3_a, x3_b)) = x3.expect("calc_niseci() returned earlier on Err match");
 
     let mut x1_x2_errors = Vec::new();
     if x1 < 0.0 {
@@ -73,7 +117,15 @@ pub fn calculate_niseci(campionamento: &CampionamentoNISECI, riferimento: &Rifer
         ( (0.1 * (1.0 - x3)) *
           ((0.1 * x1.sqrt()) + (0.1 * x2.sqrt()) + (0.8 * (x1 * x2)))
         );
-    return Ok(niseci);
+
+    let intermediates = ValoriIntermediNISECI {
+        specie_specifici: valori_intermedi_specie,
+        x2_a: x2_a,
+        x2_b: x2_b,
+        x3_a: x3_a,
+        x3_b: x3_b,
+    };
+    return Ok((niseci, intermediates));
 }
 
 pub fn calculate_rqe_niseci(niseci: f32) -> f32 {
