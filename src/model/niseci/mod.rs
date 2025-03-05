@@ -427,40 +427,46 @@ impl RisultatoNISECI {
     }
 }
 
-pub struct CriteriX2aB (u8, f32);
+pub struct MetricheX2aB {
+    criterio_b: u8,
+    rapporto_ad_juv: f32
+}
 
-impl CriteriX2aB {
+impl MetricheX2aB {
     pub fn new(criterio_b: u8, rapporto_ad_juv: f32) -> Self {
-        Self (
-            criterio_b,
-            rapporto_ad_juv,
-        )
+        Self {
+            criterio_b: criterio_b,
+            rapporto_ad_juv: rapporto_ad_juv,
+        }
     }
     pub fn get_criterio_b(&self) -> u8 {
-        return self.0;
+        return self.criterio_b;
     }
     pub fn get_rapporto_ad_juv(&self) -> f32 {
-        return self.1;
+        return self.rapporto_ad_juv;
     }
 }
 
-pub struct CriteriX2A (u8, CriteriX2aB);
+pub struct MetricheX2A {
+    criterio_a: u8,
+    criteri_x2a_b: MetricheX2aB
+}
 
-impl CriteriX2A {
-    pub fn new(criterio_a: u8, criteri_x2a_b: CriteriX2aB) -> Self {
-        Self (
-            criterio_a,
-            criteri_x2a_b
-        )
+impl MetricheX2A {
+    pub fn new(criterio_a: u8, criteri_x2a_b: MetricheX2aB) -> Self {
+        Self {
+            criterio_a: criterio_a,
+            criteri_x2a_b: criteri_x2a_b
+        }
     }
     pub fn get_criterio_a(&self) -> u8 {
-        return self.0;
+        return self.criterio_a;
     }
     pub fn get_criterio_b(&self) -> u8 {
-        return self.1.get_criterio_b();
+        return self.criteri_x2a_b.get_criterio_b();
     }
     pub fn get_rapporto_ad_juv(&self) -> f32 {
-        return self.1.get_rapporto_ad_juv();
+        return self.criteri_x2a_b.get_rapporto_ad_juv();
     }
 }
 
@@ -556,24 +562,24 @@ impl ClassiEtaSpecieNISECI {
 
   /// questa fn viene usata sia per x2_a che per x3
   /// i suoi test sono esattamente quelli per calculate_x2_a
-  pub(crate) fn calculate_struttura_popolazione(&self) -> Result<(f32, CriteriX2A), String> {
+  pub(crate) fn calculate_struttura_popolazione(&self) -> Result<(f32, MetricheX2A), String> {
     let criterio_a: u8 = self.get_x2_a_criterio_a();
     let (criterio_b, ad_juv): (u8, f32) = self.get_x2_a_criterio_b();
 
     if criterio_a == 1 && criterio_b == 3 {
-      return Ok((0.5, CriteriX2A::new(criterio_a, CriteriX2aB::new(criterio_b, ad_juv))));
+      return Ok((0.5, MetricheX2A::new(criterio_a, MetricheX2aB::new(criterio_b, ad_juv))));
     }
     if criterio_a == 1 {
-      return Ok((1.0, CriteriX2A::new(criterio_a, CriteriX2aB::new(criterio_b, ad_juv))));
+      return Ok((1.0, MetricheX2A::new(criterio_a, MetricheX2aB::new(criterio_b, ad_juv))));
     }
     if criterio_a == 2 && criterio_b == 3 {
-      return Ok((0.0, CriteriX2A::new(criterio_a, CriteriX2aB::new(criterio_b, ad_juv))));
+      return Ok((0.0, MetricheX2A::new(criterio_a, MetricheX2aB::new(criterio_b, ad_juv))));
     }
     if criterio_a == 2 {
-      return Ok((0.5, CriteriX2A::new(criterio_a, CriteriX2aB::new(criterio_b, ad_juv))));
+      return Ok((0.5, MetricheX2A::new(criterio_a, MetricheX2aB::new(criterio_b, ad_juv))));
     }
     if criterio_a == 3 {
-      return Ok((0.0, CriteriX2A::new(criterio_a, CriteriX2aB::new(criterio_b, ad_juv))));
+      return Ok((0.0, MetricheX2A::new(criterio_a, MetricheX2aB::new(criterio_b, ad_juv))));
     }
     return Err(format!("Il Criterio A o B di x2a è diverso da 1 o 2 o 3. criterio A = {}, criterio B = {}", criterio_a, criterio_b));
   }
