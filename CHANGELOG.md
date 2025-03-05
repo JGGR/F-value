@@ -1,3 +1,14 @@
+## [0.0.11] - Unreleased
+
+### Added
+
+- More info on HOME and SECOND view
+
+### Changed
+
+- Fixed broken author link
+- Improved console backout hint
+
 ## [0.0.10] - 2025-03-04
 
 ### Added

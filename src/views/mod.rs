@@ -51,6 +51,7 @@ impl HomeView {
 
         // Draw the state retrieved via the Controller
         let state = controller.get_state();
+        let frame_counter = state.get_frame_counter();
         let state_name = state.get_name();
         let line = format!("Value: {}, Name: {}", state.get_value(), state_name);
         d.draw_text_ex(
@@ -120,6 +121,16 @@ impl HomeView {
                 Some(label.as_c_str())
             );
         }
+        let rainbow_speed = 0.03;
+        let todo_font_scale = 4;
+        let todo_font_height = main_state.current_font_height * todo_font_scale;
+
+        let todo_txt = "TODO: WELCOME";
+        let todo_txt_bounds = main_state.current_font.measure_text(todo_txt, todo_font_height as f32, main_state.default_txt_spacing as f32);
+        let todo_txt_x = (d.get_screen_width() / 2) - (todo_txt_bounds.x as i32 / 2);
+        let todo_txt_y = (d.get_screen_height() / 2) - (todo_txt_bounds.y as i32 / 2);
+
+        draw_rainbow_text(d, todo_txt_x, todo_txt_y, "TODO: WELCOME", frame_counter, rainbow_speed, &main_state.current_font, main_state.default_txt_spacing, main_state.current_font_height, todo_font_scale);
     }
 }
 
@@ -140,6 +151,7 @@ impl SecondView {
 
         // Draw the state retrieved via the Controller
         let state = controller.get_state();
+        let frame_counter = state.get_frame_counter();
         let state_name = state.get_name();
         let line = format!("Value: {}, Name: {}", state.get_value(), state_name);
         d.draw_text_ex(
@@ -208,6 +220,16 @@ impl SecondView {
                 Some(label.as_c_str())
             );
         }
+        let rainbow_speed = 0.03;
+        let todo_font_scale = 4;
+        let todo_font_height = main_state.current_font_height * todo_font_scale;
+
+        let todo_txt = "TODO: WELCOME";
+        let todo_txt_bounds = main_state.current_font.measure_text(todo_txt, todo_font_height as f32, main_state.default_txt_spacing as f32);
+        let todo_txt_x = (d.get_screen_width() / 2) - (todo_txt_bounds.x as i32 / 2);
+        let todo_txt_y = (d.get_screen_height() / 2) - (todo_txt_bounds.y as i32 / 2);
+
+        draw_rainbow_text(d, todo_txt_x, todo_txt_y, "TODO: WELCOME", frame_counter, rainbow_speed, &main_state.current_font, main_state.default_txt_spacing, main_state.current_font_height, todo_font_scale);
     }
 }
 

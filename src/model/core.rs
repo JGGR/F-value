@@ -26,11 +26,19 @@ use crate::SHORT_PROJECT_VERSION;
 // State struct holding non-`Copy` types
 #[derive(Clone)]
 pub struct HomeModel {
+    frame_counter: u32,
     value: i32,
     name: String,
 }
 
 impl HomeModel {
+    pub fn get_frame_counter(&self) -> u32 {
+        return self.frame_counter;
+    }
+    pub fn increment_frame_counter(&mut self) {
+        self.frame_counter += 1;
+    }
+
     pub fn get_value(&self) -> i32 {
         return self.value;
     }
@@ -51,11 +59,18 @@ impl HomeModel {
 // State struct holding non-`Copy` types
 #[derive(Clone)]
 pub struct SecondModel {
+    frame_counter: u32,
     value: i32,
     name: String,
 }
 
 impl SecondModel {
+    pub fn get_frame_counter(&self) -> u32 {
+        return self.frame_counter;
+    }
+    pub fn increment_frame_counter(&mut self) {
+        self.frame_counter += 1;
+    }
     pub fn get_value(&self) -> i32 {
         return self.value;
     }
@@ -318,10 +333,12 @@ impl Model {
     pub fn new() -> Self {
         Self {
             home_model: HomeModel {
+                frame_counter: 0,
                 value: 0,
                 name: "Initial".to_string(),
             },
             second_model: SecondModel {
+                frame_counter: 0,
                 value: 1,
                 name: "Initial".to_string(),
             },

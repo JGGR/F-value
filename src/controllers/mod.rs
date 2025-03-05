@@ -38,6 +38,7 @@ impl HomeController {
 
     pub fn update(&self, _rl: &RaylibHandle) {
         let mut state = GLOBAL_STATE.lock().unwrap();
+        state.home_model.increment_frame_counter();
         state.home_model.set_name("Updated".to_string());
     }
 
@@ -66,6 +67,7 @@ impl SecondController {
 
     pub fn update(&self, _rl: &RaylibHandle) {
         let mut state = GLOBAL_STATE.lock().unwrap();
+        state.second_model.increment_frame_counter();
         state.second_model.set_name("Updated".to_string());
     }
 
