@@ -3,12 +3,15 @@
 ### Added
 
 - More info on HOME and SECOND view
+- Store `RisultatoNISECI` as console env, for info command
+- Added format functions for some model structs
 
 ### Changed
 
 - Fixed broken author link
 - Improved console backout hint
 - Refactored engines to return niseci intermediate values
+- `RisultatoNISECI` now holds intermediates
 - Update tests
 
 ## [0.0.10] - 2025-03-04

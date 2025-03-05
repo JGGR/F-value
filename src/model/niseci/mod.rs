@@ -427,6 +427,42 @@ impl RisultatoNISECI {
     }
 }
 
+pub struct CriteriX2aB (u8, f32);
+
+impl CriteriX2aB {
+    pub fn new(criterio_b: u8, rapporto_ad_juv: f32) -> Self {
+        Self (
+            criterio_b,
+            rapporto_ad_juv,
+        )
+    }
+    pub fn get_criterio_b(&self) -> u8 {
+        return self.0;
+    }
+    pub fn get_rapporto_ad_juv(&self) -> f32 {
+        return self.1;
+    }
+}
+
+pub struct CriteriX2A (u8, CriteriX2aB);
+
+impl CriteriX2A {
+    pub fn new(criterio_a: u8, criteri_x2a_b: CriteriX2aB) -> Self {
+        Self (
+            criterio_a,
+            criteri_x2a_b
+        )
+    }
+    pub fn get_criterio_a(&self) -> u8 {
+        return self.0;
+    }
+    pub fn get_criterio_b(&self) -> u8 {
+        return self.1.get_criterio_b();
+    }
+    pub fn get_rapporto_ad_juv(&self) -> f32 {
+        return self.1.get_rapporto_ad_juv();
+    }
+}
 
 /// le classi eta contengono il numero di esemplari trovati
 /// nel campionamento per ogni specie catturata
@@ -520,24 +556,24 @@ impl ClassiEtaSpecieNISECI {
 
   /// questa fn viene usata sia per x2_a che per x3
   /// i suoi test sono esattamente quelli per calculate_x2_a
-  pub(crate) fn calculate_struttura_popolazione(&self) -> Result<(f32, u8, (u8, f32)), String> {
+  pub(crate) fn calculate_struttura_popolazione(&self) -> Result<(f32, CriteriX2A), String> {
     let criterio_a: u8 = self.get_x2_a_criterio_a();
     let (criterio_b, ad_juv): (u8, f32) = self.get_x2_a_criterio_b();
 
     if criterio_a == 1 && criterio_b == 3 {
-      return Ok((0.5, criterio_a, (criterio_b, ad_juv)));
+      return Ok((0.5, CriteriX2A::new(criterio_a, CriteriX2aB::new(criterio_b, ad_juv))));
     }
     if criterio_a == 1 {
-      return Ok((1.0, criterio_a, (criterio_b, ad_juv)));
+      return Ok((1.0, CriteriX2A::new(criterio_a, CriteriX2aB::new(criterio_b, ad_juv))));
     }
     if criterio_a == 2 && criterio_b == 3 {
-      return Ok((0.0, criterio_a, (criterio_b, ad_juv)));
+      return Ok((0.0, CriteriX2A::new(criterio_a, CriteriX2aB::new(criterio_b, ad_juv))));
     }
     if criterio_a == 2 {
-      return Ok((0.5, criterio_a, (criterio_b, ad_juv)));
+      return Ok((0.5, CriteriX2A::new(criterio_a, CriteriX2aB::new(criterio_b, ad_juv))));
     }
     if criterio_a == 3 {
-      return Ok((0.0, criterio_a, (criterio_b, ad_juv)));
+      return Ok((0.0, CriteriX2A::new(criterio_a, CriteriX2aB::new(criterio_b, ad_juv))));
     }
     return Err(format!("Il Criterio A o B di x2a è diverso da 1 o 2 o 3. criterio A = {}, criterio B = {}", criterio_a, criterio_b));
   }
@@ -606,7 +642,7 @@ impl InfoPopolazioniNISECI {
     let epsilon: f32 = 1e-6;
     for (_key, classe) in map {
       match classe.calculate_struttura_popolazione() {
-        Ok((popolazione, crit_a, (crit_b, ad_juv))) => {
+        Ok((popolazione, criteri_x2_a)) => {
           if info_pop.popolazione_piu_strutt < popolazione {
             info_pop.popolazione_piu_strutt = popolazione;
           }
@@ -620,9 +656,9 @@ impl InfoPopolazioniNISECI {
             info_pop.species_destrutt += 1;
           }
 
-          info_pop.criterio_a = crit_a;
-          info_pop.criterio_b = crit_b;
-          info_pop.rapporto_ad_juv = ad_juv;
+          info_pop.criterio_a = criteri_x2_a.get_criterio_a();
+          info_pop.criterio_b = criteri_x2_a.get_criterio_b();
+          info_pop.rapporto_ad_juv = criteri_x2_a.get_rapporto_ad_juv();
         },
         Err(error) => errors.push(error),
       }

@@ -45,17 +45,17 @@ pub fn calculate_niseci(campionamento: &CampionamentoNISECI, riferimento: &Rifer
         }
     }
     //pub fn calculate_x2(campionamento: &CampionamentoNISECI, anagrafica: &AnagraficaNISECI) -> Result<(f32, (f32, f32), Vec<(String, (u8, (u8, f32)), ClassiEtaSpecieNISECI)>, Vec<(String, f32)>), Vec<String>> {
-    let (x2, (x2_a, x2_b), criteri_vec, densita_vec) = x2.expect("calc_niseci() returned earlier on Err match");
+    let (x2, criteri_x2, criteri_vec, densita_vec) = x2.expect("calc_niseci() returned earlier on Err match");
 
     let mut valori_intermedi_specie: HashMap<String, ValoriIntermediSpecieNISECI> = HashMap::new();
 
-    for (specie, (x2_a_a, (x2_a_b, ad_juv)), classi_eta) in criteri_vec {
+    for (specie, criteri_x2_a, classi_eta) in criteri_vec {
         let val = ValoriIntermediSpecieNISECI {
             classi_eta: classi_eta,
             densita_stimata: -1.0, // We fill it later
-            x2_a_a: x2_a_a,
-            x2_a_b: x2_a_b,
-            rapporto_ad_juv: ad_juv
+            x2_a_a: criteri_x2_a.get_criterio_a(),
+            x2_a_b: criteri_x2_a.get_criterio_b(),
+            rapporto_ad_juv: criteri_x2_a.get_rapporto_ad_juv(),
         };
         match valori_intermedi_specie.entry(specie) {
             Entry::Occupied(_) => {},
@@ -65,7 +65,9 @@ pub fn calculate_niseci(campionamento: &CampionamentoNISECI, riferimento: &Rifer
         }
     }
 
-    for (id, densita) in densita_vec {
+    for val in densita_vec {
+        let id = val.get_id();
+        let densita = val.get_densita_stimata();
         match valori_intermedi_specie.entry(id.clone()) {
             Entry::Occupied(mut entry) => {
                 let interm = entry.get_mut();
@@ -91,7 +93,7 @@ pub fn calculate_niseci(campionamento: &CampionamentoNISECI, riferimento: &Rifer
             return Err(errors);
         }
     }
-    let (x3, (x3_a, x3_b)) = x3.expect("calc_niseci() returned earlier on Err match");
+    let (x3, criteri_x3) = x3.expect("calc_niseci() returned earlier on Err match");
 
     let mut x1_x2_errors = Vec::new();
     if x1 < 0.0 {
@@ -112,10 +114,10 @@ pub fn calculate_niseci(campionamento: &CampionamentoNISECI, riferimento: &Rifer
 
     let intermediates = ValoriIntermediNISECI {
         specie_specifici: valori_intermedi_specie,
-        x2_a: x2_a,
-        x2_b: x2_b,
-        x3_a: x3_a,
-        x3_b: x3_b,
+        x2_a: criteri_x2.get_criterio_a(),
+        x2_b: criteri_x2.get_criterio_b(),
+        x3_a: criteri_x3.get_criterio_a(),
+        x3_b: criteri_x3.get_criterio_b(),
     };
     return Ok((niseci, intermediates));
 }
