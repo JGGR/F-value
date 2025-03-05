@@ -224,7 +224,7 @@ pub fn draw_info_box(d: &mut RaylibDrawHandle, showing_info_box: &mut bool, font
         }
 
         let author_display_links: Vec<String> = vec!(format!("{AUTHOR_JGABAUT}"), format!("{AUTHOR_GIONINJO}"));
-        let author_actual_links: Vec<String> = vec!(format!("{AUTHOR_JGABAUT_LINK}"), format!("h{AUTHOR_GIONINJO_LINK}"));
+        let author_actual_links: Vec<String> = vec!(format!("{AUTHOR_JGABAUT_LINK}"), format!("{AUTHOR_GIONINJO_LINK}"));
         let author_links_str: Vec<CString> = vec!(CString::new(author_display_links[0].clone()).unwrap(), CString::new(author_display_links[1].clone()).unwrap());
         let author_display_links_width: Vec<i32> = vec!(
             font.measure_text(&format!("{}, ", author_display_links[0]), current_font_height as f32, default_txt_spacing as f32).x as i32,
