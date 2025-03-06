@@ -36,6 +36,19 @@ pub const AUTHOR_JGABAUT: &'static str = "jgabaut";
 pub const AUTHOR_GIONINJO: &'static str = "gioninjo";
 pub const AUTHOR_GIONINJO_LINK: &'static str = "https://github.com/gioninjo";
 pub const AUTHOR_JGABAUT_LINK: &'static str = "https://github.com/jgabaut";
+pub const COPYRIGHT_INFO: &'static str = "Copyright (C) 2025  jgabaut, gioninjo
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, version 3 of the License.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.";
+
 pub const EXIT_KEY: raylib::consts::KeyboardKey = raylib::consts::KeyboardKey::KEY_ESCAPE;
 pub const PROJECT_NAME: &'static str = env!("CARGO_PKG_NAME");
 pub const PROJECT_VERSION: &'static str = env!("CARGO_PKG_VERSION");
@@ -1323,4 +1336,9 @@ pub fn print_warranty_info() {
   PURPOSE.  THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM
   IS WITH YOU.  SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF
   ALL NECESSARY SERVICING, REPAIR OR CORRECTION.\n");
+}
+
+pub fn print_copyright_splash() {
+    let splash: String = format!("{PROJECT_VERSION_FULL}\n\n{COPYRIGHT_INFO}");
+    println!("{splash}");
 }
