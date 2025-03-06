@@ -44,7 +44,6 @@ pub fn calculate_niseci(campionamento: &CampionamentoNISECI, riferimento: &Rifer
             return Err(errors);
         }
     }
-    //pub fn calculate_x2(campionamento: &CampionamentoNISECI, anagrafica: &AnagraficaNISECI) -> Result<(f32, (f32, f32), Vec<(String, (u8, (u8, f32)), ClassiEtaSpecieNISECI)>, Vec<(String, f32)>), Vec<String>> {
     let (x2, criteri_x2) = x2.expect("calc_niseci() returned earlier on Err match");
 
     let mut valori_intermedi_specie: HashMap<String, ValoriIntermediSpecieNISECI> = HashMap::new();

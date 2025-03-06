@@ -5,6 +5,14 @@
 - More info on HOME and SECOND view
 - Store `RisultatoNISECI` as console env, for info command
 - Added format functions for some model structs
+- New types for holding intermediate values in `RisultatoNISECI`: `ValoriIntermediNISECI`, `ValoriIntermediSpecieNISECI`
+- New utility types for low-level calls:
+  - `MetricheX2`
+  - `SubmetricheX2`
+    - `MetricheX2A`
+    - `MetricheX2aB`
+    - `MetricheX2B`
+  - `MetricheX3`
 
 ### Changed
 
