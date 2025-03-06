@@ -21,16 +21,44 @@ use crate::model::niseci::{AnagraficaNISECI, CampionamentoNISECI, ClassiEtaSpeci
 
 use super::linear_regression::{calculate_quantita_with_regression, Point};
 
+#[derive(Clone)]
+pub struct SubmetricheX2 {
+    metriche_x2_a: MetricheX2A,
+    classi_eta: ClassiEtaSpecieNISECI,
+    metriche_x2_b: MetricheX2B
+}
+
+impl SubmetricheX2 {
+    pub fn new(metriche_x2_a: MetricheX2A, classi_eta: ClassiEtaSpecieNISECI, metriche_x2_b: MetricheX2B) -> Self {
+        Self {
+            metriche_x2_a: metriche_x2_a,
+            classi_eta: classi_eta,
+            metriche_x2_b: metriche_x2_b
+        }
+    }
+    pub fn get_metriche_x2_a(&self) -> MetricheX2A {
+        return self.metriche_x2_a;
+    }
+    pub fn get_classi_eta(&self) -> ClassiEtaSpecieNISECI {
+        return self.classi_eta.clone();
+    }
+    pub fn get_metriche_x2_b(&self) -> MetricheX2B {
+        return self.metriche_x2_b.clone();
+    }
+}
+
 pub struct MetricheX2 {
     criterio_a: f32,
-    criterio_b: f32
+    criterio_b: f32,
+    submetriche_map: HashMap<String, SubmetricheX2>
 }
 
 impl MetricheX2 {
-    pub fn new(criterio_a: f32, criterio_b: f32) -> Self {
+    pub fn new(criterio_a: f32, criterio_b: f32, submetriche_map: HashMap<String, SubmetricheX2>) -> Self {
         Self {
             criterio_a: criterio_a,
-            criterio_b: criterio_b
+            criterio_b: criterio_b,
+            submetriche_map: submetriche_map
         }
     }
     pub fn get_criterio_a(&self) -> f32 {
@@ -39,8 +67,12 @@ impl MetricheX2 {
     pub fn get_criterio_b(&self) -> f32 {
         return self.criterio_b;
     }
+    pub fn get_submetriche_map(&self) -> HashMap<String, SubmetricheX2> {
+        return self.submetriche_map.clone();
+    }
 }
 
+#[derive(Clone)]
 pub struct MetricheX2B {
     id_specie: String,
     densita_stimata: f32
@@ -61,7 +93,7 @@ impl MetricheX2B {
     }
 }
 
-pub fn calculate_x2(campionamento: &CampionamentoNISECI, anagrafica: &AnagraficaNISECI) -> Result<(f32, MetricheX2, Vec<(String, MetricheX2A, ClassiEtaSpecieNISECI)>, Vec<MetricheX2B>), Vec<String>> {
+pub fn calculate_x2(campionamento: &CampionamentoNISECI, anagrafica: &AnagraficaNISECI) -> Result<(f32, MetricheX2), Vec<String>> {
   let (x2_a, criteri_vec) = match calculate_sommatoria_x2_a(campionamento) {
     Ok(x2_a) => x2_a,
     Err(errors) => return Err(errors),
@@ -87,7 +119,40 @@ pub fn calculate_x2(campionamento: &CampionamentoNISECI, anagrafica: &Anagrafica
 
   let result = (0.6 * x2_a + 0.4 * x2_b) / tot_specie_attese_trovate as f32;
 
-  Ok((result, MetricheX2::new(x2_a, x2_b), criteri_vec, densita_vec))
+  let mut submetriche = HashMap::<String, SubmetricheX2>::new();
+
+  for crit in &criteri_vec {
+    match submetriche.entry(crit.0.clone()) {
+        Entry::Occupied(_) => {},
+        Entry::Vacant(vacant_entry) => {
+            vacant_entry.insert(
+                // We fill densita_stimata later
+                SubmetricheX2::new(crit.1, crit.2.clone(), MetricheX2B::new(crit.0.clone(), -1.0))
+            );
+        }
+    }
+  }
+
+  let mut errors = Vec::<String>::new();
+
+  for dens in &densita_vec {
+    let id = dens.get_id();
+    match submetriche.entry(id.clone()) {
+        Entry::Occupied(mut entry) => {
+            let submetr = entry.get_mut();
+            *submetr = SubmetricheX2::new(submetr.get_metriche_x2_a(), submetr.get_classi_eta(), MetricheX2B::new(id, dens.get_densita_stimata()));
+        },
+        Entry::Vacant(_) => {
+            errors.push(format!("Errore: specie {} ha una densita stimata ma manca degli altri valori intermedi", id));
+        }
+    }
+  }
+
+  if errors.len() > 0 { // In case the densita_vec had some problems
+    return Err(errors);
+  }
+
+  Ok((result, MetricheX2::new(x2_a, x2_b, submetriche)))
 }
 
 fn calculate_sommatoria_x2_a(c: &CampionamentoNISECI) -> Result<(f32, Vec<(String, MetricheX2A, ClassiEtaSpecieNISECI)>), Vec<String>> {

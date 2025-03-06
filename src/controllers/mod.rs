@@ -825,7 +825,7 @@ impl OutputController {
                     //TODO: recalculation of x1, x2, x3 is only used for richer console output ATM
                     //Maybe should be removed later
                     let x1 = calculate_x1(&campionamento, &riferimento);
-                    let (x2, _criteri_x2, _criteri_vec, _densita_vec) = calculate_x2(&campionamento, &anagrafica).unwrap();
+                    let (x2, _criteri_x2) = calculate_x2(&campionamento, &anagrafica).unwrap();
                     let (x3, _criteri_x3) = calculate_x3(&campionamento).unwrap();
                     self.add_console_message(format!("x1: {x1}"));
                     self.add_console_message(format!("x2: {x2}"));

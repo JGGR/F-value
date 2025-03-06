@@ -45,14 +45,19 @@ pub fn calculate_niseci(campionamento: &CampionamentoNISECI, riferimento: &Rifer
         }
     }
     //pub fn calculate_x2(campionamento: &CampionamentoNISECI, anagrafica: &AnagraficaNISECI) -> Result<(f32, (f32, f32), Vec<(String, (u8, (u8, f32)), ClassiEtaSpecieNISECI)>, Vec<(String, f32)>), Vec<String>> {
-    let (x2, criteri_x2, criteri_vec, densita_vec) = x2.expect("calc_niseci() returned earlier on Err match");
+    let (x2, criteri_x2) = x2.expect("calc_niseci() returned earlier on Err match");
 
     let mut valori_intermedi_specie: HashMap<String, ValoriIntermediSpecieNISECI> = HashMap::new();
 
-    for (specie, criteri_x2_a, classi_eta) in criteri_vec {
+    let submetriche_map = criteri_x2.get_submetriche_map();
+    for (key, val) in submetriche_map.iter() {
+        let criteri_x2_a = val.get_metriche_x2_a();
+        let classi_eta = val.get_classi_eta();
+        let specie = key.clone();
+        let densita_stimata = val.get_metriche_x2_b().get_densita_stimata();
         let val = ValoriIntermediSpecieNISECI {
             classi_eta: classi_eta,
-            densita_stimata: -1.0, // We fill it later
+            densita_stimata: densita_stimata,
             x2_a_a: criteri_x2_a.get_criterio_a(),
             x2_a_b: criteri_x2_a.get_criterio_b(),
             rapporto_ad_juv: criteri_x2_a.get_rapporto_ad_juv(),
@@ -63,24 +68,6 @@ pub fn calculate_niseci(campionamento: &CampionamentoNISECI, riferimento: &Rifer
                 vacant_entry.insert(val);
             }
         }
-    }
-
-    for val in densita_vec {
-        let id = val.get_id();
-        let densita = val.get_densita_stimata();
-        match valori_intermedi_specie.entry(id.clone()) {
-            Entry::Occupied(mut entry) => {
-                let interm = entry.get_mut();
-                interm.densita_stimata = densita;
-            },
-            Entry::Vacant(_) => {
-                errors.push(format!("Errore: specie {} ha una densita stimata ma manca degli altri valori intermedi", id));
-            }
-        }
-    }
-
-    if errors.len() > 0 { // In case the densita_vec had some problems
-        return Err(errors);
     }
 
     let x3 = calculate_x3(campionamento);

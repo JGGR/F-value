@@ -427,6 +427,7 @@ impl RisultatoNISECI {
     }
 }
 
+#[derive(Clone, Copy)]
 pub struct MetricheX2aB {
     criterio_b: u8,
     rapporto_ad_juv: f32
@@ -447,6 +448,7 @@ impl MetricheX2aB {
     }
 }
 
+#[derive(Clone, Copy)]
 pub struct MetricheX2A {
     criterio_a: u8,
     criteri_x2a_b: MetricheX2aB
