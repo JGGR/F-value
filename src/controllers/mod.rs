@@ -39,22 +39,11 @@ impl HomeController {
     pub fn update(&self, _rl: &RaylibHandle) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.home_model.increment_frame_counter();
-        state.home_model.set_name("Updated".to_string());
     }
 
     pub fn get_state(&self) -> HomeModel {
         let state = GLOBAL_STATE.lock().unwrap();
         return state.home_model.clone();
-    }
-
-    pub fn _set_name(&self, name: String) {
-        let mut state = GLOBAL_STATE.lock().unwrap();
-        state.home_model.set_name(name);
-    }
-
-    pub fn set_value(&self, val: i32) {
-        let mut state = GLOBAL_STATE.lock().unwrap();
-        state.home_model.set_value(val);
     }
 }
 

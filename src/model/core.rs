@@ -27,8 +27,6 @@ use crate::SHORT_PROJECT_VERSION;
 #[derive(Clone)]
 pub struct HomeModel {
     frame_counter: u32,
-    value: i32,
-    name: String,
 }
 
 impl HomeModel {
@@ -37,21 +35,6 @@ impl HomeModel {
     }
     pub fn increment_frame_counter(&mut self) {
         self.frame_counter += 1;
-    }
-
-    pub fn get_value(&self) -> i32 {
-        return self.value;
-    }
-
-    pub fn set_value(&mut self, val: i32) {
-        self.value = val;
-    }
-    pub fn get_name(&self) -> String {
-        return self.name.clone();
-    }
-
-    pub fn set_name(&mut self, new_name: String) {
-        self.name = new_name;
     }
 }
 
@@ -334,8 +317,6 @@ impl Model {
         Self {
             home_model: HomeModel {
                 frame_counter: 0,
-                value: 0,
-                name: "Initial".to_string(),
             },
             second_model: SecondModel {
                 frame_counter: 0,

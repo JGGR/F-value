@@ -13,6 +13,7 @@
     - `MetricheX2aB`
     - `MetricheX2B`
   - `MetricheX3`
+- Added copyright info in `HomeView`
 
 ### Changed
 
@@ -23,6 +24,7 @@
 - Update tests
 - Less verbose CLI output
 - Print intermediate values to stdout on full calc
+- Updated copyright info splash
 
 ## [0.0.10] - 2025-03-04
 

@@ -34,17 +34,11 @@ use std::ffi::CString;
 
 // A view responsible for rendering the state
 // Tightly coupled with its respective controller
-pub struct HomeView {
-    spinner_value: i32,
-    spinner_edit_mode: bool,
-}
+pub struct HomeView {}
 
 impl HomeView {
     pub fn new() -> Self {
-        Self {
-            spinner_value: 0,
-            spinner_edit_mode: false,
-        }
+        Self {}
     }
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &HomeController, main_state: &MainState) {
         d.clear_background(main_state.default_bg_color);
@@ -52,38 +46,6 @@ impl HomeView {
         // Draw the state retrieved via the Controller
         let state = controller.get_state();
         let frame_counter = state.get_frame_counter();
-        let state_name = state.get_name();
-        let line = format!("Value: {}, Name: {}", state.get_value(), state_name);
-        d.draw_text_ex(
-            &main_state.current_font,
-            &line,
-            // We use propwidth/height for the text starting position:
-            // this is not the bound
-            Vector2::new(propwidth(&d, 100) as f32, propheight(&d, 10) as f32),
-            main_state.current_font_height as f32,
-            main_state.default_txt_spacing as f32,
-            main_state.default_txt_color
-        );
-
-
-        let updated_spinner = d.gui_spinner(
-            rrect(propwidth(&d, 100), propheight(&d, 50), propwidth(&d, 125), propheight(&d, 30)),
-            None,
-            &mut self.spinner_value,
-            0,
-            100,
-            self.spinner_edit_mode,
-        );
-        if updated_spinner {
-            self.spinner_edit_mode = !self.spinner_edit_mode;
-        }
-
-        // gui_value_box() (and gui_spinner() too since it's used by it. The "value" argument
-        // must be a value living for the whole draw loop, so we just dup them
-        // to the View and ensure to set them on all frames to the model via
-        // the controller.
-        controller.set_value(self.spinner_value);
-
 
         let next_itext = d.gui_icon_text(ICON_PLAYER_NEXT, Some(rstr!(": Prossimo")));
         let next_itext = CString::new(next_itext).unwrap();
@@ -98,6 +60,23 @@ impl HomeView {
                 propheight(&d, 50),
             ),
             Some(next_itext.as_c_str())
+        );
+
+        let copyright_label_width = propwidth(&d, 400);
+        let copyright_label_x = propwidth(&d, 20);
+        let copyright_label_y = propheight(&d, 30);
+        let copyright_label_height = propheight(&d, 300);
+
+        let copyright_label = CString::new(COPYRIGHT_INFO).unwrap();
+
+        d.gui_label(
+            rrect(
+                copyright_label_x,
+                copyright_label_y,
+                copyright_label_width,
+                copyright_label_height
+            ),
+            Some(copyright_label.as_c_str())
         );
 
         let labels_width = propwidth(&d, 200);
