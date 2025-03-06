@@ -39,18 +39,18 @@ impl MetricheX3 {
 
 use crate::model::niseci::{CampionamentoNISECI, ClassiEtaAlieniNISECI, ClassiEtaSpecieNISECI, InfoPopolazioniAlieneNISECI};
 
-pub fn calculate_x3(c: &CampionamentoNISECI) -> Result<(f32, MetricheX3), Vec<String>> {
+pub fn calculate_x3(c: &CampionamentoNISECI) -> Result<(f32, Option<MetricheX3>), Vec<String>> {
 
   let alieni_indigeni = c.get_numero_pesci_alieni_e_indigeni();
 
   // condizione 1
   if alieni_indigeni.alieni == 0 {
-    return Ok((1.0, MetricheX3::new(-1.0, -1.0)));
+    return Ok((1.0, None));
   }
 
   // condizione 2
   if alieni_indigeni.alieni >= alieni_indigeni.indigeni {
-    return Ok((0.0, MetricheX3::new(-1.0, -1.0)));
+    return Ok((0.0, None));
   }
 
 
@@ -70,7 +70,7 @@ pub fn calculate_x3(c: &CampionamentoNISECI) -> Result<(f32, MetricheX3), Vec<St
   // condizione 3
   let epsilon: f32 = 1e-6;
   if (info_pop_aliene.tipo_1.popolazione_piu_strutt - 1.0).abs() < epsilon {
-    return Ok((0.0, MetricheX3::new(-1.0, -1.0)));
+    return Ok((0.0, None));
   }
 
 
@@ -82,7 +82,7 @@ pub fn calculate_x3(c: &CampionamentoNISECI) -> Result<(f32, MetricheX3), Vec<St
 
   let x3 = 0.5 * (a + b);
 
-  Ok((x3, MetricheX3::new(a, b)))
+  Ok((x3, Some(MetricheX3::new(a, b))))
 }
 
 fn calculate_classi_eta_alieni(c: &CampionamentoNISECI) -> ClassiEtaAlieniNISECI {

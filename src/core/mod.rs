@@ -1340,5 +1340,5 @@ pub fn print_warranty_info() {
 
 pub fn print_copyright_splash() {
     let splash: String = format!("{PROJECT_VERSION_FULL}\n\n{COPYRIGHT_INFO}");
-    println!("{splash}");
+    println!("{splash}\n");
 }

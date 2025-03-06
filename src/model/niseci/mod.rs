@@ -47,8 +47,12 @@ pub struct SpecieNISECI {
 
 impl fmt::Display for SpecieNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let specie_attesa_str = match self.specie_attesa {
+            true => format!("SI"),
+            false => format!("NO"),
+        };
         let string_representation = format!("SpecieNISECI: {{ id: {{{}}}, nome {{{}}}, tipo_autoctono: {{{}}}, tipo_alloctono: {{{}}}, specie_attesa: {{{}}}",
-                self.id, self.nome, self.tipo_autoctono, self.tipo_alloctono, self.specie_attesa);
+                self.id, self.nome, self.tipo_autoctono, self.tipo_alloctono, specie_attesa_str);
         write!(f, "{}", string_representation)
     }
 }
@@ -388,14 +392,22 @@ pub struct ValoriIntermediNISECI {
     pub specie_specifici: HashMap<String, ValoriIntermediSpecieNISECI>,
     pub x2_a: f32,
     pub x2_b: f32,
-    pub x3_a: f32,
-    pub x3_b: f32,
+    pub x3_a: Option<f32>,
+    pub x3_b: Option<f32>,
 }
 
 impl fmt::Display for ValoriIntermediNISECI {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    let x3_a_str = match self.x3_a {
+        Some(v) => format!("{v}"),
+        None => format!("NC")
+    };
+    let x3_b_str = match self.x3_b {
+        Some(v) => format!("{v}"),
+        None => format!("NC")
+    };
     let mut string_representation = format!("ValoriIntermediNISECI: {{\n    x2_a: {{{}}}, x2_b: {{{}}}, x3_a: {{{}}}, x3_b: {{{}}}\n    specie specifici:",
-        self.x2_a, self.x2_b, self.x3_a, self.x3_b);
+        self.x2_a, self.x2_b, x3_a_str, x3_b_str);
 
     for (k, v) in self.specie_specifici.iter() {
         string_representation = format!("{}\n        specie: {{{}}}, valori: {{{}}}", string_representation, k, v);

@@ -102,8 +102,14 @@ pub fn calculate_niseci(campionamento: &CampionamentoNISECI, riferimento: &Rifer
         specie_specifici: valori_intermedi_specie,
         x2_a: criteri_x2.get_criterio_a(),
         x2_b: criteri_x2.get_criterio_b(),
-        x3_a: criteri_x3.get_criterio_a(),
-        x3_b: criteri_x3.get_criterio_b(),
+        x3_a: match criteri_x3 {
+            Some(ref v) => Some(v.get_criterio_a()),
+            None => None
+        },
+        x3_b: match criteri_x3 {
+            Some(v) => Some(v.get_criterio_b()),
+            None => None
+        },
     };
     return Ok((niseci, intermediates));
 }
