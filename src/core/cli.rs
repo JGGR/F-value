@@ -285,9 +285,11 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) -> bool {
                 elenco_specie: riferimento_specie
             };
             match calculate_niseci(&campionamento, &riferimento, &anagrafica) {
-                Ok((niseci, _intermediates)) => {
+                Ok((niseci, intermediates)) => {
                     let rqe_niseci = calculate_rqe_niseci(niseci);
                     let stato_eco_niseci = calculate_stato_ecologico(niseci, &anagrafica.area);
+
+                    intermediates.log();
                     println!("NISECI: {niseci}");
                     println!("RQE NISECI: {rqe_niseci}");
                     println!("STATO ECOLOGICO NISECI: {stato_eco_niseci}");

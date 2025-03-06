@@ -386,15 +386,23 @@ pub struct ValoriIntermediNISECI {
 
 impl fmt::Display for ValoriIntermediNISECI {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    let mut string_representation = format!("ValoriIntermediNISECI: {{\n    x2_a: {{{}}}, x2_b: {{{}}}, x3_a: {{{}}}, x3_b: {{{}}}\n    specie specifici:\n",
+    let mut string_representation = format!("ValoriIntermediNISECI: {{\n    x2_a: {{{}}}, x2_b: {{{}}}, x3_a: {{{}}}, x3_b: {{{}}}\n    specie specifici:",
         self.x2_a, self.x2_b, self.x3_a, self.x3_b);
 
     for (k, v) in self.specie_specifici.iter() {
-        string_representation = format!("{}\n    specie: {{{}}}, valori: {{{}}}", string_representation, k, v);
+        string_representation = format!("{}\n        specie: {{{}}}, valori: {{{}}}", string_representation, k, v);
     }
     string_representation = format!("{}\n}}", string_representation);
     write!(f, "{}", string_representation)
   }
+}
+
+impl ValoriIntermediNISECI {
+    pub fn log(&self) {
+        //TODO: a proper format? we count on the embedded newlines to leverage the
+        //chopping on newlines from add_console_message()
+        println!("Valori intermedi: {{{self}}}");
+    }
 }
 
 #[derive(Clone)]
