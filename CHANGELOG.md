@@ -21,6 +21,8 @@
 - Refactored engines to return niseci intermediate values
 - `RisultatoNISECI` now holds intermediates
 - Update tests
+- Less verbose CLI output
+- Print intermediate values to stdout on full calc
 
 ## [0.0.10] - 2025-03-04
 

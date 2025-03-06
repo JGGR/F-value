@@ -362,15 +362,23 @@ impl fmt::Display for IdroEcoRegioneNISECI {
 pub struct ValoriIntermediSpecieNISECI {
     pub densita_stimata: f32,
     pub classi_eta: ClassiEtaSpecieNISECI,
-    pub rapporto_ad_juv: f32,
+    pub rapporto_ad_juv: Option<f32>,
     pub x2_a_a: u8,
     pub x2_a_b: u8,
 }
 
 impl fmt::Display for ValoriIntermediSpecieNISECI {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    let rapporto_ad_juv_str = match self.rapporto_ad_juv {
+        Some(v) => {
+            format!("{v}")
+        }
+        None => {
+            format!("NC")
+        }
+    };
     let string_representation = format!("ValoriIntermediSpecieNISECI: {{ densita stimata: {{{}}}, classi eta: {{{}}}, rapport ad/juv: {{{}}}, x2a_a: {{{}}}, x2a_b: {{{}}} }}",
-        self.densita_stimata, self.classi_eta, self.rapporto_ad_juv, self.x2_a_a, self.x2_a_b);
+        self.densita_stimata, self.classi_eta, rapporto_ad_juv_str, self.x2_a_a, self.x2_a_b);
     write!(f, "{}", string_representation)
   }
 }
@@ -438,11 +446,11 @@ impl RisultatoNISECI {
 #[derive(Clone, Copy)]
 pub struct MetricheX2aB {
     criterio_b: u8,
-    rapporto_ad_juv: f32
+    rapporto_ad_juv: Option<f32>
 }
 
 impl MetricheX2aB {
-    pub fn new(criterio_b: u8, rapporto_ad_juv: f32) -> Self {
+    pub fn new(criterio_b: u8, rapporto_ad_juv: Option<f32>) -> Self {
         Self {
             criterio_b: criterio_b,
             rapporto_ad_juv: rapporto_ad_juv,
@@ -451,7 +459,7 @@ impl MetricheX2aB {
     pub fn get_criterio_b(&self) -> u8 {
         return self.criterio_b;
     }
-    pub fn get_rapporto_ad_juv(&self) -> f32 {
+    pub fn get_rapporto_ad_juv(&self) -> Option<f32> {
         return self.rapporto_ad_juv;
     }
 }
@@ -475,7 +483,7 @@ impl MetricheX2A {
     pub fn get_criterio_b(&self) -> u8 {
         return self.criteri_x2a_b.get_criterio_b();
     }
-    pub fn get_rapporto_ad_juv(&self) -> f32 {
+    pub fn get_rapporto_ad_juv(&self) -> Option<f32> {
         return self.criteri_x2a_b.get_rapporto_ad_juv();
     }
 }
@@ -549,32 +557,32 @@ impl ClassiEtaSpecieNISECI {
     return 3;
   }
 
-  pub fn get_x2_a_criterio_b(&self) -> (u8, f32) {
+  pub fn get_x2_a_criterio_b(&self) -> (u8, Option<f32>) {
     if (self.cl2 + self.cl3) == 0 {
-      return (3, -1.0);
+      return (3, None);
     }
 
     let ad_juv = (self.cl4 + self.cl5) as f32 / (self.cl2 + self.cl3) as f32;
     if ad_juv < self.specie.ad_juv_soglia1 {
-      return (3, ad_juv);
+      return (3, Some(ad_juv));
     }
     if ad_juv <= self.specie.ad_juv_soglia2 {
-      return (2, ad_juv);
+      return (2, Some(ad_juv));
     }
     if ad_juv <= self.specie.ad_juv_soglia3 {
-      return (1, ad_juv);
+      return (1, Some(ad_juv));
     }
     if ad_juv <= self.specie.ad_juv_soglia4 {
-      return (2, ad_juv);
+      return (2, Some(ad_juv));
     }
-    return (3, ad_juv);
+    return (3, Some(ad_juv));
   }
 
   /// questa fn viene usata sia per x2_a che per x3
   /// i suoi test sono esattamente quelli per calculate_x2_a
   pub(crate) fn calculate_struttura_popolazione(&self) -> Result<(f32, MetricheX2A), String> {
     let criterio_a: u8 = self.get_x2_a_criterio_a();
-    let (criterio_b, ad_juv): (u8, f32) = self.get_x2_a_criterio_b();
+    let (criterio_b, ad_juv): (u8, Option<f32>) = self.get_x2_a_criterio_b();
 
     if criterio_a == 1 && criterio_b == 3 {
       return Ok((0.5, MetricheX2A::new(criterio_a, MetricheX2aB::new(criterio_b, ad_juv))));
@@ -633,7 +641,7 @@ pub struct InfoPopolazioniNISECI {
   pub tot_species: usize,
   pub criterio_a: u8,
   pub criterio_b: u8,
-  pub rapporto_ad_juv: f32,
+  pub rapporto_ad_juv: Option<f32>,
 }
 
 impl InfoPopolazioniNISECI {
@@ -646,7 +654,7 @@ impl InfoPopolazioniNISECI {
       tot_species: 0,
       criterio_a: 0,
       criterio_b: 0,
-      rapporto_ad_juv: 0.0,
+      rapporto_ad_juv: None,
     }
   }
 
