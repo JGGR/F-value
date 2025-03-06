@@ -911,7 +911,8 @@ pub fn check_anagrafica_niseci_reader<R: Read>(reader: R) -> Result<Vec<RecordCs
         eprintln!("}}");
         return Err(errors);
     } else {
-        println!("Tutti i record csv dell'anagrafica NISECI sono stati processati con successo!");
+        //TODO: handle verbosity
+        //println!("Tutti i record csv dell'anagrafica NISECI sono stati processati con successo!");
         /*
         for record in &records {
             println!("  Record: {{{record}}}");
@@ -928,7 +929,8 @@ pub fn check_records_anagrafica_niseci(records: Vec<RecordCsvAnagraficaNISECI>) 
     match res {
         Ok(anagrafica) => {
             println!("Anagrafica NISECI: {}", anagrafica);
-            println!("Tutti i record dell'anagrafica NISECI sono stati processati con successo!");
+            //TODO: handle verbosity
+            //println!("Tutti i record dell'anagrafica NISECI sono stati processati con successo!");
             /*
             for record in &records {
                 println!("  Record: {{{record}}}");
@@ -1169,7 +1171,8 @@ pub fn check_campionamento_niseci_reader<R: Read>(reader: R) -> Result<Vec<Recor
         eprintln!("}}");
         return Err(errors);
     } else {
-        println!("Tutti i record csv del campionamento NISECI sono stati processati con successo!");
+        //TODO: handle verbosity
+        //println!("Tutti i record csv del campionamento NISECI sono stati processati con successo!");
         /*
         for record in &records {
             println!("  Record: {{{record}}}");
@@ -1206,7 +1209,8 @@ pub fn check_records_campionamento_niseci(records: Vec<RecordCsvCampionamentoNIS
         eprintln!("}}");
         return Err(errors);
     } else {
-        println!("Tutti i record del campionamento NISECI sono stati processati con successo!");
+        //TODO: handle verbosity
+        //println!("Tutti i record del campionamento NISECI sono stati processati con successo!");
         /*
         for record in &records {
             println!("  Record: {{{record}}}");
@@ -1243,7 +1247,8 @@ pub fn check_riferimento_niseci_reader<R: Read>(reader: R) -> Result<Vec<RecordC
         eprintln!("}}");
         return Err(errors);
     } else {
-        println!("Tutti i record csv del riferimento NISECI sono stati processati con successo!");
+        //TODO: handle verbosity
+        //println!("Tutti i record csv del riferimento NISECI sono stati processati con successo!");
         /*
         for record in &records {
             println!("  Record: {{{record}}}");
@@ -1280,7 +1285,8 @@ pub fn check_records_riferimento_niseci(records: Vec<RecordCsvRiferimentoNISECI>
         eprintln!("}}");
         return Err(errors);
     } else {
-        println!("Tutti i record del riferimento NISECI sono stati processati con successo!");
+        //TODO: handle verbosity
+        //println!("Tutti i record del riferimento NISECI sono stati processati con successo!");
         /*
         for record in &records {
             println!("  Record: {{{record}}}");
