@@ -93,7 +93,7 @@ impl MetricheX2B {
     }
 }
 
-pub fn calculate_x2(campionamento: &CampionamentoNISECI, anagrafica: &AnagraficaNISECI) -> Result<(f32, MetricheX2), Vec<String>> {
+pub fn calculate_x2(campionamento: &CampionamentoNISECI, anagrafica: &AnagraficaNISECI) -> Result<(Option<f32>, MetricheX2), Vec<String>> {
   let (x2_a, criteri_vec) = match calculate_sommatoria_x2_a(campionamento) {
     Ok(x2_a) => x2_a,
     Err(errors) => return Err(errors),
@@ -102,22 +102,6 @@ pub fn calculate_x2(campionamento: &CampionamentoNISECI, anagrafica: &Anagrafica
     Ok(result) => result,
     Err(errors) => return Err(errors),
   };
-
-  let mut specie_campionate_set:HashMap<String, bool> = HashMap::new();
-  for cattura in &campionamento.campionamento {
-    if cattura.specie.specie_attesa && (cattura.specie.tipo_autoctono == 1 || cattura.specie.tipo_autoctono == 2) {
-      match specie_campionate_set.entry(cattura.specie.id.clone()) {
-          Entry::Occupied(_) => {},
-          Entry::Vacant(vacant_entry) => {
-            vacant_entry.insert(true);
-          },
-      }
-    }
-  }
-
-  let tot_specie_attese_trovate = specie_campionate_set.len();
-
-  let result = (0.6 * x2_a + 0.4 * x2_b) / tot_specie_attese_trovate as f32;
 
   let mut submetriche = HashMap::<String, SubmetricheX2>::new();
 
@@ -152,7 +136,30 @@ pub fn calculate_x2(campionamento: &CampionamentoNISECI, anagrafica: &Anagrafica
     return Err(errors);
   }
 
-  Ok((result, MetricheX2::new(x2_a, x2_b, submetriche)))
+  let metriche_x2 = MetricheX2::new(x2_a, x2_b, submetriche);
+
+  let mut specie_campionate_set:HashMap<String, bool> = HashMap::new();
+  for cattura in &campionamento.campionamento {
+    if cattura.specie.specie_attesa && (cattura.specie.tipo_autoctono == 1 || cattura.specie.tipo_autoctono == 2) {
+      match specie_campionate_set.entry(cattura.specie.id.clone()) {
+          Entry::Occupied(_) => {},
+          Entry::Vacant(vacant_entry) => {
+            vacant_entry.insert(true);
+          },
+      }
+    }
+  }
+
+  let tot_specie_attese_trovate = specie_campionate_set.len();
+
+  if tot_specie_attese_trovate == 0 {
+      // Nel caso in cui nessuna specie attesa sia presente nel campionamento
+      return Ok((None, metriche_x2));
+  }
+
+  let result = (0.6 * x2_a + 0.4 * x2_b) / tot_specie_attese_trovate as f32;
+
+  Ok((Some(result), metriche_x2))
 }
 
 fn calculate_sommatoria_x2_a(c: &CampionamentoNISECI) -> Result<(f32, Vec<(String, MetricheX2A, ClassiEtaSpecieNISECI)>), Vec<String>> {

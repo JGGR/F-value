@@ -20,6 +20,7 @@
 - Fixed broken author link
 - Improved console backout hint
 - Refactored engines to return niseci intermediate values
+    - Made x2 and full result optional values
 - `RisultatoNISECI` now holds intermediates
 - Update tests
 - Less verbose CLI output

@@ -699,7 +699,7 @@ impl OutputController {
             let opt_res = self.get_data_risultato_niseci();
             match opt_res {
                 Some(r) => {
-                    return Some(r.get_valore());
+                    return r.get_valore();
                 }
                 None => {
                     return None;
@@ -715,7 +715,7 @@ impl OutputController {
             let opt_res = self.get_data_risultato_niseci();
             match opt_res {
                 Some(r) => {
-                    return Some(r.get_rqe());
+                    return r.get_rqe();
                 }
                 None => {
                     return None;
@@ -735,7 +735,15 @@ impl OutputController {
                     let opt_anagrafica = state.data_model.get_anagrafica_niseci();
                     match opt_anagrafica {
                         Some(anagr) => {
-                            return Some(calculate_stato_ecologico(r.get_valore(), &anagr.area));
+                            let niseci_val = r.get_valore();
+                            match calculate_stato_ecologico(niseci_val, &anagr.area) {
+                                Some(res) => {
+                                    return Some(res);
+                                }
+                                None => {
+                                    return None;
+                                }
+                            }
                         }
                         None => {
                             return None;
@@ -803,13 +811,36 @@ impl OutputController {
 
             match calculate_niseci(&campionamento, &riferimento, &anagrafica) {
                 Ok((niseci, intermediates)) => {
-                    self.add_console_message(format!("NISECI: {niseci}"));
+                    match niseci {
+                        Some(val) => {
+                            self.add_console_message(format!("NISECI: {val}"));
+                        }
+                        None => {
+                            self.add_console_message(format!("NISECI: NC"));
+                        }
+                    }
 
                     let rqe_niseci = calculate_rqe_niseci(niseci);
-                    self.add_console_message(format!("RQE NISECI: {rqe_niseci}"));
+
+                    match rqe_niseci {
+                        Some(val) => {
+                            self.add_console_message(format!("RQE NISECI: {val}"));
+                        }
+                        None => {
+                            self.add_console_message(format!("RQE NISECI: NC"));
+                        }
+                    }
 
                     let stato_ecologico = calculate_stato_ecologico(niseci, &anagrafica.area);
-                    self.add_console_message(format!("Stato ecologico: {stato_ecologico}"));
+
+                    match stato_ecologico {
+                        Some(val) => {
+                            self.add_console_message(format!("Stato ecologico: {val}"));
+                        }
+                        None => {
+                            self.add_console_message(format!("Stato ecologico: NC"));
+                        }
+                    }
 
                     //TODO: recalculation of x1, x2, x3 is only used for richer console output ATM
                     //Maybe should be removed later
@@ -817,7 +848,14 @@ impl OutputController {
                     let (x2, _criteri_x2) = calculate_x2(&campionamento, &anagrafica).unwrap();
                     let (x3, _criteri_x3) = calculate_x3(&campionamento).unwrap();
                     self.add_console_message(format!("x1: {x1}"));
-                    self.add_console_message(format!("x2: {x2}"));
+                    match x2 {
+                        Some(val) => {
+                            self.add_console_message(format!("x2: {val}"));
+                        }
+                        None => {
+                            self.add_console_message(format!("x2: NC"));
+                        }
+                    }
                     self.add_console_message(format!("x3: {x3}"));
 
                     intermediates.log();

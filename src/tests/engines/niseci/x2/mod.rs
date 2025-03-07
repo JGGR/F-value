@@ -193,7 +193,7 @@ fn calculate_x2_test_1() {
   assert!(x2.is_ok());
 
   let (x2, _criteri_x2) = x2.unwrap();
-  assert_eq!(1.0, x2);
+  assert_eq!(Some(1.0), x2);
 
   // secondo test con valori alternativi
 
@@ -227,5 +227,7 @@ fn calculate_x2_test_1() {
   assert!(x2.is_ok());
   let epsilon: f32 = 1e-6;
   let (x2, _criteri_x2) = x2.unwrap();
-  assert!((0.7 - x2).abs() < epsilon);
+  assert!(x2.is_some());
+  let x2_val = x2.unwrap();
+  assert!((0.7 - x2_val).abs() < epsilon);
 }

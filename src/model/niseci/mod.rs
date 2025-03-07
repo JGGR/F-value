@@ -427,30 +427,38 @@ impl ValoriIntermediNISECI {
 
 #[derive(Clone)]
 pub struct RisultatoNISECI {
-  valore: f32,
-  rqe: f32,
+  valore: Option<f32>,
+  rqe: Option<f32>,
   valori_intermedi: ValoriIntermediNISECI,
 }
 
 impl fmt::Display for RisultatoNISECI {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    let string_representation = format!("RisultatoNISECI: {{ valore NISECI: {{{}}}, valore RQE NISECI: {{{}}}, valori intermedi: {{{}}} }}", self.valore, self.rqe, self.valori_intermedi);
+    let valore_str = match self.valore {
+        Some(v) => format!("{v}"),
+        None => format!("NC")
+    };
+    let rqe_str = match self.rqe {
+        Some(v) => format!("{v}"),
+        None => format!("NC")
+    };
+    let string_representation = format!("RisultatoNISECI: {{ valore NISECI: {{{}}}, valore RQE NISECI: {{{}}}, valori intermedi: {{{}}} }}", valore_str, rqe_str, self.valori_intermedi);
     write!(f, "{}", string_representation)
   }
 }
 
 impl RisultatoNISECI {
-    pub fn new(valore: f32, rqe: f32, valori_intermedi: ValoriIntermediNISECI) -> Self {
+    pub fn new(valore: Option<f32>, rqe: Option<f32>, valori_intermedi: ValoriIntermediNISECI) -> Self {
         Self {
             valore: valore,
             rqe: rqe,
             valori_intermedi: valori_intermedi,
         }
     }
-    pub fn get_valore(&self) -> f32 {
+    pub fn get_valore(&self) -> Option<f32> {
         return self.valore;
     }
-    pub fn get_rqe(&self) -> f32 {
+    pub fn get_rqe(&self) -> Option<f32> {
         return self.rqe;
     }
 }

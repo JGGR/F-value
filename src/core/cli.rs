@@ -298,9 +298,30 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) -> bool {
                     let stato_eco_niseci = calculate_stato_ecologico(niseci, &anagrafica.area);
 
                     intermediates.log();
-                    println!("NISECI: {niseci}");
-                    println!("RQE NISECI: {rqe_niseci}");
-                    println!("STATO ECOLOGICO NISECI: {stato_eco_niseci}");
+                    match niseci {
+                        Some(val) => {
+                            println!("NISECI: {val}");
+                        }
+                        None => {
+                            println!("NISECI: NC");
+                        }
+                    }
+                    match rqe_niseci {
+                        Some(val) => {
+                            println!("RQE NISECI: {val}");
+                        }
+                        None => {
+                            println!("RQE NISECI: NC");
+                        }
+                    }
+                    match stato_eco_niseci {
+                        Some(val) => {
+                            println!("STATO ECOLOGICO NISECI: {val}");
+                        }
+                        None => {
+                            println!("STATO ECOLOGICO NISECI: NC");
+                        }
+                    }
                 }
                 Err(_errors) => {
                     /* Assuming they were printed before this point
