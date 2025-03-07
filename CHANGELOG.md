@@ -22,6 +22,7 @@
 - Refactored engines to return niseci intermediate values
     - Made x2 and full result optional values
 - `RisultatoNISECI` now holds intermediates
+- Fix `calculate_x2()` divide-by-zero
 - Update tests
 - Less verbose CLI output
 - Print intermediate values to stdout on full calc

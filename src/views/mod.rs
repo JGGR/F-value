@@ -1492,14 +1492,27 @@ impl ProduzioneOutputView {
 
         let done_calc = controller.get_is_done_calc();
 
-        if !done_calc {
+        let really_done_calc = match current_index {
+            Indice::NISECI => {
+                done_calc && controller.get_niseci_value().is_some()
+            }
+            Indice::HFBI => {
+                false //TODO: Implement this
+                       //
+                       //Maybe the is_some won't be needed
+                //done_calc && controller.get_hfbi_value().is_some()
+            }
+        };
+
+
+        if !done_calc || !really_done_calc {
             d.gui_lock();
             d.gui_set_state(STATE_DISABLED);
         }
         if d.gui_button(rrect(submit_x, submit_y, submit_width, submit_height), Some(confirm_itext.as_c_str())) {
             controller.user_confirm_calc();
         }
-        if !done_calc {
+        if !done_calc || !really_done_calc {
             d.gui_set_state(STATE_NORMAL);
             d.gui_unlock();
         }
@@ -1523,7 +1536,12 @@ impl ProduzioneOutputView {
                         format!("{}", v)
                     }
                     None => {
-                        format!("Non calcolato")
+                        if controller.get_is_done_calc() { // Could use done_calc and avoid another
+                                                           // lock call
+                            format!("NC")
+                        } else {
+                            format!("Non calcolato")
+                        }
                     }
                 };
                 let niseci_line = format!("NISECI: {}", niseci_str);
@@ -1543,7 +1561,11 @@ impl ProduzioneOutputView {
                         format!("{}", v)
                     }
                     None => {
-                        format!("Non calcolato")
+                        if controller.get_is_done_calc() {
+                            format!("NC")
+                        } else {
+                            format!("Non calcolato")
+                        }
                     }
                 };
                 let rqe_line = format!("RQE NISECI: {}", rqe_niseci_str);
@@ -1563,7 +1585,11 @@ impl ProduzioneOutputView {
                         format!("{}", v)
                     }
                     None => {
-                        format!("Non calcolato")
+                        if controller.get_is_done_calc() {
+                            format!("NC")
+                        } else {
+                            format!("Non calcolato")
+                        }
                     }
                 };
                 let stato_eco_line = format!("STATO ECOLOGICO NISECI: {}", stato_eco_niseci_str);

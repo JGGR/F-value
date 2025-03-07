@@ -736,14 +736,7 @@ impl OutputController {
                     match opt_anagrafica {
                         Some(anagr) => {
                             let niseci_val = r.get_valore();
-                            match calculate_stato_ecologico(niseci_val, &anagr.area) {
-                                Some(res) => {
-                                    return Some(res);
-                                }
-                                None => {
-                                    return None;
-                                }
-                            }
+                            return calculate_stato_ecologico(niseci_val, &anagr.area);
                         }
                         None => {
                             return None;
@@ -772,8 +765,12 @@ impl OutputController {
     }
 
     pub fn get_data_risultato_niseci(&self) -> Option<RisultatoNISECI> {
-        let state = GLOBAL_STATE.lock().unwrap();
-        return state.data_model.get_risultato_niseci();
+        if self.get_is_done_calc() {
+            let state = GLOBAL_STATE.lock().unwrap();
+            return state.data_model.get_risultato_niseci();
+        } else {
+            return None;
+        }
     }
 
     pub fn calc_niseci(&self) {
