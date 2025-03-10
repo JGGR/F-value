@@ -219,7 +219,7 @@ pub struct OutputModel {
 }
 
 impl OutputModel {
-    pub fn _get_frame_counter(&self) -> u32 {
+    pub fn get_frame_counter(&self) -> u32 {
         return self.frame_counter;
     }
     pub fn increment_frame_counter(&mut self) {

@@ -1660,7 +1660,8 @@ impl ProduzionePDFView {
 
         d.clear_background(main_state.default_bg_color);
 
-        let _state = controller.get_state();
+        let state = controller.get_state();
+        let frame_counter = state.get_frame_counter();
         let button_esporta_width = propwidth(&d, 200);
         let button_esporta_x = d.get_screen_width() / 2 - button_esporta_width /2;
         let button_esporta_height = propwidth(&d, 50);
@@ -1708,6 +1709,18 @@ impl ProduzionePDFView {
             ),
             Some(rstr!("TODO: Output qui"))
         );
+
+        let rainbow_speed = 0.03;
+        let todo_font_scale = 6;
+        let todo_font_height = main_state.current_font_height * todo_font_scale;
+
+        let todo_txt = "TODO: ESPORTAZIONE PDF";
+        let todo_txt_bounds = main_state.current_font.measure_text(todo_txt, todo_font_height as f32, main_state.default_txt_spacing as f32);
+        let todo_txt_x = (d.get_screen_width() / 2) - (todo_txt_bounds.x as i32 / 2);
+        let todo_txt_y = (d.get_screen_height() / 2) - (todo_txt_bounds.y as i32 / 2);
+
+        draw_rainbow_text(d, todo_txt_x, todo_txt_y, "TODO: ESPORTAZIONE PDF", frame_counter, rainbow_speed, &main_state.current_font, main_state.default_txt_spacing, main_state.current_font_height, todo_font_scale);
+
     }
 }
 
