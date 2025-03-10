@@ -1636,6 +1636,81 @@ impl ProduzioneOutputView {
                     main_state.default_txt_spacing as f32,
                     main_state.default_txt_color
                 );
+
+                let x1_opt = controller.get_x1_value();
+                let x1_str = match x1_opt {
+                    Some(v) => {
+                        format!("{}", v)
+                    }
+                    None => {
+                        if controller.get_is_done_calc() {
+                            format!("NC")
+                        } else {
+                            format!("Non calcolato")
+                        }
+                    }
+                };
+                let x1_line = format!("X1: {}", x1_str);
+                d.draw_text_ex(
+                    &main_state.current_font,
+                    &x1_line,
+                    // We use propwidth/height for the text starting position:
+                    // this is not the bound
+                    Vector2::new((panel_x + propwidth(&d, 25)) as f32, (panel_y + (y_spacing * 5)) as f32),
+                    main_state.current_font_height as f32,
+                    main_state.default_txt_spacing as f32,
+                    main_state.default_txt_color
+                );
+
+                let x2_opt = controller.get_x2_value();
+                let x2_str = match x2_opt {
+                    Some(v) => {
+                        format!("{}", v)
+                    }
+                    None => {
+                        if controller.get_is_done_calc() {
+                            format!("NC")
+                        } else {
+                            format!("Non calcolato")
+                        }
+                    }
+                };
+                let x2_line = format!("X2: {}", x2_str);
+                d.draw_text_ex(
+                    &main_state.current_font,
+                    &x2_line,
+                    // We use propwidth/height for the text starting position:
+                    // this is not the bound
+                    Vector2::new((panel_x + propwidth(&d, 25)) as f32, (panel_y + (y_spacing * 6)) as f32),
+                    main_state.current_font_height as f32,
+                    main_state.default_txt_spacing as f32,
+                    main_state.default_txt_color
+                );
+
+                let x3_opt = controller.get_x3_value();
+                let x3_str = match x3_opt {
+                    Some(v) => {
+                        format!("{}", v)
+                    }
+                    None => {
+                        if controller.get_is_done_calc() {
+                            format!("NC")
+                        } else {
+                            format!("Non calcolato")
+                        }
+                    }
+                };
+                let x3_line = format!("X3: {}", x3_str);
+                d.draw_text_ex(
+                    &main_state.current_font,
+                    &x3_line,
+                    // We use propwidth/height for the text starting position:
+                    // this is not the bound
+                    Vector2::new((panel_x + propwidth(&d, 25)) as f32, (panel_y + (y_spacing * 7)) as f32),
+                    main_state.current_font_height as f32,
+                    main_state.default_txt_spacing as f32,
+                    main_state.default_txt_color
+                );
             },
             Indice::HFBI => {
                 todo!("Implement this!");

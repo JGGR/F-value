@@ -4,6 +4,7 @@
 
 - More info on HOME and SECOND view
 - Store `RisultatoNISECI` as console env, for info command
+- Display `x1`, `x2`, `x3` on `ProduzioneOutputView`
 - Added format functions for some model structs
 - New types for holding intermediate values in `RisultatoNISECI`:
   - `ValoriIntermediNISECI`

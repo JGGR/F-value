@@ -777,6 +777,55 @@ impl OutputController {
         }
     }
 
+    pub fn get_x1_value(&self) -> Option<f32> {
+        if self.get_is_done_calc() {
+            let opt_res = self.get_data_risultato_niseci();
+            match opt_res {
+                Some(r) => {
+                    return Some(r.get_x1());
+                }
+                None => {
+                    return None;
+                }
+            }
+        } else {
+            return None;
+        }
+    }
+
+    pub fn get_x2_value(&self) -> Option<f32> {
+        if self.get_is_done_calc() {
+            let opt_res = self.get_data_risultato_niseci();
+            match opt_res {
+                Some(r) => {
+                    return r.get_x2();
+                }
+                None => {
+                    return None;
+                }
+            }
+        } else {
+            return None;
+        }
+    }
+
+    pub fn get_x3_value(&self) -> Option<f32> {
+        if self.get_is_done_calc() {
+            let opt_res = self.get_data_risultato_niseci();
+            match opt_res {
+                Some(r) => {
+                    return Some(r.get_x3());
+                }
+                None => {
+                    return None;
+                }
+            }
+        } else {
+            return None;
+        }
+    }
+
+
     pub fn get_current_index(&self) -> Option<Indice> {
         let state = GLOBAL_STATE.lock().unwrap();
         return state.indice_model.get_selected_index();

@@ -469,6 +469,15 @@ impl RisultatoNISECI {
     pub fn get_rqe(&self) -> Option<f32> {
         return self.rqe;
     }
+    pub fn get_x1(&self) -> f32 {
+        return self.valori_intermedi.x1;
+    }
+    pub fn get_x2(&self) -> Option<f32> {
+        return self.valori_intermedi.x2;
+    }
+    pub fn get_x3(&self) -> f32 {
+        return self.valori_intermedi.x3;
+    }
 }
 
 #[derive(Clone, Copy)]
