@@ -22,7 +22,7 @@ use crate::model::niseci::{RiferimentoNISECI, CampionamentoNISECI, AnagraficaNIS
 use crate::state::GLOBAL_STATE;
 use crate::CurrentView;
 use crate::process_csv_errors;
-use crate::engines::niseci::{full::{calculate_niseci, calculate_rqe_niseci, calculate_stato_ecologico}, x1::calculate_x1, x2::calculate_x2, x3::calculate_x3};
+use crate::engines::niseci::full::{calculate_niseci, calculate_rqe_niseci, calculate_stato_ecologico};
 use raylib::RaylibHandle;
 use std::path::PathBuf;
 use raylib::consts::KeyboardKey::*;
@@ -863,22 +863,6 @@ impl OutputController {
                             self.add_console_message(format!("Stato ecologico: NC"));
                         }
                     }
-
-                    //TODO: recalculation of x1, x2, x3 is only used for richer console output ATM
-                    //Maybe should be removed later
-                    let x1 = calculate_x1(&campionamento, &riferimento);
-                    let (x2, _criteri_x2) = calculate_x2(&campionamento, &anagrafica).unwrap();
-                    let (x3, _criteri_x3) = calculate_x3(&campionamento).unwrap();
-                    self.add_console_message(format!("x1: {x1}"));
-                    match x2 {
-                        Some(val) => {
-                            self.add_console_message(format!("x2: {val}"));
-                        }
-                        None => {
-                            self.add_console_message(format!("x2: NC"));
-                        }
-                    }
-                    self.add_console_message(format!("x3: {x3}"));
 
                     intermediates.log();
 

@@ -98,6 +98,9 @@ pub fn calculate_niseci(campionamento: &CampionamentoNISECI, riferimento: &Rifer
     }
 
     let intermediates = ValoriIntermediNISECI {
+        x1: x1,
+        x2: x2,
+        x3: x3,
         specie_specifici: valori_intermedi_specie,
         x2_a: criteri_x2.get_criterio_a(),
         x2_b: criteri_x2.get_criterio_b(),
