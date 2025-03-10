@@ -539,10 +539,10 @@ pub struct SelezioneInfoAggiuntiveView {
     textbox_provincia_buffer: [u8; 64],
     textbox_data_edit_mode: bool,
     textbox_data_buffer: [u8; 64],
-    valuebox_lunghezza_stazione_edit_mode: bool,
-    valuebox_lunghezza_stazione_value: i32,
-    valuebox_larghezza_stazione_edit_mode: bool,
-    valuebox_larghezza_stazione_value: i32,
+    spinner_lunghezza_stazione_value: i32,
+    spinner_lunghezza_stazione_edit_mode: bool,
+    spinner_larghezza_stazione_value: i32,
+    spinner_larghezza_stazione_edit_mode: bool,
     dropdownbox_tipocomunit_niseci_edit_mode: bool,
     dropdownbox_tipocomunit_niseci_value: i32,
     textbox_fontecomunit_niseci_edit_mode: bool,
@@ -609,10 +609,10 @@ impl SelezioneInfoAggiuntiveView {
             textbox_provincia_buffer: provincia_buffer,
             textbox_data_edit_mode: false,
             textbox_data_buffer: data_buffer,
-            valuebox_lunghezza_stazione_edit_mode: false,
-            valuebox_lunghezza_stazione_value: 0,
-            valuebox_larghezza_stazione_edit_mode: false,
-            valuebox_larghezza_stazione_value: 0,
+            spinner_lunghezza_stazione_edit_mode: false,
+            spinner_lunghezza_stazione_value: 0,
+            spinner_larghezza_stazione_edit_mode: false,
+            spinner_larghezza_stazione_value: 0,
             dropdownbox_tipocomunit_niseci_edit_mode: false,
             dropdownbox_tipocomunit_niseci_value: 0,
             textbox_fontecomunit_niseci_edit_mode: false,
@@ -705,8 +705,8 @@ impl SelezioneInfoAggiuntiveView {
                 regione: regione_string,
                 provincia: provincia_string,
             };
-            let larghezza_stazione = self.valuebox_larghezza_stazione_value;
-            let lunghezza_stazione = self.valuebox_lunghezza_stazione_value;
+            let larghezza_stazione = self.spinner_larghezza_stazione_value;
+            let lunghezza_stazione = self.spinner_lunghezza_stazione_value;
 
             // Raylib has trouble handling the string downstream if we don't ensure to do this
             let end = self.textbox_codice_stazione_buffer.iter().position(|&b| b == 0).unwrap_or(self.textbox_codice_stazione_buffer.len());
@@ -1014,7 +1014,7 @@ impl SelezioneInfoAggiuntiveView {
         ) {
             self.textbox_data_edit_mode = !self.textbox_data_edit_mode;
         }
-        if d.gui_value_box(
+        if d.gui_spinner(
             rrect(
                 column_1_boxes_x,
                 column_1_label_lunghezza_stazione_y,
@@ -1022,14 +1022,14 @@ impl SelezioneInfoAggiuntiveView {
                 column_1_boxes_height
             ),
             None,
-            &mut self.valuebox_lunghezza_stazione_value,
+            &mut self.spinner_lunghezza_stazione_value,
             0,
             100000, //TODO: ask a reasonable max for this
-            self.valuebox_lunghezza_stazione_edit_mode
+            self.spinner_lunghezza_stazione_edit_mode
         ) {
-            self.valuebox_lunghezza_stazione_edit_mode = !self.valuebox_lunghezza_stazione_edit_mode;
+            self.spinner_lunghezza_stazione_edit_mode = !self.spinner_lunghezza_stazione_edit_mode;
         }
-        if d.gui_value_box(
+        if d.gui_spinner(
             rrect(
                 column_1_boxes_x,
                 column_1_label_larghezza_stazione_y,
@@ -1037,12 +1037,12 @@ impl SelezioneInfoAggiuntiveView {
                 column_1_boxes_height
             ),
             None,
-            &mut self.valuebox_larghezza_stazione_value,
+            &mut self.spinner_larghezza_stazione_value,
             0,
             100000, //TODO: ask a resonable max for this
-            self.valuebox_larghezza_stazione_edit_mode
+            self.spinner_larghezza_stazione_edit_mode
         ) {
-            self.valuebox_larghezza_stazione_edit_mode = !self.valuebox_larghezza_stazione_edit_mode;
+            self.spinner_larghezza_stazione_edit_mode = !self.spinner_larghezza_stazione_edit_mode;
         }
         // Column 2
 

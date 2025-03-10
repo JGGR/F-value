@@ -26,6 +26,7 @@
 - Update tests
 - Less verbose CLI output
 - Print intermediate values to stdout on full calc
+- Use spinner for lunghezza, larghezza in `InfoAggiuntiveView`
 - Updated copyright info splash
 
 ## [0.0.10] - 2025-03-04
