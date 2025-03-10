@@ -36,14 +36,27 @@ impl HomeController {
         Self
     }
 
-    pub fn update(&self, _rl: &RaylibHandle) {
+    pub fn update(&self, _rl: &RaylibHandle, main_state: &mut MainState) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.home_model.increment_frame_counter();
+        match state.home_model.get_user_continued() {
+            true => {
+                eprintln!("HomeController:  L'utente ha premuto Continua");
+                eprintln!("HomeController:  Let's update current view and go to SelezioneIndice.");
+                main_state.set_current_view(CurrentView::SelezioneIndice)
+            }
+            false => {}
+        }
     }
 
     pub fn get_state(&self) -> HomeModel {
         let state = GLOBAL_STATE.lock().unwrap();
         return state.home_model.clone();
+    }
+
+    pub fn set_user_continued(&self, val: bool) {
+        let mut state = GLOBAL_STATE.lock().unwrap();
+        state.home_model.set_user_continued(val);
     }
 }
 
@@ -54,10 +67,18 @@ impl SecondController {
         Self
     }
 
-    pub fn update(&self, _rl: &RaylibHandle) {
+    pub fn update(&self, _rl: &RaylibHandle, main_state: &mut MainState) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.second_model.increment_frame_counter();
         state.second_model.set_name("Updated".to_string());
+        match state.second_model.get_user_continued() {
+            true => {
+                eprintln!("SecondController:  L'utente ha premuto Continua");
+                eprintln!("SecondController:  Let's update current view and go to SelezioneIndice.");
+                main_state.set_current_view(CurrentView::SelezioneIndice)
+            }
+            false => {}
+        }
     }
 
     pub fn get_state(&self) -> SecondModel {
@@ -73,6 +94,10 @@ impl SecondController {
     pub fn set_value(&self, val: i32) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.second_model.set_value(val);
+    }
+    pub fn set_user_continued(&self, val: bool) {
+        let mut state = GLOBAL_STATE.lock().unwrap();
+        state.second_model.set_user_continued(val);
     }
 }
 

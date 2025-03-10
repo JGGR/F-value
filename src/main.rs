@@ -176,10 +176,10 @@ fn main() {
         // Current view update step
         match main_state.current_view {
             CurrentView::HOME => {
-                home_controller.update(&rl);
+                home_controller.update(&rl, &mut main_state);
             }
             CurrentView::SECOND => {
-                second_controller.update(&rl);
+                second_controller.update(&rl, &mut main_state);
             }
             CurrentView::SelezioneIndice => {
                 indice_controller.update(&rl, &mut main_state);

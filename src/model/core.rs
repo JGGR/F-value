@@ -27,6 +27,7 @@ use crate::SHORT_PROJECT_VERSION;
 #[derive(Clone)]
 pub struct HomeModel {
     frame_counter: u32,
+    user_continued: bool
 }
 
 impl HomeModel {
@@ -35,6 +36,12 @@ impl HomeModel {
     }
     pub fn increment_frame_counter(&mut self) {
         self.frame_counter += 1;
+    }
+    pub fn get_user_continued(&self) -> bool {
+        return self.user_continued;
+    }
+    pub fn set_user_continued(&mut self, val: bool) {
+        self.user_continued = val;
     }
 }
 
@@ -45,6 +52,7 @@ pub struct SecondModel {
     frame_counter: u32,
     value: i32,
     name: String,
+    user_continued: bool
 }
 
 impl SecondModel {
@@ -67,6 +75,12 @@ impl SecondModel {
 
     pub fn set_name(&mut self, new_name: String) {
         self.name = new_name;
+    }
+    pub fn get_user_continued(&self) -> bool {
+        return self.user_continued;
+    }
+    pub fn set_user_continued(&mut self, val: bool) {
+        self.user_continued = val;
     }
 }
 
@@ -317,11 +331,13 @@ impl Model {
         Self {
             home_model: HomeModel {
                 frame_counter: 0,
+                user_continued: false,
             },
             second_model: SecondModel {
                 frame_counter: 0,
                 value: 1,
                 name: "Initial".to_string(),
+                user_continued: false,
             },
             indice_model: IndiceModel {
                 frame_counter: 0,

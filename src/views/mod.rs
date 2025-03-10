@@ -47,22 +47,7 @@ impl HomeView {
         let state = controller.get_state();
         let frame_counter = state.get_frame_counter();
 
-        let next_itext = d.gui_icon_text(ICON_PLAYER_NEXT, Some(rstr!(": Prossimo")));
-        let next_itext = CString::new(next_itext).unwrap();
-        let userinfo_x_padding = d.get_screen_width() - propwidth(&d, 200);
-        let userinfo_y_padding = propheight(&d, 100);
-
-        d.gui_label(
-            rrect(
-                userinfo_x_padding,
-                userinfo_y_padding,
-                propwidth(&d, 200),
-                propheight(&d, 50),
-            ),
-            Some(next_itext.as_c_str())
-        );
-
-        let copyright_label_width = propwidth(&d, 400);
+        let copyright_label_width = propwidth(&d, 500);
         let copyright_label_x = propwidth(&d, 20);
         let copyright_label_y = propheight(&d, 30);
         let copyright_label_height = propheight(&d, 300);
@@ -80,7 +65,7 @@ impl HomeView {
         );
 
         let labels_width = propwidth(&d, 200);
-        let labels_x = userinfo_x_padding;
+        let labels_x = d.get_screen_width() - propwidth(&d, 200);
         let labels_y = propheight(&d, 300);
         let labels_height = propheight(&d, 25);
 
@@ -100,6 +85,28 @@ impl HomeView {
                 Some(label.as_c_str())
             );
         }
+
+        let continue_width = propwidth(&d, 100);
+        let continue_x = labels_x;
+        let continue_height = propwidth(&d, 50);
+        let continue_y_padding = propwidth(&d, 25);
+        let continue_y = labels_y + (labels_height * labels.len() as i32) + continue_y_padding;
+
+        let continue_itext = d.gui_icon_text(ICON_PLAYER_NEXT, Some(rstr!(": Continua")));
+        let continue_itext = CString::new(continue_itext).unwrap();
+
+        if d.gui_button(
+            rrect(
+                continue_x,
+                continue_y,
+                continue_width,
+                continue_height
+            ),
+            Some(continue_itext.as_c_str())
+        ) {
+            controller.set_user_continued(true);
+        }
+
         let rainbow_speed = 0.03;
         let todo_font_scale = 4;
         let todo_font_height = main_state.current_font_height * todo_font_scale;
@@ -110,6 +117,7 @@ impl HomeView {
         let todo_txt_y = (d.get_screen_height() / 2) - (todo_txt_bounds.y as i32 / 2);
 
         draw_rainbow_text(d, todo_txt_x, todo_txt_y, "TODO: WELCOME", frame_counter, rainbow_speed, &main_state.current_font, main_state.default_txt_spacing, main_state.current_font_height, todo_font_scale);
+
     }
 }
 
@@ -163,23 +171,26 @@ impl SecondView {
         // the controller.
         controller.set_value(self.spinner_value);
 
-        let next_itext = d.gui_icon_text(ICON_PLAYER_NEXT, Some(rstr!(": Prossimo")));
-        let next_itext = CString::new(next_itext).unwrap();
-        let userinfo_x_padding = d.get_screen_width() - propwidth(&d, 200);
-        let userinfo_y_padding = propheight(&d, 100);
+        let copyright_label_width = propwidth(&d, 500);
+        let copyright_label_x = propwidth(&d, 20);
+        let copyright_label_y = propheight(&d, 30);
+        let copyright_label_height = propheight(&d, 300);
+
+        let copyright_label = CString::new(COPYRIGHT_INFO).unwrap();
 
         d.gui_label(
             rrect(
-                userinfo_x_padding,
-                userinfo_y_padding,
-                propwidth(&d, 200),
-                propheight(&d, 50),
+                copyright_label_x,
+                copyright_label_y,
+                copyright_label_width,
+                copyright_label_height
             ),
-            Some(next_itext.as_c_str())
+            Some(copyright_label.as_c_str())
         );
 
+
         let labels_width = propwidth(&d, 200);
-        let labels_x = userinfo_x_padding;
+        let labels_x = d.get_screen_width() - propwidth(&d, 200);
         let labels_y = propheight(&d, 300);
         let labels_height = propheight(&d, 25);
 
@@ -199,6 +210,28 @@ impl SecondView {
                 Some(label.as_c_str())
             );
         }
+
+        let continue_width = propwidth(&d, 100);
+        let continue_x = labels_x;
+        let continue_height = propwidth(&d, 50);
+        let continue_y_padding = propwidth(&d, 25);
+        let continue_y = labels_y + (labels_height * labels.len() as i32) + continue_y_padding;
+
+        let continue_itext = d.gui_icon_text(ICON_PLAYER_NEXT, Some(rstr!(": Continua")));
+        let continue_itext = CString::new(continue_itext).unwrap();
+
+        if d.gui_button(
+            rrect(
+                continue_x,
+                continue_y,
+                continue_width,
+                continue_height
+            ),
+            Some(continue_itext.as_c_str())
+        ) {
+            controller.set_user_continued(true);
+        }
+
         let rainbow_speed = 0.03;
         let todo_font_scale = 4;
         let todo_font_height = main_state.current_font_height * todo_font_scale;
