@@ -1525,7 +1525,11 @@ impl ProduzioneOutputView {
 
         let done_calc = controller.get_is_done_calc();
 
-        let really_done_calc = match current_index {
+        let _really_done_calc = match current_index {
+            // This distinguishes the case where the calc finished but the resulting value is None.
+            // It should only really happen when we try to get x2 with a divide-by-zero, as in:
+            // our campionamento had no records matching a riferimentore record with specie_attesa == 1
+
             Indice::NISECI => {
                 done_calc && controller.get_niseci_value().is_some()
             }
@@ -1537,15 +1541,19 @@ impl ProduzioneOutputView {
             }
         };
 
+        let lock_user_submit = !done_calc;
 
-        if !done_calc || !really_done_calc {
+        // If one wanted to avoid users pressing submit when the calc ended in the None case
+        // let lock_submit = !done_calc || !really_done_calc;
+
+        if lock_user_submit {
             d.gui_lock();
             d.gui_set_state(STATE_DISABLED);
         }
         if d.gui_button(rrect(submit_x, submit_y, submit_width, submit_height), Some(confirm_itext.as_c_str())) {
             controller.user_confirm_calc();
         }
-        if !done_calc || !really_done_calc {
+        if lock_user_submit {
             d.gui_set_state(STATE_NORMAL);
             d.gui_unlock();
         }
