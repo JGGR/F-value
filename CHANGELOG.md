@@ -1,4 +1,4 @@
-## [0.0.11] - Unreleased
+## [0.0.11] - 2025-03-11
 
 ### Added
 
@@ -30,7 +30,7 @@
 - Fix `calculate_x2()` divide-by-zero
 - Update tests
 - Less verbose CLI output
-- Print intermediate values to stdout on full calc
+- Print intermediate values to stdout and console on full calc
 - Use spinner for lunghezza, larghezza in `InfoAggiuntiveView`
 - Updated copyright info splash
 

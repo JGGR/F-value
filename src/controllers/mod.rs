@@ -915,6 +915,8 @@ impl OutputController {
 
                     intermediates.log();
 
+                    self.add_console_message(format!("{intermediates}"));
+
                     let risultato_niseci = RisultatoNISECI::new(
                         niseci,
                         rqe_niseci,
