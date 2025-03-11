@@ -380,6 +380,7 @@ pub fn parse_csv_campionamento_niseci<R>(mut rdr: csv::Reader<R>) -> (Vec<Record
     (records, errors)
 }
 
+#[derive(Debug)]
 pub enum RecordCsvCampionamentoNISECIError {
     ValoreInvalido { msg : String }, //TODO: add position?
 }
@@ -484,6 +485,7 @@ pub fn parse_csv_riferimento_niseci<R>(mut rdr: csv::Reader<R>) -> (Vec<RecordCs
     (records, errors)
 }
 
+#[derive(Debug)]
 pub enum RecordCsvRiferimentoNISECIError {
     ValoreInvalido { msg : String }, //TODO: add position?
     SoglieCLNonCrescenti { msg : String },
@@ -687,6 +689,7 @@ impl fmt::Display for RecordCsvAnagraficaNISECI {
     }
 }
 
+#[derive(Debug)]
 pub enum RecordCsvAnagraficaNISECIError {
     ValoreInvalido { msg : String }, //TODO: add position?
 }
