@@ -4,7 +4,9 @@
 
 ### Changed
 
-- Drop field `superficie` from `RecordCsvCampionamentoNISECI`
+- Refactor `RecordCsvCampionamentoNISECI`:
+  - Drop field `superficie`
+  - Refactor field `numPassaggio` to be `u32`
 
 ## [0.0.11] - 2025-03-12
 

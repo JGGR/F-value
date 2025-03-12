@@ -300,7 +300,7 @@ impl<R: Read> Read for NormalizerReader<R> {
 
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct RecordCsvRiferimentoNISECI { //TODO: add position
+pub struct RecordCsvRiferimentoNISECI {
     pub nome_comune: String,
     pub nome_latino: String,
     pub codice_specie: String,
@@ -342,11 +342,10 @@ impl fmt::Display for RecordCsvRiferimentoNISECI {
 
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct RecordCsvCampionamentoNISECI { //TODO: add position
-    //id: i32,
+pub struct RecordCsvCampionamentoNISECI {
     pub data: String,
     pub stazione: String,
-    pub num_passaggio: String,
+    pub num_passaggio: u32,
     pub codice_specie: String,
     pub lunghezza: i32,
     pub peso: i32,
@@ -425,27 +424,13 @@ pub fn parse_recordcsv_campionamento_niseci(records: Vec<RecordCsvCampionamentoN
         }
 
 
-        let passaggio_cattura;
         //TODO: update this abomination when records change to have an integer directly
-        match r.num_passaggio.as_str() {
-            "c1" => {
-                passaggio_cattura = 1;
-            }
-            "c2" => {
-                passaggio_cattura = 2;
-            }
-            "c3" => {
-                passaggio_cattura = 3;
-            }
-            "c4" => {
-                passaggio_cattura = 4;
-            }
-            _ => {
-                let err = RecordCsvCampionamentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: num_passaggio non valido (non in [\"c1\", \"c2\" ... \"c4\"]): {}", r.num_passaggio) };
-                errors.push(err);
-                continue;
-            }
+        if r.num_passaggio < 1 {
+            let err = RecordCsvCampionamentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: num_passaggio non valido (non in [\"c1\", \"c2\" ... \"c4\"]): {}", r.num_passaggio) };
+            errors.push(err);
+            continue;
         }
+        let passaggio_cattura = r.num_passaggio;
 
         if r.lunghezza < 0 {
             let err = RecordCsvCampionamentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: lunghezza < 0") };
