@@ -14,6 +14,7 @@
   - Drop field `superficie`
   - Refactor field `numPassaggio` to be `u32`
 - Flag `--info` now also prints expected types
+- Fixed wrong message in error reports for `check_riferimento_niseci_reader`
 
 ## [0.0.11] - 2025-03-12
 

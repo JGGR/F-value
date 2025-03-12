@@ -1246,14 +1246,13 @@ pub fn check_riferimento_niseci_reader<R: Read>(reader: R) -> Result<Vec<RecordC
     println!("Riferimento NISECI: Numero record csv non validi: {}", errors.len());
 
     if !errors.is_empty() {
-        eprintln!("Errori incontrati durante l'elaborazione csv del riferimento NISECI: {{");
         /*
         for error in &errors {
             eprintln!("  {}", error);
         }
         */
         let processed_errors = process_csv_errors(&errors, TipoRecordCsv::RiferimentoNISECI);
-        eprintln!("Errori incontrati durante l'elaborazione csv del campionamento NISECI: {{");
+        eprintln!("Errori incontrati durante l'elaborazione csv del riferimento NISECI: {{");
         for e in processed_errors {
             eprintln!("{e}");
         }
