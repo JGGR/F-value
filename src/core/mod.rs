@@ -70,6 +70,7 @@ pub const LAVANDA_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_
 pub const TERMINAL_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_terminal.rgs");
 pub const ASHES_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_ashes.rgs");
 pub const CONSOLE_FONT_DATA: &[u8] = include_bytes!("../../assets/ubuntu.mono.ttf");
+pub const PROJECT_LOGO_DATA: &[u8] = include_bytes!("../../assets/logo.png");
 
 #[cfg(all(windows, debug_assertions))]
 pub const SUPPORT_HEADLESS: bool = true;
@@ -196,10 +197,11 @@ pub struct MainState {
     pub default_txt_color: Color,
     pub current_font: WeakFont,
     pub default_bg_color: Color,
+    pub logo_texture: Option<Texture2D>,
 }
 
 impl MainState {
-    pub fn new(default_font_height: i32, current_font_height: i32, default_txt_spacing: i32, current_font: WeakFont, default_txt_color: Color, default_bg_color: Color) -> Self {
+    pub fn new(default_font_height: i32, current_font_height: i32, default_txt_spacing: i32, current_font: WeakFont, default_txt_color: Color, default_bg_color: Color, logo_texture: Option<Texture2D>) -> Self {
         Self {
             frame_counter: 0,
             showing_quit_win: false,
@@ -216,6 +218,7 @@ impl MainState {
             default_txt_color: default_txt_color,
             current_font: current_font,
             default_bg_color: default_bg_color,
+            logo_texture: logo_texture
         }
     }
 

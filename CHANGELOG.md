@@ -1,6 +1,11 @@
 ## [0.0.12] - Unreleased
 
 ### Added
+- Add `assets/logo.png`
+- Embedding logo increases binary size:
+  - Target `x86_64-pc-windows-gnu`:
+    - Absolute: +1.03MB
+    - Relative: +25.6%
 
 ### Changed
 

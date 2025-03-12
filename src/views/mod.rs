@@ -64,8 +64,37 @@ impl HomeView {
             Some(copyright_label.as_c_str())
         );
 
+        let texture_target_width = propwidth(&d, 205);
+        let side_x_padding = d.get_screen_width() - texture_target_width - propwidth(&d, 25);
+        let texture_target_height = propheight(&d, 205);
+        let texture_target_x = side_x_padding;
+        let texture_target_y = propheight(&d, 50);
+        match main_state.logo_texture {
+            Some(ref texture) => {
+                d.draw_texture_pro(
+                    &texture,
+                    Rectangle {
+                        x: 0.0,
+                        y: 0.0,
+                        width: texture.width() as f32,
+                        height: texture.height() as f32,
+                    },
+                    Rectangle {
+                        x: texture_target_x as f32,
+                        y: texture_target_y as f32,
+                        width: texture_target_width as f32,
+                        height: texture_target_height as f32,
+                    },
+                    Vector2::zero(),
+                    0.0,
+                    Color::WHITE,
+                );
+            }
+            None => {}
+        }
+
         let labels_width = propwidth(&d, 200);
-        let labels_x = d.get_screen_width() - propwidth(&d, 200);
+        let labels_x =  side_x_padding;
         let labels_y = propheight(&d, 300);
         let labels_height = propheight(&d, 25);
 
@@ -188,9 +217,37 @@ impl SecondView {
             Some(copyright_label.as_c_str())
         );
 
+        let texture_target_width = propwidth(&d, 205);
+        let side_x_padding = d.get_screen_width() - texture_target_width - propwidth(&d, 25);
+        let texture_target_height = propheight(&d, 205);
+        let texture_target_x = side_x_padding;
+        let texture_target_y = propheight(&d, 50);
+        match main_state.logo_texture {
+            Some(ref texture) => {
+                d.draw_texture_pro(
+                    &texture,
+                    Rectangle {
+                        x: 0.0,
+                        y: 0.0,
+                        width: texture.width() as f32,
+                        height: texture.height() as f32,
+                    },
+                    Rectangle {
+                        x: texture_target_x as f32,
+                        y: texture_target_y as f32,
+                        width: texture_target_width as f32,
+                        height: texture_target_height as f32,
+                    },
+                    Vector2::zero(),
+                    0.0,
+                    Color::WHITE,
+                );
+            }
+            None => {}
+        }
 
         let labels_width = propwidth(&d, 200);
-        let labels_x = d.get_screen_width() - propwidth(&d, 200);
+        let labels_x = side_x_padding;
         let labels_y = propheight(&d, 300);
         let labels_height = propheight(&d, 25);
 

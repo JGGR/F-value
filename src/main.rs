@@ -120,6 +120,19 @@ fn main() {
         return;
     }
 
+    let img_load_res = Image::load_image_from_mem(".png", PROJECT_LOGO_DATA);
+
+    let mut logo_img = None;
+    match img_load_res {
+        Ok(img) => {
+            println!("Img size: x {}, y {}", img.width(), img.height());
+            logo_img = Some(img);
+        }
+        Err(err) => {
+            println!("Error loading img: {err}");
+        }
+    }
+
     let home_controller = HomeController::new();
     let mut home_view = HomeView::new();
     let second_controller = SecondController::new();
@@ -150,6 +163,14 @@ fn main() {
     rl.set_exit_key(None); // This allows capturing the exit key with a message box
     rl.set_target_fps(30);
 
+    let mut logo_texture = None;
+    match logo_img {
+        Some(img) => {
+            logo_texture = Some(rl.load_texture_from_image(&thread, &img).unwrap());
+        }
+        None => {}
+    }
+
     let gui_default_font_height: i32 = rl.gui_get_style(DEFAULT, TEXT_SIZE as i32);
     let gui_current_font_height: i32 = gui_default_font_height;
 
@@ -163,7 +184,8 @@ fn main() {
         txt_spacing,
         current_font,
         Color::get_color(txt_color_int as u32),
-        Color::get_color(bg_color_int as u32)
+        Color::get_color(bg_color_int as u32),
+        logo_texture
     );
 
     let mut console_view = ConsoleView::new(&mut rl, &thread, gui_current_font_height*2, txt_spacing);
