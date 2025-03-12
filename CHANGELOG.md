@@ -1,3 +1,11 @@
+## [0.0.12] - Unreleased
+
+### Added
+
+### Changed
+
+- Drop field `superficie` from `RecordCsvCampionamentoNISECI`
+
 ## [0.0.11] - 2025-03-12
 
 ### Added

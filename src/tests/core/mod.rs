@@ -249,7 +249,7 @@ fn test_recordcsv_riferimento_niseci_soglie_ad_juv_error() {
 #[test]
 fn test_csv_campionamento_niseci_found_string_expect_int() {
     let csv_data = format!(
-        "{}\n07/07/2019;2190627 Reno 390;abc;c1;BA;275;152",
+        "{}\n07/07/2019;2190627 Reno 390;c1;BA;abc;152",
         CAMPIONAMENTO_NISECI_HEADER
     );
     let reader = Cursor::new(csv_data);
@@ -265,7 +265,7 @@ fn test_csv_campionamento_niseci_found_string_expect_int() {
 #[test]
 fn test_csv_campionamento_niseci_found_empty_string_expect_int() {
     let csv_data = format!(
-        "{}\n07/07/2019;2190627 Reno 390;;c1;BA;275;152",
+        "{}\n07/07/2019;2190627 Reno 390;c1;BA;;152",
         CAMPIONAMENTO_NISECI_HEADER
     );
     let reader = Cursor::new(csv_data);
@@ -281,7 +281,7 @@ fn test_csv_campionamento_niseci_found_empty_string_expect_int() {
 #[test]
 fn test_csv_campionamento_niseci_found_float_expect_int() {
     let csv_data = format!(
-        "{}\n07/07/2019;2190627 Reno 390;75.0;c1;BA;275;152",
+        "{}\n07/07/2019;2190627 Reno 390;c1;BA;2.75;152",
         CAMPIONAMENTO_NISECI_HEADER
     );
     let reader = Cursor::new(csv_data);
@@ -297,7 +297,7 @@ fn test_csv_campionamento_niseci_found_float_expect_int() {
 #[test]
 fn test_csv_campionamento_niseci_lessfields() {
     let csv_data = format!(
-        "{}\n07/07/2019;2190627 Reno 390;75.0;c1;BA;275",
+        "{}\n07/07/2019;2190627 Reno 390;c1;BA;2.75",
         CAMPIONAMENTO_NISECI_HEADER
     );
     let reader = Cursor::new(csv_data);
@@ -314,9 +314,9 @@ fn test_csv_campionamento_niseci_lessfields() {
 #[test]
 fn test_valid_csv_campionamento_niseci() {
     let csv_data = format!(
-        "{}\n07/07/2019;2190627 Reno 390;750;c1;BA;275;152
-        07/07/2019;2190627 Reno 390;750;1;BA;275;152
-        abc;2190627 Reno 390;750;c1;BA;275;152",
+        "{}\n07/07/2019;2190627 Reno 390;c1;BA;275;152
+        07/07/2019;2190627 Reno 390;1;BA;275;152
+        abc;2190627 Reno 390;c1;BA;275;152",
         CAMPIONAMENTO_NISECI_HEADER
     );
     let reader = Cursor::new(csv_data);
@@ -361,7 +361,6 @@ fn test_valid_recordcsv_campionamento_niseci() {
     let record_1 = RecordCsvCampionamentoNISECI {
         data: "07/07/2007".to_string(),
         stazione: "Foo".to_string(),
-        superficie: 420,
         num_passaggio: "c1".to_string(),
         codice_specie: "1234".to_string(),
         lunghezza: 100,

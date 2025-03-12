@@ -84,9 +84,9 @@ pub const RIFERIMENTO_NISECI_HEADER_FIELDS: [&str; 17] = [ "nomeComune", "nomeLa
 pub const RIFERIMENTO_NISECI_HEADER: &str = "\
 nomeComune;nomeLatino;codiceSpecie;origine;tipoAutoctono;alloNocivita;specieAttesa;clSoglia1;clSoglia2;clSoglia3;clSoglia4;adJuvSoglia1;adJuvSoglia2;adJuvSoglia3;adJuvSoglia4;densSoglia1;densSoglia2";
 
-pub const CAMPIONAMENTO_NISECI_HEADER_FIELDS: [&str; 7] = [ "data", "stazione", "superficie", "numPassaggio", "codiceSpecie", "lunghezza", "peso" ];
+pub const CAMPIONAMENTO_NISECI_HEADER_FIELDS: [&str; 6] = [ "data", "stazione", "numPassaggio", "codiceSpecie", "lunghezza", "peso" ];
 pub const CAMPIONAMENTO_NISECI_HEADER: &str = "\
-data;stazione;superficie;numPassaggio;codiceSpecie;lunghezza;peso";
+data;stazione;numPassaggio;codiceSpecie;lunghezza;peso";
 
 pub const ANAGRAFICA_NISECI_HEADER_FIELDS: [&str; 13] = [
 "codiceStazione", "corpoIdrico", "regione", "provincia", "data", "lunghezzaStazione", "larghezzaStazione", "tipoComunita", "fonte", "numeroProtocollo", "idroEcoRegione", "areaAlpina", "nomeBacino" ];
@@ -346,7 +346,6 @@ pub struct RecordCsvCampionamentoNISECI { //TODO: add position
     //id: i32,
     pub data: String,
     pub stazione: String,
-    pub superficie: i32,
     pub num_passaggio: String,
     pub codice_specie: String,
     pub lunghezza: i32,
@@ -356,11 +355,11 @@ pub struct RecordCsvCampionamentoNISECI { //TODO: add position
 impl fmt::Display for RecordCsvCampionamentoNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let string_representation = format!(
-            "RecordCsvCampionamentoNISECI: {{ data: [{}], stazione: [{}], superficie: [{}], num_passaggio: [{}], codice_specie: [{}], lunghezza: [{}], peso: [{}] }}",
+            "RecordCsvCampionamentoNISECI: {{ data: [{}], stazione: [{}], num_passaggio: [{}], codice_specie: [{}], lunghezza: [{}], peso: [{}] }}",
               // id: [{}], before the }}
               //self.id,
-              self.data, self.stazione, self.superficie,
-              self.num_passaggio, self.codice_specie, self.lunghezza, self.peso
+              self.data, self.stazione, self.num_passaggio,
+              self.codice_specie, self.lunghezza, self.peso
         );
         write!(f, "{}", string_representation)
     }
