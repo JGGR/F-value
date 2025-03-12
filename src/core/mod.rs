@@ -100,7 +100,7 @@ data;stazione;numPassaggio;codiceSpecie;lunghezza;peso";
 // TODO: get this stuff with some macro?
 pub const ANAGRAFICA_NISECI_HEADER_FIELDS: [&str; 13] = [
 "codiceStazione", "corpoIdrico", "regione", "provincia", "data", "lunghezzaStazione", "larghezzaStazione", "tipoComunita", "fonte", "numeroProtocollo", "idroEcoRegione", "areaAlpina", "nomeBacino" ];
-pub const ANAGRAFICA_NISECI_HEADER_FIELD_TYPES: [&str; 13] = [ "String", "String", "String", "String", "String", "u32", "u32", "u32", "String", "String", "u32", "u32", "String"];
+pub const ANAGRAFICA_NISECI_HEADER_FIELD_TYPES: [&str; 13] = [ "String", "String", "String", "String", "String", "f32", "f32", "u32", "String", "String", "u32", "u32", "String"];
 pub const ANAGRAFICA_NISECI_HEADER: &str = "\
 codiceStazione;corpoIdrico;regione;provincia;data;lunghezzaStazione;larghezzaStazione;tipoComunita;fonte;numeroProtocollo;idroEcoRegione;areaAlpina;nomeBacino";
 
@@ -659,8 +659,8 @@ pub struct RecordCsvAnagraficaNISECI {
     pub regione: String,
     pub provincia: String,
     pub data: String,
-    pub lunghezza_stazione: u32,
-    pub larghezza_stazione: u32,
+    pub lunghezza_stazione: f32,
+    pub larghezza_stazione: f32,
     pub tipo_comunita: u32,
     pub fonte: String,
     pub numero_protocollo: String,
@@ -788,12 +788,12 @@ pub fn parse_recordcsv_anagrafica_niseci(records: Vec<RecordCsvAnagraficaNISECI>
         }
     }
 
-    if r.lunghezza_stazione < 1 {
+    if r.lunghezza_stazione < 0.0 {
         let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Lunghezza stazione troppo bassa: {}", r.lunghezza_stazione) };
         errors.push(err);
     }
 
-    if r.larghezza_stazione < 1 {
+    if r.larghezza_stazione < 0.0 {
         let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Larghezza stazione troppo bassa: {}", r.larghezza_stazione) };
         errors.push(err);
     }

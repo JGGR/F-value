@@ -13,6 +13,8 @@
 - Refactor `RecordCsvCampionamentoNISECI`:
   - Drop field `superficie`
   - Refactor field `numPassaggio` to be `u32`
+- Refactor `RecordCsvAnagraficaNISECI`:
+  - Refactor fields `larghezza_stazione`, `lunghezza_stazione` to be `f32`
 - Flag `--info` now also prints expected types
 - Fixed wrong message in error reports for `check_riferimento_niseci_reader`
 
