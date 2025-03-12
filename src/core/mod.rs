@@ -85,14 +85,14 @@ pub const SUPPORT_HEADLESS: bool = true;
 // This must be kept aligned with RecordCsvRiferimentoNISECI definition.
 // TODO: get this stuff with some macro?
 pub const RIFERIMENTO_NISECI_HEADER_FIELDS: [&str; 17] = [ "nomeComune", "nomeLatino", "codiceSpecie", "origine", "tipoAutoctono", "alloNocivita", "specieAttesa", "clSoglia1", "clSoglia2", "clSoglia3", "clSoglia4", "adJuvSoglia1", "adJuvSoglia2", "adJuvSoglia3", "adJuvSoglia4", "densSoglia1", "densSoglia2" ];
-pub const RIFERIMENTO_NISECI_HEADER_FIELD_TYPES: [&str; 17] = [ "String", "String", "String", "String", "i32", "i32", "i32", "u32", "u32", "u32", "u32", "f32", "f32", "f32", "f32", "f32", "f32" ];
+pub const RIFERIMENTO_NISECI_HEADER_FIELD_TYPES: [&str; 17] = [ "String", "String", "String", "String", "u32", "u32", "u32", "u32", "u32", "u32", "u32", "f32", "f32", "f32", "f32", "f32", "f32" ];
 pub const RIFERIMENTO_NISECI_HEADER: &str = "\
 nomeComune;nomeLatino;codiceSpecie;origine;tipoAutoctono;alloNocivita;specieAttesa;clSoglia1;clSoglia2;clSoglia3;clSoglia4;adJuvSoglia1;adJuvSoglia2;adJuvSoglia3;adJuvSoglia4;densSoglia1;densSoglia2";
 
 // This must be kept aligned with RecordCsvCampionamentoNISECI definition.
 // TODO: get this stuff with some macro?
 pub const CAMPIONAMENTO_NISECI_HEADER_FIELDS: [&str; 6] = [ "data", "stazione", "numPassaggio", "codiceSpecie", "lunghezza", "peso" ];
-pub const CAMPIONAMENTO_NISECI_HEADER_FIELD_TYPES: [&str; 6] = [ "String", "String", "u32", "String", "i32", "i32" ];
+pub const CAMPIONAMENTO_NISECI_HEADER_FIELD_TYPES: [&str; 6] = [ "String", "String", "u32", "String", "u32", "u32" ];
 pub const CAMPIONAMENTO_NISECI_HEADER: &str = "\
 data;stazione;numPassaggio;codiceSpecie;lunghezza;peso";
 
@@ -318,9 +318,9 @@ pub struct RecordCsvRiferimentoNISECI {
     pub nome_latino: String,
     pub codice_specie: String,
     pub origine: String,
-    pub tipo_autoctono: i32,
-    pub allo_nocivita: i32,
-    pub specie_attesa: i32,
+    pub tipo_autoctono: u32,
+    pub allo_nocivita: u32,
+    pub specie_attesa: u32,
     pub cl_soglia1: u32, // in mm
     pub cl_soglia2: u32, // in mm
     pub cl_soglia3: u32, // in mm
@@ -360,16 +360,14 @@ pub struct RecordCsvCampionamentoNISECI {
     pub stazione: String,
     pub num_passaggio: u32,
     pub codice_specie: String,
-    pub lunghezza: i32,
-    pub peso: i32,
+    pub lunghezza: u32,
+    pub peso: u32,
 }
 
 impl fmt::Display for RecordCsvCampionamentoNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let string_representation = format!(
             "RecordCsvCampionamentoNISECI: {{ data: [{}], stazione: [{}], num_passaggio: [{}], codice_specie: [{}], lunghezza: [{}], peso: [{}] }}",
-              // id: [{}], before the }}
-              //self.id,
               self.data, self.stazione, self.num_passaggio,
               self.codice_specie, self.lunghezza, self.peso
         );
@@ -406,7 +404,6 @@ impl fmt::Display for RecordCsvCampionamentoNISECIError {
 }
 
 pub fn parse_recordcsv_campionamento_niseci(records: Vec<RecordCsvCampionamentoNISECI>, riferimento_specie: Vec<SpecieNISECI>) -> (Vec<RecordNISECI>,Vec<RecordCsvCampionamentoNISECIError>) {
-    //TODO: update when the model includes the missing fields
     let mut campioni = Vec::new();
     let mut errors = Vec::new();
     let mut idx = 0;
@@ -444,18 +441,6 @@ pub fn parse_recordcsv_campionamento_niseci(records: Vec<RecordCsvCampionamentoN
             continue;
         }
         let passaggio_cattura = r.num_passaggio;
-
-        if r.lunghezza < 0 {
-            let err = RecordCsvCampionamentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: lunghezza < 0") };
-            errors.push(err);
-            continue;
-        }
-
-        if r.peso < 0 {
-            let err = RecordCsvCampionamentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: peso < 0") };
-            errors.push(err);
-            continue;
-        }
 
         let niseci_rec = RecordNISECI {
             specie: matched_specie.clone(),
@@ -501,7 +486,6 @@ let string_representation = match self {
 }
 
 pub fn parse_recordcsv_riferimento_niseci(records: Vec<RecordCsvRiferimentoNISECI>) -> (Vec<SpecieNISECI>,Vec<RecordCsvRiferimentoNISECIError>) {
-    //TODO: update when the model includes the missing fields
     let mut specie = Vec::new();
     let mut errors = Vec::new();
     let mut idx = 0;
@@ -520,19 +504,8 @@ pub fn parse_recordcsv_riferimento_niseci(records: Vec<RecordCsvRiferimentoNISEC
                 continue;
             }
         }
-        if r.specie_attesa < 0 {
-            let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: specie_attesa < 0") };
-            errors.push(err);
-            continue;
-        }
         let specie_attesa = r.specie_attesa > 0; // TODO: possiamo prendere qualsiasi non-zero come
                                                  // "atteso"?
-        if r.tipo_autoctono < 0 {
-            let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: tipo_autoctono < 0") };
-            errors.push(err);
-            continue;
-        }
-
         let tipo_autoctono: u8;
         let tipo_alloctono: u8;
         if origine_autoctono {

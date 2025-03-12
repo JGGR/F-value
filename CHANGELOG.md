@@ -13,11 +13,14 @@
 - Refactor `RecordCsvCampionamentoNISECI`:
   - Drop field `superficie`
   - Refactor field `numPassaggio` to be `u32`
+  - Refactor fields `lunghezza`, `peso` to be `u32`
 - Refactor `RecordCsvAnagraficaNISECI`:
   - Refactor fields `larghezza_stazione`, `lunghezza_stazione` to be `f32`
   - Refactor `SelezioneInfoAggiuntiveView` to handle the check
     - ATM it's done by `InfoAggiuntiveController::check_larghezza_stazione_str()`
     - Also updates the model and sets the error flag, going to `ConsoleView`
+- Refactor `RecordCsvRiferimentoNISECI`
+    - Refactor fields `tipo_autoctono`, `allo_nocivita`, `specie_attesa` to be `u32`
 - Flag `--info` now also prints expected types
 - Fixed wrong message in error reports for `check_riferimento_niseci_reader`
 
