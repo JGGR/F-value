@@ -6,12 +6,14 @@
   - Target `x86_64-pc-windows-gnu`:
     - Absolute: +1.03MB
     - Relative: +25.6%
+- Add missing tests for anagrafica NISECI csv parsing
 
 ### Changed
 
 - Refactor `RecordCsvCampionamentoNISECI`:
   - Drop field `superficie`
   - Refactor field `numPassaggio` to be `u32`
+- Flag `--info` now also prints expected types
 
 ## [0.0.11] - 2025-03-12
 

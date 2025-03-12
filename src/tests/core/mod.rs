@@ -17,7 +17,7 @@
 
 use std::io::Cursor;
 
-use crate::{check_campionamento_niseci_reader, check_records_campionamento_niseci, check_records_riferimento_niseci, check_riferimento_niseci_reader, model::niseci::SpecieNISECI, translate_error_message, RecordCsvCampionamentoNISECI, RecordCsvRiferimentoNISECI, CAMPIONAMENTO_NISECI_HEADER, RIFERIMENTO_NISECI_HEADER};
+use crate::{check_campionamento_niseci_reader, check_records_campionamento_niseci, check_records_riferimento_niseci, check_riferimento_niseci_reader, check_anagrafica_niseci_reader, check_records_anagrafica_niseci, model::niseci::SpecieNISECI, translate_error_message, RecordCsvCampionamentoNISECI, RecordCsvRiferimentoNISECI, RecordCsvAnagraficaNISECI, CAMPIONAMENTO_NISECI_HEADER, RIFERIMENTO_NISECI_HEADER, ANAGRAFICA_NISECI_HEADER};
 
 #[test]
 fn test_csv_riferimento_niseci_found_string_expect_int() {
@@ -368,6 +368,117 @@ fn test_valid_recordcsv_campionamento_niseci() {
     };
     let recordcsv_data = vec![record_1];
     let result = check_records_campionamento_niseci(recordcsv_data, riferimento_specie);
+
+    assert!(!result.is_err());
+}
+
+#[test]
+fn test_csv_anagrafica_niseci_found_string_expect_int() {
+    let csv_data = format!(
+        "{}\nCODICE;CORPO;REGIONE;PROVINCIA;1/1/1111;abc;8;0;;;20;1;BACINO",
+        ANAGRAFICA_NISECI_HEADER
+    );
+    let reader = Cursor::new(csv_data);
+    let result = check_anagrafica_niseci_reader(reader);
+
+    assert!(result.is_err());
+    let errors = result.err().unwrap();
+    assert_eq!(errors.len(), 1); // One invalid record
+    let translated_error = translate_error_message(&errors[0].to_string());
+    assert!(translated_error.contains("tipo non valido"));
+}
+
+#[test]
+fn test_csv_anagrafica_niseci_found_empty_string_expect_int() {
+    let csv_data = format!(
+        "{}\nCODICE;CORPO;REGIONE;PROVINCIA;1/1/1111;;8;0;;;20;1;BACINO",
+        ANAGRAFICA_NISECI_HEADER
+    );
+    let reader = Cursor::new(csv_data);
+    let result = check_anagrafica_niseci_reader(reader);
+
+    assert!(result.is_err());
+    let errors = result.err().unwrap();
+    assert_eq!(errors.len(), 1); // One invalid record
+    let translated_error = translate_error_message(&errors[0].to_string());
+    assert!(translated_error.contains("campo vuoto"));
+}
+
+#[test]
+fn test_csv_anagrafica_niseci_found_float_expect_int() {
+    let csv_data = format!(
+        "{}\nCODICE;CORPO;REGIONE;PROVINCIA;1/1/1111;100,0;8;0;;;20;1;BACINO",
+        ANAGRAFICA_NISECI_HEADER
+    );
+    let reader = Cursor::new(csv_data);
+    let result = check_anagrafica_niseci_reader(reader);
+
+    assert!(result.is_err());
+    let errors = result.err().unwrap();
+    assert_eq!(errors.len(), 1); // One invalid record
+    let translated_error = translate_error_message(&errors[0].to_string());
+    assert!(translated_error.contains("tipo non valido"));
+}
+
+#[test]
+fn test_csv_anagrafica_niseci_lessfields() {
+    let csv_data = format!(
+        "{}\nCODICE;CORPO;REGIONE;PROVINCIA;1/1/1111;100;8;0;;;20;1",
+        ANAGRAFICA_NISECI_HEADER
+    );
+    let reader = Cursor::new(csv_data);
+    let result = check_anagrafica_niseci_reader(reader);
+
+    assert!(result.is_err());
+    let errors = result.err().unwrap();
+    assert_eq!(errors.len(), 1); // One invalid record
+
+    let translated_error = translate_error_message(&errors[0].to_string());
+    assert!(translated_error.contains("numero campi"));
+}
+
+#[test]
+fn test_valid_csv_anagrafica_niseci() {
+    let csv_data = format!(
+        "{}\nCODICE;CORPO;REGIONE;PROVINCIA;1/1/1111;100;8;0;;;20;1;BACINO",
+        ANAGRAFICA_NISECI_HEADER
+    );
+    let reader = Cursor::new(csv_data);
+    let result = check_anagrafica_niseci_reader(reader);
+
+    assert!(!result.is_err());
+}
+
+#[test]
+fn test_empty_csv_anagrafica_niseci() {
+    let csv_data = ANAGRAFICA_NISECI_HEADER.to_string(); // Only header, no data
+    let reader = Cursor::new(csv_data);
+    let result = check_anagrafica_niseci_reader(reader);
+
+    assert!(result.is_ok());
+    let records = result.unwrap();
+    assert_eq!(records.len(), 0); // No records
+}
+
+#[test]
+fn test_valid_recordcsv_anagrafica_niseci() {
+    let record_1 = RecordCsvAnagraficaNISECI {
+        codice_stazione: "Foo".to_string(),
+        corpo_idrico: "Bar".to_string(),
+        regione: "Foo".to_string(),
+        provincia: "Bar".to_string(),
+        data: "07/07/2007".to_string(),
+        lunghezza_stazione: 100,
+        larghezza_stazione: 6,
+        tipo_comunita: 0,
+        fonte: "foo".to_string(),
+        numero_protocollo: "foo".to_string(),
+        idro_eco_regione: 0,
+        area_alpina: 0,
+        nome_bacino: "Foo".to_string()
+    };
+    let recordcsv_data = vec![record_1];
+    let result = check_records_anagrafica_niseci(recordcsv_data);
 
     assert!(!result.is_err());
 }
