@@ -22,7 +22,7 @@ use crate::model::niseci::{RiferimentoNISECI, CampionamentoNISECI, AnagraficaNIS
 use crate::state::GLOBAL_STATE;
 use crate::CurrentView;
 use crate::process_csv_errors;
-use crate::engines::niseci::{full::{calculate_niseci, calculate_rqe_niseci, calculate_stato_ecologico}, x1::calculate_x1, x2::calculate_x2, x3::calculate_x3};
+use crate::engines::niseci::full::{calculate_niseci, calculate_rqe_niseci, calculate_stato_ecologico};
 use raylib::RaylibHandle;
 use std::path::PathBuf;
 use raylib::consts::KeyboardKey::*;
@@ -36,9 +36,17 @@ impl HomeController {
         Self
     }
 
-    pub fn update(&self, _rl: &RaylibHandle) {
+    pub fn update(&self, _rl: &RaylibHandle, main_state: &mut MainState) {
         let mut state = GLOBAL_STATE.lock().unwrap();
-        state.home_model.set_name("Updated".to_string());
+        state.home_model.increment_frame_counter();
+        match state.home_model.get_user_continued() {
+            true => {
+                eprintln!("HomeController:  L'utente ha premuto Continua");
+                eprintln!("HomeController:  Let's update current view and go to SelezioneIndice.");
+                main_state.set_current_view(CurrentView::SelezioneIndice)
+            }
+            false => {}
+        }
     }
 
     pub fn get_state(&self) -> HomeModel {
@@ -46,14 +54,9 @@ impl HomeController {
         return state.home_model.clone();
     }
 
-    pub fn _set_name(&self, name: String) {
+    pub fn set_user_continued(&self, val: bool) {
         let mut state = GLOBAL_STATE.lock().unwrap();
-        state.home_model.set_name(name);
-    }
-
-    pub fn set_value(&self, val: i32) {
-        let mut state = GLOBAL_STATE.lock().unwrap();
-        state.home_model.set_value(val);
+        state.home_model.set_user_continued(val);
     }
 }
 
@@ -64,9 +67,18 @@ impl SecondController {
         Self
     }
 
-    pub fn update(&self, _rl: &RaylibHandle) {
+    pub fn update(&self, _rl: &RaylibHandle, main_state: &mut MainState) {
         let mut state = GLOBAL_STATE.lock().unwrap();
+        state.second_model.increment_frame_counter();
         state.second_model.set_name("Updated".to_string());
+        match state.second_model.get_user_continued() {
+            true => {
+                eprintln!("SecondController:  L'utente ha premuto Continua");
+                eprintln!("SecondController:  Let's update current view and go to SelezioneIndice.");
+                main_state.set_current_view(CurrentView::SelezioneIndice)
+            }
+            false => {}
+        }
     }
 
     pub fn get_state(&self) -> SecondModel {
@@ -82,6 +94,10 @@ impl SecondController {
     pub fn set_value(&self, val: i32) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.second_model.set_value(val);
+    }
+    pub fn set_user_continued(&self, val: bool) {
+        let mut state = GLOBAL_STATE.lock().unwrap();
+        state.second_model.set_user_continued(val);
     }
 }
 
@@ -705,11 +721,10 @@ impl OutputController {
 
     pub fn get_niseci_value(&self) -> Option<f32> {
         if self.get_is_done_calc() {
-            let state = GLOBAL_STATE.lock().unwrap();
-            let opt_res = state.data_model.get_risultato_niseci();
+            let opt_res = self.get_data_risultato_niseci();
             match opt_res {
                 Some(r) => {
-                    return Some(r.get_valore());
+                    return r.get_valore();
                 }
                 None => {
                     return None;
@@ -722,11 +737,10 @@ impl OutputController {
 
     pub fn get_rqe_niseci_value(&self) -> Option<f32> {
         if self.get_is_done_calc() {
-            let state = GLOBAL_STATE.lock().unwrap();
-            let opt_res = state.data_model.get_risultato_niseci();
+            let opt_res = self.get_data_risultato_niseci();
             match opt_res {
                 Some(r) => {
-                    return Some(r.get_rqe());
+                    return r.get_rqe();
                 }
                 None => {
                     return None;
@@ -739,14 +753,15 @@ impl OutputController {
 
     pub fn get_stato_eco_niseci_value(&self) -> Option<StatoEcologicoNISECI> {
         if self.get_is_done_calc() {
-            let state = GLOBAL_STATE.lock().unwrap();
-            let opt_res = state.data_model.get_risultato_niseci();
+            let opt_res = self.get_data_risultato_niseci();
             match opt_res {
                 Some(r) => {
+                    let state = GLOBAL_STATE.lock().unwrap();
                     let opt_anagrafica = state.data_model.get_anagrafica_niseci();
                     match opt_anagrafica {
                         Some(anagr) => {
-                            return Some(calculate_stato_ecologico(r.get_valore(), &anagr.area));
+                            let niseci_val = r.get_valore();
+                            return calculate_stato_ecologico(niseci_val, &anagr.area);
                         }
                         None => {
                             return None;
@@ -762,9 +777,74 @@ impl OutputController {
         }
     }
 
+    pub fn get_x1_value(&self) -> Option<f32> {
+        if self.get_is_done_calc() {
+            let opt_res = self.get_data_risultato_niseci();
+            match opt_res {
+                Some(r) => {
+                    return Some(r.get_x1());
+                }
+                None => {
+                    return None;
+                }
+            }
+        } else {
+            return None;
+        }
+    }
+
+    pub fn get_x2_value(&self) -> Option<f32> {
+        if self.get_is_done_calc() {
+            let opt_res = self.get_data_risultato_niseci();
+            match opt_res {
+                Some(r) => {
+                    return r.get_x2();
+                }
+                None => {
+                    return None;
+                }
+            }
+        } else {
+            return None;
+        }
+    }
+
+    pub fn get_x3_value(&self) -> Option<f32> {
+        if self.get_is_done_calc() {
+            let opt_res = self.get_data_risultato_niseci();
+            match opt_res {
+                Some(r) => {
+                    return Some(r.get_x3());
+                }
+                None => {
+                    return None;
+                }
+            }
+        } else {
+            return None;
+        }
+    }
+
+
     pub fn get_current_index(&self) -> Option<Indice> {
         let state = GLOBAL_STATE.lock().unwrap();
         return state.indice_model.get_selected_index();
+    }
+
+    fn set_data_risultato_niseci(&self, risultato: RisultatoNISECI) {
+        self.set_console_env(("risultato_niseci".to_string(), format!("{risultato}")));
+        let mut state = GLOBAL_STATE.lock().unwrap();
+        state.data_model.set_risultato_niseci(Some(risultato));
+        state.output_model.set_done_calc(true);
+    }
+
+    pub fn get_data_risultato_niseci(&self) -> Option<RisultatoNISECI> {
+        if self.get_is_done_calc() {
+            let state = GLOBAL_STATE.lock().unwrap();
+            return state.data_model.get_risultato_niseci();
+        } else {
+            return None;
+        }
     }
 
     pub fn calc_niseci(&self) {
@@ -801,32 +881,49 @@ impl OutputController {
             let anagrafica = anagrafica.expect("calc_niseci() checked is_none() before");
 
             match calculate_niseci(&campionamento, &riferimento, &anagrafica) {
-                Ok(niseci) => {
-                    self.add_console_message(format!("NISECI: {niseci}"));
+                Ok((niseci, intermediates)) => {
+                    match niseci {
+                        Some(val) => {
+                            self.add_console_message(format!("NISECI: {val}"));
+                        }
+                        None => {
+                            self.add_console_message(format!("NISECI: NC"));
+                        }
+                    }
 
                     let rqe_niseci = calculate_rqe_niseci(niseci);
-                    self.add_console_message(format!("RQE NISECI: {rqe_niseci}"));
+
+                    match rqe_niseci {
+                        Some(val) => {
+                            self.add_console_message(format!("RQE NISECI: {val}"));
+                        }
+                        None => {
+                            self.add_console_message(format!("RQE NISECI: NC"));
+                        }
+                    }
 
                     let stato_ecologico = calculate_stato_ecologico(niseci, &anagrafica.area);
-                    self.add_console_message(format!("Stato ecologico: {stato_ecologico}"));
 
-                    //TODO: recalculation of x1, x2, x3 is only used for richer console output ATM
-                    //Maybe should be removed later
-                    let x1 = calculate_x1(&campionamento, &riferimento);
-                    let x2 = calculate_x2(&campionamento, &anagrafica).unwrap();
-                    let x3 = calculate_x3(&campionamento).unwrap();
-                    self.add_console_message(format!("x1: {x1}"));
-                    self.add_console_message(format!("x2: {x2}"));
-                    self.add_console_message(format!("x3: {x3}"));
+                    match stato_ecologico {
+                        Some(val) => {
+                            self.add_console_message(format!("Stato ecologico: {val}"));
+                        }
+                        None => {
+                            self.add_console_message(format!("Stato ecologico: NC"));
+                        }
+                    }
+
+                    intermediates.log();
+
+                    self.add_console_message(format!("{intermediates}"));
 
                     let risultato_niseci = RisultatoNISECI::new(
                         niseci,
-                        rqe_niseci
+                        rqe_niseci,
+                        intermediates
                     );
 
-                    let mut state = GLOBAL_STATE.lock().unwrap();
-                    state.data_model.set_risultato_niseci(Some(risultato_niseci));
-                    state.output_model.set_done_calc(true);
+                    self.set_data_risultato_niseci(risultato_niseci);
                     println!("OutputController: Finished NISECI calc");
                 },
                 Err(niseci_errors) => {
@@ -856,6 +953,12 @@ impl OutputController {
         let mut state = GLOBAL_STATE.lock().unwrap();
 
         state.console_model.console.add_message(msg);
+    }
+
+    pub fn set_console_env(&self, (key, val): (String,String)) {
+        let mut state = GLOBAL_STATE.lock().unwrap();
+
+        state.console_model.console.set_env((key,val));
     }
 }
 

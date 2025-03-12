@@ -36,6 +36,19 @@ pub const AUTHOR_JGABAUT: &'static str = "jgabaut";
 pub const AUTHOR_GIONINJO: &'static str = "gioninjo";
 pub const AUTHOR_GIONINJO_LINK: &'static str = "https://github.com/gioninjo";
 pub const AUTHOR_JGABAUT_LINK: &'static str = "https://github.com/jgabaut";
+pub const COPYRIGHT_INFO: &'static str = "Copyright (C) 2024, 2025  jgabaut, gioninjo
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, version 3 of the License.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.";
+
 pub const EXIT_KEY: raylib::consts::KeyboardKey = raylib::consts::KeyboardKey::KEY_ESCAPE;
 pub const PROJECT_NAME: &'static str = env!("CARGO_PKG_NAME");
 pub const PROJECT_VERSION: &'static str = env!("CARGO_PKG_VERSION");
@@ -367,6 +380,7 @@ pub fn parse_csv_campionamento_niseci<R>(mut rdr: csv::Reader<R>) -> (Vec<Record
     (records, errors)
 }
 
+#[derive(Debug)]
 pub enum RecordCsvCampionamentoNISECIError {
     ValoreInvalido { msg : String }, //TODO: add position?
 }
@@ -471,6 +485,7 @@ pub fn parse_csv_riferimento_niseci<R>(mut rdr: csv::Reader<R>) -> (Vec<RecordCs
     (records, errors)
 }
 
+#[derive(Debug)]
 pub enum RecordCsvRiferimentoNISECIError {
     ValoreInvalido { msg : String }, //TODO: add position?
     SoglieCLNonCrescenti { msg : String },
@@ -674,6 +689,7 @@ impl fmt::Display for RecordCsvAnagraficaNISECI {
     }
 }
 
+#[derive(Debug)]
 pub enum RecordCsvAnagraficaNISECIError {
     ValoreInvalido { msg : String }, //TODO: add position?
 }
@@ -911,7 +927,8 @@ pub fn check_anagrafica_niseci_reader<R: Read>(reader: R) -> Result<Vec<RecordCs
         eprintln!("}}");
         return Err(errors);
     } else {
-        println!("Tutti i record csv dell'anagrafica NISECI sono stati processati con successo!");
+        //TODO: handle verbosity
+        //println!("Tutti i record csv dell'anagrafica NISECI sono stati processati con successo!");
         /*
         for record in &records {
             println!("  Record: {{{record}}}");
@@ -928,7 +945,8 @@ pub fn check_records_anagrafica_niseci(records: Vec<RecordCsvAnagraficaNISECI>) 
     match res {
         Ok(anagrafica) => {
             println!("Anagrafica NISECI: {}", anagrafica);
-            println!("Tutti i record dell'anagrafica NISECI sono stati processati con successo!");
+            //TODO: handle verbosity
+            //println!("Tutti i record dell'anagrafica NISECI sono stati processati con successo!");
             /*
             for record in &records {
                 println!("  Record: {{{record}}}");
@@ -1169,7 +1187,8 @@ pub fn check_campionamento_niseci_reader<R: Read>(reader: R) -> Result<Vec<Recor
         eprintln!("}}");
         return Err(errors);
     } else {
-        println!("Tutti i record csv del campionamento NISECI sono stati processati con successo!");
+        //TODO: handle verbosity
+        //println!("Tutti i record csv del campionamento NISECI sono stati processati con successo!");
         /*
         for record in &records {
             println!("  Record: {{{record}}}");
@@ -1206,7 +1225,8 @@ pub fn check_records_campionamento_niseci(records: Vec<RecordCsvCampionamentoNIS
         eprintln!("}}");
         return Err(errors);
     } else {
-        println!("Tutti i record del campionamento NISECI sono stati processati con successo!");
+        //TODO: handle verbosity
+        //println!("Tutti i record del campionamento NISECI sono stati processati con successo!");
         /*
         for record in &records {
             println!("  Record: {{{record}}}");
@@ -1243,7 +1263,8 @@ pub fn check_riferimento_niseci_reader<R: Read>(reader: R) -> Result<Vec<RecordC
         eprintln!("}}");
         return Err(errors);
     } else {
-        println!("Tutti i record csv del riferimento NISECI sono stati processati con successo!");
+        //TODO: handle verbosity
+        //println!("Tutti i record csv del riferimento NISECI sono stati processati con successo!");
         /*
         for record in &records {
             println!("  Record: {{{record}}}");
@@ -1280,7 +1301,8 @@ pub fn check_records_riferimento_niseci(records: Vec<RecordCsvRiferimentoNISECI>
         eprintln!("}}");
         return Err(errors);
     } else {
-        println!("Tutti i record del riferimento NISECI sono stati processati con successo!");
+        //TODO: handle verbosity
+        //println!("Tutti i record del riferimento NISECI sono stati processati con successo!");
         /*
         for record in &records {
             println!("  Record: {{{record}}}");
@@ -1317,4 +1339,9 @@ pub fn print_warranty_info() {
   PURPOSE.  THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM
   IS WITH YOU.  SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF
   ALL NECESSARY SERVICING, REPAIR OR CORRECTION.\n");
+}
+
+pub fn print_copyright_splash() {
+    let splash: String = format!("{PROJECT_VERSION_FULL}\n\n{COPYRIGHT_INFO}");
+    println!("{splash}\n");
 }

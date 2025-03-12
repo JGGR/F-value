@@ -85,11 +85,13 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) -> bool {
         let mut riferimento_specie = Vec::new(); // Holds parsed SpecieNISECI
         match riferimento_csv_check_res {
             Ok(csv_recs) => {
+                /* TODO: handle verbosity
                 println!("Riferimento csv result: {{");
                 for r in &csv_recs {
                     println!("  {r}");
                 }
                 println!("}}");
+                */
                 let riferimento_records_check_res = check_records_riferimento_niseci(csv_recs);
                 match riferimento_records_check_res {
                     Ok(recs_specie) => {
@@ -138,11 +140,13 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) -> bool {
         let mut campionamento_specie = Vec::new(); // Holds parsed RecordNISECI
         match campionamento_csv_check_res {
             Ok(csv_recs) => {
+                /* TODO: handle verbosity
                 println!("Campionamento result: {{");
                 for r in &csv_recs {
                     println!("  {r}");
                 }
                 println!("}}");
+                */
                 let campionamento_records_check_res = check_records_campionamento_niseci(csv_recs, riferimento_specie.clone());
                 match campionamento_records_check_res {
                     Ok(campioni) => {
@@ -221,20 +225,24 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) -> bool {
             larghezza_media_stazione: 0.0,
         };
         if !had_failures {
+            /* TODO: handle verbosity
             for s in &riferimento_specie {
                 println!("Specie:  {:?}", s);
             }
             for c in &campionamento_specie {
                 println!("Campione:  {:?}", c);
             }
+            */
             let anagrafica_csv_check_res = check_anagrafica_niseci_path(anagrafica_path);
             match anagrafica_csv_check_res {
                 Ok(csv_recs) => {
+                    /* TODO: handle verbosity
                     println!("Anagrafica result: {{");
                     for r in &csv_recs {
                         println!("  {r}");
                     }
                     println!("}}");
+                    */
                     let anagrafica_records_check_res = check_records_anagrafica_niseci(csv_recs);
                     match anagrafica_records_check_res {
                         Ok(a) => {
@@ -285,12 +293,35 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) -> bool {
                 elenco_specie: riferimento_specie
             };
             match calculate_niseci(&campionamento, &riferimento, &anagrafica) {
-                Ok(niseci) => {
+                Ok((niseci, intermediates)) => {
                     let rqe_niseci = calculate_rqe_niseci(niseci);
                     let stato_eco_niseci = calculate_stato_ecologico(niseci, &anagrafica.area);
-                    println!("NISECI: {niseci}");
-                    println!("RQE NISECI: {rqe_niseci}");
-                    println!("STATO ECOLOGICO NISECI: {stato_eco_niseci}");
+
+                    intermediates.log();
+                    match niseci {
+                        Some(val) => {
+                            println!("NISECI: {val}");
+                        }
+                        None => {
+                            println!("NISECI: NC");
+                        }
+                    }
+                    match rqe_niseci {
+                        Some(val) => {
+                            println!("RQE NISECI: {val}");
+                        }
+                        None => {
+                            println!("RQE NISECI: NC");
+                        }
+                    }
+                    match stato_eco_niseci {
+                        Some(val) => {
+                            println!("STATO ECOLOGICO NISECI: {val}");
+                        }
+                        None => {
+                            println!("STATO ECOLOGICO NISECI: NC");
+                        }
+                    }
                 }
                 Err(_errors) => {
                     /* Assuming they were printed before this point

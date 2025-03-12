@@ -17,22 +17,126 @@
 
 use std::collections::{hash_map::Entry, HashMap};
 
-use crate::model::niseci::{AnagraficaNISECI, CampionamentoNISECI, ClassiEtaSpecieNISECI, EsemplariPerCattura, RecordNISECI};
+use crate::model::niseci::{AnagraficaNISECI, CampionamentoNISECI, ClassiEtaSpecieNISECI, EsemplariPerCattura, RecordNISECI, MetricheX2A, MetricheX2aB};
 
 use super::linear_regression::{calculate_quantita_with_regression, Point};
 
+#[derive(Clone)]
+pub struct SubmetricheX2 {
+    metriche_x2_a: MetricheX2A,
+    classi_eta: ClassiEtaSpecieNISECI,
+    metriche_x2_b: MetricheX2B
+}
 
+impl SubmetricheX2 {
+    pub fn new(metriche_x2_a: MetricheX2A, classi_eta: ClassiEtaSpecieNISECI, metriche_x2_b: MetricheX2B) -> Self {
+        Self {
+            metriche_x2_a: metriche_x2_a,
+            classi_eta: classi_eta,
+            metriche_x2_b: metriche_x2_b
+        }
+    }
+    pub fn get_metriche_x2_a(&self) -> MetricheX2A {
+        return self.metriche_x2_a;
+    }
+    pub fn get_classi_eta(&self) -> ClassiEtaSpecieNISECI {
+        return self.classi_eta.clone();
+    }
+    pub fn get_metriche_x2_b(&self) -> MetricheX2B {
+        return self.metriche_x2_b.clone();
+    }
+}
 
+pub struct MetricheX2 {
+    criterio_a: f32,
+    criterio_b: f32,
+    submetriche_map: HashMap<String, SubmetricheX2>
+}
 
-pub fn calculate_x2(campionamento: &CampionamentoNISECI, anagrafica: &AnagraficaNISECI) -> Result<f32, Vec<String>> {
-  let x2_a = match calculate_sommatoria_x2_a(campionamento) {
+impl MetricheX2 {
+    pub fn new(criterio_a: f32, criterio_b: f32, submetriche_map: HashMap<String, SubmetricheX2>) -> Self {
+        Self {
+            criterio_a: criterio_a,
+            criterio_b: criterio_b,
+            submetriche_map: submetriche_map
+        }
+    }
+    pub fn get_criterio_a(&self) -> f32 {
+        return self.criterio_a;
+    }
+    pub fn get_criterio_b(&self) -> f32 {
+        return self.criterio_b;
+    }
+    pub fn get_submetriche_map(&self) -> HashMap<String, SubmetricheX2> {
+        return self.submetriche_map.clone();
+    }
+}
+
+#[derive(Clone)]
+pub struct MetricheX2B {
+    id_specie: String,
+    densita_stimata: f32
+}
+
+impl MetricheX2B {
+    pub fn new(id_specie: String, densita_stimata: f32) -> Self {
+        Self {
+            id_specie: id_specie,
+            densita_stimata: densita_stimata
+        }
+    }
+    pub fn get_id(&self) -> String {
+        return self.id_specie.clone();
+    }
+    pub fn get_densita_stimata(&self) -> f32 {
+        return self.densita_stimata;
+    }
+}
+
+pub fn calculate_x2(campionamento: &CampionamentoNISECI, anagrafica: &AnagraficaNISECI) -> Result<(Option<f32>, MetricheX2), Vec<String>> {
+  let (x2_a, criteri_vec) = match calculate_sommatoria_x2_a(campionamento) {
     Ok(x2_a) => x2_a,
     Err(errors) => return Err(errors),
   };
-  let x2_b = match calculate_sommatoria_x2_b(campionamento, anagrafica){
+  let (x2_b, densita_vec) = match calculate_sommatoria_x2_b(campionamento, anagrafica) {
     Ok(result) => result,
     Err(errors) => return Err(errors),
   };
+
+  let mut submetriche = HashMap::<String, SubmetricheX2>::new();
+
+  for crit in &criteri_vec {
+    match submetriche.entry(crit.0.clone()) {
+        Entry::Occupied(_) => {},
+        Entry::Vacant(vacant_entry) => {
+            vacant_entry.insert(
+                // We fill densita_stimata later
+                SubmetricheX2::new(crit.1, crit.2.clone(), MetricheX2B::new(crit.0.clone(), -1.0))
+            );
+        }
+    }
+  }
+
+  let mut errors = Vec::<String>::new();
+
+  for dens in &densita_vec {
+    let id = dens.get_id();
+    match submetriche.entry(id.clone()) {
+        Entry::Occupied(mut entry) => {
+            let submetr = entry.get_mut();
+            *submetr = SubmetricheX2::new(submetr.get_metriche_x2_a(), submetr.get_classi_eta(), MetricheX2B::new(id, dens.get_densita_stimata()));
+        },
+        Entry::Vacant(_) => {
+            errors.push(format!("Errore: specie {} ha una densita stimata ma manca degli altri valori intermedi", id));
+        }
+    }
+  }
+
+  if errors.len() > 0 { // In case the densita_vec had some problems
+    return Err(errors);
+  }
+
+  let metriche_x2 = MetricheX2::new(x2_a, x2_b, submetriche);
 
   let mut specie_campionate_set:HashMap<String, bool> = HashMap::new();
   for cattura in &campionamento.campionamento {
@@ -48,12 +152,17 @@ pub fn calculate_x2(campionamento: &CampionamentoNISECI, anagrafica: &Anagrafica
 
   let tot_specie_attese_trovate = specie_campionate_set.len();
 
+  if tot_specie_attese_trovate == 0 {
+      // Nel caso in cui nessuna specie attesa sia presente nel campionamento
+      return Ok((None, metriche_x2));
+  }
+
   let result = (0.6 * x2_a + 0.4 * x2_b) / tot_specie_attese_trovate as f32;
 
-  Ok(result)
+  Ok((Some(result), metriche_x2))
 }
 
-fn calculate_sommatoria_x2_a(c: &CampionamentoNISECI) -> Result<f32, Vec<String>> {
+fn calculate_sommatoria_x2_a(c: &CampionamentoNISECI) -> Result<(f32, Vec<(String, MetricheX2A, ClassiEtaSpecieNISECI)>), Vec<String>> {
 
   // ad ogni specie associo le loro classi che andrò poi a riempire
   // ho controllato i campionamenti di andrea e trovto massimo 9 specie diverse
@@ -80,9 +189,16 @@ fn calculate_sommatoria_x2_a(c: &CampionamentoNISECI) -> Result<f32, Vec<String>
 
   let mut sommatoria_x2_a = 0.0;
   let mut errors: Vec<String> = Vec::with_capacity(classi_eta_map.len()); // prenoto ora e poi restringo dopo
-  for (_key, classe) in &classi_eta_map {
-    match calculate_x2_a(classe) {
-      Ok(x2_a) => sommatoria_x2_a += x2_a,
+  let mut criteri_vec: Vec<(String, MetricheX2A, ClassiEtaSpecieNISECI)> = Vec::with_capacity(classi_eta_map.len());
+  for (_key, classe) in classi_eta_map {
+    match calculate_x2_a(&classe) {
+      Ok((x2_a, criteri_x2_a)) => {
+          let criterio_a = criteri_x2_a.get_criterio_a();
+          let criterio_b = criteri_x2_a.get_criterio_b();
+          let ad_juv = criteri_x2_a.get_rapporto_ad_juv();
+          sommatoria_x2_a += x2_a;
+          criteri_vec.push((classe.specie.id.clone(), MetricheX2A::new(criterio_a, MetricheX2aB::new(criterio_b, ad_juv)), classe));
+      }
       Err(error) => errors.push(error),
     }
   }
@@ -92,10 +208,12 @@ fn calculate_sommatoria_x2_a(c: &CampionamentoNISECI) -> Result<f32, Vec<String>
     return Err(errors);
   }
 
-  Ok(sommatoria_x2_a)
+  criteri_vec.shrink_to_fit();
+
+  Ok((sommatoria_x2_a, criteri_vec))
 }
 
-fn calculate_sommatoria_x2_b(c: &CampionamentoNISECI, anagrafica: &AnagraficaNISECI) -> Result<f32, Vec<String>> {
+fn calculate_sommatoria_x2_b(c: &CampionamentoNISECI, anagrafica: &AnagraficaNISECI) -> Result<(f32, Vec<MetricheX2B>), Vec<String>> {
   let superficie = anagrafica.get_larghezza_media() * anagrafica.get_lunghezza_media();
 
   let mut esemplari_per_cattura_map: HashMap<String, EsemplariPerCattura> = HashMap::with_capacity(10);
@@ -117,9 +235,13 @@ fn calculate_sommatoria_x2_b(c: &CampionamentoNISECI, anagrafica: &AnagraficaNIS
   // a calcolar x2b per ogni specie
   let mut sommatoria_x2_b = 0.0;
   let mut errors: Vec<String> = Vec::with_capacity(esemplari_per_cattura_map.len()); // prenoto ora e poi restringo dopo
+  let mut densita_vec: Vec<MetricheX2B> = Vec::with_capacity(esemplari_per_cattura_map.len());
   for (_key, catture) in &esemplari_per_cattura_map {
     match calculate_x2_b(catture, &superficie) {
-        Ok(x2_b) => sommatoria_x2_b += x2_b,
+        Ok((x2_b, densita_stimata)) => {
+            sommatoria_x2_b += x2_b;
+            densita_vec.push(MetricheX2B::new(catture.specie.id.clone(), densita_stimata));
+        }
         Err(err_mess) => errors.push(err_mess),
     }
   }
@@ -130,7 +252,9 @@ fn calculate_sommatoria_x2_b(c: &CampionamentoNISECI, anagrafica: &AnagraficaNIS
     return Err(errors);
   }
 
-  Ok(sommatoria_x2_b) // finally
+  densita_vec.shrink_to_fit();
+
+  Ok((sommatoria_x2_b, densita_vec)) // finally
 }
 
 fn _update_classi_eta(cl: &mut ClassiEtaSpecieNISECI, record: &RecordNISECI) -> () {
@@ -148,11 +272,11 @@ fn _update_classi_eta(cl: &mut ClassiEtaSpecieNISECI, record: &RecordNISECI) -> 
 }
 
 /// fn wrapper del calcolo della struttura di una popolazione
-fn calculate_x2_a(classe: &ClassiEtaSpecieNISECI) -> Result<f32, String> {
+fn calculate_x2_a(classe: &ClassiEtaSpecieNISECI) -> Result<(f32, MetricheX2A), String> {
   return classe.calculate_struttura_popolazione();
 }
 
-fn calculate_x2_b(e: &EsemplariPerCattura, superficie: &f32) -> Result<f32, String> {
+fn calculate_x2_b(e: &EsemplariPerCattura, superficie: &f32) -> Result<(f32,f32), String> {
 
   match get_quantita_stimata(&e.mappa) {
     Ok(q_stimata) => {
@@ -161,12 +285,12 @@ fn calculate_x2_b(e: &EsemplariPerCattura, superficie: &f32) -> Result<f32, Stri
 
       // trovo ora x2_b
       if densita_stimata > e.specie.dens_soglia2 {
-        return Ok(1.0);
+        return Ok((1.0, densita_stimata));
       }
       if densita_stimata > e.specie.dens_soglia1 {
-        return Ok(0.5);
+        return Ok((0.5, densita_stimata));
       }
-      return Ok(0.0);
+      return Ok((0.0, densita_stimata));
 
     },
     Err(err_message) => return Err(err_message)
@@ -388,7 +512,9 @@ mod x2_private_tests {
     let x2_b = calculate_x2_b(&esemplari_per_cattura, &2.0);
 
     assert!(x2_b.is_ok());
-    assert_eq!(x2_b.unwrap(), 1.0)
+
+    let (x2_b, _densita_stimata) = x2_b.unwrap();
+    assert_eq!(x2_b, 1.0)
 
   }
 
@@ -410,7 +536,9 @@ mod x2_private_tests {
     let x2_b = calculate_x2_b(&esemplari_per_cattura, &2.0);
 
     assert!(x2_b.is_ok());
-    assert_eq!(x2_b.unwrap(), 0.5)
+
+    let (x2_b, _densita_stimata) = x2_b.unwrap();
+    assert_eq!(x2_b, 0.5)
 
   }
 
@@ -432,7 +560,9 @@ mod x2_private_tests {
     let x2_b = calculate_x2_b(&esemplari_per_cattura, &2.0);
 
     assert!(x2_b.is_ok());
-    assert_eq!(x2_b.unwrap(), 0.0)
+
+    let (x2_b, _densita_stimata) = x2_b.unwrap();
+    assert_eq!(x2_b, 0.0)
 
   }
 
@@ -451,7 +581,9 @@ mod x2_private_tests {
     let x2_a = calculate_x2_a(&classe);
 
     assert!(x2_a.is_ok());
-    assert_eq!(0.5, x2_a.unwrap());
+
+    let (x2_a, _criteri_x2_a) = x2_a.unwrap();
+    assert_eq!(0.5, x2_a);
 
   }
 
@@ -469,7 +601,8 @@ mod x2_private_tests {
     let x2_a = calculate_x2_a(&classe);
 
     assert!(x2_a.is_ok());
-    assert_eq!(0.5, x2_a.unwrap());
+    let (x2_a, _criteri_x2_a) = x2_a.unwrap();
+    assert_eq!(0.5, x2_a);
 
   }
 
@@ -487,7 +620,8 @@ mod x2_private_tests {
     let x2_a = calculate_x2_a(&classe);
 
     assert!(x2_a.is_ok());
-    assert_eq!(1.0, x2_a.unwrap());
+    let (x2_a, _criteri_x2_a) = x2_a.unwrap();
+    assert_eq!(1.0, x2_a);
 
   }
 
@@ -505,7 +639,8 @@ mod x2_private_tests {
     let x2_a = calculate_x2_a(&classe);
 
     assert!(x2_a.is_ok());
-    assert_eq!(1.0, x2_a.unwrap());
+    let (x2_a, _criteri_x2_a) = x2_a.unwrap();
+    assert_eq!(1.0, x2_a);
 
   }
 
@@ -523,7 +658,8 @@ mod x2_private_tests {
     let x2_a = calculate_x2_a(&classe);
 
     assert!(x2_a.is_ok());
-    assert_eq!(1.0, x2_a.unwrap());
+    let (x2_a, _criteri_x2_a) = x2_a.unwrap();
+    assert_eq!(1.0, x2_a);
 
   }
 
@@ -541,7 +677,8 @@ mod x2_private_tests {
     let x2_a = calculate_x2_a(&classe);
 
     assert!(x2_a.is_ok());
-    assert_eq!(0.5, x2_a.unwrap());
+    let (x2_a, _criteri_x2_a) = x2_a.unwrap();
+    assert_eq!(0.5, x2_a);
 
   }
 
@@ -559,7 +696,8 @@ mod x2_private_tests {
     let x2_a = calculate_x2_a(&classe);
 
     assert!(x2_a.is_ok());
-    assert_eq!(0.5, x2_a.unwrap());
+    let (x2_a, _criteri_x2_a) = x2_a.unwrap();
+    assert_eq!(0.5, x2_a);
 
   }
 
@@ -577,7 +715,8 @@ mod x2_private_tests {
     let x2_a = calculate_x2_a(&classe);
 
     assert!(x2_a.is_ok());
-    assert_eq!(0.5, x2_a.unwrap());
+    let (x2_a, _criteri_x2_a) = x2_a.unwrap();
+    assert_eq!(0.5, x2_a);
 
   }
 
@@ -595,7 +734,8 @@ mod x2_private_tests {
     let x2_a = calculate_x2_a(&classe);
 
     assert!(x2_a.is_ok());
-    assert_eq!(0.0, x2_a.unwrap());
+    let (x2_a, _criteri_x2_a) = x2_a.unwrap();
+    assert_eq!(0.0, x2_a);
 
   }
 
@@ -613,7 +753,8 @@ mod x2_private_tests {
     let x2_a = calculate_x2_a(&classe);
 
     assert!(x2_a.is_ok());
-    assert_eq!(0.0, x2_a.unwrap());
+    let (x2_a, _criteri_x2_a) = x2_a.unwrap();
+    assert_eq!(0.0, x2_a);
 
   }
 
@@ -631,7 +772,8 @@ mod x2_private_tests {
     let x2_a = calculate_x2_a(&classe);
 
     assert!(x2_a.is_ok());
-    assert_eq!(0.0, x2_a.unwrap());
+    let (x2_a, _criteri_x2_a) = x2_a.unwrap();
+    assert_eq!(0.0, x2_a);
 
   }
 
@@ -649,7 +791,8 @@ mod x2_private_tests {
     let x2_a = calculate_x2_a(&classe);
 
     assert!(x2_a.is_ok());
-    assert_eq!(0.0, x2_a.unwrap());
+    let (x2_a, _criteri_x2_a) = x2_a.unwrap();
+    assert_eq!(0.0, x2_a);
 
   }
 
@@ -667,7 +810,8 @@ mod x2_private_tests {
     let x2_a = calculate_x2_a(&classe);
 
     assert!(x2_a.is_ok());
-    assert_eq!(0.0, x2_a.unwrap());
+    let (x2_a, _criteri_x2_a) = x2_a.unwrap();
+    assert_eq!(0.0, x2_a);
 
   }
 
@@ -685,7 +829,8 @@ mod x2_private_tests {
     let x2_a = calculate_x2_a(&classe);
 
     assert!(x2_a.is_ok());
-    assert_eq!(0.0, x2_a.unwrap());
+    let (x2_a, _criteri_x2_a) = x2_a.unwrap();
+    assert_eq!(0.0, x2_a);
 
   }
 
@@ -703,7 +848,8 @@ mod x2_private_tests {
     let x2_a = calculate_x2_a(&classe);
 
     assert!(x2_a.is_ok());
-    assert_eq!(0.0, x2_a.unwrap());
+    let (x2_a, _criteri_x2_a) = x2_a.unwrap();
+    assert_eq!(0.0, x2_a);
 
   }
 
@@ -721,10 +867,9 @@ mod x2_private_tests {
     let x2_a = calculate_x2_a(&classe);
 
     assert!(x2_a.is_ok());
-    assert_eq!(0.5, x2_a.unwrap());
+    let (x2_a, _criteri_x2_a) = x2_a.unwrap();
+    assert_eq!(0.5, x2_a);
 
   }
-
-
 
 }

@@ -26,24 +26,22 @@ use crate::SHORT_PROJECT_VERSION;
 // State struct holding non-`Copy` types
 #[derive(Clone)]
 pub struct HomeModel {
-    value: i32,
-    name: String,
+    frame_counter: u32,
+    user_continued: bool
 }
 
 impl HomeModel {
-    pub fn get_value(&self) -> i32 {
-        return self.value;
+    pub fn get_frame_counter(&self) -> u32 {
+        return self.frame_counter;
     }
-
-    pub fn set_value(&mut self, val: i32) {
-        self.value = val;
+    pub fn increment_frame_counter(&mut self) {
+        self.frame_counter += 1;
     }
-    pub fn get_name(&self) -> String {
-        return self.name.clone();
+    pub fn get_user_continued(&self) -> bool {
+        return self.user_continued;
     }
-
-    pub fn set_name(&mut self, new_name: String) {
-        self.name = new_name;
+    pub fn set_user_continued(&mut self, val: bool) {
+        self.user_continued = val;
     }
 }
 
@@ -51,11 +49,19 @@ impl HomeModel {
 // State struct holding non-`Copy` types
 #[derive(Clone)]
 pub struct SecondModel {
+    frame_counter: u32,
     value: i32,
     name: String,
+    user_continued: bool
 }
 
 impl SecondModel {
+    pub fn get_frame_counter(&self) -> u32 {
+        return self.frame_counter;
+    }
+    pub fn increment_frame_counter(&mut self) {
+        self.frame_counter += 1;
+    }
     pub fn get_value(&self) -> i32 {
         return self.value;
     }
@@ -69,6 +75,12 @@ impl SecondModel {
 
     pub fn set_name(&mut self, new_name: String) {
         self.name = new_name;
+    }
+    pub fn get_user_continued(&self) -> bool {
+        return self.user_continued;
+    }
+    pub fn set_user_continued(&mut self, val: bool) {
+        self.user_continued = val;
     }
 }
 
@@ -207,7 +219,7 @@ pub struct OutputModel {
 }
 
 impl OutputModel {
-    pub fn _get_frame_counter(&self) -> u32 {
+    pub fn get_frame_counter(&self) -> u32 {
         return self.frame_counter;
     }
     pub fn increment_frame_counter(&mut self) {
@@ -318,12 +330,14 @@ impl Model {
     pub fn new() -> Self {
         Self {
             home_model: HomeModel {
-                value: 0,
-                name: "Initial".to_string(),
+                frame_counter: 0,
+                user_continued: false,
             },
             second_model: SecondModel {
+                frame_counter: 0,
                 value: 1,
                 name: "Initial".to_string(),
+                user_continued: false,
             },
             indice_model: IndiceModel {
                 frame_counter: 0,
@@ -358,6 +372,7 @@ impl Model {
                         ("riferimento_niseci".to_string(), "Vuoto".to_string()),
                         ("campionamento_niseci".to_string(), "Vuoto".to_string()),
                         ("anagrafica_niseci".to_string(), "Vuoto".to_string()),
+                        ("risultato_niseci".to_string(), "Vuoto".to_string()),
                     ]),
                 ),
                 name: "Initial".to_string(),

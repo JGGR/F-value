@@ -1,3 +1,39 @@
+## [0.0.11] - 2025-03-12
+
+### Added
+
+- More info on HOME and SECOND view
+- Store `RisultatoNISECI` as console env, for info command
+- Display `x1`, `x2`, `x3` on `ProduzioneOutputView`
+- Added format functions for some model structs
+- New types for holding intermediate values in `RisultatoNISECI`:
+  - `ValoriIntermediNISECI`
+  - `ValoriIntermediSpecieNISECI`
+- New utility types for low-level calls:
+  - `MetricheX2`
+  - `SubmetricheX2`
+    - `MetricheX2A`
+    - `MetricheX2aB`
+    - `MetricheX2B`
+  - `MetricheX3`
+- `HomeView`, `SecondView` improvements
+  - Added copyright info
+  - Added continue button
+
+### Changed
+
+- Fixed broken author link
+- Improved console backout hint
+- Refactored engines to return niseci intermediate values
+    - Made x2 and full result optional values
+- `RisultatoNISECI` now holds intermediates
+- Fix `calculate_x2()` divide-by-zero
+- Update tests
+- Less verbose CLI output
+- Print intermediate values to stdout and console on full calc
+- Use spinner for lunghezza, larghezza in `InfoAggiuntiveView`
+- Updated copyright info splash
+
 ## [0.0.10] - 2025-03-04
 
 ### Added

@@ -24,7 +24,8 @@ fn calculate_x3_assenza_specie_aliene() {
   let x3 = calculate_x3(&c);
 
   assert!(x3.is_ok());
-  assert_eq!(x3.unwrap(), 1.0);
+  let (x3, _criteri_x3) = x3.unwrap();
+  assert_eq!(x3, 1.0);
 }
 
 #[test]
@@ -33,7 +34,8 @@ fn calculate_x3_un_trocchio() {
   let x3 = calculate_x3(&c);
 
   assert!(x3.is_ok());
-  assert_eq!(x3.unwrap(), 0.75);
+  let (x3, _criteri_x3) = x3.unwrap();
+  assert_eq!(x3, 0.75);
 }
 
 #[test]
@@ -42,7 +44,8 @@ fn calculate_x3_alieni_magg_uguale_autoctoni() {
   let x3 = calculate_x3(&c);
 
   assert!(x3.is_ok());
-  assert_eq!(x3.unwrap(), 0.0);
+  let (x3, _criteri_x3) = x3.unwrap();
+  assert_eq!(x3, 0.0);
 }
 
 #[test]
@@ -60,7 +63,8 @@ fn calculate_x3_alieni_tipo_1_strutt() {
   let x3 = calculate_x3(&c);
 
   assert!(x3.is_ok());
-  assert_eq!(x3.unwrap(), 0.0);
+  let (x3, _criteri_x3) = x3.unwrap();
+  assert_eq!(x3, 0.0);
 }
 
 #[test]
@@ -78,7 +82,8 @@ fn calculate_x3_alieni_tipo_2_strutt() {
   let x3 = calculate_x3(&c);
 
   assert!(x3.is_ok());
-  assert_eq!(x3.unwrap(), 0.25);
+  let (x3, _criteri_x3) = x3.unwrap();
+  assert_eq!(x3, 0.25);
 }
 
 
@@ -97,7 +102,8 @@ fn calculate_x3_alieni_tipo_3_strutt() {
   let x3 = calculate_x3(&c);
 
   assert!(x3.is_ok());
-  assert_eq!(x3.unwrap(), 0.375);
+  let (x3, _criteri_x3) = x3.unwrap();
+  assert_eq!(x3, 0.375);
 }
 
 #[test]
@@ -115,7 +121,8 @@ fn calculate_x3_alieni_tipo_3_destrutt() {
   let x3 = calculate_x3(&c);
 
   assert!(x3.is_ok());
-  assert_eq!(x3.unwrap(), 0.875);
+  let (x3, _criteri_x3) = x3.unwrap();
+  assert_eq!(x3, 0.875);
 }
 
 #[test]
@@ -133,5 +140,6 @@ fn calculate_x3_alieni_tipo_3_mediam_strutt() {
   let x3 = calculate_x3(&c);
 
   assert!(x3.is_ok());
-  assert_eq!(x3.unwrap(), 0.625);
+  let (x3, _criteri_x3) = x3.unwrap();
+  assert_eq!(x3, 0.625);
 }
