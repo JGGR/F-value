@@ -77,6 +77,21 @@ fn main() {
                         println!("Header anagrafica NISECI: {{");
                         println!("  {ANAGRAFICA_NISECI_HEADER}");
                         println!("}}");
+                        println!("Tipi header riferimento NISECI: {{");
+                        for (i, field) in RIFERIMENTO_NISECI_HEADER_FIELDS.iter().enumerate() {
+                            println!("    {}: {};", field, RIFERIMENTO_NISECI_HEADER_FIELD_TYPES[i]);
+                        }
+                        println!("}}");
+                        println!("Tipi header campionamento NISECI: {{");
+                        for (i, field) in CAMPIONAMENTO_NISECI_HEADER_FIELDS.iter().enumerate() {
+                            println!("    {}: {};", field, CAMPIONAMENTO_NISECI_HEADER_FIELD_TYPES[i]);
+                        }
+                        println!("}}");
+                        println!("Tipi header anagrafica NISECI: {{");
+                        for (i, field) in ANAGRAFICA_NISECI_HEADER_FIELDS.iter().enumerate() {
+                            println!("    {}: {};", field, ANAGRAFICA_NISECI_HEADER_FIELD_TYPES[i]);
+                        }
+                        println!("}}");
                         return;
                     }
                     "-h" | "-help" | "--help" => {

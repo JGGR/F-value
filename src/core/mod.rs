@@ -81,16 +81,26 @@ pub const SUPPORT_HEADLESS: bool = false; // This is due to windows_subsystem be
 #[cfg(not(windows))]
 pub const SUPPORT_HEADLESS: bool = true;
 
+
+// This must be kept aligned with RecordCsvRiferimentoNISECI definition.
+// TODO: get this stuff with some macro?
 pub const RIFERIMENTO_NISECI_HEADER_FIELDS: [&str; 17] = [ "nomeComune", "nomeLatino", "codiceSpecie", "origine", "tipoAutoctono", "alloNocivita", "specieAttesa", "clSoglia1", "clSoglia2", "clSoglia3", "clSoglia4", "adJuvSoglia1", "adJuvSoglia2", "adJuvSoglia3", "adJuvSoglia4", "densSoglia1", "densSoglia2" ];
+pub const RIFERIMENTO_NISECI_HEADER_FIELD_TYPES: [&str; 17] = [ "String", "String", "String", "String", "i32", "i32", "i32", "u32", "u32", "u32", "u32", "f32", "f32", "f32", "f32", "f32", "f32" ];
 pub const RIFERIMENTO_NISECI_HEADER: &str = "\
 nomeComune;nomeLatino;codiceSpecie;origine;tipoAutoctono;alloNocivita;specieAttesa;clSoglia1;clSoglia2;clSoglia3;clSoglia4;adJuvSoglia1;adJuvSoglia2;adJuvSoglia3;adJuvSoglia4;densSoglia1;densSoglia2";
 
+// This must be kept aligned with RecordCsvCampionamentoNISECI definition.
+// TODO: get this stuff with some macro?
 pub const CAMPIONAMENTO_NISECI_HEADER_FIELDS: [&str; 6] = [ "data", "stazione", "numPassaggio", "codiceSpecie", "lunghezza", "peso" ];
+pub const CAMPIONAMENTO_NISECI_HEADER_FIELD_TYPES: [&str; 6] = [ "String", "String", "u32", "String", "i32", "i32" ];
 pub const CAMPIONAMENTO_NISECI_HEADER: &str = "\
 data;stazione;numPassaggio;codiceSpecie;lunghezza;peso";
 
+// This must be kept aligned with RecordCsvAnagraficaNISECI definition.
+// TODO: get this stuff with some macro?
 pub const ANAGRAFICA_NISECI_HEADER_FIELDS: [&str; 13] = [
 "codiceStazione", "corpoIdrico", "regione", "provincia", "data", "lunghezzaStazione", "larghezzaStazione", "tipoComunita", "fonte", "numeroProtocollo", "idroEcoRegione", "areaAlpina", "nomeBacino" ];
+pub const ANAGRAFICA_NISECI_HEADER_FIELD_TYPES: [&str; 13] = [ "String", "String", "String", "String", "String", "u32", "u32", "u32", "String", "String", "u32", "u32", "String"];
 pub const ANAGRAFICA_NISECI_HEADER: &str = "\
 codiceStazione;corpoIdrico;regione;provincia;data;lunghezzaStazione;larghezzaStazione;tipoComunita;fonte;numeroProtocollo;idroEcoRegione;areaAlpina;nomeBacino";
 
