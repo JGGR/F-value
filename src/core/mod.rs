@@ -659,7 +659,9 @@ pub struct RecordCsvAnagraficaNISECI {
     pub regione: String,
     pub provincia: String,
     pub data: String,
+    #[serde(deserialize_with = "deserialize_comma_f32")]
     pub lunghezza_stazione: f32,
+    #[serde(deserialize_with = "deserialize_comma_f32")]
     pub larghezza_stazione: f32,
     pub tipo_comunita: u32,
     pub fonte: String,

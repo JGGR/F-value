@@ -140,11 +140,10 @@ fn main() {
     let mut logo_img = None;
     match img_load_res {
         Ok(img) => {
-            println!("Img size: x {}, y {}", img.width(), img.height());
             logo_img = Some(img);
         }
         Err(err) => {
-            println!("Error loading img: {err}");
+            println!("Error loading logo img: {err}");
         }
     }
 

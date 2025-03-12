@@ -407,7 +407,7 @@ fn test_csv_anagrafica_niseci_found_empty_string_expect_int() {
 #[test]
 fn test_csv_anagrafica_niseci_found_float_expect_int() {
     let csv_data = format!(
-        "{}\nCODICE;CORPO;REGIONE;PROVINCIA;1/1/1111;100,0;8;0;;;20;1;BACINO",
+        "{}\nCODICE;CORPO;REGIONE;PROVINCIA;1/1/1111;100;8;0,1;;;20;1;BACINO",
         ANAGRAFICA_NISECI_HEADER
     );
     let reader = Cursor::new(csv_data);

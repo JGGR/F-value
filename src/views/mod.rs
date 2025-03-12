@@ -629,10 +629,10 @@ pub struct SelezioneInfoAggiuntiveView {
     textbox_provincia_buffer: [u8; 64],
     textbox_data_edit_mode: bool,
     textbox_data_buffer: [u8; 64],
-    spinner_lunghezza_stazione_value: i32,
-    spinner_lunghezza_stazione_edit_mode: bool,
-    spinner_larghezza_stazione_value: i32,
-    spinner_larghezza_stazione_edit_mode: bool,
+    textbox_lunghezza_stazione_edit_mode: bool,
+    textbox_lunghezza_stazione_buffer: [u8; 64],
+    textbox_larghezza_stazione_edit_mode: bool,
+    textbox_larghezza_stazione_buffer: [u8; 64],
     dropdownbox_tipocomunit_niseci_edit_mode: bool,
     dropdownbox_tipocomunit_niseci_value: i32,
     textbox_fontecomunit_niseci_edit_mode: bool,
@@ -673,6 +673,16 @@ impl SelezioneInfoAggiuntiveView {
         let data_buffer_len = data_buffer_bytes.len().min(64);
         data_buffer[..data_buffer_len].copy_from_slice(&data_buffer_bytes[..data_buffer_len]);
 
+        let mut lunghezza_stazione_buffer = [0u8; 64];
+        let lunghezza_stazione_buffer_bytes = "Inserisci lunghezza".as_bytes();
+        let lunghezza_stazione_buffer_len = lunghezza_stazione_buffer_bytes.len().min(64);
+        lunghezza_stazione_buffer[..lunghezza_stazione_buffer_len].copy_from_slice(&lunghezza_stazione_buffer_bytes[..lunghezza_stazione_buffer_len]);
+
+        let mut larghezza_stazione_buffer = [0u8; 64];
+        let larghezza_stazione_buffer_bytes = "Inserisci larghezza".as_bytes();
+        let larghezza_stazione_buffer_len = larghezza_stazione_buffer_bytes.len().min(64);
+        larghezza_stazione_buffer[..larghezza_stazione_buffer_len].copy_from_slice(&larghezza_stazione_buffer_bytes[..larghezza_stazione_buffer_len]);
+
         let mut fonte_comunit_buffer = [0u8; 64];
         let fonte_comunit_buffer_bytes = "Inserisci fonte".as_bytes();
         let fonte_comunit_buffer_len = fonte_comunit_buffer_bytes.len().min(64);
@@ -699,10 +709,10 @@ impl SelezioneInfoAggiuntiveView {
             textbox_provincia_buffer: provincia_buffer,
             textbox_data_edit_mode: false,
             textbox_data_buffer: data_buffer,
-            spinner_lunghezza_stazione_edit_mode: false,
-            spinner_lunghezza_stazione_value: 0,
-            spinner_larghezza_stazione_edit_mode: false,
-            spinner_larghezza_stazione_value: 0,
+            textbox_lunghezza_stazione_edit_mode: false,
+            textbox_lunghezza_stazione_buffer: lunghezza_stazione_buffer,
+            textbox_larghezza_stazione_edit_mode: false,
+            textbox_larghezza_stazione_buffer: larghezza_stazione_buffer,
             dropdownbox_tipocomunit_niseci_edit_mode: false,
             dropdownbox_tipocomunit_niseci_value: 0,
             textbox_fontecomunit_niseci_edit_mode: false,
@@ -795,8 +805,49 @@ impl SelezioneInfoAggiuntiveView {
                 regione: regione_string,
                 provincia: provincia_string,
             };
-            let larghezza_stazione = self.spinner_larghezza_stazione_value;
-            let lunghezza_stazione = self.spinner_lunghezza_stazione_value;
+
+
+            // Raylib has trouble handling the string downstream if we don't ensure to do this
+            let end = self.textbox_larghezza_stazione_buffer.iter().position(|&b| b == 0).unwrap_or(self.textbox_larghezza_stazione_buffer.len());
+            let larghezza_stazione_str = match String::from_utf8(self.textbox_larghezza_stazione_buffer[..end].to_vec()) {
+                Ok(s) => s,
+                Err(_) => {
+                    //TODO: signal error: invalid UTF-8
+                    "ERROR".to_string()
+                }
+            };
+
+            let larghezza_stazione;
+            match controller.check_larghezza_stazione_string(&larghezza_stazione_str) {
+                Ok(v) => {
+                    larghezza_stazione = v;
+                }
+                Err(_e) => {
+                    return; // This is not very appropriate but we expect the controller to change
+                            // the view for us in case of error so it's ok I guess
+                }
+            }
+
+            // Raylib has trouble handling the string downstream if we don't ensure to do this
+            let end = self.textbox_lunghezza_stazione_buffer.iter().position(|&b| b == 0).unwrap_or(self.textbox_lunghezza_stazione_buffer.len());
+            let lunghezza_stazione_str = match String::from_utf8(self.textbox_lunghezza_stazione_buffer[..end].to_vec()) {
+                Ok(s) => s,
+                Err(_) => {
+                    //TODO: signal error: invalid UTF-8
+                    "ERROR".to_string()
+                }
+            };
+
+            let lunghezza_stazione;
+            match controller.check_lunghezza_stazione_string(&lunghezza_stazione_str) {
+                Ok(v) => {
+                    lunghezza_stazione = v;
+                }
+                Err(_e) => {
+                    return; // This is not very appropriate but we expect the controller to change
+                            // the view for us in case of error so it's ok I guess
+                }
+            }
 
             // Raylib has trouble handling the string downstream if we don't ensure to do this
             let end = self.textbox_codice_stazione_buffer.iter().position(|&b| b == 0).unwrap_or(self.textbox_codice_stazione_buffer.len());
@@ -927,8 +978,8 @@ impl SelezioneInfoAggiuntiveView {
                 bacino_appartenenza: bacino_niseci,
                 idro_eco_regione: idro_ecoregione_niseci,
                 posizione: posizione,
-                lunghezza_media_stazione: lunghezza_stazione as f32,
-                larghezza_media_stazione: larghezza_stazione as f32,
+                lunghezza_media_stazione: lunghezza_stazione,
+                larghezza_media_stazione: larghezza_stazione,
             };
 
             controller.submit_anagrafica_niseci(anagrafica);
@@ -1104,35 +1155,29 @@ impl SelezioneInfoAggiuntiveView {
         ) {
             self.textbox_data_edit_mode = !self.textbox_data_edit_mode;
         }
-        if d.gui_spinner(
+        if d.gui_text_box(
             rrect(
                 column_1_boxes_x,
                 column_1_label_lunghezza_stazione_y,
                 column_1_boxes_width,
                 column_1_boxes_height
             ),
-            None,
-            &mut self.spinner_lunghezza_stazione_value,
-            0,
-            100000, //TODO: ask a reasonable max for this
-            self.spinner_lunghezza_stazione_edit_mode
+            &mut self.textbox_lunghezza_stazione_buffer,
+            self.textbox_lunghezza_stazione_edit_mode
         ) {
-            self.spinner_lunghezza_stazione_edit_mode = !self.spinner_lunghezza_stazione_edit_mode;
+            self.textbox_lunghezza_stazione_edit_mode = !self.textbox_lunghezza_stazione_edit_mode;
         }
-        if d.gui_spinner(
+        if d.gui_text_box(
             rrect(
                 column_1_boxes_x,
                 column_1_label_larghezza_stazione_y,
                 column_1_boxes_width,
                 column_1_boxes_height
             ),
-            None,
-            &mut self.spinner_larghezza_stazione_value,
-            0,
-            100000, //TODO: ask a resonable max for this
-            self.spinner_larghezza_stazione_edit_mode
+            &mut self.textbox_larghezza_stazione_buffer,
+            self.textbox_larghezza_stazione_edit_mode
         ) {
-            self.spinner_larghezza_stazione_edit_mode = !self.spinner_larghezza_stazione_edit_mode;
+            self.textbox_larghezza_stazione_edit_mode = !self.textbox_larghezza_stazione_edit_mode;
         }
         // Column 2
 
