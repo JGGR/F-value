@@ -48,9 +48,8 @@ impl HomeView {
         let frame_counter = state.get_frame_counter();
 
         let texture_target_width = propwidth(&d, 205);
-        let side_x_padding = d.get_screen_width() - texture_target_width - propwidth(&d, 25);
         let texture_target_height = propheight(&d, 205);
-        let texture_target_x = side_x_padding;
+        let texture_target_x = d.get_screen_width()/2 - texture_target_width /2;
         let texture_target_y = propheight(&d, 50);
         match main_state.logo_texture {
             Some(ref texture) => {
@@ -76,8 +75,8 @@ impl HomeView {
             None => {}
         }
 
-        let labels_width = propwidth(&d, 200);
-        let labels_x =  side_x_padding;
+        let labels_width = propwidth(&d, 400);
+        let labels_x = d.get_screen_width()/2 - labels_width/2;
         let labels_y = propheight(&d, 300);
         let labels_height = propheight(&d, 25);
 
@@ -98,8 +97,8 @@ impl HomeView {
             );
         }
 
-        let continue_width = propwidth(&d, 100);
-        let continue_x = labels_x;
+        let continue_width = propwidth(&d, 150);
+        let continue_x = d.get_screen_width()/2 - continue_width/2;
         let continue_height = propwidth(&d, 50);
         let continue_y_padding = propwidth(&d, 25);
         let continue_y = labels_y + (labels_height * labels.len() as i32) + continue_y_padding;
@@ -120,7 +119,7 @@ impl HomeView {
         }
 
         let rainbow_speed = 0.03;
-        let todo_font_scale = 4;
+        let todo_font_scale = 3;
         let todo_font_height = main_state.current_font_height * todo_font_scale;
 
         let todo_txt = "TODO: WELCOME";
@@ -184,9 +183,8 @@ impl SecondView {
         controller.set_value(self.spinner_value);
 
         let texture_target_width = propwidth(&d, 205);
-        let side_x_padding = d.get_screen_width() - texture_target_width - propwidth(&d, 25);
         let texture_target_height = propheight(&d, 205);
-        let texture_target_x = side_x_padding;
+        let texture_target_x = d.get_screen_width()/2 - texture_target_width /2;
         let texture_target_y = propheight(&d, 50);
         match main_state.logo_texture {
             Some(ref texture) => {
@@ -212,8 +210,8 @@ impl SecondView {
             None => {}
         }
 
-        let labels_width = propwidth(&d, 200);
-        let labels_x = side_x_padding;
+        let labels_width = propwidth(&d, 400);
+        let labels_x = d.get_screen_width()/2 - labels_width/2;
         let labels_y = propheight(&d, 300);
         let labels_height = propheight(&d, 25);
 
@@ -234,8 +232,8 @@ impl SecondView {
             );
         }
 
-        let continue_width = propwidth(&d, 100);
-        let continue_x = labels_x;
+        let continue_width = propwidth(&d, 150);
+        let continue_x = d.get_screen_width()/2 - continue_width/2;
         let continue_height = propwidth(&d, 50);
         let continue_y_padding = propwidth(&d, 25);
         let continue_y = labels_y + (labels_height * labels.len() as i32) + continue_y_padding;
@@ -256,7 +254,7 @@ impl SecondView {
         }
 
         let rainbow_speed = 0.03;
-        let todo_font_scale = 4;
+        let todo_font_scale = 3;
         let todo_font_height = main_state.current_font_height * todo_font_scale;
 
         let todo_txt = "TODO: WELCOME";
@@ -265,6 +263,7 @@ impl SecondView {
         let todo_txt_y = (d.get_screen_height() / 2) - (todo_txt_bounds.y as i32 / 2);
 
         draw_rainbow_text(d, todo_txt_x, todo_txt_y, "TODO: WELCOME", frame_counter, rainbow_speed, &main_state.current_font, main_state.default_txt_spacing, main_state.current_font_height, todo_font_scale);
+
     }
 }
 
