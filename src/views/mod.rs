@@ -31,6 +31,7 @@ use rfd::FileDialog;
 use raylib::consts::GuiState::{STATE_NORMAL, STATE_DISABLED};
 use raylib::consts::GuiIconName::{ICON_FILE_OPEN, ICON_BIN, ICON_OK_TICK, ICON_CROSS, ICON_PLAYER_NEXT};
 use std::ffi::CString;
+use std::cmp::max;
 
 // A view responsible for rendering the state
 // Tightly coupled with its respective controller
@@ -75,14 +76,18 @@ impl HomeView {
             None => {}
         }
 
-        let labels_width = propwidth(&d, 400);
+        let label_version_txt = format!("Version:   {}", SHORT_PROJECT_VERSION);
+        let label_target_txt = format!("Target:    {}-{}", std::env::consts::ARCH, std::env::consts::OS);
+        let label_version_txt_bounds = main_state.current_font.measure_text(&label_version_txt, main_state.current_font_height as f32, main_state.default_txt_spacing as f32);
+        let label_target_txt_bounds = main_state.current_font.measure_text(&label_target_txt, main_state.current_font_height as f32, main_state.default_txt_spacing as f32);
+        let labels_width = propwidth(&d, 25) + max(label_version_txt_bounds.x as i32, label_target_txt_bounds.x as i32);
         let labels_x = d.get_screen_width()/2 - labels_width/2;
         let labels_y = propheight(&d, 300);
         let labels_height = propheight(&d, 25);
 
         let labels: Vec<CString> = vec!(
-            CString::new(format!("Version:   {}", SHORT_PROJECT_VERSION)).unwrap(),
-            CString::new(format!("Target:    {}-{}", std::env::consts::ARCH, std::env::consts::OS)).unwrap(),
+            CString::new(label_version_txt).unwrap(),
+            CString::new(label_target_txt).unwrap(),
         );
 
         for (i, label) in labels.iter().enumerate() {
@@ -210,14 +215,18 @@ impl SecondView {
             None => {}
         }
 
-        let labels_width = propwidth(&d, 400);
+        let label_version_txt = format!("Version:   {}", SHORT_PROJECT_VERSION);
+        let label_target_txt = format!("Target:    {}-{}", std::env::consts::ARCH, std::env::consts::OS);
+        let label_version_txt_bounds = main_state.current_font.measure_text(&label_version_txt, main_state.current_font_height as f32, main_state.default_txt_spacing as f32);
+        let label_target_txt_bounds = main_state.current_font.measure_text(&label_target_txt, main_state.current_font_height as f32, main_state.default_txt_spacing as f32);
+        let labels_width = propwidth(&d, 25) + max(label_version_txt_bounds.x as i32, label_target_txt_bounds.x as i32);
         let labels_x = d.get_screen_width()/2 - labels_width/2;
         let labels_y = propheight(&d, 300);
         let labels_height = propheight(&d, 25);
 
         let labels: Vec<CString> = vec!(
-            CString::new(format!("Version:   {}", SHORT_PROJECT_VERSION)).unwrap(),
-            CString::new(format!("Target:    {}-{}", std::env::consts::ARCH, std::env::consts::OS)).unwrap(),
+            CString::new(label_version_txt).unwrap(),
+            CString::new(label_target_txt).unwrap(),
         );
 
         for (i, label) in labels.iter().enumerate() {
