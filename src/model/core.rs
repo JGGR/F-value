@@ -247,6 +247,7 @@ impl OutputModel {
 pub struct ConsoleModel {
     pub console: Console,
     name: String,
+    should_backout: bool,
 }
 
 impl ConsoleModel {
@@ -256,6 +257,13 @@ impl ConsoleModel {
 
     pub fn set_name(&mut self, new_name: String) {
         self.name = new_name;
+    }
+
+    pub fn should_backout(&self) -> bool {
+        return self.should_backout;
+    }
+    pub fn set_should_backout(&mut self, val: bool) {
+        self.should_backout = val;
     }
 }
 
@@ -376,6 +384,7 @@ impl Model {
                     ]),
                 ),
                 name: "Initial".to_string(),
+                should_backout: false,
             },
             data_model: DataModel {
                 errors_occurred: false,

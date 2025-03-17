@@ -232,7 +232,7 @@ fn main() {
                 output_controller.update(&rl, &mut main_state);
             }
             CurrentView::CONSOLE => {
-                console_controller.update(&mut rl);
+                console_controller.update(&mut rl, &mut main_state);
             }
         }
 

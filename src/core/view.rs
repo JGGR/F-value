@@ -558,11 +558,8 @@ pub fn draw_main(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
     if d.gui_button(rrect(console_button_x, console_button_y, console_button_width, console_button_height), Some(itext.as_c_str())) {
         match main_state.current_view {
             CurrentView::CONSOLE => {
-                if let Some(prev) = main_state.previous_view {
-                    main_state.set_current_view(prev);
-                } else {
-                    main_state.set_current_view(CurrentView::HOME);
-                }
+                let prev = main_state.previous_view;
+                main_state.set_current_view(prev);
             }
             _ => {
                 main_state.set_current_view(CurrentView::CONSOLE);

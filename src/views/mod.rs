@@ -1930,6 +1930,6 @@ impl ConsoleView {
 
         let state = controller.get_state();
 
-        state.console.draw(d, main_state.default_txt_color, self.current_font_size, self.font_spacing, &self.font);
+        state.console.draw(d, controller, main_state.default_txt_color, self.current_font_size, self.font_spacing, &self.font);
     }
 }

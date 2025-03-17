@@ -1027,8 +1027,16 @@ impl ConsoleController {
         Self
     }
 
-    pub fn update(&self, rl : &mut RaylibHandle) {
+    pub fn update(&self, rl: &mut RaylibHandle, main_state: &mut MainState) {
         let mut state = GLOBAL_STATE.lock().unwrap();
+
+        if state.console_model.should_backout() {
+            state.console_model.set_should_backout(false);
+            let prev = main_state.previous_view;
+            main_state.set_current_view(prev);
+            return;
+        }
+
         // Handle input
 
         let mwheel_move = rl.get_mouse_wheel_move() as i32;
@@ -1068,6 +1076,11 @@ impl ConsoleController {
     pub fn get_state(&self) -> ConsoleModel {
         let state = GLOBAL_STATE.lock().unwrap();
         return state.console_model.clone();
+    }
+
+    pub fn backout(&self) {
+        let mut state = GLOBAL_STATE.lock().unwrap();
+        state.console_model.set_should_backout(true);
     }
 
     pub fn _add_console_message(&self, msg: String) {

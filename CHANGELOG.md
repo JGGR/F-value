@@ -8,6 +8,7 @@
     - Relative: +25.6%
 - Add missing tests for anagrafica NISECI csv parsing
 - Add license info button
+- Add backout button in `ConsoleView`
 
 ### Changed
 
@@ -30,6 +31,10 @@
   - On theme switch
 - Replace `razionale` with `decimale` in hints
 - Ensure to set default font height on theme change
+- Tidy up some views to handle the bigger default text
+- Refactor `MainState.previous_view` to drop the `Option` wrap
+- Refactor `Console::draw()` to pass in `ConsoleController`
+  - Only used for backout button logic
 
 ## [0.0.11] - 2025-03-12
 
