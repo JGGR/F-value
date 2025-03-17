@@ -185,7 +185,9 @@ fn main() {
         None => {}
     }
 
-    let gui_default_font_height: i32 = rl.gui_get_style(DEFAULT, TEXT_SIZE as i32);
+    // 10 is way too small for the default font height
+    let gui_default_font_height: i32 = rl.gui_get_style(DEFAULT, TEXT_SIZE as i32);// *2;
+    rl.gui_set_style(DEFAULT, TEXT_SIZE as i32, gui_default_font_height);
     let gui_current_font_height: i32 = gui_default_font_height;
 
     let txt_color_int = rl.gui_get_style(DEFAULT, TEXT_COLOR_NORMAL as i32);

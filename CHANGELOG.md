@@ -23,6 +23,7 @@
     - Refactor fields `tipo_autoctono`, `allo_nocivita`, `specie_attesa` to be `u32`
 - Flag `--info` now also prints expected types
 - Fixed wrong message in error reports for `check_riferimento_niseci_reader`
+- Refactor theme loading into `core::controller::GuiTheme::load_and_set()`
 
 ## [0.0.11] - 2025-03-12
 
