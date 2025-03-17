@@ -439,7 +439,7 @@ pub fn parse_recordcsv_campionamento_niseci(records: Vec<RecordCsvCampionamentoN
 
         //TODO: update this abomination when records change to have an integer directly
         if r.num_passaggio < 1 {
-            let err = RecordCsvCampionamentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: num_passaggio non valido (non in [\"c1\", \"c2\" ... \"c4\"]): {}", r.num_passaggio) };
+            let err = RecordCsvCampionamentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: num_passaggio non valido (<1): {}", r.num_passaggio) };
             errors.push(err);
             continue;
         }
