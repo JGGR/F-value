@@ -967,13 +967,13 @@ pub fn translate_error_message(msg: &str) -> String {
         msg.replace("invalid digit found in string", "tipo non valido: numero, attesa stringa")
             .replace("field", "campo")
     } else if msg.contains("invalid float literal") {
-        msg.replace("invalid float literal", "tipo non valido: atteso razionale").replace("field", "campo")
+        msg.replace("invalid float literal", "tipo non valido: atteso decimale").replace("field", "campo")
     } else if msg.contains("cannot parse") && msg.contains("from empty string") {
         // NOTE: there's a leading space in " from empty string", it enables us to attach the ","
         // to the previous part
         msg.replace("cannot parse", "campo vuoto: atteso")
             .replace("field","campo")
-            .replace("float","razionale")
+            .replace("float","decimale")
             .replace("integer","intero")
             .replace(" from empty string",", trovato: stringa vuota")
     } else if msg.contains("fields, but the previous record has") {

@@ -28,6 +28,7 @@
 - Use double default font height on `GuiTheme::Light`
   - At startup (`MainState`, `ConsoleView` prep)
   - On theme switch
+- Replace `razionale` with `decimale` in hints
 
 ## [0.0.11] - 2025-03-12
 

@@ -544,7 +544,7 @@ impl InfoAggiuntiveController {
             Err(e) => {
                 let mut err_msg = format!("Errore nella conversione larghezza stazione: {}", e);
                 if err_msg.contains("invalid float literal") {
-                    err_msg = err_msg.replace("invalid float literal", "tipo non valido: atteso razionale");
+                    err_msg = err_msg.replace("invalid float literal", "tipo non valido: atteso decimale");
                 }
                 self.add_console_message(format!("InfoAggiuntiveController:  {err_msg}"));
                 let mut state = GLOBAL_STATE.lock().unwrap();
@@ -566,7 +566,7 @@ impl InfoAggiuntiveController {
             Err(e) => {
                 let mut err_msg = format!("Errore nella conversione lunghezza stazione: {}", e);
                 if err_msg.contains("invalid float literal") {
-                    err_msg = err_msg.replace("invalid float literal", "tipo non valido: atteso razionale");
+                    err_msg = err_msg.replace("invalid float literal", "tipo non valido: atteso decimale");
                 }
                 self.add_console_message(format!("InfoAggiuntiveController:  {err_msg}"));
                 let mut state = GLOBAL_STATE.lock().unwrap();
