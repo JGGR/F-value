@@ -29,6 +29,7 @@
   - At startup (`MainState`, `ConsoleView` prep)
   - On theme switch
 - Replace `razionale` with `decimale` in hints
+- Ensure to set default font height on theme change
 
 ## [0.0.11] - 2025-03-12
 

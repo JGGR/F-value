@@ -133,6 +133,7 @@ impl GuiTheme {
             _ => 1
         };
         main_state.default_font_height = rl.gui_get_style(DEFAULT, TEXT_SIZE as i32) * font_height_scale;
+        rl.gui_set_style(DEFAULT, TEXT_SIZE as i32, main_state.default_font_height);
         main_state.current_font_height = main_state.default_font_height;
         main_state.default_txt_spacing = rl.gui_get_style(DEFAULT, TEXT_SPACING as i32);
         let txt_color_int = rl.gui_get_style(DEFAULT, TEXT_COLOR_NORMAL as i32);
