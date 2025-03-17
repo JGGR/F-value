@@ -1544,7 +1544,7 @@ impl ProduzioneOutputView {
         let groupbox_height = button_calcola_height + propheight(&d, 100);
         let groupbox_y = button_calcola_y - propheight(&d, 50);
 
-        let panel_width = groupbox_width + propwidth(&d, 100);
+        let panel_width = groupbox_width + propwidth(&d, 150);
         let panel_x = d.get_screen_width() / 2 - panel_width /2;
         let panel_y = groupbox_y + groupbox_height + propwidth(&d, 50);
         let panel_height = groupbox_height + propheight(&d, 50);
@@ -1637,7 +1637,8 @@ impl ProduzioneOutputView {
 
         match current_index {
             Indice::NISECI => {
-                let y_spacing = main_state.current_font_height *2;
+                let y_spacing = main_state.current_font_height + propwidth(&d, 5);
+                let output_start_y = panel_y + propwidth(&d, 15);
                 let niseci_opt = controller.get_niseci_value();
                 let niseci_str = match niseci_opt {
                     Some(v) => {
@@ -1658,7 +1659,7 @@ impl ProduzioneOutputView {
                     &niseci_line,
                     // We use propwidth/height for the text starting position:
                     // this is not the bound
-                    Vector2::new((panel_x + propwidth(&d, 25)) as f32, (panel_y + (y_spacing * 2)) as f32),
+                    Vector2::new((panel_x + propwidth(&d, 25)) as f32, (output_start_y + (y_spacing )) as f32),
                     main_state.current_font_height as f32,
                     main_state.default_txt_spacing as f32,
                     main_state.default_txt_color
@@ -1682,7 +1683,7 @@ impl ProduzioneOutputView {
                     &rqe_line,
                     // We use propwidth/height for the text starting position:
                     // this is not the bound
-                    Vector2::new((panel_x + propwidth(&d, 25)) as f32, (panel_y + (y_spacing * 3)) as f32),
+                    Vector2::new((panel_x + propwidth(&d, 25)) as f32, (output_start_y + (y_spacing * 2)) as f32),
                     main_state.current_font_height as f32,
                     main_state.default_txt_spacing as f32,
                     main_state.default_txt_color
@@ -1706,7 +1707,7 @@ impl ProduzioneOutputView {
                     &stato_eco_line,
                     // We use propwidth/height for the text starting position:
                     // this is not the bound
-                    Vector2::new((panel_x + propwidth(&d, 25)) as f32, (panel_y + (y_spacing * 4)) as f32),
+                    Vector2::new((panel_x + propwidth(&d, 25)) as f32, (output_start_y + (y_spacing * 3)) as f32),
                     main_state.current_font_height as f32,
                     main_state.default_txt_spacing as f32,
                     main_state.default_txt_color
@@ -1731,7 +1732,7 @@ impl ProduzioneOutputView {
                     &x1_line,
                     // We use propwidth/height for the text starting position:
                     // this is not the bound
-                    Vector2::new((panel_x + propwidth(&d, 25)) as f32, (panel_y + (y_spacing * 5)) as f32),
+                    Vector2::new((panel_x + propwidth(&d, 25)) as f32, (output_start_y + (y_spacing * 4)) as f32),
                     main_state.current_font_height as f32,
                     main_state.default_txt_spacing as f32,
                     main_state.default_txt_color
@@ -1756,7 +1757,7 @@ impl ProduzioneOutputView {
                     &x2_line,
                     // We use propwidth/height for the text starting position:
                     // this is not the bound
-                    Vector2::new((panel_x + propwidth(&d, 25)) as f32, (panel_y + (y_spacing * 6)) as f32),
+                    Vector2::new((panel_x + propwidth(&d, 25)) as f32, (output_start_y + (y_spacing * 5)) as f32),
                     main_state.current_font_height as f32,
                     main_state.default_txt_spacing as f32,
                     main_state.default_txt_color
@@ -1781,7 +1782,7 @@ impl ProduzioneOutputView {
                     &x3_line,
                     // We use propwidth/height for the text starting position:
                     // this is not the bound
-                    Vector2::new((panel_x + propwidth(&d, 25)) as f32, (panel_y + (y_spacing * 7)) as f32),
+                    Vector2::new((panel_x + propwidth(&d, 25)) as f32, (output_start_y + (y_spacing * 6)) as f32),
                     main_state.current_font_height as f32,
                     main_state.default_txt_spacing as f32,
                     main_state.default_txt_color
