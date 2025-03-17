@@ -1,4 +1,4 @@
-## [0.0.12] - Unreleased
+## [0.0.12] - 2025-03-17
 
 ### Added
 - Add `assets/logo.png`
