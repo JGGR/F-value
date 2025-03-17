@@ -47,23 +47,6 @@ impl HomeView {
         let state = controller.get_state();
         let frame_counter = state.get_frame_counter();
 
-        let copyright_label_width = propwidth(&d, 500);
-        let copyright_label_x = propwidth(&d, 20);
-        let copyright_label_y = propheight(&d, 30);
-        let copyright_label_height = propheight(&d, 300);
-
-        let copyright_label = CString::new(COPYRIGHT_INFO).unwrap();
-
-        d.gui_label(
-            rrect(
-                copyright_label_x,
-                copyright_label_y,
-                copyright_label_width,
-                copyright_label_height
-            ),
-            Some(copyright_label.as_c_str())
-        );
-
         let texture_target_width = propwidth(&d, 205);
         let side_x_padding = d.get_screen_width() - texture_target_width - propwidth(&d, 25);
         let texture_target_height = propheight(&d, 205);
@@ -199,23 +182,6 @@ impl SecondView {
         // to the View and ensure to set them on all frames to the model via
         // the controller.
         controller.set_value(self.spinner_value);
-
-        let copyright_label_width = propwidth(&d, 500);
-        let copyright_label_x = propwidth(&d, 20);
-        let copyright_label_y = propheight(&d, 30);
-        let copyright_label_height = propheight(&d, 300);
-
-        let copyright_label = CString::new(COPYRIGHT_INFO).unwrap();
-
-        d.gui_label(
-            rrect(
-                copyright_label_x,
-                copyright_label_y,
-                copyright_label_width,
-                copyright_label_height
-            ),
-            Some(copyright_label.as_c_str())
-        );
 
         let texture_target_width = propwidth(&d, 205);
         let side_x_padding = d.get_screen_width() - texture_target_width - propwidth(&d, 25);

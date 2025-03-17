@@ -204,7 +204,7 @@ fn main() {
         logo_texture
     );
 
-    let mut console_view = ConsoleView::new(&mut rl, &thread, gui_current_font_height*2, txt_spacing);
+    let mut console_view = ConsoleView::new(&mut rl, &thread, gui_current_font_height, txt_spacing);
 
     while !main_state.should_quit {
 

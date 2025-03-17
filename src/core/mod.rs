@@ -196,6 +196,7 @@ pub struct MainState {
     pub showing_quit_win: bool,
     pub should_quit: bool,
     pub showing_info_box: bool,
+    pub showing_license_box: bool,
     pub showing_settings_box: bool,
     pub current_view: CurrentView,
     pub previous_view: Option<CurrentView>,
@@ -217,6 +218,7 @@ impl MainState {
             showing_quit_win: false,
             should_quit: false,
             showing_info_box: false,
+            showing_license_box: false,
             showing_settings_box: false,
             current_view: CurrentView::HOME,
             previous_view: None,
@@ -238,7 +240,7 @@ impl MainState {
     }
 
     pub fn get_gui_should_lock(&self) -> bool {
-        return self.showing_quit_win || self.showing_info_box || self.showing_settings_box;
+        return self.showing_quit_win || self.showing_info_box || self.showing_settings_box || self.showing_license_box;
     }
 }
 
