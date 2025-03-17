@@ -70,7 +70,7 @@ pub const JUNGLE_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_j
 pub const LAVANDA_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_lavanda.rgs");
 pub const TERMINAL_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_terminal.rgs");
 pub const ASHES_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_ashes.rgs");
-pub const CONSOLE_FONT_DATA: &[u8] = include_bytes!("../../assets/ubuntu.mono.ttf");
+pub const CONSOLE_FONT_DATA: &[u8] = include_bytes!("../../assets/FreeMono.ttf");
 pub const PROJECT_LOGO_DATA: &[u8] = include_bytes!("../../assets/logo.png");
 
 #[cfg(all(windows, debug_assertions))]

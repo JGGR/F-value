@@ -1,3 +1,9 @@
+## [0.0.13] - Unreleased
+
+### Added
+
+- Add `assets/FreeMono.ttf` and use it instead of `assets/ubuntu.mono.ttf`
+
 ## [0.0.12] - 2025-03-17
 
 ### Added
