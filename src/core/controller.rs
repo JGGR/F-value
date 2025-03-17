@@ -21,11 +21,9 @@ use raylib::consts::GuiDefaultProperty::{BACKGROUND_COLOR, TEXT_SIZE, TEXT_SPACI
 use raylib::consts::KeyboardKey::*;
 use raylib::consts::GuiControl::DEFAULT;
 use raylib::consts::GuiControlProperty::TEXT_COLOR_NORMAL;
-use std::fs::File;
-use std::io::Write;
-use std::path::PathBuf;
 use std::ffi::CString;
 use uuid::Uuid;
+use std::io::Write;
 
 pub fn update_main(rl: &mut RaylibHandle, main_state: &mut MainState) {
     main_state.should_quit = rl.window_should_close();
@@ -35,57 +33,12 @@ pub fn update_main(rl: &mut RaylibHandle, main_state: &mut MainState) {
     let current_theme_idx = main_state.gui_theme_combobox_active;
 
     if current_theme_idx != main_state.theme as i32 {
-        match current_theme_idx.try_into() {
-            Ok(GuiTheme::Dark) => {
-                load_style_from_memory(rl, DARK_THEME_DATA);
-                main_state.theme = GuiTheme::Dark;
-            }
-            Ok(GuiTheme::Bluish) => {
-                load_style_from_memory(rl, BLUISH_THEME_DATA);
-                main_state.theme = GuiTheme::Bluish;
-            }
-            Ok(GuiTheme::Candy) => {
-                load_style_from_memory(rl, CANDY_THEME_DATA);
-                main_state.theme = GuiTheme::Candy;
-            }
-            Ok(GuiTheme::Cherry) => {
-                load_style_from_memory(rl, CHERRY_THEME_DATA);
-                main_state.theme = GuiTheme::Cherry;
-            }
-            Ok(GuiTheme::Cyber) => {
-                load_style_from_memory(rl, CYBER_THEME_DATA);
-                main_state.theme = GuiTheme::Cyber;
-            }
-            Ok(GuiTheme::Jungle) => {
-                load_style_from_memory(rl, JUNGLE_THEME_DATA);
-                main_state.theme = GuiTheme::Jungle;
-            }
-            Ok(GuiTheme::Lavanda) => {
-                load_style_from_memory(rl, LAVANDA_THEME_DATA);
-                main_state.theme = GuiTheme::Lavanda;
-            }
-            Ok(GuiTheme::Terminal) => {
-                load_style_from_memory(rl, TERMINAL_THEME_DATA);
-                main_state.theme = GuiTheme::Terminal;
-            }
-            Ok(GuiTheme::Ashes) => {
-                load_style_from_memory(rl, ASHES_THEME_DATA);
-                main_state.theme = GuiTheme::Ashes;
-            }
-            Ok(GuiTheme::Light) => {
-                rl.gui_load_style_default();
-                main_state.theme = GuiTheme::Light;
+        match <i32 as TryInto<GuiTheme>>::try_into(current_theme_idx) {
+            Ok(theme) => {
+                theme.load_and_set(rl, main_state);
             }
             Err(_) => eprintln!("unknown number"),
         }
-        main_state.default_font_height = rl.gui_get_style(DEFAULT, TEXT_SIZE as i32);
-        main_state.current_font_height = main_state.default_font_height;
-        main_state.default_txt_spacing = rl.gui_get_style(DEFAULT, TEXT_SPACING as i32);
-        let txt_color_int = rl.gui_get_style(DEFAULT, TEXT_COLOR_NORMAL as i32);
-        let bg_color_int = rl.gui_get_style(DEFAULT, BACKGROUND_COLOR as i32);
-        main_state.default_txt_color = Color::get_color(txt_color_int as u32);
-        main_state.default_bg_color = Color::get_color(bg_color_int as u32);
-        main_state.current_font = rl.gui_get_font();
     }
 
     if rl.is_key_pressed(crate::EXIT_KEY) {
@@ -129,4 +82,64 @@ fn load_style_from_memory(rl: &mut RaylibHandle, data: &[u8]) {
 
     // Remove the temp file after loading the style
     std::fs::remove_file(temp_file_path).expect("Failed to delete temp style file");
+}
+
+impl GuiTheme {
+    fn load_and_set(&self, rl: &mut RaylibHandle, main_state: &mut MainState) {
+        match self {
+            GuiTheme::Dark => {
+                load_style_from_memory(rl, DARK_THEME_DATA);
+                main_state.theme = GuiTheme::Dark;
+            }
+            GuiTheme::Bluish => {
+                load_style_from_memory(rl, BLUISH_THEME_DATA);
+                main_state.theme = GuiTheme::Bluish;
+            }
+            GuiTheme::Candy => {
+                load_style_from_memory(rl, CANDY_THEME_DATA);
+                main_state.theme = GuiTheme::Candy;
+            }
+            GuiTheme::Cherry => {
+                load_style_from_memory(rl, CHERRY_THEME_DATA);
+                main_state.theme = GuiTheme::Cherry;
+            }
+            GuiTheme::Cyber => {
+                load_style_from_memory(rl, CYBER_THEME_DATA);
+                main_state.theme = GuiTheme::Cyber;
+            }
+            GuiTheme::Jungle => {
+                load_style_from_memory(rl, JUNGLE_THEME_DATA);
+                main_state.theme = GuiTheme::Jungle;
+            }
+            GuiTheme::Lavanda => {
+                load_style_from_memory(rl, LAVANDA_THEME_DATA);
+                main_state.theme = GuiTheme::Lavanda;
+            }
+            GuiTheme::Terminal => {
+                load_style_from_memory(rl, TERMINAL_THEME_DATA);
+                main_state.theme = GuiTheme::Terminal;
+            }
+            GuiTheme::Ashes => {
+                load_style_from_memory(rl, ASHES_THEME_DATA);
+                main_state.theme = GuiTheme::Ashes;
+            }
+            GuiTheme::Light => {
+                rl.gui_load_style_default();
+                main_state.theme = GuiTheme::Light;
+            }
+        }
+        let font_height_scale = match self {
+            GuiTheme::Light => 2, // 10 is way too small for the default font height
+            _ => 1
+        };
+        main_state.default_font_height = rl.gui_get_style(DEFAULT, TEXT_SIZE as i32) * font_height_scale;
+        rl.gui_set_style(DEFAULT, TEXT_SIZE as i32, main_state.default_font_height);
+        main_state.current_font_height = main_state.default_font_height;
+        main_state.default_txt_spacing = rl.gui_get_style(DEFAULT, TEXT_SPACING as i32);
+        let txt_color_int = rl.gui_get_style(DEFAULT, TEXT_COLOR_NORMAL as i32);
+        let bg_color_int = rl.gui_get_style(DEFAULT, BACKGROUND_COLOR as i32);
+        main_state.default_txt_color = Color::get_color(txt_color_int as u32);
+        main_state.default_bg_color = Color::get_color(bg_color_int as u32);
+        main_state.current_font = rl.gui_get_font();
+    }
 }

@@ -1,3 +1,41 @@
+## [0.0.12] - Unreleased
+
+### Added
+- Add `assets/logo.png`
+- Embedding logo increases binary size:
+  - Target `x86_64-pc-windows-gnu`:
+    - Absolute: +1.03MB
+    - Relative: +25.6%
+- Add missing tests for anagrafica NISECI csv parsing
+- Add license info button
+- Add backout button in `ConsoleView`
+
+### Changed
+
+- Refactor `RecordCsvCampionamentoNISECI`:
+  - Drop field `superficie`
+  - Refactor field `numPassaggio` to be `u32`
+  - Refactor fields `lunghezza`, `peso` to be `u32`
+- Refactor `RecordCsvAnagraficaNISECI`:
+  - Refactor fields `larghezza_stazione`, `lunghezza_stazione` to be `f32`
+  - Refactor `SelezioneInfoAggiuntiveView` to handle the check
+    - ATM it's done by `InfoAggiuntiveController::check_larghezza_stazione_str()`
+    - Also updates the model and sets the error flag, going to `ConsoleView`
+- Refactor `RecordCsvRiferimentoNISECI`
+    - Refactor fields `tipo_autoctono`, `allo_nocivita`, `specie_attesa` to be `u32`
+- Flag `--info` now also prints expected types
+- Fixed wrong message in error reports for `check_riferimento_niseci_reader`
+- Refactor theme loading into `core::controller::GuiTheme::load_and_set()`
+- Use double default font height on `GuiTheme::Light`
+  - At startup (`MainState`, `ConsoleView` prep)
+  - On theme switch
+- Replace `razionale` with `decimale` in hints
+- Ensure to set default font height on theme change
+- Tidy up some views to handle the bigger default text
+- Refactor `MainState.previous_view` to drop the `Option` wrap
+- Refactor `Console::draw()` to pass in `ConsoleController`
+  - Only used for backout button logic
+
 ## [0.0.11] - 2025-03-12
 
 ### Added

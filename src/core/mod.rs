@@ -36,7 +36,8 @@ pub const AUTHOR_JGABAUT: &'static str = "jgabaut";
 pub const AUTHOR_GIONINJO: &'static str = "gioninjo";
 pub const AUTHOR_GIONINJO_LINK: &'static str = "https://github.com/gioninjo";
 pub const AUTHOR_JGABAUT_LINK: &'static str = "https://github.com/jgabaut";
-pub const COPYRIGHT_INFO: &'static str = "Copyright (C) 2024, 2025  jgabaut, gioninjo
+pub const COPYRIGHT_INFO: &'static str = "Copyright (C) 2024-2025  jgabaut, gioninjo
+
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, version 3 of the License.
@@ -70,6 +71,7 @@ pub const LAVANDA_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_
 pub const TERMINAL_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_terminal.rgs");
 pub const ASHES_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_ashes.rgs");
 pub const CONSOLE_FONT_DATA: &[u8] = include_bytes!("../../assets/ubuntu.mono.ttf");
+pub const PROJECT_LOGO_DATA: &[u8] = include_bytes!("../../assets/logo.png");
 
 #[cfg(all(windows, debug_assertions))]
 pub const SUPPORT_HEADLESS: bool = true;
@@ -80,16 +82,26 @@ pub const SUPPORT_HEADLESS: bool = false; // This is due to windows_subsystem be
 #[cfg(not(windows))]
 pub const SUPPORT_HEADLESS: bool = true;
 
+
+// This must be kept aligned with RecordCsvRiferimentoNISECI definition.
+// TODO: get this stuff with some macro?
 pub const RIFERIMENTO_NISECI_HEADER_FIELDS: [&str; 17] = [ "nomeComune", "nomeLatino", "codiceSpecie", "origine", "tipoAutoctono", "alloNocivita", "specieAttesa", "clSoglia1", "clSoglia2", "clSoglia3", "clSoglia4", "adJuvSoglia1", "adJuvSoglia2", "adJuvSoglia3", "adJuvSoglia4", "densSoglia1", "densSoglia2" ];
+pub const RIFERIMENTO_NISECI_HEADER_FIELD_TYPES: [&str; 17] = [ "String", "String", "String", "String", "u32", "u32", "u32", "u32", "u32", "u32", "u32", "f32", "f32", "f32", "f32", "f32", "f32" ];
 pub const RIFERIMENTO_NISECI_HEADER: &str = "\
 nomeComune;nomeLatino;codiceSpecie;origine;tipoAutoctono;alloNocivita;specieAttesa;clSoglia1;clSoglia2;clSoglia3;clSoglia4;adJuvSoglia1;adJuvSoglia2;adJuvSoglia3;adJuvSoglia4;densSoglia1;densSoglia2";
 
-pub const CAMPIONAMENTO_NISECI_HEADER_FIELDS: [&str; 7] = [ "data", "stazione", "superficie", "numPassaggio", "codiceSpecie", "lunghezza", "peso" ];
+// This must be kept aligned with RecordCsvCampionamentoNISECI definition.
+// TODO: get this stuff with some macro?
+pub const CAMPIONAMENTO_NISECI_HEADER_FIELDS: [&str; 6] = [ "data", "stazione", "numPassaggio", "codiceSpecie", "lunghezza", "peso" ];
+pub const CAMPIONAMENTO_NISECI_HEADER_FIELD_TYPES: [&str; 6] = [ "String", "String", "u32", "String", "u32", "u32" ];
 pub const CAMPIONAMENTO_NISECI_HEADER: &str = "\
-data;stazione;superficie;numPassaggio;codiceSpecie;lunghezza;peso";
+data;stazione;numPassaggio;codiceSpecie;lunghezza;peso";
 
+// This must be kept aligned with RecordCsvAnagraficaNISECI definition.
+// TODO: get this stuff with some macro?
 pub const ANAGRAFICA_NISECI_HEADER_FIELDS: [&str; 13] = [
 "codiceStazione", "corpoIdrico", "regione", "provincia", "data", "lunghezzaStazione", "larghezzaStazione", "tipoComunita", "fonte", "numeroProtocollo", "idroEcoRegione", "areaAlpina", "nomeBacino" ];
+pub const ANAGRAFICA_NISECI_HEADER_FIELD_TYPES: [&str; 13] = [ "String", "String", "String", "String", "String", "f32", "f32", "u32", "String", "String", "u32", "u32", "String"];
 pub const ANAGRAFICA_NISECI_HEADER: &str = "\
 codiceStazione;corpoIdrico;regione;provincia;data;lunghezzaStazione;larghezzaStazione;tipoComunita;fonte;numeroProtocollo;idroEcoRegione;areaAlpina;nomeBacino";
 
@@ -185,9 +197,10 @@ pub struct MainState {
     pub showing_quit_win: bool,
     pub should_quit: bool,
     pub showing_info_box: bool,
+    pub showing_license_box: bool,
     pub showing_settings_box: bool,
     pub current_view: CurrentView,
-    pub previous_view: Option<CurrentView>,
+    pub previous_view: CurrentView,
     pub theme: GuiTheme,
     pub gui_theme_combobox_active: i32,
     pub default_font_height: i32,
@@ -196,18 +209,20 @@ pub struct MainState {
     pub default_txt_color: Color,
     pub current_font: WeakFont,
     pub default_bg_color: Color,
+    pub logo_texture: Option<Texture2D>,
 }
 
 impl MainState {
-    pub fn new(default_font_height: i32, current_font_height: i32, default_txt_spacing: i32, current_font: WeakFont, default_txt_color: Color, default_bg_color: Color) -> Self {
+    pub fn new(default_font_height: i32, current_font_height: i32, default_txt_spacing: i32, current_font: WeakFont, default_txt_color: Color, default_bg_color: Color, logo_texture: Option<Texture2D>) -> Self {
         Self {
             frame_counter: 0,
             showing_quit_win: false,
             should_quit: false,
             showing_info_box: false,
+            showing_license_box: false,
             showing_settings_box: false,
             current_view: CurrentView::HOME,
-            previous_view: None,
+            previous_view: CurrentView::HOME,
             theme: GuiTheme::Light,
             gui_theme_combobox_active: GuiTheme::Light as i32,
             default_font_height: default_font_height,
@@ -216,16 +231,17 @@ impl MainState {
             default_txt_color: default_txt_color,
             current_font: current_font,
             default_bg_color: default_bg_color,
+            logo_texture: logo_texture
         }
     }
 
     pub fn set_current_view(&mut self, view: CurrentView) -> () {
-        self.previous_view = Some(self.current_view);
+        self.previous_view = self.current_view;
         self.current_view = view;
     }
 
     pub fn get_gui_should_lock(&self) -> bool {
-        return self.showing_quit_win || self.showing_info_box || self.showing_settings_box;
+        return self.showing_quit_win || self.showing_info_box || self.showing_settings_box || self.showing_license_box;
     }
 }
 
@@ -300,14 +316,14 @@ impl<R: Read> Read for NormalizerReader<R> {
 
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct RecordCsvRiferimentoNISECI { //TODO: add position
+pub struct RecordCsvRiferimentoNISECI {
     pub nome_comune: String,
     pub nome_latino: String,
     pub codice_specie: String,
     pub origine: String,
-    pub tipo_autoctono: i32,
-    pub allo_nocivita: i32,
-    pub specie_attesa: i32,
+    pub tipo_autoctono: u32,
+    pub allo_nocivita: u32,
+    pub specie_attesa: u32,
     pub cl_soglia1: u32, // in mm
     pub cl_soglia2: u32, // in mm
     pub cl_soglia3: u32, // in mm
@@ -342,25 +358,21 @@ impl fmt::Display for RecordCsvRiferimentoNISECI {
 
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct RecordCsvCampionamentoNISECI { //TODO: add position
-    //id: i32,
+pub struct RecordCsvCampionamentoNISECI {
     pub data: String,
     pub stazione: String,
-    pub superficie: i32,
-    pub num_passaggio: String,
+    pub num_passaggio: u32,
     pub codice_specie: String,
-    pub lunghezza: i32,
-    pub peso: i32,
+    pub lunghezza: u32,
+    pub peso: u32,
 }
 
 impl fmt::Display for RecordCsvCampionamentoNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let string_representation = format!(
-            "RecordCsvCampionamentoNISECI: {{ data: [{}], stazione: [{}], superficie: [{}], num_passaggio: [{}], codice_specie: [{}], lunghezza: [{}], peso: [{}] }}",
-              // id: [{}], before the }}
-              //self.id,
-              self.data, self.stazione, self.superficie,
-              self.num_passaggio, self.codice_specie, self.lunghezza, self.peso
+            "RecordCsvCampionamentoNISECI: {{ data: [{}], stazione: [{}], num_passaggio: [{}], codice_specie: [{}], lunghezza: [{}], peso: [{}] }}",
+              self.data, self.stazione, self.num_passaggio,
+              self.codice_specie, self.lunghezza, self.peso
         );
         write!(f, "{}", string_representation)
     }
@@ -395,7 +407,6 @@ impl fmt::Display for RecordCsvCampionamentoNISECIError {
 }
 
 pub fn parse_recordcsv_campionamento_niseci(records: Vec<RecordCsvCampionamentoNISECI>, riferimento_specie: Vec<SpecieNISECI>) -> (Vec<RecordNISECI>,Vec<RecordCsvCampionamentoNISECIError>) {
-    //TODO: update when the model includes the missing fields
     let mut campioni = Vec::new();
     let mut errors = Vec::new();
     let mut idx = 0;
@@ -426,39 +437,13 @@ pub fn parse_recordcsv_campionamento_niseci(records: Vec<RecordCsvCampionamentoN
         }
 
 
-        let passaggio_cattura;
         //TODO: update this abomination when records change to have an integer directly
-        match r.num_passaggio.as_str() {
-            "c1" => {
-                passaggio_cattura = 1;
-            }
-            "c2" => {
-                passaggio_cattura = 2;
-            }
-            "c3" => {
-                passaggio_cattura = 3;
-            }
-            "c4" => {
-                passaggio_cattura = 4;
-            }
-            _ => {
-                let err = RecordCsvCampionamentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: num_passaggio non valido (non in [\"c1\", \"c2\" ... \"c4\"]): {}", r.num_passaggio) };
-                errors.push(err);
-                continue;
-            }
-        }
-
-        if r.lunghezza < 0 {
-            let err = RecordCsvCampionamentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: lunghezza < 0") };
+        if r.num_passaggio < 1 {
+            let err = RecordCsvCampionamentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: num_passaggio non valido (<1): {}", r.num_passaggio) };
             errors.push(err);
             continue;
         }
-
-        if r.peso < 0 {
-            let err = RecordCsvCampionamentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: peso < 0") };
-            errors.push(err);
-            continue;
-        }
+        let passaggio_cattura = r.num_passaggio;
 
         let niseci_rec = RecordNISECI {
             specie: matched_specie.clone(),
@@ -504,7 +489,6 @@ let string_representation = match self {
 }
 
 pub fn parse_recordcsv_riferimento_niseci(records: Vec<RecordCsvRiferimentoNISECI>) -> (Vec<SpecieNISECI>,Vec<RecordCsvRiferimentoNISECIError>) {
-    //TODO: update when the model includes the missing fields
     let mut specie = Vec::new();
     let mut errors = Vec::new();
     let mut idx = 0;
@@ -523,19 +507,8 @@ pub fn parse_recordcsv_riferimento_niseci(records: Vec<RecordCsvRiferimentoNISEC
                 continue;
             }
         }
-        if r.specie_attesa < 0 {
-            let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: specie_attesa < 0") };
-            errors.push(err);
-            continue;
-        }
         let specie_attesa = r.specie_attesa > 0; // TODO: possiamo prendere qualsiasi non-zero come
                                                  // "atteso"?
-        if r.tipo_autoctono < 0 {
-            let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: tipo_autoctono < 0") };
-            errors.push(err);
-            continue;
-        }
-
         let tipo_autoctono: u8;
         let tipo_alloctono: u8;
         if origine_autoctono {
@@ -662,8 +635,10 @@ pub struct RecordCsvAnagraficaNISECI {
     pub regione: String,
     pub provincia: String,
     pub data: String,
-    pub lunghezza_stazione: u32,
-    pub larghezza_stazione: u32,
+    #[serde(deserialize_with = "deserialize_comma_f32")]
+    pub lunghezza_stazione: f32,
+    #[serde(deserialize_with = "deserialize_comma_f32")]
+    pub larghezza_stazione: f32,
     pub tipo_comunita: u32,
     pub fonte: String,
     pub numero_protocollo: String,
@@ -791,12 +766,12 @@ pub fn parse_recordcsv_anagrafica_niseci(records: Vec<RecordCsvAnagraficaNISECI>
         }
     }
 
-    if r.lunghezza_stazione < 1 {
+    if r.lunghezza_stazione < 0.0 {
         let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Lunghezza stazione troppo bassa: {}", r.lunghezza_stazione) };
         errors.push(err);
     }
 
-    if r.larghezza_stazione < 1 {
+    if r.larghezza_stazione < 0.0 {
         let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Larghezza stazione troppo bassa: {}", r.larghezza_stazione) };
         errors.push(err);
     }
@@ -993,13 +968,13 @@ pub fn translate_error_message(msg: &str) -> String {
         msg.replace("invalid digit found in string", "tipo non valido: numero, attesa stringa")
             .replace("field", "campo")
     } else if msg.contains("invalid float literal") {
-        msg.replace("invalid float literal", "tipo non valido: atteso razionale").replace("field", "campo")
+        msg.replace("invalid float literal", "tipo non valido: atteso decimale").replace("field", "campo")
     } else if msg.contains("cannot parse") && msg.contains("from empty string") {
         // NOTE: there's a leading space in " from empty string", it enables us to attach the ","
         // to the previous part
         msg.replace("cannot parse", "campo vuoto: atteso")
             .replace("field","campo")
-            .replace("float","razionale")
+            .replace("float","decimale")
             .replace("integer","intero")
             .replace(" from empty string",", trovato: stringa vuota")
     } else if msg.contains("fields, but the previous record has") {
@@ -1249,14 +1224,13 @@ pub fn check_riferimento_niseci_reader<R: Read>(reader: R) -> Result<Vec<RecordC
     println!("Riferimento NISECI: Numero record csv non validi: {}", errors.len());
 
     if !errors.is_empty() {
-        eprintln!("Errori incontrati durante l'elaborazione csv del riferimento NISECI: {{");
         /*
         for error in &errors {
             eprintln!("  {}", error);
         }
         */
         let processed_errors = process_csv_errors(&errors, TipoRecordCsv::RiferimentoNISECI);
-        eprintln!("Errori incontrati durante l'elaborazione csv del campionamento NISECI: {{");
+        eprintln!("Errori incontrati durante l'elaborazione csv del riferimento NISECI: {{");
         for e in processed_errors {
             eprintln!("{e}");
         }

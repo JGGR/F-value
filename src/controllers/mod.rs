@@ -535,6 +535,50 @@ impl InfoAggiuntiveController {
         state.infoaggiuntive_model.set_valid(false);
     }
 
+    pub fn check_larghezza_stazione_string(&self, larghezza: &str) -> Result<f32,String> {
+        let s = larghezza.replace(',', "."); // Replace comma with dot
+        match s.parse::<f32>() {
+            Ok(value) => {
+                return Ok(value);
+            }
+            Err(e) => {
+                let mut err_msg = format!("Errore nella conversione larghezza stazione: {}", e);
+                if err_msg.contains("invalid float literal") {
+                    err_msg = err_msg.replace("invalid float literal", "tipo non valido: atteso decimale");
+                }
+                self.add_console_message(format!("InfoAggiuntiveController:  {err_msg}"));
+                let mut state = GLOBAL_STATE.lock().unwrap();
+                state.data_model.set_anagrafica_niseci(None);
+                state.infoaggiuntive_model.set_done_editing(false);
+                state.infoaggiuntive_model.set_valid(false);
+                state.infoaggiuntive_model.set_errors_occurred(true);
+                return Err(err_msg);
+            }
+        }
+    }
+
+    pub fn check_lunghezza_stazione_string(&self, lunghezza: &str) -> Result<f32,String> {
+        let s = lunghezza.replace(',', "."); // Replace comma with dot
+        match s.parse::<f32>() {
+            Ok(value) => {
+                return Ok(value);
+            }
+            Err(e) => {
+                let mut err_msg = format!("Errore nella conversione lunghezza stazione: {}", e);
+                if err_msg.contains("invalid float literal") {
+                    err_msg = err_msg.replace("invalid float literal", "tipo non valido: atteso decimale");
+                }
+                self.add_console_message(format!("InfoAggiuntiveController:  {err_msg}"));
+                let mut state = GLOBAL_STATE.lock().unwrap();
+                state.data_model.set_anagrafica_niseci(None);
+                state.infoaggiuntive_model.set_done_editing(false);
+                state.infoaggiuntive_model.set_valid(false);
+                state.infoaggiuntive_model.set_errors_occurred(true);
+                return Err(err_msg);
+            }
+        }
+    }
+
     pub fn valida_anagrafica_niseci(&self) {
 
         //We grab the state in a scope to ensure we don't get lock problems
@@ -983,8 +1027,16 @@ impl ConsoleController {
         Self
     }
 
-    pub fn update(&self, rl : &mut RaylibHandle) {
+    pub fn update(&self, rl: &mut RaylibHandle, main_state: &mut MainState) {
         let mut state = GLOBAL_STATE.lock().unwrap();
+
+        if state.console_model.should_backout() {
+            state.console_model.set_should_backout(false);
+            let prev = main_state.previous_view;
+            main_state.set_current_view(prev);
+            return;
+        }
+
         // Handle input
 
         let mwheel_move = rl.get_mouse_wheel_move() as i32;
@@ -1024,6 +1076,11 @@ impl ConsoleController {
     pub fn get_state(&self) -> ConsoleModel {
         let state = GLOBAL_STATE.lock().unwrap();
         return state.console_model.clone();
+    }
+
+    pub fn backout(&self) {
+        let mut state = GLOBAL_STATE.lock().unwrap();
+        state.console_model.set_should_backout(true);
     }
 
     pub fn _add_console_message(&self, msg: String) {

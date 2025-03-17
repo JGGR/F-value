@@ -18,6 +18,7 @@
 use std::collections::{VecDeque, HashMap};
 use raylib::prelude::*;
 use crate::{propwidth, propheight};
+use crate::controllers::ConsoleController;
 use raylib::consts::GuiIconName::ICON_MONITOR;
 use std::ffi::CString;
 
@@ -215,7 +216,7 @@ impl Console {
         }
     }
 
-    pub fn draw(&self, d: &mut RaylibDrawHandle, txt_color: Color, font_size: i32, font_spacing: i32, font: &Font) {
+    pub fn draw(&self, d: &mut RaylibDrawHandle, controller: &ConsoleController, txt_color: Color, font_size: i32, font_spacing: i32, font: &Font) {
         let line_height = propheight(&d, font_size + 4); // Adjust as needed
         let console_height = (self.max_lines_visible +1) * line_height as usize; // +1 for user
                                                                                  // prompt
@@ -242,22 +243,26 @@ impl Console {
             sidebox_x, sidebox_y, sidebox_width, sidebox_height, txt_color,
         );
 
-        // Suggestion for console button
-        let back_itext = d.gui_icon_text(ICON_MONITOR, Some(rstr!(": Indietro")));
-        let back_itext = CString::new(back_itext).unwrap();
-        let userinfo_x_padding = propwidth(&d, 10);
-        let userinfo_y_padding = propheight(&d, 50);
-        let userinfo_height = propheight(&d, 25);
+        let userinfo_y_padding = propheight(&d, 75);
+        // Backout button
+        let backout_itext = d.gui_icon_text(ICON_MONITOR, Some(rstr!(": Indietro")));
+        let backout_itext = CString::new(backout_itext).unwrap();
+        let backout_x = sidebox_x + sidebox_x_padding;
+        let backout_y = userinfo_y_padding;
+        let backout_width = sidebox_width - sidebox_x_padding*2;
+        let backout_height = propheight(&d, 30);
 
-        d.gui_label(
+        if d.gui_button(
             rrect(
-                sidebox_x + userinfo_x_padding,
-                userinfo_y_padding,
-                sidebox_width,
-                userinfo_height
+                backout_x,
+                backout_y,
+                backout_width,
+                backout_height
             ),
-            Some(back_itext.as_c_str())
-        );
+            Some(backout_itext.as_c_str())
+        ) {
+            controller.backout();
+        }
 
         for (i, line) in self
             .messages

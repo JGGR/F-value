@@ -52,6 +52,49 @@ pub fn draw_quit_win(d: &mut RaylibDrawHandle, showing_quit_win: &mut bool, shou
     }
 }
 
+pub fn draw_license_box(d: &mut RaylibDrawHandle, showing_license_box: &mut bool, font: &WeakFont, default_txt_spacing: i32, current_font_height: i32) {
+    if *showing_license_box {
+        let x_padding = propwidth(&d, 50);
+        let y_padding = propheight(&d, 100);
+        let bar_height = 23; // Height of the "x" bar
+        let copyright_notice_txt_bounds = font.measure_text(&COPYRIGHT_INFO, current_font_height as f32, default_txt_spacing as f32);
+        let licensebox_height = copyright_notice_txt_bounds.y as i32 + bar_height;
+        let licensebox_y = d.get_screen_height() / 2 - licensebox_height / 2;
+        let licensebox_width = x_padding *2 + copyright_notice_txt_bounds.x as i32;
+        let licensebox_x = d.get_screen_width() / 2 - licensebox_width / 2;
+        let result = d.gui_window_box(
+            rrect(
+                licensebox_x,
+                licensebox_y,
+                licensebox_width,
+                licensebox_height
+            ),
+            Some(rstr!("License"))
+        );
+
+        let copyright_label_width = copyright_notice_txt_bounds.x as i32;
+        let copyright_label_x = licensebox_x + x_padding;
+        let copyright_label_y = licensebox_y + y_padding;
+        let copyright_label_height = copyright_notice_txt_bounds.y as i32;
+
+        let copyright_label = CString::new(COPYRIGHT_INFO).unwrap();
+
+        d.gui_label(
+            rrect(
+                copyright_label_x,
+                copyright_label_y,
+                copyright_label_width,
+                copyright_label_height
+            ),
+            Some(copyright_label.as_c_str())
+        );
+
+        if result == true {
+            *showing_license_box = false;
+        }
+    }
+}
+
 pub fn draw_info_box(d: &mut RaylibDrawHandle, showing_info_box: &mut bool, font: &WeakFont, default_txt_spacing: i32, default_txt_color: Color, current_font_height: i32) {
     if *showing_info_box {
         d.draw_rectangle(
@@ -62,7 +105,7 @@ pub fn draw_info_box(d: &mut RaylibDrawHandle, showing_info_box: &mut bool, font
             Color::RAYWHITE.alpha(0.8),
         );
 
-        let bar_height = 23; // Height of the "x" bar
+        let bar_height = propheight(&d, 23); // Height of the "x" bar
 
         let itext = d.gui_icon_text(ICON_INFO, Some(rstr!("Program Info")));
         let itext = CString::new(itext).unwrap();
@@ -81,11 +124,16 @@ pub fn draw_info_box(d: &mut RaylibDrawHandle, showing_info_box: &mut bool, font
         //let proj_name_str1_y = proj_info_str_y + (proj_info_txt_bounds.y as i32 * 2);
         //let proj_name_str2_y = proj_name_str1_y + proj_name_str1_txt_bounds.y as i32;
 
-        let widest_line = std::cmp::max(proj_info_txt_bounds.x as i32, std::cmp::max(proj_name_str1_txt_bounds.x as i32, proj_name_str2_txt_bounds.x as i32));
+        let copyright_display_link = "Copyright (C) 2024-2025 jgabaut, gioninjo";
+        let copyright_actual_link = "https://spdx.org/licenses/GPL-3.0-only.html";
+
+        let copyright_display_link_txt_bounds = font.measure_text(&copyright_display_link, current_font_height as f32, default_txt_spacing as f32);
+
+        let widest_line_x_bound: i32 = copyright_display_link_txt_bounds.x as i32;
 
         let infobox_height = propheight(&d, 200) + proj_info_txt_bounds.y as i32 + proj_name_str1_txt_bounds.y as i32 + proj_name_str2_txt_bounds.y as i32;
         let infobox_y = d.get_screen_height() / 2 - infobox_height / 2;
-        let infobox_width = propwidth(&d, 100) + widest_line as i32;
+        let infobox_width = propwidth(&d, 100) + widest_line_x_bound as i32;
         let infobox_x = d.get_screen_width() / 2 - infobox_width / 2;
         let result = d.gui_window_box(
             rrect(
@@ -142,8 +190,6 @@ pub fn draw_info_box(d: &mut RaylibDrawHandle, showing_info_box: &mut bool, font
             default_txt_color
         );
 
-        let copyright_display_link = "Copyright (C) 2024-2025 jgabaut, gioninjo";
-        let copyright_actual_link = "https://spdx.org/licenses/GPL-3.0-only.html";
         let copyright_link_str = CString::new(copyright_display_link).unwrap();
         let copyright_link_x = infobox_x + propwidth(&d, 10);
         let copyright_link_y = proj_name_str2_y + proj_name_str2_txt_bounds.y as i32 + text_y_spacing*2;
@@ -409,7 +455,7 @@ pub fn draw_main(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
 
     let core_button_width = propwidth(&d, 25);
     let core_button_heigth = core_button_width;
-    let core_buttons_count = 4;
+    let core_buttons_count = 5;
     let core_buttons_x_padding = propwidth(&d, 5);
     let core_buttons_y_padding = core_buttons_x_padding;
     let core_buttons_panel_height = navbar_height;
@@ -478,10 +524,21 @@ pub fn draw_main(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
         }
     }
 
-    let settings_button_width = changeview_button_width;
-    let settings_button_x = changeview_button_x + changeview_button_width + core_buttons_x_padding;
-    let settings_button_height = changeview_button_height;
-    let settings_button_y = changeview_button_y;
+    // License button
+    let license_button_width = changeview_button_width;
+    let license_button_x = changeview_button_x + changeview_button_width + core_buttons_x_padding;
+    let license_button_height = changeview_button_height;
+    let license_button_y = changeview_button_y;
+    let itext = d.gui_icon_text(ICON_TEXT_NOTES, Some(rstr!("")));
+    let itext = CString::new(itext).unwrap();
+    if d.gui_button(rrect(license_button_x, license_button_y, license_button_width, license_button_height), Some(itext.as_c_str())) {
+        main_state.showing_license_box = true;
+    }
+
+    let settings_button_width = license_button_width;
+    let settings_button_x = license_button_x + license_button_width + core_buttons_x_padding;
+    let settings_button_height = license_button_height;
+    let settings_button_y = license_button_y;
 
     // Settings button
     let itext = d.gui_icon_text(ICON_GEAR, Some(rstr!("")));
@@ -501,11 +558,8 @@ pub fn draw_main(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
     if d.gui_button(rrect(console_button_x, console_button_y, console_button_width, console_button_height), Some(itext.as_c_str())) {
         match main_state.current_view {
             CurrentView::CONSOLE => {
-                if let Some(prev) = main_state.previous_view {
-                    main_state.set_current_view(prev);
-                } else {
-                    main_state.set_current_view(CurrentView::HOME);
-                }
+                let prev = main_state.previous_view;
+                main_state.set_current_view(prev);
             }
             _ => {
                 main_state.set_current_view(CurrentView::CONSOLE);
@@ -526,6 +580,14 @@ pub fn draw_main(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
     }
     draw_info_box(d, &mut main_state.showing_info_box, &main_state.current_font, main_state.default_txt_spacing, main_state.default_txt_color, main_state.current_font_height);
     if lock_gui && main_state.showing_info_box {
+        d.gui_lock();
+    }
+
+    if lock_gui && main_state.showing_license_box {
+        d.gui_unlock();
+    }
+    draw_license_box(d, &mut main_state.showing_license_box, &main_state.current_font, main_state.default_txt_spacing, main_state.current_font_height);
+    if lock_gui && main_state.showing_license_box {
         d.gui_lock();
     }
 
