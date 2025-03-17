@@ -24,6 +24,9 @@
 - Flag `--info` now also prints expected types
 - Fixed wrong message in error reports for `check_riferimento_niseci_reader`
 - Refactor theme loading into `core::controller::GuiTheme::load_and_set()`
+- Use double default font height on `GuiTheme::Light`
+  - At startup (`MainState` prep)
+  - On theme switch
 
 ## [0.0.11] - 2025-03-12
 

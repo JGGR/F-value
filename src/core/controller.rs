@@ -129,7 +129,7 @@ impl GuiTheme {
             }
         }
         let font_height_scale = match self {
-            //GuiTheme::Light => 2, // 10 is way too small for the default font height
+            GuiTheme::Light => 2, // 10 is way too small for the default font height
             _ => 1
         };
         main_state.default_font_height = rl.gui_get_style(DEFAULT, TEXT_SIZE as i32) * font_height_scale;
