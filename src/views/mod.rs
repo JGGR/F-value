@@ -706,7 +706,7 @@ impl SelezioneInfoAggiuntiveView {
             }
         };
 
-        let groupbox_width = propwidth(&d, 600);
+        let groupbox_width = propwidth(&d, 750);
         let groupbox_x = d.get_screen_width() /2 - groupbox_width /2;
         let groupbox_height = propheight(&d, 450);
         let groupbox_y = d.get_screen_height() / 2 - groupbox_height /2;
