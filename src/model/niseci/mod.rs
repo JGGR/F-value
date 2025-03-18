@@ -229,6 +229,20 @@ impl fmt::Display for TipoComunitaNISECI {
     }
 }
 
+impl TryFrom<i32> for TipoComunitaNISECI {
+    type Error = ();
+
+    fn try_from(v: i32) -> Result<Self, Self::Error> {
+        match v {
+            x if x == TipoComunitaNISECI::Redatta as i32 => Ok(TipoComunitaNISECI::Redatta),
+            x if x == TipoComunitaNISECI::Recuperata as i32 => Ok(TipoComunitaNISECI::Recuperata),
+            x if x == TipoComunitaNISECI::Dm260_2010 as i32 => Ok(TipoComunitaNISECI::Dm260_2010),
+            x if x == TipoComunitaNISECI::AffinataDalMase as i32 => Ok(TipoComunitaNISECI::AffinataDalMase),
+            _ => Err(()),
+        }
+    }
+}
+
 #[derive(Clone)]
 pub struct ComunitaNISECI {
   pub tipo: TipoComunitaNISECI,
@@ -274,6 +288,18 @@ impl fmt::Display for AreaNISECI {
             AreaNISECI::Mediterranea => format!("AreaNISECI: {{ Mediterranea }}"),
         };
         write!(f, "{}", string_representation)
+    }
+}
+
+impl TryFrom<i32> for AreaNISECI {
+    type Error = ();
+
+    fn try_from(v: i32) -> Result<Self, Self::Error> {
+        match v {
+            x if x == AreaNISECI::Alpina as i32 => Ok(AreaNISECI::Alpina),
+            x if x == AreaNISECI::Mediterranea as i32 => Ok(AreaNISECI::Mediterranea),
+            _ => Err(()),
+        }
     }
 }
 
@@ -360,6 +386,37 @@ impl fmt::Display for IdroEcoRegioneNISECI {
     };
     write!(f, "{}", string_representation)
   }
+}
+
+impl TryFrom<i32> for IdroEcoRegioneNISECI {
+    type Error = ();
+
+    fn try_from(v: i32) -> Result<Self, Self::Error> {
+        match v {
+            x if x == IdroEcoRegioneNISECI::AlpiCentroOrientali as i32 => Ok(IdroEcoRegioneNISECI::AlpiCentroOrientali),
+            x if x == IdroEcoRegioneNISECI::AlpiMediterranee as i32 => Ok(IdroEcoRegioneNISECI::AlpiMediterranee),
+            x if x == IdroEcoRegioneNISECI::AlpiMeridionali as i32 => Ok(IdroEcoRegioneNISECI::AlpiMeridionali),
+            x if x == IdroEcoRegioneNISECI::AlpiOccidentali as i32 => Ok(IdroEcoRegioneNISECI::AlpiOccidentali),
+            x if x == IdroEcoRegioneNISECI::AppenninoCentrale as i32 => Ok(IdroEcoRegioneNISECI::AppenninoCentrale),
+            x if x == IdroEcoRegioneNISECI::AppenninoMeridionale as i32 => Ok(IdroEcoRegioneNISECI::AppenninoMeridionale),
+            x if x == IdroEcoRegioneNISECI::AppenninoPiemontese as i32 => Ok(IdroEcoRegioneNISECI::AppenninoPiemontese),
+            x if x == IdroEcoRegioneNISECI::AppenninoSettentrionale as i32 => Ok(IdroEcoRegioneNISECI::AppenninoSettentrionale),
+            x if x == IdroEcoRegioneNISECI::BasilicataTavoliere as i32 => Ok(IdroEcoRegioneNISECI::BasilicataTavoliere),
+            x if x == IdroEcoRegioneNISECI::BassoLazio as i32 => Ok(IdroEcoRegioneNISECI::BassoLazio),
+            x if x == IdroEcoRegioneNISECI::CalabriaNebrodi as i32 => Ok(IdroEcoRegioneNISECI::CalabriaNebrodi),
+            x if x == IdroEcoRegioneNISECI::Carso as i32 => Ok(IdroEcoRegioneNISECI::Carso),
+            x if x == IdroEcoRegioneNISECI::CostaAdriatica as i32 => Ok(IdroEcoRegioneNISECI::CostaAdriatica),
+            x if x == IdroEcoRegioneNISECI::Monferrato as i32 => Ok(IdroEcoRegioneNISECI::Monferrato),
+            x if x == IdroEcoRegioneNISECI::PianuraPadana as i32 => Ok(IdroEcoRegioneNISECI::PianuraPadana),
+            x if x == IdroEcoRegioneNISECI::PrealpiDolomiti as i32 => Ok(IdroEcoRegioneNISECI::PrealpiDolomiti),
+            x if x == IdroEcoRegioneNISECI::PugliaGargano as i32 => Ok(IdroEcoRegioneNISECI::PugliaGargano),
+            x if x == IdroEcoRegioneNISECI::RomaViterbeseVesuvio as i32 => Ok(IdroEcoRegioneNISECI::RomaViterbeseVesuvio),
+            x if x == IdroEcoRegioneNISECI::Sardegna as i32 => Ok(IdroEcoRegioneNISECI::Sardegna),
+            x if x == IdroEcoRegioneNISECI::Sicilia as i32 => Ok(IdroEcoRegioneNISECI::Sicilia),
+            x if x == IdroEcoRegioneNISECI::Toscana as i32 => Ok(IdroEcoRegioneNISECI::Toscana),
+            _ => Err(()),
+        }
+    }
 }
 
 #[derive(Clone)]

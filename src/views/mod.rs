@@ -802,13 +802,8 @@ impl View for SelezioneInfoAggiuntiveView {
                 }
             };
 
-            //TODO: impl TryInto<u32> for TipoComunitaNISECI
-            //Which would also handle errors better than this crap
-            let tipo_comunita = match self.dropdownbox_tipocomunit_niseci_value {
-                0 => TipoComunitaNISECI::Redatta,
-                1 => TipoComunitaNISECI::Recuperata,
-                2 => TipoComunitaNISECI::Dm260_2010,
-                3 => TipoComunitaNISECI::AffinataDalMase,
+            let tipo_comunita = match <TipoComunitaNISECI as TryFrom<i32>>::try_from(self.dropdownbox_tipocomunit_niseci_value) {
+                Ok(v) => v,
                 _ => { panic!("Unexpected tipo_comunita in SelezioneInfoAggiuntiveView::draw()"); }
             };
             let mut opt_fonte: Option<String> = None;
@@ -843,15 +838,8 @@ impl View for SelezioneInfoAggiuntiveView {
                 fonte: opt_fonte,
                 numero_protocollo: opt_num_protocollo
             };
-            //TODO: impl TryInto<u32> for AreaNISECI
-            //Which would also handle errors better than this crap
-            let area = match self.combobox_area_niseci_value {
-                0 => { // 0 == Alpina I guess
-                    AreaNISECI::Alpina
-                }
-                1 => { // 1 == Mediterranea I guess
-                    AreaNISECI::Mediterranea
-                }
+            let area = match <AreaNISECI as TryFrom<i32>>::try_from(self.combobox_area_niseci_value) {
+                Ok(v) => v,
                 _ => { panic!("Unexpected area_niseci in SelezioneInfoAggiuntiveView::draw()"); }
             };
 
@@ -865,30 +853,8 @@ impl View for SelezioneInfoAggiuntiveView {
                 }
             };
 
-            //TODO: impl TryInto<u32> for IdroEcoRegioneNISECI
-            //Which would also handle errors better than this crap
-            let idro_ecoregione_niseci = match self.listview_idroecoregione_niseci_value {
-                0 => IdroEcoRegioneNISECI::AlpiCentroOrientali,
-                1 => IdroEcoRegioneNISECI::AlpiMediterranee,
-                2 => IdroEcoRegioneNISECI::AlpiMeridionali,
-                3 => IdroEcoRegioneNISECI::AlpiOccidentali,
-                4 => IdroEcoRegioneNISECI::AppenninoCentrale,
-                5 => IdroEcoRegioneNISECI::AppenninoMeridionale,
-                6 => IdroEcoRegioneNISECI::AppenninoPiemontese,
-                7 => IdroEcoRegioneNISECI::AppenninoSettentrionale,
-                8 => IdroEcoRegioneNISECI::BasilicataTavoliere,
-                9 => IdroEcoRegioneNISECI::BassoLazio,
-                10 => IdroEcoRegioneNISECI::CalabriaNebrodi,
-                11 => IdroEcoRegioneNISECI::Carso,
-                12 => IdroEcoRegioneNISECI::CostaAdriatica,
-                13 => IdroEcoRegioneNISECI::Monferrato,
-                14 => IdroEcoRegioneNISECI::PianuraPadana,
-                15 => IdroEcoRegioneNISECI::PrealpiDolomiti,
-                16 => IdroEcoRegioneNISECI::PugliaGargano,
-                17 => IdroEcoRegioneNISECI::RomaViterbeseVesuvio,
-                18 => IdroEcoRegioneNISECI::Sardegna,
-                19 => IdroEcoRegioneNISECI::Sicilia,
-                20 => IdroEcoRegioneNISECI::Toscana,
+            let idro_ecoregione_niseci = match <IdroEcoRegioneNISECI as TryFrom<i32>>::try_from(self.listview_idroecoregione_niseci_value) {
+                Ok(v) => v,
                 _ => { panic!("Unexpected idroecoregione_niseci in SelezioneInfoAggiuntiveView::draw()"); }
             };
 

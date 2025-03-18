@@ -33,7 +33,7 @@ pub fn update_main(rl: &mut RaylibHandle, main_state: &mut MainState) {
     let current_theme_idx = main_state.gui_theme_combobox_active;
 
     if current_theme_idx != main_state.theme as i32 {
-        match <i32 as TryInto<GuiTheme>>::try_into(current_theme_idx) {
+        match <GuiTheme as TryFrom<i32>>::try_from(current_theme_idx) {
             Ok(theme) => {
                 theme.load_and_set(rl, main_state);
             }
