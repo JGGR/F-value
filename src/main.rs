@@ -214,22 +214,22 @@ fn main() {
         // Current view update step
         match main_state.current_view {
             CurrentView::HOME => {
-                home_controller.update(&rl, &mut main_state);
+                home_controller.update(&mut rl, &mut main_state);
             }
             CurrentView::SECOND => {
-                second_controller.update(&rl, &mut main_state);
+                second_controller.update(&mut rl, &mut main_state);
             }
             CurrentView::SelezioneIndice => {
-                indice_controller.update(&rl, &mut main_state);
+                indice_controller.update(&mut rl, &mut main_state);
             }
             CurrentView::SelezioneFileInput | CurrentView::ValidazioneFileInput => {
-                fileinput_controller.update(&rl, &mut main_state);
+                fileinput_controller.update(&mut rl, &mut main_state);
             }
             CurrentView::SelezioneInfoAggiuntive | CurrentView::ValidazioneInfoAggiuntive => {
-                infoaggiuntive_controller.update(&rl, &mut main_state);
+                infoaggiuntive_controller.update(&mut rl, &mut main_state);
             }
             CurrentView::ProduzioneOutput | CurrentView::ProduzionePDF=> {
-                output_controller.update(&rl, &mut main_state);
+                output_controller.update(&mut rl, &mut main_state);
             }
             CurrentView::CONSOLE => {
                 console_controller.update(&mut rl, &mut main_state);

@@ -33,15 +33,19 @@ use raylib::consts::GuiIconName::{ICON_FILE_OPEN, ICON_BIN, ICON_OK_TICK, ICON_C
 use std::ffi::CString;
 use std::cmp::max;
 
+pub trait View {
+    type Controller: Controller;
+    fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &Self::Controller, main_state: &MainState);
+}
+
 // A view responsible for rendering the state
 // Tightly coupled with its respective controller
 pub struct HomeView {}
 
-impl HomeView {
-    pub fn new() -> Self {
-        Self {}
-    }
-    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &HomeController, main_state: &MainState) {
+impl View for HomeView {
+    type Controller = HomeController;
+
+    fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &Self::Controller, main_state: &MainState) {
         d.clear_background(main_state.default_bg_color);
 
         // Draw the state retrieved via the Controller
@@ -137,19 +141,21 @@ impl HomeView {
     }
 }
 
+impl HomeView {
+    pub fn new() -> Self {
+        Self {}
+    }
+}
+
 pub struct SecondView {
     spinner_value: i32,
     spinner_edit_mode: bool,
 }
 
-impl SecondView {
-    pub fn new() -> Self {
-        Self {
-            spinner_value: 0,
-            spinner_edit_mode: false,
-        }
-    }
-    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &SecondController, main_state: &MainState) {
+impl View for SecondView {
+    type Controller = SecondController;
+
+    fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &Self::Controller, main_state: &MainState) {
         d.clear_background(main_state.default_bg_color);
 
         // Draw the state retrieved via the Controller
@@ -276,19 +282,23 @@ impl SecondView {
     }
 }
 
+impl SecondView {
+    pub fn new() -> Self {
+        Self {
+            spinner_value: 0,
+            spinner_edit_mode: false,
+        }
+    }
+}
+
 pub struct SelezioneIndiceView {
 
 }
 
-impl SelezioneIndiceView {
+impl View for SelezioneIndiceView {
+    type Controller = IndiceController;
 
-    pub fn new() -> Self {
-        Self {
-
-        }
-    }
-
-    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &IndiceController, main_state: &MainState) {
+    fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &Self::Controller, main_state: &MainState) {
 
         d.clear_background(main_state.default_bg_color);
 
@@ -346,19 +356,23 @@ impl SelezioneIndiceView {
     }
 }
 
-pub struct SelezioneFileInputView {
-
-}
-
-impl SelezioneFileInputView {
+impl SelezioneIndiceView {
 
     pub fn new() -> Self {
         Self {
 
         }
     }
+}
 
-    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &FileInputController, main_state: &MainState) {
+pub struct SelezioneFileInputView {
+
+}
+
+impl View for SelezioneFileInputView {
+    type Controller = FileInputController;
+
+    fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &Self::Controller, main_state: &MainState) {
 
         d.clear_background(main_state.default_bg_color);
 
@@ -488,19 +502,23 @@ impl SelezioneFileInputView {
     }
 }
 
-pub struct ValidazioneFileInputView {
-
-}
-
-impl ValidazioneFileInputView {
+impl SelezioneFileInputView {
 
     pub fn new() -> Self {
         Self {
 
         }
     }
+}
 
-    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &FileInputController, main_state: &MainState) {
+pub struct ValidazioneFileInputView {
+
+}
+
+impl View for ValidazioneFileInputView {
+    type Controller = FileInputController;
+
+    fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &Self::Controller, main_state: &MainState) {
 
         d.clear_background(main_state.default_bg_color);
 
@@ -592,6 +610,15 @@ impl ValidazioneFileInputView {
     }
 }
 
+impl ValidazioneFileInputView {
+
+    pub fn new() -> Self {
+        Self {
+
+        }
+    }
+}
+
 pub struct SelezioneInfoAggiuntiveView {
     textbox_codice_stazione_edit_mode: bool,
     textbox_codice_stazione_buffer: [u8; 64],
@@ -620,88 +647,10 @@ pub struct SelezioneInfoAggiuntiveView {
     textbox_bacino_niseci_buffer: [u8; 64],
 }
 
-impl SelezioneInfoAggiuntiveView {
+impl View for SelezioneInfoAggiuntiveView {
+    type Controller = InfoAggiuntiveController;
 
-    pub fn new() -> Self {
-        let mut codice_stazione_buffer = [0u8; 64];
-        let codice_stazione_buffer_bytes = "Inserisci codice stazione".as_bytes();
-        let codice_stazione_buffer_len = codice_stazione_buffer_bytes.len().min(64);
-        codice_stazione_buffer[..codice_stazione_buffer_len].copy_from_slice(&codice_stazione_buffer_bytes[..codice_stazione_buffer_len]);
-
-        let mut corpo_idrico_buffer = [0u8; 64];
-        let corpo_idrico_buffer_bytes = "Inserisci nome".as_bytes();
-        let corpo_idrico_buffer_len = corpo_idrico_buffer_bytes.len().min(64);
-        corpo_idrico_buffer[..corpo_idrico_buffer_len].copy_from_slice(&corpo_idrico_buffer_bytes[..corpo_idrico_buffer_len]);
-
-        let mut regione_buffer = [0u8; 64];
-        let regione_buffer_bytes = "Inserisci regione".as_bytes();
-        let regione_buffer_len = regione_buffer_bytes.len().min(64);
-        regione_buffer[..regione_buffer_len].copy_from_slice(&regione_buffer_bytes[..regione_buffer_len]);
-
-        let mut provincia_buffer = [0u8; 64];
-        let provincia_buffer_bytes = "Inserisci provincia".as_bytes();
-        let provincia_buffer_len = provincia_buffer_bytes.len().min(64);
-        provincia_buffer[..provincia_buffer_len].copy_from_slice(&provincia_buffer_bytes[..provincia_buffer_len]);
-        let mut data_buffer = [0u8; 64];
-        let data_buffer_bytes = "Inserisci data".as_bytes();
-        let data_buffer_len = data_buffer_bytes.len().min(64);
-        data_buffer[..data_buffer_len].copy_from_slice(&data_buffer_bytes[..data_buffer_len]);
-
-        let mut lunghezza_stazione_buffer = [0u8; 64];
-        let lunghezza_stazione_buffer_bytes = "Inserisci lunghezza".as_bytes();
-        let lunghezza_stazione_buffer_len = lunghezza_stazione_buffer_bytes.len().min(64);
-        lunghezza_stazione_buffer[..lunghezza_stazione_buffer_len].copy_from_slice(&lunghezza_stazione_buffer_bytes[..lunghezza_stazione_buffer_len]);
-
-        let mut larghezza_stazione_buffer = [0u8; 64];
-        let larghezza_stazione_buffer_bytes = "Inserisci larghezza".as_bytes();
-        let larghezza_stazione_buffer_len = larghezza_stazione_buffer_bytes.len().min(64);
-        larghezza_stazione_buffer[..larghezza_stazione_buffer_len].copy_from_slice(&larghezza_stazione_buffer_bytes[..larghezza_stazione_buffer_len]);
-
-        let mut fonte_comunit_buffer = [0u8; 64];
-        let fonte_comunit_buffer_bytes = "Inserisci fonte".as_bytes();
-        let fonte_comunit_buffer_len = fonte_comunit_buffer_bytes.len().min(64);
-        fonte_comunit_buffer[..fonte_comunit_buffer_len].copy_from_slice(&fonte_comunit_buffer_bytes[..fonte_comunit_buffer_len]);
-
-        let mut protocollo_comunit_buffer = [0u8; 64];
-        let protocollo_comunit_buffer_bytes = "Inserisci protocollo".as_bytes();
-        let protocollo_comunit_buffer_len = protocollo_comunit_buffer_bytes.len().min(64);
-        protocollo_comunit_buffer[..protocollo_comunit_buffer_len].copy_from_slice(&protocollo_comunit_buffer_bytes[..protocollo_comunit_buffer_len]);
-
-        let mut bacino_buffer = [0u8; 64];
-        let bacino_buffer_bytes = "Inserisci bacino".as_bytes();
-        let bacino_buffer_len = bacino_buffer_bytes.len().min(64);
-        bacino_buffer[..bacino_buffer_len].copy_from_slice(&bacino_buffer_bytes[..bacino_buffer_len]);
-
-        Self {
-            textbox_codice_stazione_edit_mode: false,
-            textbox_codice_stazione_buffer: codice_stazione_buffer,
-            textbox_corpo_idrico_edit_mode: false,
-            textbox_corpo_idrico_buffer: corpo_idrico_buffer,
-            listview_regione_value: 0,
-            listview_regione_scroll_value: 0,
-            textbox_provincia_edit_mode: false,
-            textbox_provincia_buffer: provincia_buffer,
-            textbox_data_edit_mode: false,
-            textbox_data_buffer: data_buffer,
-            textbox_lunghezza_stazione_edit_mode: false,
-            textbox_lunghezza_stazione_buffer: lunghezza_stazione_buffer,
-            textbox_larghezza_stazione_edit_mode: false,
-            textbox_larghezza_stazione_buffer: larghezza_stazione_buffer,
-            dropdownbox_tipocomunit_niseci_edit_mode: false,
-            dropdownbox_tipocomunit_niseci_value: 0,
-            textbox_fontecomunit_niseci_edit_mode: false,
-            textbox_fontecomunit_niseci_buffer: fonte_comunit_buffer,
-            textbox_protocollocomunit_niseci_edit_mode: false,
-            textbox_protocollocomunit_niseci_buffer: protocollo_comunit_buffer,
-            listview_idroecoregione_niseci_value: 0,
-            listview_idroecoregione_niseci_scroll_value: 0,
-            combobox_area_niseci_value: 0,
-            textbox_bacino_niseci_edit_mode: false,
-            textbox_bacino_niseci_buffer: bacino_buffer,
-        }
-    }
-
-    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &InfoAggiuntiveController, main_state: &MainState) {
+    fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &Self::Controller, main_state: &MainState) {
 
         d.clear_background(main_state.default_bg_color);
 
@@ -1420,19 +1369,96 @@ impl SelezioneInfoAggiuntiveView {
     }
 }
 
+impl SelezioneInfoAggiuntiveView {
+
+    pub fn new() -> Self {
+        let mut codice_stazione_buffer = [0u8; 64];
+        let codice_stazione_buffer_bytes = "Inserisci codice stazione".as_bytes();
+        let codice_stazione_buffer_len = codice_stazione_buffer_bytes.len().min(64);
+        codice_stazione_buffer[..codice_stazione_buffer_len].copy_from_slice(&codice_stazione_buffer_bytes[..codice_stazione_buffer_len]);
+
+        let mut corpo_idrico_buffer = [0u8; 64];
+        let corpo_idrico_buffer_bytes = "Inserisci nome".as_bytes();
+        let corpo_idrico_buffer_len = corpo_idrico_buffer_bytes.len().min(64);
+        corpo_idrico_buffer[..corpo_idrico_buffer_len].copy_from_slice(&corpo_idrico_buffer_bytes[..corpo_idrico_buffer_len]);
+
+        let mut regione_buffer = [0u8; 64];
+        let regione_buffer_bytes = "Inserisci regione".as_bytes();
+        let regione_buffer_len = regione_buffer_bytes.len().min(64);
+        regione_buffer[..regione_buffer_len].copy_from_slice(&regione_buffer_bytes[..regione_buffer_len]);
+
+        let mut provincia_buffer = [0u8; 64];
+        let provincia_buffer_bytes = "Inserisci provincia".as_bytes();
+        let provincia_buffer_len = provincia_buffer_bytes.len().min(64);
+        provincia_buffer[..provincia_buffer_len].copy_from_slice(&provincia_buffer_bytes[..provincia_buffer_len]);
+        let mut data_buffer = [0u8; 64];
+        let data_buffer_bytes = "Inserisci data".as_bytes();
+        let data_buffer_len = data_buffer_bytes.len().min(64);
+        data_buffer[..data_buffer_len].copy_from_slice(&data_buffer_bytes[..data_buffer_len]);
+
+        let mut lunghezza_stazione_buffer = [0u8; 64];
+        let lunghezza_stazione_buffer_bytes = "Inserisci lunghezza".as_bytes();
+        let lunghezza_stazione_buffer_len = lunghezza_stazione_buffer_bytes.len().min(64);
+        lunghezza_stazione_buffer[..lunghezza_stazione_buffer_len].copy_from_slice(&lunghezza_stazione_buffer_bytes[..lunghezza_stazione_buffer_len]);
+
+        let mut larghezza_stazione_buffer = [0u8; 64];
+        let larghezza_stazione_buffer_bytes = "Inserisci larghezza".as_bytes();
+        let larghezza_stazione_buffer_len = larghezza_stazione_buffer_bytes.len().min(64);
+        larghezza_stazione_buffer[..larghezza_stazione_buffer_len].copy_from_slice(&larghezza_stazione_buffer_bytes[..larghezza_stazione_buffer_len]);
+
+        let mut fonte_comunit_buffer = [0u8; 64];
+        let fonte_comunit_buffer_bytes = "Inserisci fonte".as_bytes();
+        let fonte_comunit_buffer_len = fonte_comunit_buffer_bytes.len().min(64);
+        fonte_comunit_buffer[..fonte_comunit_buffer_len].copy_from_slice(&fonte_comunit_buffer_bytes[..fonte_comunit_buffer_len]);
+
+        let mut protocollo_comunit_buffer = [0u8; 64];
+        let protocollo_comunit_buffer_bytes = "Inserisci protocollo".as_bytes();
+        let protocollo_comunit_buffer_len = protocollo_comunit_buffer_bytes.len().min(64);
+        protocollo_comunit_buffer[..protocollo_comunit_buffer_len].copy_from_slice(&protocollo_comunit_buffer_bytes[..protocollo_comunit_buffer_len]);
+
+        let mut bacino_buffer = [0u8; 64];
+        let bacino_buffer_bytes = "Inserisci bacino".as_bytes();
+        let bacino_buffer_len = bacino_buffer_bytes.len().min(64);
+        bacino_buffer[..bacino_buffer_len].copy_from_slice(&bacino_buffer_bytes[..bacino_buffer_len]);
+
+        Self {
+            textbox_codice_stazione_edit_mode: false,
+            textbox_codice_stazione_buffer: codice_stazione_buffer,
+            textbox_corpo_idrico_edit_mode: false,
+            textbox_corpo_idrico_buffer: corpo_idrico_buffer,
+            listview_regione_value: 0,
+            listview_regione_scroll_value: 0,
+            textbox_provincia_edit_mode: false,
+            textbox_provincia_buffer: provincia_buffer,
+            textbox_data_edit_mode: false,
+            textbox_data_buffer: data_buffer,
+            textbox_lunghezza_stazione_edit_mode: false,
+            textbox_lunghezza_stazione_buffer: lunghezza_stazione_buffer,
+            textbox_larghezza_stazione_edit_mode: false,
+            textbox_larghezza_stazione_buffer: larghezza_stazione_buffer,
+            dropdownbox_tipocomunit_niseci_edit_mode: false,
+            dropdownbox_tipocomunit_niseci_value: 0,
+            textbox_fontecomunit_niseci_edit_mode: false,
+            textbox_fontecomunit_niseci_buffer: fonte_comunit_buffer,
+            textbox_protocollocomunit_niseci_edit_mode: false,
+            textbox_protocollocomunit_niseci_buffer: protocollo_comunit_buffer,
+            listview_idroecoregione_niseci_value: 0,
+            listview_idroecoregione_niseci_scroll_value: 0,
+            combobox_area_niseci_value: 0,
+            textbox_bacino_niseci_edit_mode: false,
+            textbox_bacino_niseci_buffer: bacino_buffer,
+        }
+    }
+}
+
 pub struct ValidazioneInfoAggiuntiveView {
 
 }
 
-impl ValidazioneInfoAggiuntiveView {
+impl View for ValidazioneInfoAggiuntiveView {
+    type Controller = InfoAggiuntiveController;
 
-    pub fn new() -> Self {
-        Self {
-
-        }
-    }
-
-    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &InfoAggiuntiveController, main_state: &MainState) {
+    fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &Self::Controller, main_state: &MainState) {
 
         d.clear_background(main_state.default_bg_color);
 
@@ -1518,19 +1544,23 @@ impl ValidazioneInfoAggiuntiveView {
     }
 }
 
-pub struct ProduzioneOutputView {
-
-}
-
-impl ProduzioneOutputView {
+impl ValidazioneInfoAggiuntiveView {
 
     pub fn new() -> Self {
         Self {
 
         }
     }
+}
 
-    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &OutputController, main_state: &MainState) {
+pub struct ProduzioneOutputView {
+
+}
+
+impl View for ProduzioneOutputView {
+    type Controller = OutputController;
+
+    fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &Self::Controller, main_state: &MainState) {
 
         d.clear_background(main_state.default_bg_color);
 
@@ -1804,19 +1834,23 @@ impl ProduzioneOutputView {
     }
 }
 
-pub struct ProduzionePDFView {
-
-}
-
-impl ProduzionePDFView {
+impl ProduzioneOutputView {
 
     pub fn new() -> Self {
         Self {
 
         }
     }
+}
 
-    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &OutputController, main_state: &MainState) {
+pub struct ProduzionePDFView {
+
+}
+
+impl View for ProduzionePDFView {
+    type Controller = OutputController;
+
+    fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &Self::Controller, main_state: &MainState) {
 
         d.clear_background(main_state.default_bg_color);
 
@@ -1884,6 +1918,15 @@ impl ProduzionePDFView {
     }
 }
 
+impl ProduzionePDFView {
+
+    pub fn new() -> Self {
+        Self {
+
+        }
+    }
+}
+
 fn rainbow_color_from_framecounter(frame_counter: u32, speed: f32) -> Color {
     let red = (0.5 * (1.0 + (frame_counter as f32 * speed).sin()) * 255.0) as u8;
     let green = (0.5 * (1.0 + (frame_counter as f32 * speed + 2.0).sin()) * 255.0) as u8;
@@ -1912,6 +1955,18 @@ pub struct ConsoleView {
     font_spacing : i32,
 }
 
+impl View for ConsoleView {
+    type Controller = ConsoleController;
+
+    fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &Self::Controller, main_state: &MainState) {
+        d.clear_background(main_state.default_bg_color);
+
+        let state = controller.get_state();
+
+        state.console.draw(d, controller, main_state.default_txt_color, self.current_font_size, self.font_spacing, &self.font);
+    }
+}
+
 impl ConsoleView {
     pub fn new(rl: &mut RaylibHandle, thread : &RaylibThread, font_size : i32, font_spacing: i32) -> Self {
         Self {
@@ -1924,12 +1979,5 @@ impl ConsoleView {
             current_font_size : font_size,
             font_spacing : font_spacing,
         }
-    }
-    pub fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &ConsoleController, main_state: &MainState) {
-        d.clear_background(main_state.default_bg_color);
-
-        let state = controller.get_state();
-
-        state.console.draw(d, controller, main_state.default_txt_color, self.current_font_size, self.font_spacing, &self.font);
     }
 }

@@ -28,15 +28,27 @@ use std::path::PathBuf;
 use raylib::consts::KeyboardKey::*;
 use chrono::format::ParseErrorKind;
 
+pub trait Controller {
+    type SubState; // Associated type for controller substate
+    fn update(&self, rl: &mut RaylibHandle, main_state: &mut MainState);
+    fn get_state(&self) -> Self::SubState;
+    fn add_console_message(&self, msg: String) {
+        let mut state = GLOBAL_STATE.lock().unwrap();
+        state.console_model.console.add_message(msg);
+    }
+    fn get_current_index(&self) -> Option<Indice> {
+        let state = GLOBAL_STATE.lock().unwrap();
+        return state.indice_model.get_selected_index();
+    }
+}
+
 // Controller to update and access the state
 pub struct HomeController;
 
-impl HomeController {
-    pub fn new() -> Self {
-        Self
-    }
+impl Controller for HomeController {
+    type SubState = HomeModel;
 
-    pub fn update(&self, _rl: &RaylibHandle, main_state: &mut MainState) {
+    fn update(&self, _rl: &mut RaylibHandle, main_state: &mut MainState) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.home_model.increment_frame_counter();
         match state.home_model.get_user_continued() {
@@ -49,9 +61,15 @@ impl HomeController {
         }
     }
 
-    pub fn get_state(&self) -> HomeModel {
+    fn get_state(&self) -> Self::SubState {
         let state = GLOBAL_STATE.lock().unwrap();
         return state.home_model.clone();
+    }
+}
+
+impl HomeController {
+    pub fn new() -> Self {
+        Self
     }
 
     pub fn set_user_continued(&self, val: bool) {
@@ -62,12 +80,9 @@ impl HomeController {
 
 pub struct SecondController;
 
-impl SecondController {
-    pub fn new() -> Self {
-        Self
-    }
-
-    pub fn update(&self, _rl: &RaylibHandle, main_state: &mut MainState) {
+impl Controller for SecondController {
+    type SubState = SecondModel;
+    fn update(&self, _rl: &mut RaylibHandle, main_state: &mut MainState) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.second_model.increment_frame_counter();
         state.second_model.set_name("Updated".to_string());
@@ -81,9 +96,16 @@ impl SecondController {
         }
     }
 
-    pub fn get_state(&self) -> SecondModel {
+    fn get_state(&self) -> Self::SubState {
         let state = GLOBAL_STATE.lock().unwrap();
         return state.second_model.clone();
+    }
+}
+
+impl SecondController {
+
+    pub fn new() -> Self {
+        Self
     }
 
     pub fn _set_name(&self, name: String) {
@@ -103,12 +125,10 @@ impl SecondController {
 
 pub struct IndiceController;
 
-impl IndiceController {
-    pub fn new() -> Self {
-        Self
-    }
+impl Controller for IndiceController {
+    type SubState = IndiceModel;
 
-    pub fn update(&self, _rl: &RaylibHandle, main_state: &mut MainState) {
+    fn update(&self, _rl: &mut RaylibHandle, main_state: &mut MainState) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.indice_model.increment_frame_counter();
 
@@ -121,26 +141,29 @@ impl IndiceController {
             None => ()
         }
     }
+    fn get_state(&self) -> Self::SubState {
+        let state = GLOBAL_STATE.lock().unwrap();
+        return state.indice_model.clone();
+    }
+}
+
+impl IndiceController {
+    pub fn new() -> Self {
+        Self
+    }
 
     pub fn set_indice_corrente(&self, index: Indice) -> () {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.indice_model.set_selected_index(index);
     }
-    pub fn _add_console_message(&self, msg: String) {
-        let mut state = GLOBAL_STATE.lock().unwrap();
-
-        state.console_model.console.add_message(msg);
-    }
 }
 
 pub struct FileInputController;
 
-impl FileInputController {
-    pub fn new() -> Self {
-        Self
-    }
+impl Controller for FileInputController {
+    type SubState = FileInputModel;
 
-    pub fn update(&self, _rl: &RaylibHandle, main_state: &mut MainState) {
+    fn update(&self, _rl: &mut RaylibHandle, main_state: &mut MainState) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.fileinput_model.increment_frame_counter();
 
@@ -253,14 +276,16 @@ impl FileInputController {
         }
     }
 
-    pub fn get_state(&self) -> FileInputModel {
+    fn get_state(&self) -> Self::SubState {
         let state = GLOBAL_STATE.lock().unwrap();
         return state.fileinput_model.clone();
     }
 
-    pub fn get_current_index(&self) -> Option<Indice> {
-        let state = GLOBAL_STATE.lock().unwrap();
-        return state.indice_model.get_selected_index();
+}
+
+impl FileInputController {
+    pub fn new() -> Self {
+        Self
     }
 
     pub fn get_riferimento_path(&self) -> Option<PathBuf> {
@@ -433,11 +458,6 @@ impl FileInputController {
             }
         }
     }
-    pub fn add_console_message(&self, msg: String) {
-        let mut state = GLOBAL_STATE.lock().unwrap();
-
-        state.console_model.console.add_message(msg);
-    }
     pub fn set_console_env(&self, (key, val): (String,String)) {
         let mut state = GLOBAL_STATE.lock().unwrap();
 
@@ -447,12 +467,10 @@ impl FileInputController {
 
 pub struct InfoAggiuntiveController;
 
-impl InfoAggiuntiveController {
-    pub fn new() -> Self {
-        Self
-    }
+impl Controller for InfoAggiuntiveController {
+    type SubState = InfoAggiuntiveModel;
 
-    pub fn update(&self, _rl: &RaylibHandle, main_state: &mut MainState) {
+    fn update(&self, _rl: &mut RaylibHandle, main_state: &mut MainState) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.infoaggiuntive_model.increment_frame_counter();
 
@@ -510,14 +528,15 @@ impl InfoAggiuntiveController {
 
     }
 
-    pub fn get_state(&self) -> InfoAggiuntiveModel {
+    fn get_state(&self) -> Self::SubState {
         let state = GLOBAL_STATE.lock().unwrap();
         return state.infoaggiuntive_model.clone();
     }
+}
 
-    pub fn get_current_index(&self) -> Option<Indice> {
-        let state = GLOBAL_STATE.lock().unwrap();
-        return state.indice_model.get_selected_index();
+impl InfoAggiuntiveController {
+    pub fn new() -> Self {
+        Self
     }
 
     pub fn get_data_anagrafica_niseci(&self) -> Option<AnagraficaNISECI> {
@@ -703,12 +722,6 @@ impl InfoAggiuntiveController {
         state.infoaggiuntive_model.set_valid(false);
     }
 
-    pub fn add_console_message(&self, msg: String) {
-        let mut state = GLOBAL_STATE.lock().unwrap();
-
-        state.console_model.console.add_message(msg);
-    }
-
     pub fn set_console_env(&self, (key, val): (String,String)) {
         let mut state = GLOBAL_STATE.lock().unwrap();
 
@@ -723,12 +736,10 @@ impl InfoAggiuntiveController {
 
 pub struct OutputController;
 
-impl OutputController {
-    pub fn new() -> Self {
-        Self
-    }
+impl Controller for OutputController {
+    type SubState = OutputModel;
 
-    pub fn update(&self, _rl: &RaylibHandle, main_state: &mut MainState) {
+    fn update(&self, _rl: &mut RaylibHandle, main_state: &mut MainState) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.output_model.increment_frame_counter();
         if state.data_model.get_errors_occurred() {
@@ -753,9 +764,15 @@ impl OutputController {
         }
     }
 
-    pub fn get_state(&self) -> OutputModel {
+    fn get_state(&self) -> Self::SubState {
         let state = GLOBAL_STATE.lock().unwrap();
         return state.output_model.clone();
+    }
+}
+
+impl OutputController {
+    pub fn new() -> Self {
+        Self
     }
 
     pub fn get_is_done_calc(&self) -> bool {
@@ -869,11 +886,6 @@ impl OutputController {
         }
     }
 
-
-    pub fn get_current_index(&self) -> Option<Indice> {
-        let state = GLOBAL_STATE.lock().unwrap();
-        return state.indice_model.get_selected_index();
-    }
 
     fn set_data_risultato_niseci(&self, risultato: RisultatoNISECI) {
         self.set_console_env(("risultato_niseci".to_string(), format!("{risultato}")));
@@ -993,12 +1005,6 @@ impl OutputController {
         state.output_model.set_done_user_confirm(true);
     }
 
-    pub fn add_console_message(&self, msg: String) {
-        let mut state = GLOBAL_STATE.lock().unwrap();
-
-        state.console_model.console.add_message(msg);
-    }
-
     pub fn set_console_env(&self, (key, val): (String,String)) {
         let mut state = GLOBAL_STATE.lock().unwrap();
 
@@ -1021,13 +1027,10 @@ impl _LogController {
 
 pub struct ConsoleController;
 
-impl ConsoleController {
+impl Controller for ConsoleController {
+    type SubState = ConsoleModel;
 
-    pub fn new() -> Self {
-        Self
-    }
-
-    pub fn update(&self, rl: &mut RaylibHandle, main_state: &mut MainState) {
+    fn update(&self, rl: &mut RaylibHandle, main_state: &mut MainState) {
         let mut state = GLOBAL_STATE.lock().unwrap();
 
         if state.console_model.should_backout() {
@@ -1073,20 +1076,21 @@ impl ConsoleController {
         state.console_model.set_name("Updated".to_string());
     }
 
-    pub fn get_state(&self) -> ConsoleModel {
+    fn get_state(&self) -> Self::SubState {
         let state = GLOBAL_STATE.lock().unwrap();
         return state.console_model.clone();
+    }
+}
+
+impl ConsoleController {
+
+    pub fn new() -> Self {
+        Self
     }
 
     pub fn backout(&self) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.console_model.set_should_backout(true);
-    }
-
-    pub fn _add_console_message(&self, msg: String) {
-        let mut state = GLOBAL_STATE.lock().unwrap();
-
-        state.console_model.console.add_message(msg);
     }
 
     pub fn _set_console_env(&self, (key, val): (String,String)) {
