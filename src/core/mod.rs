@@ -35,6 +35,7 @@ use serde::de::{self, Deserializer};
 use chrono::NaiveDate;
 use chrono::format::ParseErrorKind;
 use std::io::{self, Error, ErrorKind};
+use std::any::TypeId;
 
 pub const AUTHOR_JGABAUT: &'static str = "jgabaut";
 pub const AUTHOR_GIONINJO: &'static str = "gioninjo";
@@ -1104,12 +1105,20 @@ pub fn parse_recordcsv_anagrafica_niseci<T: RecordCsvAnagraficaNISECI>(records: 
 
 pub fn check_anagrafica_niseci_reader<R: Read, T>(reader: R) -> Result<Vec<T>,Vec<csv::Error>>
 where
-    T: RecordCsvAnagraficaNISECI
+    T: RecordCsvAnagraficaNISECI + 'static
 {
     let normalizing_reader = NormalizerReader::new(reader);
 
+    let type_id = TypeId::of::<T>();  // Get the TypeId of T at runtime
+
+    // Match on the TypeId to determine the actual type of T
+    let delimiter = match type_id {
+        id if id == TypeId::of::<VeryItalianRecordCsvAnagraficaNISECI>() => { b';' },
+        _ => { b',' }
+    };
+
     let rdr = csv::ReaderBuilder::new()
-        .delimiter(b';')
+        .delimiter(delimiter)
         .from_reader(normalizing_reader);
     let (records, errors) = parse_csv_anagrafica_niseci(rdr);
 
@@ -1172,7 +1181,7 @@ pub fn check_records_anagrafica_niseci<T: RecordCsvAnagraficaNISECI>(records: Ve
 
 pub fn check_anagrafica_niseci_path<T>(path: PathBuf) -> Result<Vec<T>,Vec<csv::Error>>
 where
-    T: RecordCsvAnagraficaNISECI
+    T: RecordCsvAnagraficaNISECI + 'static
 {
     if !check_path_is_file_ends_with_csv(&path) {
         eprintln!("Il file {} non è un .csv", path.display());
@@ -1444,13 +1453,21 @@ pub fn check_records_campionamento_niseci(records: Vec<RecordCsvCampionamentoNIS
 
 pub fn check_riferimento_niseci_reader<R: Read, T>(reader: R) -> Result<Vec<T>,Vec<csv::Error>>
 where
-    T: RecordCsvRiferimentoNISECI
+    T: RecordCsvRiferimentoNISECI + 'static
 {
 
     let normalizing_reader = NormalizerReader::new(reader);
 
+    let type_id = TypeId::of::<T>();  // Get the TypeId of T at runtime
+
+    // Match on the TypeId to determine the actual type of T
+    let delimiter = match type_id {
+        id if id == TypeId::of::<VeryItalianRecordCsvRiferimentoNISECI>() => { b';' },
+        _ => { b',' }
+    };
+
     let rdr = csv::ReaderBuilder::new()
-        .delimiter(b';')
+        .delimiter(delimiter)
         .from_reader(normalizing_reader);
     let (records, errors) = parse_csv_riferimento_niseci(rdr);
 
@@ -1484,7 +1501,7 @@ where
 
 pub fn check_riferimento_niseci_path<T>(path: PathBuf) -> Result<Vec<T>,Vec<csv::Error>>
 where
-    T: RecordCsvRiferimentoNISECI
+    T: RecordCsvRiferimentoNISECI + 'static
 {
     if !check_path_is_file_ends_with_csv(&path) {
         eprintln!("Il file {} non è un .csv", path.display());
