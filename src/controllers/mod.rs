@@ -28,6 +28,56 @@ use std::path::PathBuf;
 use raylib::consts::KeyboardKey::*;
 use chrono::format::ParseErrorKind;
 
+pub struct Controllers {
+    pub(crate) home_controller: HomeController,
+    pub(crate) second_controller: SecondController,
+    pub(crate) indice_controller: IndiceController,
+    pub(crate) fileinput_controller: FileInputController,
+    pub(crate) infoaggiuntive_controller: InfoAggiuntiveController,
+    pub(crate) output_controller: OutputController,
+    pub(crate) console_controller: ConsoleController
+}
+
+impl Controllers {
+    pub fn new() -> Self {
+        Self {
+            home_controller: HomeController::new(),
+            second_controller: SecondController::new(),
+            indice_controller: IndiceController::new(),
+            fileinput_controller: FileInputController::new(),
+            infoaggiuntive_controller: InfoAggiuntiveController::new(),
+            output_controller: OutputController::new(),
+            console_controller: ConsoleController::new()
+        }
+    }
+    pub fn update(&self, rl: &mut RaylibHandle, main_state: &mut MainState) {
+        // Current view update step
+        match main_state.current_view {
+            CurrentView::HOME => {
+                self.home_controller.update(rl, main_state);
+            }
+            CurrentView::SECOND => {
+                self.second_controller.update(rl, main_state);
+            }
+            CurrentView::SelezioneIndice => {
+                self.indice_controller.update(rl, main_state);
+            }
+            CurrentView::SelezioneFileInput | CurrentView::ValidazioneFileInput => {
+                self.fileinput_controller.update(rl, main_state);
+            }
+            CurrentView::SelezioneInfoAggiuntive | CurrentView::ValidazioneInfoAggiuntive => {
+                self.infoaggiuntive_controller.update(rl, main_state);
+            }
+            CurrentView::ProduzioneOutput | CurrentView::ProduzionePDF=> {
+                self.output_controller.update(rl, main_state);
+            }
+            CurrentView::CONSOLE => {
+                self.console_controller.update(rl, main_state);
+            }
+        }
+    }
+}
+
 pub trait Controller {
     type SubModel: SubModel; // Associated type for controller substate
     fn update(&self, rl: &mut RaylibHandle, main_state: &mut MainState);

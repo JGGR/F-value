@@ -34,6 +34,70 @@ use raylib::consts::GuiIconName::{ICON_FILE_OPEN, ICON_BIN, ICON_OK_TICK, ICON_C
 use std::ffi::CString;
 use std::cmp::max;
 
+pub struct Views {
+    home_view: HomeView,
+    second_view: SecondView,
+    selezione_indice_view: SelezioneIndiceView,
+    selezione_fileinput_view: SelezioneFileInputView,
+    validazione_fileinput_view: ValidazioneFileInputView,
+    selezione_infoaggiuntive_view: SelezioneInfoAggiuntiveView,
+    validazione_infoaggiuntive_view: ValidazioneInfoAggiuntiveView,
+    produzione_output_view: ProduzioneOutputView,
+    produzione_pdf_view: ProduzionePDFView,
+    console_view: ConsoleView,
+}
+
+impl Views {
+    pub fn new(rl: &mut RaylibHandle, thread: &RaylibThread, gui_current_font_height: i32, txt_spacing: i32) -> Self {
+        Self {
+            home_view: HomeView::new(),
+            second_view: SecondView::new(),
+            selezione_indice_view: SelezioneIndiceView::new(),
+            selezione_fileinput_view: SelezioneFileInputView::new(),
+            validazione_fileinput_view: ValidazioneFileInputView::new(),
+            selezione_infoaggiuntive_view: SelezioneInfoAggiuntiveView::new(),
+            validazione_infoaggiuntive_view: ValidazioneInfoAggiuntiveView::new(),
+            produzione_output_view: ProduzioneOutputView::new(),
+            produzione_pdf_view: ProduzionePDFView::new(),
+            console_view: ConsoleView::new(rl, &thread, gui_current_font_height, txt_spacing),
+        }
+    }
+    pub fn draw(&mut self, d: &mut RaylibDrawHandle, thread: &RaylibThread, controllers: &Controllers, main_state: &MainState) {
+        match main_state.current_view {
+            CurrentView::HOME => {
+                self.home_view.draw(d, &thread, &controllers.home_controller, &main_state);
+            }
+            CurrentView::SECOND => {
+                self.second_view.draw(d, &thread, &controllers.second_controller, &main_state);
+            }
+            CurrentView::SelezioneIndice => {
+                self.selezione_indice_view.draw(d, &thread, &controllers.indice_controller, &main_state);
+            }
+            CurrentView::SelezioneFileInput => {
+                self.selezione_fileinput_view.draw(d, &thread, &controllers.fileinput_controller, &main_state);
+            }
+            CurrentView::ValidazioneFileInput => {
+                self.validazione_fileinput_view.draw(d, &thread, &controllers.fileinput_controller, &main_state);
+            }
+            CurrentView::SelezioneInfoAggiuntive => {
+                self.selezione_infoaggiuntive_view.draw(d, &thread, &controllers.infoaggiuntive_controller, &main_state);
+            }
+            CurrentView::ValidazioneInfoAggiuntive => {
+                self.validazione_infoaggiuntive_view.draw(d, &thread, &controllers.infoaggiuntive_controller, &main_state);
+            }
+            CurrentView::ProduzioneOutput => {
+                self.produzione_output_view.draw(d, &thread, &controllers.output_controller, &main_state);
+            }
+            CurrentView::ProduzionePDF => {
+                self.produzione_pdf_view.draw(d, &thread, &controllers.output_controller, &main_state);
+            }
+            CurrentView::CONSOLE => {
+                self.console_view.draw(d, &thread, &controllers.console_controller, &main_state);
+            }
+        }
+    }
+}
+
 pub trait View {
     type Controller: Controller;
     fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &Self::Controller, main_state: &MainState);

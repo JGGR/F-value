@@ -24,6 +24,10 @@ use std::fmt;
 use std::path::PathBuf;
 use std::io::Read;
 use std::fs::File;
+use crate::controllers::Controllers;
+use crate::views::Views;
+use crate::core::controller::update_main;
+use crate::core::view::draw_main;
 use crate::model::niseci::{SpecieNISECI, RecordNISECI, AnagraficaNISECI, AreaNISECI, TipoComunitaNISECI, ComunitaNISECI, IdroEcoRegioneNISECI};
 use crate::model::location::Location;
 use serde::Deserialize;
@@ -242,6 +246,36 @@ impl MainState {
 
     pub fn get_gui_should_lock(&self) -> bool {
         return self.showing_quit_win || self.showing_info_box || self.showing_settings_box || self.showing_license_box;
+    }
+
+    pub fn mainloop(&mut self, rl: &mut RaylibHandle, thread: &RaylibThread, controllers: &Controllers, views: &mut Views) {
+        while !self.should_quit {
+
+            // Base update step
+            update_main(rl, self);
+
+            controllers.update(rl, self);
+
+            let mut d = rl.begin_drawing(&thread);
+
+            let lock_view = self.get_gui_should_lock();
+
+            if lock_view {
+                d.gui_lock();
+            }
+
+            // Ask the view for render, passing the controller for state changes
+            // Current view draw step
+            views.draw(&mut d, &thread, controllers, &self);
+
+            if lock_view {
+                d.gui_unlock();
+            }
+
+            // Base draw step
+            // Render stuff not depending on view
+            draw_main(&mut d, self);
+        }
     }
 }
 

@@ -28,8 +28,6 @@ mod engines;
 mod tests;
 
 use crate::core::*;
-use crate::core::view::*;
-use crate::core::controller::*;
 use crate::core::cli::*;
 use crate::controllers::*;
 use crate::views::*;
@@ -147,23 +145,6 @@ fn main() {
         }
     }
 
-    let home_controller = HomeController::new();
-    let mut home_view = HomeView::new();
-    let second_controller = SecondController::new();
-    let mut second_view = SecondView::new();
-    let indice_controller = IndiceController::new();
-    let mut selezione_indice_view = SelezioneIndiceView::new();
-    let fileinput_controller = FileInputController::new();
-    let mut selezione_fileinput_view = SelezioneFileInputView::new();
-    let mut validazione_fileinput_view = ValidazioneFileInputView::new();
-    let infoaggiuntive_controller = InfoAggiuntiveController::new();
-    let mut selezione_infoaggiuntive_view = SelezioneInfoAggiuntiveView::new();
-    let mut validazione_infoaggiuntive_view = ValidazioneInfoAggiuntiveView::new();
-    let output_controller = OutputController::new();
-    let mut produzione_output_view = ProduzioneOutputView::new();
-    let mut produzione_pdf_view = ProduzionePDFView::new();
-    let console_controller = ConsoleController::new();
-
     let window_title = format!("esox v{SHORT_PROJECT_VERSION}");
 
     let (mut rl, thread) = raylib::init()
@@ -204,87 +185,10 @@ fn main() {
         logo_texture
     );
 
-    let mut console_view = ConsoleView::new(&mut rl, &thread, gui_current_font_height, txt_spacing);
+    let controllers = Controllers::new();
 
-    while !main_state.should_quit {
+    let mut views = Views::new(&mut rl, &thread, gui_current_font_height, txt_spacing);
 
-        // Base update step
-        update_main(&mut rl, &mut main_state);
+    main_state.mainloop(&mut rl, &thread, &controllers, &mut views);
 
-        // Current view update step
-        match main_state.current_view {
-            CurrentView::HOME => {
-                home_controller.update(&mut rl, &mut main_state);
-            }
-            CurrentView::SECOND => {
-                second_controller.update(&mut rl, &mut main_state);
-            }
-            CurrentView::SelezioneIndice => {
-                indice_controller.update(&mut rl, &mut main_state);
-            }
-            CurrentView::SelezioneFileInput | CurrentView::ValidazioneFileInput => {
-                fileinput_controller.update(&mut rl, &mut main_state);
-            }
-            CurrentView::SelezioneInfoAggiuntive | CurrentView::ValidazioneInfoAggiuntive => {
-                infoaggiuntive_controller.update(&mut rl, &mut main_state);
-            }
-            CurrentView::ProduzioneOutput | CurrentView::ProduzionePDF=> {
-                output_controller.update(&mut rl, &mut main_state);
-            }
-            CurrentView::CONSOLE => {
-                console_controller.update(&mut rl, &mut main_state);
-            }
-        }
-
-        let mut d = rl.begin_drawing(&thread);
-
-        let lock_view = main_state.get_gui_should_lock();
-
-        if lock_view {
-            d.gui_lock();
-        }
-
-        // Ask the view for render, passing the controller for state changes
-        // Current view draw step
-        match main_state.current_view {
-            CurrentView::HOME => {
-                home_view.draw(&mut d, &thread, &home_controller, &main_state);
-            }
-            CurrentView::SECOND => {
-                second_view.draw(&mut d, &thread, &second_controller, &main_state);
-            }
-            CurrentView::SelezioneIndice => {
-                selezione_indice_view.draw(&mut d, &thread, &indice_controller, &main_state);
-            }
-            CurrentView::SelezioneFileInput => {
-                selezione_fileinput_view.draw(&mut d, &thread, &fileinput_controller, &main_state);
-            }
-            CurrentView::ValidazioneFileInput => {
-                validazione_fileinput_view.draw(&mut d, &thread, &fileinput_controller, &main_state);
-            }
-            CurrentView::SelezioneInfoAggiuntive => {
-                selezione_infoaggiuntive_view.draw(&mut d, &thread, &infoaggiuntive_controller, &main_state);
-            }
-            CurrentView::ValidazioneInfoAggiuntive => {
-                validazione_infoaggiuntive_view.draw(&mut d, &thread, &infoaggiuntive_controller, &main_state);
-            }
-            CurrentView::ProduzioneOutput => {
-                produzione_output_view.draw(&mut d, &thread, &output_controller, &main_state);
-            }
-            CurrentView::ProduzionePDF => {
-                produzione_pdf_view.draw(&mut d, &thread, &output_controller, &main_state);
-            }
-            CurrentView::CONSOLE => {
-                console_view.draw(&mut d, &thread, &console_controller, &main_state);
-            }
-        }
-
-        if lock_view {
-            d.gui_unlock();
-        }
-
-        // Base draw step
-        // Render stuff not depending on view
-        draw_main(&mut d, &mut main_state);
-    }
 }
