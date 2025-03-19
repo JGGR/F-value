@@ -31,7 +31,7 @@ use crate::core::view::draw_main;
 use crate::model::niseci::{SpecieNISECI, RecordNISECI, AnagraficaNISECI, AreaNISECI, TipoComunitaNISECI, ComunitaNISECI, IdroEcoRegioneNISECI};
 use crate::model::location::Location;
 use serde::Deserialize;
-use serde::de::{self, Deserializer};
+use serde::de::{self, Deserializer, DeserializeOwned};
 use chrono::NaiveDate;
 use chrono::format::ParseErrorKind;
 use std::io::{self, Error, ErrorKind};
@@ -348,9 +348,46 @@ impl<R: Read> Read for NormalizerReader<R> {
     }
 }
 
+pub trait RecordCsvRiferimentoNISECI: serde::de::DeserializeOwned {
+    fn nome_comune(&self) -> String;
+    fn nome_latino(&self) -> String;
+    fn codice_specie(&self) -> String;
+    fn origine(&self) -> String;
+    fn tipo_autoctono(&self) -> u32;
+    fn allo_nocivita(&self) -> u32;
+    fn specie_attesa(&self) -> u32;
+    fn cl_soglia1(&self) -> u32;
+    fn cl_soglia2(&self) -> u32;
+    fn cl_soglia3(&self) -> u32;
+    fn cl_soglia4(&self) -> u32;
+    fn ad_juv_soglia1(&self) -> f32;
+    fn ad_juv_soglia2(&self) -> f32;
+    fn ad_juv_soglia3(&self) -> f32;
+    fn ad_juv_soglia4(&self) -> f32;
+    fn dens_soglia1(&self) -> f32;
+    fn dens_soglia2(&self) -> f32;
+}
+
+struct RecordCsvRiferimentoNISECIWrapper<T: RecordCsvRiferimentoNISECI>(T);
+
+impl<T: RecordCsvRiferimentoNISECI> fmt::Display for RecordCsvRiferimentoNISECIWrapper<T> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let string_representation = format!(
+            "RecordCsvRiferimentoNISECI: {{ nome_comune: [{}], nome_latino: [{}], codice_specie: [{}], origine: [{}], tipo_autoctono: [{}], allo_nocivita: [{}], specie_attesa: [{}], cl_soglia1: [{}], cl_soglia2: [{}], cl_soglia3: [{}], cl_soglia4: [{}], ad_juv_soglia1: [{}], ad_juv_soglia2: [{}], ad_juv_soglia3: [{}], ad_juv_soglia4: [{}], dens_soglia1: [{}], dens_soglia2: [{}] }}",
+              self.0.nome_comune(), self.0.nome_latino(), self.0.codice_specie(), self.0.origine(),
+              self.0.tipo_autoctono(), self.0.allo_nocivita(), self.0.specie_attesa(),
+              self.0.cl_soglia1(), self.0.cl_soglia2(), self.0.cl_soglia3(), self.0.cl_soglia4(),
+              self.0.ad_juv_soglia1(), self.0.ad_juv_soglia2(), self.0.ad_juv_soglia3(), self.0.ad_juv_soglia4(),
+              self.0.dens_soglia1(), self.0.dens_soglia2()
+        );
+        write!(f, "{}", string_representation)
+    }
+}
+
+
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct RecordCsvRiferimentoNISECI {
+pub struct RecordCsvRiferimentoNISECI_It {
     pub nome_comune: String,
     pub nome_latino: String,
     pub codice_specie: String,
@@ -376,18 +413,66 @@ pub struct RecordCsvRiferimentoNISECI {
     pub dens_soglia2: f32,
 }
 
-impl fmt::Display for RecordCsvRiferimentoNISECI {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let string_representation = format!(
-            "RecordCsvRiferimentoNISECI: {{ nome_comune: [{}], nome_latino: [{}], codice_specie: [{}], origine: [{}], tipo_autoctono: [{}], allo_nocivita: [{}], specie_attesa: [{}], cl_soglia1: [{}], cl_soglia2: [{}], cl_soglia3: [{}], cl_soglia4: [{}], ad_juv_soglia1: [{}], ad_juv_soglia2: [{}], ad_juv_soglia3: [{}], ad_juv_soglia4: [{}], dens_soglia1: [{}], dens_soglia2: [{}] }}",
-              self.nome_comune, self.nome_latino, self.codice_specie, self.origine,
-              self.tipo_autoctono, self.allo_nocivita, self.specie_attesa,
-              self.cl_soglia1, self.cl_soglia2, self.cl_soglia3, self.cl_soglia4,
-              self.ad_juv_soglia1, self.ad_juv_soglia2, self.ad_juv_soglia3, self.ad_juv_soglia4,
-              self.dens_soglia1, self.dens_soglia2
-        );
-        write!(f, "{}", string_representation)
-    }
+impl RecordCsvRiferimentoNISECI for RecordCsvRiferimentoNISECI_It {
+    fn nome_comune(&self) -> String { self.nome_comune.clone() }
+    fn nome_latino(&self) -> String { self.nome_latino.clone() }
+    fn codice_specie(&self) -> String { self.codice_specie.clone() }
+    fn origine(&self) -> String { self.origine.clone() }
+    fn tipo_autoctono(&self) -> u32 { self.tipo_autoctono }
+    fn allo_nocivita(&self) -> u32 { self.allo_nocivita }
+    fn specie_attesa(&self) -> u32 { self.specie_attesa }
+    fn cl_soglia1(&self) -> u32 { self.cl_soglia1 }
+    fn cl_soglia2(&self) -> u32 { self.cl_soglia2 }
+    fn cl_soglia3(&self) -> u32 { self.cl_soglia3 }
+    fn cl_soglia4(&self) -> u32 { self.cl_soglia4 }
+    fn ad_juv_soglia1(&self) -> f32 { self.ad_juv_soglia1 }
+    fn ad_juv_soglia2(&self) -> f32 { self.ad_juv_soglia2 }
+    fn ad_juv_soglia3(&self) -> f32 { self.ad_juv_soglia3 }
+    fn ad_juv_soglia4(&self) -> f32 { self.ad_juv_soglia4 }
+    fn dens_soglia1(&self) -> f32 { self.dens_soglia1 }
+    fn dens_soglia2(&self) -> f32 { self.dens_soglia2 }
+}
+
+#[derive(Debug, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RecordCsvRiferimentoNISECI_Plain {
+    pub nome_comune: String,
+    pub nome_latino: String,
+    pub codice_specie: String,
+    pub origine: String,
+    pub tipo_autoctono: u32,
+    pub allo_nocivita: u32,
+    pub specie_attesa: u32,
+    pub cl_soglia1: u32, // in mm
+    pub cl_soglia2: u32, // in mm
+    pub cl_soglia3: u32, // in mm
+    pub cl_soglia4: u32, // in mm
+    pub ad_juv_soglia1: f32,
+    pub ad_juv_soglia2: f32,
+    pub ad_juv_soglia3: f32,
+    pub ad_juv_soglia4: f32,
+    pub dens_soglia1: f32,
+    pub dens_soglia2: f32,
+}
+
+impl RecordCsvRiferimentoNISECI for RecordCsvRiferimentoNISECI_Plain {
+    fn nome_comune(&self) -> String { self.nome_comune.clone() }
+    fn nome_latino(&self) -> String { self.nome_latino.clone() }
+    fn codice_specie(&self) -> String { self.codice_specie.clone() }
+    fn origine(&self) -> String { self.origine.clone() }
+    fn tipo_autoctono(&self) -> u32 { self.tipo_autoctono }
+    fn allo_nocivita(&self) -> u32 { self.allo_nocivita }
+    fn specie_attesa(&self) -> u32 { self.specie_attesa }
+    fn cl_soglia1(&self) -> u32 { self.cl_soglia1 }
+    fn cl_soglia2(&self) -> u32 { self.cl_soglia2 }
+    fn cl_soglia3(&self) -> u32 { self.cl_soglia3 }
+    fn cl_soglia4(&self) -> u32 { self.cl_soglia4 }
+    fn ad_juv_soglia1(&self) -> f32 { self.ad_juv_soglia1 }
+    fn ad_juv_soglia2(&self) -> f32 { self.ad_juv_soglia2 }
+    fn ad_juv_soglia3(&self) -> f32 { self.ad_juv_soglia3 }
+    fn ad_juv_soglia4(&self) -> f32 { self.ad_juv_soglia4 }
+    fn dens_soglia1(&self) -> f32 { self.dens_soglia1 }
+    fn dens_soglia2(&self) -> f32 { self.dens_soglia2 }
 }
 
 #[derive(Debug, serde::Deserialize)]
@@ -490,7 +575,11 @@ pub fn parse_recordcsv_campionamento_niseci(records: Vec<RecordCsvCampionamentoN
     (campioni, errors)
 }
 
-pub fn parse_csv_riferimento_niseci<R>(mut rdr: csv::Reader<R>) -> (Vec<RecordCsvRiferimentoNISECI>, Vec<csv::Error>) where R: std::io::Read {
+pub fn parse_csv_riferimento_niseci<R, T>(mut rdr: csv::Reader<R>) -> (Vec<T>, Vec<csv::Error>)
+where
+    R: std::io::Read,
+    T: RecordCsvRiferimentoNISECI
+{
     let mut records = Vec::new();
     let mut errors = Vec::new();
 
@@ -522,7 +611,8 @@ let string_representation = match self {
   }
 }
 
-pub fn parse_recordcsv_riferimento_niseci(records: Vec<RecordCsvRiferimentoNISECI>) -> (Vec<SpecieNISECI>,Vec<RecordCsvRiferimentoNISECIError>) {
+pub fn parse_recordcsv_riferimento_niseci<T: RecordCsvRiferimentoNISECI>(records: Vec<T>) -> (Vec<SpecieNISECI>,Vec<RecordCsvRiferimentoNISECIError>)
+{
     let mut specie = Vec::new();
     let mut errors = Vec::new();
     let mut idx = 0;
@@ -530,28 +620,28 @@ pub fn parse_recordcsv_riferimento_niseci(records: Vec<RecordCsvRiferimentoNISEC
     for r in records {
         idx += 1;
         let mut origine_autoctono = true;
-        match r.origine.as_str() {
+        match r.origine().as_str() {
             "ALL" => {
                 origine_autoctono = false;
             },
             "AUT" => {},
             _ => {
-                let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: origine invalida (non \"AUT\" o \"ALL\"): {}", r.origine) };
+                let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: origine invalida (non \"AUT\" o \"ALL\"): {}", r.origine()) };
                 errors.push(err);
                 continue;
             }
         }
-        let specie_attesa = r.specie_attesa > 0; // TODO: possiamo prendere qualsiasi non-zero come
+        let specie_attesa = r.specie_attesa() > 0; // TODO: possiamo prendere qualsiasi non-zero come
                                                  // "atteso"?
         let tipo_autoctono: u8;
         let tipo_alloctono: u8;
         if origine_autoctono {
-            match r.tipo_autoctono {
+            match r.tipo_autoctono() {
                 1 | 2 => {
-                    tipo_autoctono = r.tipo_autoctono as u8;
+                    tipo_autoctono = r.tipo_autoctono() as u8;
                 }
                 _ => {
-                    let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: tipo_autoctono non valido (non 1 o 2): {}", r.tipo_autoctono) };
+                    let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: tipo_autoctono non valido (non 1 o 2): {}", r.tipo_autoctono()) };
                     errors.push(err);
                     continue;
                 }
@@ -559,25 +649,25 @@ pub fn parse_recordcsv_riferimento_niseci(records: Vec<RecordCsvRiferimentoNISEC
             tipo_alloctono = 0;
         } else {
             tipo_autoctono = 0;
-            match r.allo_nocivita {
+            match r.allo_nocivita() {
                 0 | 1 | 2 | 3 => {
-                    tipo_alloctono = r.allo_nocivita as u8;
+                    tipo_alloctono = r.allo_nocivita() as u8;
                 }
                 _ => {
-                    let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: allo_nocivita non valido (non [0..3]): {}", r.allo_nocivita) };
+                    let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: allo_nocivita non valido (non [0..3]): {}", r.allo_nocivita()) };
                     errors.push(err);
                     continue;
                 }
             }
         }
 
-        if r.codice_specie.len() < 1 {
+        if r.codice_specie().len() < 1 {
             let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: codice_specie non valido (lunghezza < 1)") };
             errors.push(err);
             continue;
         }
 
-        let id = r.codice_specie.clone();
+        let id = r.codice_specie();
 
         if used_id_specie.contains(&id) {
             let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: codice_specie non valido (ridefinizione)") };
@@ -585,38 +675,38 @@ pub fn parse_recordcsv_riferimento_niseci(records: Vec<RecordCsvRiferimentoNISEC
             continue;
         }
 
-        let nome =  r.nome_latino.clone(); //TODO: controllare se dovrebbe essere nome_comune
+        let nome =  r.nome_latino(); //TODO: controllare se dovrebbe essere nome_comune
 
         //TODO: update when SpecieNISECI has the missing fields
 
         let epsilon: f32 = 1e-6;
 
         // Check dens_soglia
-        if r.dens_soglia1 < 0.0 {
+        if r.dens_soglia1() < 0.0 {
             let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: dens_soglia1 non valido (< 0)") };
             errors.push(err);
             continue;
         }
 
-        if r.dens_soglia1.abs() < epsilon && specie_attesa {
+        if r.dens_soglia1().abs() < epsilon && specie_attesa {
             let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: dens_soglia1 non valido (== 0) per una specie attesa") };
             errors.push(err);
             continue;
         }
 
-        if r.dens_soglia2 < 0.0 {
+        if r.dens_soglia2() < 0.0 {
             let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: dens_soglia2 non valido (< 0)") };
             errors.push(err);
             continue;
         }
 
-        if r.dens_soglia2.abs() < epsilon && specie_attesa {
+        if r.dens_soglia2().abs() < epsilon && specie_attesa {
             let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: dens_soglia2 non valido (== 0) per una specie attesa") };
             errors.push(err);
             continue;
         }
 
-        if r.dens_soglia1 >= r.dens_soglia2 && specie_attesa {
+        if r.dens_soglia1() >= r.dens_soglia2() && specie_attesa {
             let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: dens_soglia1 maggiore di dens_soglia2 per una specie attesa") };
             errors.push(err);
             continue;
@@ -643,16 +733,16 @@ pub fn parse_recordcsv_riferimento_niseci(records: Vec<RecordCsvRiferimentoNISEC
             tipo_autoctono: tipo_autoctono,
             tipo_alloctono: tipo_alloctono,
             specie_attesa: specie_attesa,
-            cl_soglia1: r.cl_soglia1, // in cm
-            cl_soglia2: r.cl_soglia2, // in cm
-            cl_soglia3: r.cl_soglia3, // in cm
-            cl_soglia4: r.cl_soglia4, // in cm
-            ad_juv_soglia1: r.ad_juv_soglia1,
-            ad_juv_soglia2: r.ad_juv_soglia2,
-            ad_juv_soglia3: r.ad_juv_soglia3,
-            ad_juv_soglia4: r.ad_juv_soglia4,
-            dens_soglia1: r.dens_soglia1,
-            dens_soglia2: r.dens_soglia2,
+            cl_soglia1: r.cl_soglia1(), // in cm
+            cl_soglia2: r.cl_soglia2(), // in cm
+            cl_soglia3: r.cl_soglia3(), // in cm
+            cl_soglia4: r.cl_soglia4(), // in cm
+            ad_juv_soglia1: r.ad_juv_soglia1(),
+            ad_juv_soglia2: r.ad_juv_soglia2(),
+            ad_juv_soglia3: r.ad_juv_soglia3(),
+            ad_juv_soglia4: r.ad_juv_soglia4(),
+            dens_soglia1: r.dens_soglia1(),
+            dens_soglia2: r.dens_soglia2(),
         };
         specie.push(specie_rec);
         used_id_specie.push(id);
@@ -661,9 +751,44 @@ pub fn parse_recordcsv_riferimento_niseci(records: Vec<RecordCsvRiferimentoNISEC
     (specie, errors)
 }
 
+pub trait RecordCsvAnagraficaNISECI: serde::de::DeserializeOwned {
+    fn codice_stazione(&self) -> String;
+    fn corpo_idrico(&self) -> String;
+    fn regione(&self) -> String;
+    fn provincia(&self) -> String;
+    fn data(&self) -> String;
+    fn lunghezza_stazione(&self) -> f32;
+    fn larghezza_stazione(&self) -> f32;
+    fn tipo_comunita(&self) -> u32;
+    fn fonte(&self) -> String;
+    fn numero_protocollo(&self) -> String;
+    fn idro_eco_regione(&self) -> u32;
+    fn area_alpina(&self) -> u32;
+    fn nome_bacino(&self) -> String;
+}
+
+struct RecordCsvAnagraficaNISECIWrapper<T: RecordCsvAnagraficaNISECI>(T);
+
+impl<T: RecordCsvAnagraficaNISECI> fmt::Display for RecordCsvAnagraficaNISECIWrapper<T> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let string_representation = format!(
+            "RecordAnagraficaNISECI: {{ codice_stazione: [{}], corpo_idrico: [{}],\
+            regione: [{}], provincia: [{}], data: [{}], lunghezza_stazione: [{}],\
+            larghezza_stazione: [{}], tipo_comunita [{}], fonte [{}],\
+            numero_protocollo: [{}], idro_eco_regione: [{}],\
+            area_alpina: [{}], nome_bacino: [{}]}}",
+            self.0.codice_stazione(), self.0.corpo_idrico(), self.0.regione(), self.0.provincia(),
+            self.0.data(), self.0.lunghezza_stazione(), self.0.larghezza_stazione(),
+            self.0.tipo_comunita(), self.0.fonte(), self.0.numero_protocollo(),
+            self.0.idro_eco_regione(), self.0.area_alpina(), self.0.nome_bacino()
+        );
+        write!(f, "{}", string_representation)
+    }
+}
+
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct RecordCsvAnagraficaNISECI {
+pub struct RecordCsvAnagraficaNISECI_It {
     pub codice_stazione: String,
     pub corpo_idrico: String,
     pub regione: String,
@@ -681,21 +806,54 @@ pub struct RecordCsvAnagraficaNISECI {
     pub nome_bacino: String,
 }
 
-impl fmt::Display for RecordCsvAnagraficaNISECI {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let string_representation = format!(
-            "RecordAnagraficaNISECI: {{ codice_stazione: [{}], corpo_idrico: [{}],\
-            regione: [{}], provincia: [{}], data: [{}], lunghezza_stazione: [{}],\
-            larghezza_stazione: [{}], tipo_comunita [{}], fonte [{}],\
-            numero_protocollo: [{}], idro_eco_regione: [{}],\
-            area_alpina: [{}], nome_bacino: [{}]}}",
-            self.codice_stazione, self.corpo_idrico, self.regione, self.provincia,
-            self.data, self.lunghezza_stazione, self.larghezza_stazione,
-            self.tipo_comunita, self.fonte, self.numero_protocollo,
-            self.idro_eco_regione, self.area_alpina, self.nome_bacino
-        );
-        write!(f, "{}", string_representation)
-    }
+impl RecordCsvAnagraficaNISECI for RecordCsvAnagraficaNISECI_It {
+    fn codice_stazione(&self) -> String { self.codice_stazione.clone() }
+    fn corpo_idrico(&self) -> String { self.corpo_idrico.clone() }
+    fn regione(&self) -> String { self.regione.clone() }
+    fn provincia(&self) -> String { self.provincia.clone() }
+    fn data(&self) -> String { self.data.clone() }
+    fn lunghezza_stazione(&self) -> f32 { self.lunghezza_stazione }
+    fn larghezza_stazione(&self) -> f32 { self.larghezza_stazione }
+    fn tipo_comunita(&self) -> u32 { self.tipo_comunita }
+    fn fonte(&self) -> String { self.fonte.clone() }
+    fn numero_protocollo(&self) -> String { self.numero_protocollo.clone() }
+    fn idro_eco_regione(&self) -> u32 { self.idro_eco_regione }
+    fn area_alpina(&self) -> u32 { self.area_alpina }
+    fn nome_bacino(&self) -> String { self.nome_bacino.clone() }
+}
+
+#[derive(Debug, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RecordCsvAnagraficaNISECI_Plain {
+    pub codice_stazione: String,
+    pub corpo_idrico: String,
+    pub regione: String,
+    pub provincia: String,
+    pub data: String,
+    pub lunghezza_stazione: f32,
+    pub larghezza_stazione: f32,
+    pub tipo_comunita: u32,
+    pub fonte: String,
+    pub numero_protocollo: String,
+    pub idro_eco_regione: u32,
+    pub area_alpina: u32,
+    pub nome_bacino: String,
+}
+
+impl RecordCsvAnagraficaNISECI for RecordCsvAnagraficaNISECI_Plain {
+    fn codice_stazione(&self) -> String { self.codice_stazione.clone() }
+    fn corpo_idrico(&self) -> String { self.corpo_idrico.clone() }
+    fn regione(&self) -> String { self.regione.clone() }
+    fn provincia(&self) -> String { self.provincia.clone() }
+    fn data(&self) -> String { self.data.clone() }
+    fn lunghezza_stazione(&self) -> f32 { self.lunghezza_stazione }
+    fn larghezza_stazione(&self) -> f32 { self.larghezza_stazione }
+    fn tipo_comunita(&self) -> u32 { self.tipo_comunita }
+    fn fonte(&self) -> String { self.fonte.clone() }
+    fn numero_protocollo(&self) -> String { self.numero_protocollo.clone() }
+    fn idro_eco_regione(&self) -> u32 { self.idro_eco_regione }
+    fn area_alpina(&self) -> u32 { self.area_alpina }
+    fn nome_bacino(&self) -> String { self.nome_bacino.clone() }
 }
 
 #[derive(Debug)]
@@ -712,7 +870,12 @@ impl fmt::Display for RecordCsvAnagraficaNISECIError {
   }
 }
 
-pub fn parse_csv_anagrafica_niseci<R>(mut rdr: csv::Reader<R>) -> (Vec<RecordCsvAnagraficaNISECI>, Vec<csv::Error>) where R: std::io::Read {
+
+pub fn parse_csv_anagrafica_niseci<R, T>(mut rdr: csv::Reader<R>) -> (Vec<T>, Vec<csv::Error>)
+where
+    R: std::io::Read,
+    T: RecordCsvAnagraficaNISECI
+{
     let mut records = Vec::new();
     let mut errors = Vec::new();
 
@@ -726,7 +889,7 @@ pub fn parse_csv_anagrafica_niseci<R>(mut rdr: csv::Reader<R>) -> (Vec<RecordCsv
     (records, errors)
 }
 
-pub fn parse_recordcsv_anagrafica_niseci(records: Vec<RecordCsvAnagraficaNISECI>) -> Result<AnagraficaNISECI, Vec<RecordCsvAnagraficaNISECIError>> {
+pub fn parse_recordcsv_anagrafica_niseci<T: RecordCsvAnagraficaNISECI>(records: Vec<T>) -> Result<AnagraficaNISECI, Vec<RecordCsvAnagraficaNISECIError>> {
     let mut errors = Vec::new();
     if records.len() > 1 {
         let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Troppi record: {}, atteso 1", records.len()) };
@@ -740,27 +903,27 @@ pub fn parse_recordcsv_anagrafica_niseci(records: Vec<RecordCsvAnagraficaNISECI>
 
     let r = records.get(0).unwrap();
 
-    if r.codice_stazione.len() < 1 {
-        let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Codice stazione troppo corto: {}", r.codice_stazione) };
+    if r.codice_stazione().len() < 1 {
+        let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Codice stazione troppo corto: {}", r.codice_stazione()) };
         errors.push(err);
     }
 
-    if r.corpo_idrico.len() < 1 {
-        let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Corpo idrico troppo corto: {}", r.corpo_idrico) };
+    if r.corpo_idrico().len() < 1 {
+        let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Corpo idrico troppo corto: {}", r.corpo_idrico()) };
         errors.push(err);
     }
 
-    if r.regione.len() < 1 {
-        let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Regione troppo corta: {}", r.regione) };
+    if r.regione().len() < 1 {
+        let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Regione troppo corta: {}", r.regione()) };
         errors.push(err);
     }
 
-    if r.provincia.len() < 1 {
-        let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Provincia troppo corta: {}", r.provincia) };
+    if r.provincia().len() < 1 {
+        let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Provincia troppo corta: {}", r.provincia()) };
         errors.push(err);
     }
 
-    match parse_date(&r.data) {
+    match parse_date(&r.data()) {
         Ok(_) => {},
         Err(e) => {
             match e.kind() {
@@ -800,18 +963,18 @@ pub fn parse_recordcsv_anagrafica_niseci(records: Vec<RecordCsvAnagraficaNISECI>
         }
     }
 
-    if r.lunghezza_stazione < 0.0 {
-        let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Lunghezza stazione troppo bassa: {}", r.lunghezza_stazione) };
+    if r.lunghezza_stazione() < 0.0 {
+        let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Lunghezza stazione troppo bassa: {}", r.lunghezza_stazione()) };
         errors.push(err);
     }
 
-    if r.larghezza_stazione < 0.0 {
-        let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Larghezza stazione troppo bassa: {}", r.larghezza_stazione) };
+    if r.larghezza_stazione() < 0.0 {
+        let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Larghezza stazione troppo bassa: {}", r.larghezza_stazione()) };
         errors.push(err);
     }
 
     let mut tipo_comunita = TipoComunitaNISECI::Redatta;
-    match r.tipo_comunita {
+    match r.tipo_comunita() {
         0 => { /* Redatta */ },
         1 => {
             tipo_comunita = TipoComunitaNISECI::Recuperata;
@@ -823,21 +986,21 @@ pub fn parse_recordcsv_anagrafica_niseci(records: Vec<RecordCsvAnagraficaNISECI>
             tipo_comunita = TipoComunitaNISECI::AffinataDalMase;
         },
         _ => {
-            let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Tipo comunita NISECI non valido: {}, atteso [0, 3]", r.tipo_comunita) };
+            let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Tipo comunita NISECI non valido: {}, atteso [0, 3]", r.tipo_comunita()) };
             errors.push(err);
         }
     }
 
     match tipo_comunita {
         TipoComunitaNISECI::Recuperata => {
-            if r.fonte.len() < 1 {
-                let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Fonte troppo corta: {}", r.fonte) };
+            if r.fonte().len() < 1 {
+                let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Fonte troppo corta: {}", r.fonte()) };
                 errors.push(err);
             }
         }
         TipoComunitaNISECI::AffinataDalMase => {
-            if r.numero_protocollo.len() < 1 {
-                let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Numero protocollo troppo corto: {}", r.numero_protocollo) };
+            if r.numero_protocollo().len() < 1 {
+                let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Numero protocollo troppo corto: {}", r.numero_protocollo()) };
                 errors.push(err);
             }
         }
@@ -845,7 +1008,7 @@ pub fn parse_recordcsv_anagrafica_niseci(records: Vec<RecordCsvAnagraficaNISECI>
     }
 
     let idro_eco_regione;
-    idro_eco_regione = match r.idro_eco_regione {
+    idro_eco_regione = match r.idro_eco_regione() {
         0 => IdroEcoRegioneNISECI::AlpiCentroOrientali,
         1 => IdroEcoRegioneNISECI::AlpiMediterranee,
         2 => IdroEcoRegioneNISECI::AlpiMeridionali,
@@ -868,19 +1031,19 @@ pub fn parse_recordcsv_anagrafica_niseci(records: Vec<RecordCsvAnagraficaNISECI>
         19 => IdroEcoRegioneNISECI::Sicilia,
         20 => IdroEcoRegioneNISECI::Toscana,
         _ => {
-            let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("IdroEcoRegioneNISECI non valido: {}, atteso [0, 20]", r.idro_eco_regione) };
+            let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("IdroEcoRegioneNISECI non valido: {}, atteso [0, 20]", r.idro_eco_regione()) };
             errors.push(err);
             IdroEcoRegioneNISECI::Toscana // To still assign something by default
         }
     };
 
     let mut area = AreaNISECI::Mediterranea;
-    if r.area_alpina > 0 {
+    if r.area_alpina() > 0 {
         area = AreaNISECI::Alpina;
     }
 
-    if r.nome_bacino.len() < 1 {
-        let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Nome bacino troppo corto: {}", r.nome_bacino) };
+    if r.nome_bacino().len() < 1 {
+        let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Nome bacino troppo corto: {}", r.nome_bacino()) };
         errors.push(err);
     }
 
@@ -891,27 +1054,30 @@ pub fn parse_recordcsv_anagrafica_niseci(records: Vec<RecordCsvAnagraficaNISECI>
     let res = AnagraficaNISECI {
         comunita: ComunitaNISECI {
             tipo: tipo_comunita,
-            fonte: Some(r.fonte.clone()),
-            numero_protocollo: Some(r.numero_protocollo.clone()),
+            fonte: Some(r.fonte()),
+            numero_protocollo: Some(r.numero_protocollo()),
         },
-        codice_stazione: r.codice_stazione.clone(),
-        date_string: r.data.clone(), // Formato gg/mm/aaaa
+        codice_stazione: r.codice_stazione(),
+        date_string: r.data(), // Formato gg/mm/aaaa
         area: area,
-        corpo_idrico: r.corpo_idrico.clone(),
-        bacino_appartenenza: r.nome_bacino.clone(),
+        corpo_idrico: r.corpo_idrico(),
+        bacino_appartenenza: r.nome_bacino(),
         idro_eco_regione: idro_eco_regione,
         posizione: Location {
-            regione: r.regione.clone(),
-            provincia: r.provincia.clone()
+            regione: r.regione(),
+            provincia: r.provincia()
         },
-        lunghezza_media_stazione: r.lunghezza_stazione as f32,
-        larghezza_media_stazione: r.larghezza_stazione as f32,
+        lunghezza_media_stazione: r.lunghezza_stazione(),
+        larghezza_media_stazione: r.larghezza_stazione(),
     };
     return Ok(res);
 
 }
 
-pub fn check_anagrafica_niseci_reader<R: Read>(reader: R) -> Result<Vec<RecordCsvAnagraficaNISECI>,Vec<csv::Error>> {
+pub fn check_anagrafica_niseci_reader<R: Read, T>(reader: R) -> Result<Vec<T>,Vec<csv::Error>>
+where
+    T: RecordCsvAnagraficaNISECI
+{
     let normalizing_reader = NormalizerReader::new(reader);
 
     let rdr = csv::ReaderBuilder::new()
@@ -947,7 +1113,7 @@ pub fn check_anagrafica_niseci_reader<R: Read>(reader: R) -> Result<Vec<RecordCs
     }
 }
 
-pub fn check_records_anagrafica_niseci(records: Vec<RecordCsvAnagraficaNISECI>) -> Result<AnagraficaNISECI,Vec<RecordCsvAnagraficaNISECIError>> {
+pub fn check_records_anagrafica_niseci<T: RecordCsvAnagraficaNISECI>(records: Vec<T>) -> Result<AnagraficaNISECI,Vec<RecordCsvAnagraficaNISECIError>> {
 
     let res = parse_recordcsv_anagrafica_niseci(records);
 
@@ -976,7 +1142,10 @@ pub fn check_records_anagrafica_niseci(records: Vec<RecordCsvAnagraficaNISECI>) 
     }
 }
 
-pub fn check_anagrafica_niseci_path(path: PathBuf) -> Result<Vec<RecordCsvAnagraficaNISECI>,Vec<csv::Error>> {
+pub fn check_anagrafica_niseci_path<T>(path: PathBuf) -> Result<Vec<T>,Vec<csv::Error>>
+where
+    T: RecordCsvAnagraficaNISECI
+{
     if !check_path_is_file_ends_with_csv(&path) {
         eprintln!("Il file {} non è un .csv", path.display());
         let err = csv::Error::from(Error::new(ErrorKind::Other, "Errore anagrafica NISECI: il file non è un .csv"));
@@ -1245,7 +1414,10 @@ pub fn check_records_campionamento_niseci(records: Vec<RecordCsvCampionamentoNIS
     }
 }
 
-pub fn check_riferimento_niseci_reader<R: Read>(reader: R) -> Result<Vec<RecordCsvRiferimentoNISECI>,Vec<csv::Error>> {
+pub fn check_riferimento_niseci_reader<R: Read, T>(reader: R) -> Result<Vec<T>,Vec<csv::Error>>
+where
+    T: RecordCsvRiferimentoNISECI
+{
 
     let normalizing_reader = NormalizerReader::new(reader);
 
@@ -1282,7 +1454,10 @@ pub fn check_riferimento_niseci_reader<R: Read>(reader: R) -> Result<Vec<RecordC
     }
 }
 
-pub fn check_riferimento_niseci_path(path: PathBuf) -> Result<Vec<RecordCsvRiferimentoNISECI>,Vec<csv::Error>> {
+pub fn check_riferimento_niseci_path<T>(path: PathBuf) -> Result<Vec<T>,Vec<csv::Error>>
+where
+    T: RecordCsvRiferimentoNISECI
+{
     if !check_path_is_file_ends_with_csv(&path) {
         eprintln!("Il file {} non è un .csv", path.display());
         let err = csv::Error::from(Error::new(ErrorKind::Other, "Errore riferimento NISECI: il file non è un .csv"));
@@ -1293,7 +1468,7 @@ pub fn check_riferimento_niseci_path(path: PathBuf) -> Result<Vec<RecordCsvRifer
     return check_riferimento_niseci_reader(file);
 }
 
-pub fn check_records_riferimento_niseci(records: Vec<RecordCsvRiferimentoNISECI>) -> Result<Vec<SpecieNISECI>,Vec<RecordCsvRiferimentoNISECIError>> {
+pub fn check_records_riferimento_niseci<T: RecordCsvRiferimentoNISECI>(records: Vec<T>) -> Result<Vec<SpecieNISECI>,Vec<RecordCsvRiferimentoNISECIError>> {
 
     let (records, errors) = parse_recordcsv_riferimento_niseci(records);
 
@@ -1324,15 +1499,16 @@ pub fn check_campionamento_hfbi_path(_path: PathBuf) -> bool {
     todo!("Implement check campionamento HFBI");
 }
 
-fn check_soglie_cl(r: &RecordCsvRiferimentoNISECI) -> bool {
-    if r.cl_soglia1 < r.cl_soglia2 && r.cl_soglia2 < r.cl_soglia3 && r.cl_soglia3 < r.cl_soglia4 {
+fn check_soglie_cl<T: RecordCsvRiferimentoNISECI>(r: &T) -> bool {
+
+    if r.cl_soglia1() < r.cl_soglia2() && r.cl_soglia2() < r.cl_soglia3() && r.cl_soglia3() < r.cl_soglia4() {
         return true;
     }
     false
 }
 
-fn check_soglie_ad_juv(r: &RecordCsvRiferimentoNISECI) -> bool {
-    if r.ad_juv_soglia1 < r.ad_juv_soglia2 && r.ad_juv_soglia2 < r.ad_juv_soglia3 && r.ad_juv_soglia3 < r.ad_juv_soglia4 {
+fn check_soglie_ad_juv<T: RecordCsvRiferimentoNISECI>(r: &T) -> bool {
+    if r.ad_juv_soglia1() < r.ad_juv_soglia2() && r.ad_juv_soglia2() < r.ad_juv_soglia3() && r.ad_juv_soglia3() < r.ad_juv_soglia4() {
         return true;
     }
     false

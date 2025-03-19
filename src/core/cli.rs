@@ -81,7 +81,8 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) -> bool {
         }
         let mut riferimento_csv_failed = false;
         let mut riferimento_valueparse_failed = false;
-        let riferimento_csv_check_res = check_riferimento_niseci_path(riferimento_path);
+        // Using italian deser for now
+        let riferimento_csv_check_res = check_riferimento_niseci_path::<RecordCsvRiferimentoNISECI_It>(riferimento_path);
         let mut riferimento_specie = Vec::new(); // Holds parsed SpecieNISECI
         match riferimento_csv_check_res {
             Ok(csv_recs) => {
@@ -233,7 +234,8 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) -> bool {
                 println!("Campione:  {:?}", c);
             }
             */
-            let anagrafica_csv_check_res = check_anagrafica_niseci_path(anagrafica_path);
+            // Using italian deser for now
+            let anagrafica_csv_check_res = check_anagrafica_niseci_path::<RecordCsvAnagraficaNISECI_It>(anagrafica_path);
             match anagrafica_csv_check_res {
                 Ok(csv_recs) => {
                     /* TODO: handle verbosity

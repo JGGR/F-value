@@ -16,7 +16,7 @@
 */
 
 use crate::model::core::*;
-use crate::core::{MainState, parse_date, TipoRecordCsv, check_campionamento_niseci_path, check_riferimento_niseci_path, check_records_riferimento_niseci, check_records_campionamento_niseci};
+use crate::core::{MainState, parse_date, TipoRecordCsv, RecordCsvRiferimentoNISECI_It, check_campionamento_niseci_path, check_riferimento_niseci_path, check_records_riferimento_niseci, check_records_campionamento_niseci};
 use crate::model::index::Indice;
 use crate::model::niseci::{RiferimentoNISECI, CampionamentoNISECI, AnagraficaNISECI, TipoComunitaNISECI, RisultatoNISECI, StatoEcologicoNISECI};
 use crate::state::GLOBAL_STATE;
@@ -373,7 +373,8 @@ impl FileInputController {
 
     pub fn valida_riferimento_niseci_path(&self) {
         if let Some(path) = self.get_riferimento_path() {
-            let csv_check = check_riferimento_niseci_path(path);
+            // Using italian deser for now
+            let csv_check = check_riferimento_niseci_path::<RecordCsvRiferimentoNISECI_It>(path);
 
             match csv_check {
                 Ok(records) => {
