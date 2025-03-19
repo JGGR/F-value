@@ -17,7 +17,7 @@
 
 use std::io::Cursor;
 
-use crate::{check_campionamento_niseci_reader, check_records_campionamento_niseci, check_records_riferimento_niseci, check_riferimento_niseci_reader, check_anagrafica_niseci_reader, check_records_anagrafica_niseci, model::niseci::SpecieNISECI, translate_error_message, RecordCsvCampionamentoNISECI, VeryItalianRecordCsvRiferimentoNISECI, VeryItalianRecordCsvAnagraficaNISECI, CAMPIONAMENTO_NISECI_HEADER, RIFERIMENTO_NISECI_HEADER, ANAGRAFICA_NISECI_HEADER};
+use crate::{check_campionamento_niseci_reader, check_records_campionamento_niseci, check_records_riferimento_niseci, check_riferimento_niseci_reader, check_anagrafica_niseci_reader, check_records_anagrafica_niseci, model::niseci::SpecieNISECI, translate_error_message, VeryItalianRecordCsvRiferimentoNISECI, VeryItalianRecordCsvCampionamentoNISECI, VeryItalianRecordCsvAnagraficaNISECI, CAMPIONAMENTO_NISECI_HEADER, RIFERIMENTO_NISECI_HEADER, ANAGRAFICA_NISECI_HEADER};
 
 #[test]
 fn test_csv_riferimento_niseci_found_string_expect_int() {
@@ -253,7 +253,7 @@ fn test_csv_campionamento_niseci_found_string_expect_int() {
         CAMPIONAMENTO_NISECI_HEADER
     );
     let reader = Cursor::new(csv_data);
-    let result = check_campionamento_niseci_reader(reader);
+    let result = check_campionamento_niseci_reader::<_, VeryItalianRecordCsvCampionamentoNISECI>(reader);
 
     assert!(result.is_err());
     let errors = result.err().unwrap();
@@ -269,7 +269,7 @@ fn test_csv_campionamento_niseci_found_empty_string_expect_int() {
         CAMPIONAMENTO_NISECI_HEADER
     );
     let reader = Cursor::new(csv_data);
-    let result = check_campionamento_niseci_reader(reader);
+    let result = check_campionamento_niseci_reader::<_, VeryItalianRecordCsvCampionamentoNISECI>(reader);
 
     assert!(result.is_err());
     let errors = result.err().unwrap();
@@ -285,7 +285,7 @@ fn test_csv_campionamento_niseci_found_float_expect_int() {
         CAMPIONAMENTO_NISECI_HEADER
     );
     let reader = Cursor::new(csv_data);
-    let result = check_campionamento_niseci_reader(reader);
+    let result = check_campionamento_niseci_reader::<_, VeryItalianRecordCsvCampionamentoNISECI>(reader);
 
     assert!(result.is_err());
     let errors = result.err().unwrap();
@@ -301,7 +301,7 @@ fn test_csv_campionamento_niseci_lessfields() {
         CAMPIONAMENTO_NISECI_HEADER
     );
     let reader = Cursor::new(csv_data);
-    let result = check_campionamento_niseci_reader(reader);
+    let result = check_campionamento_niseci_reader::<_, VeryItalianRecordCsvCampionamentoNISECI>(reader);
 
     assert!(result.is_err());
     let errors = result.err().unwrap();
@@ -320,7 +320,7 @@ fn test_valid_csv_campionamento_niseci() {
         CAMPIONAMENTO_NISECI_HEADER
     );
     let reader = Cursor::new(csv_data);
-    let result = check_campionamento_niseci_reader(reader);
+    let result = check_campionamento_niseci_reader::<_, VeryItalianRecordCsvCampionamentoNISECI>(reader);
 
     assert!(!result.is_err());
 }
@@ -329,7 +329,7 @@ fn test_valid_csv_campionamento_niseci() {
 fn test_empty_csv_campionamento_niseci() {
     let csv_data = CAMPIONAMENTO_NISECI_HEADER.to_string(); // Only header, no data
     let reader = Cursor::new(csv_data);
-    let result = check_campionamento_niseci_reader(reader);
+    let result = check_campionamento_niseci_reader::<_, VeryItalianRecordCsvCampionamentoNISECI>(reader);
 
     assert!(result.is_ok());
     let records = result.unwrap();
@@ -358,7 +358,7 @@ fn test_valid_recordcsv_campionamento_niseci() {
 
     let riferimento_specie = vec![specie_1];
 
-    let record_1 = RecordCsvCampionamentoNISECI {
+    let record_1 = VeryItalianRecordCsvCampionamentoNISECI {
         data: "07/07/2007".to_string(),
         stazione: "Foo".to_string(),
         num_passaggio: 1,

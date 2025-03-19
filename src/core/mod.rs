@@ -489,9 +489,20 @@ impl fmt::Display for PlainRecordCsvRiferimentoNISECI {
     }
 }
 
+pub trait RecordCsvCampionamentoNISECI: serde::de::DeserializeOwned {
+    #[allow(dead_code)]
+    fn data(&self) -> String;
+    #[allow(dead_code)]
+    fn stazione(&self) -> String;
+    fn num_passaggio(&self) -> u32;
+    fn codice_specie(&self) -> String;
+    fn lunghezza(&self) -> u32;
+    fn peso(&self) -> u32;
+}
+
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct RecordCsvCampionamentoNISECI {
+pub struct VeryItalianRecordCsvCampionamentoNISECI {
     pub data: String,
     pub stazione: String,
     pub num_passaggio: u32,
@@ -500,7 +511,16 @@ pub struct RecordCsvCampionamentoNISECI {
     pub peso: u32,
 }
 
-impl fmt::Display for RecordCsvCampionamentoNISECI {
+impl RecordCsvCampionamentoNISECI for VeryItalianRecordCsvCampionamentoNISECI {
+    fn data(&self) -> String { self.data.clone() }
+    fn stazione(&self) -> String { self.stazione.clone() }
+    fn num_passaggio(&self) -> u32 { self.num_passaggio }
+    fn codice_specie(&self) -> String { self.codice_specie.clone() }
+    fn lunghezza(&self) -> u32 { self.lunghezza }
+    fn peso(&self) -> u32 { self.peso }
+}
+
+impl fmt::Display for VeryItalianRecordCsvCampionamentoNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let string_representation = format!(
             "RecordCsvCampionamentoNISECI: {{ data: [{}], stazione: [{}], num_passaggio: [{}], codice_specie: [{}], lunghezza: [{}], peso: [{}] }}",
@@ -511,7 +531,42 @@ impl fmt::Display for RecordCsvCampionamentoNISECI {
     }
 }
 
-pub fn parse_csv_campionamento_niseci<R>(mut rdr: csv::Reader<R>) -> (Vec<RecordCsvCampionamentoNISECI>, Vec<csv::Error>) where R: std::io::Read {
+#[derive(Debug, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PlainRecordCsvCampionamentoNISECI {
+    pub data: String,
+    pub stazione: String,
+    pub num_passaggio: u32,
+    pub codice_specie: String,
+    pub lunghezza: u32,
+    pub peso: u32,
+}
+
+impl RecordCsvCampionamentoNISECI for PlainRecordCsvCampionamentoNISECI {
+    fn data(&self) -> String { self.data.clone() }
+    fn stazione(&self) -> String { self.stazione.clone() }
+    fn num_passaggio(&self) -> u32 { self.num_passaggio }
+    fn codice_specie(&self) -> String { self.codice_specie.clone() }
+    fn lunghezza(&self) -> u32 { self.lunghezza }
+    fn peso(&self) -> u32 { self.peso }
+}
+
+impl fmt::Display for PlainRecordCsvCampionamentoNISECI {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let string_representation = format!(
+            "RecordCsvCampionamentoNISECI: {{ data: [{}], stazione: [{}], num_passaggio: [{}], codice_specie: [{}], lunghezza: [{}], peso: [{}] }}",
+              self.data, self.stazione, self.num_passaggio,
+              self.codice_specie, self.lunghezza, self.peso
+        );
+        write!(f, "{}", string_representation)
+    }
+}
+
+pub fn parse_csv_campionamento_niseci<R, T>(mut rdr: csv::Reader<R>) -> (Vec<T>, Vec<csv::Error>)
+where
+    R: std::io::Read,
+    T: RecordCsvCampionamentoNISECI + 'static
+{
     let mut records = Vec::new();
     let mut errors = Vec::new();
 
@@ -539,18 +594,18 @@ impl fmt::Display for RecordCsvCampionamentoNISECIError {
   }
 }
 
-pub fn parse_recordcsv_campionamento_niseci(records: Vec<RecordCsvCampionamentoNISECI>, riferimento_specie: Vec<SpecieNISECI>) -> (Vec<RecordNISECI>,Vec<RecordCsvCampionamentoNISECIError>) {
+pub fn parse_recordcsv_campionamento_niseci<T: RecordCsvCampionamentoNISECI>(records: Vec<T>, riferimento_specie: Vec<SpecieNISECI>) -> (Vec<RecordNISECI>,Vec<RecordCsvCampionamentoNISECIError>) {
     let mut campioni = Vec::new();
     let mut errors = Vec::new();
     let mut idx = 0;
     for r in records {
         idx += 1;
-        if r.codice_specie.len() < 1 {
+        if r.codice_specie().len() < 1 {
             let err = RecordCsvCampionamentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: codice_specie non valido (lunghezza < 1)") };
             errors.push(err);
             continue;
         }
-        let codice_specie = r.codice_specie;
+        let codice_specie = r.codice_specie();
         let mut opt_matched_specie = None;
         for s in &riferimento_specie { // FIXME: this is O(n^2).
             if s.id == codice_specie {
@@ -571,18 +626,18 @@ pub fn parse_recordcsv_campionamento_niseci(records: Vec<RecordCsvCampionamentoN
 
 
         //TODO: update this abomination when records change to have an integer directly
-        if r.num_passaggio < 1 {
-            let err = RecordCsvCampionamentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: num_passaggio non valido (<1): {}", r.num_passaggio) };
+        if r.num_passaggio() < 1 {
+            let err = RecordCsvCampionamentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: num_passaggio non valido (<1): {}", r.num_passaggio()) };
             errors.push(err);
             continue;
         }
-        let passaggio_cattura = r.num_passaggio;
+        let passaggio_cattura = r.num_passaggio();
 
         let niseci_rec = RecordNISECI {
             specie: matched_specie.clone(),
             passaggio_cattura: passaggio_cattura as u8,
-            lunghezza: r.lunghezza as u32,
-            peso: r.peso as u32
+            lunghezza: r.lunghezza(),
+            peso: r.peso()
         };
         campioni.push(niseci_rec);
     }
@@ -1377,11 +1432,22 @@ fn check_path_is_file_ends_with_csv(path: &PathBuf) -> bool {
     }
 }
 
-pub fn check_campionamento_niseci_reader<R: Read>(reader: R) -> Result<Vec<RecordCsvCampionamentoNISECI>,Vec<csv::Error>> {
+pub fn check_campionamento_niseci_reader<R: Read, T>(reader: R) -> Result<Vec<T>,Vec<csv::Error>>
+where
+    T: RecordCsvCampionamentoNISECI + 'static
+{
     let normalizing_reader = NormalizerReader::new(reader);
 
+    let type_id = TypeId::of::<T>();  // Get the TypeId of T at runtime
+
+    // Match on the TypeId to determine the actual type of T
+    let delimiter = match type_id {
+        id if id == TypeId::of::<VeryItalianRecordCsvCampionamentoNISECI>() => { b';' },
+        _ => { b',' }
+    };
+
     let rdr = csv::ReaderBuilder::new()
-        .delimiter(b';')
+        .delimiter(delimiter)
         .from_reader(normalizing_reader);
     let (records, errors) = parse_csv_campionamento_niseci(rdr);
 
@@ -1413,7 +1479,10 @@ pub fn check_campionamento_niseci_reader<R: Read>(reader: R) -> Result<Vec<Recor
     }
 }
 
-pub fn check_campionamento_niseci_path(path: PathBuf) -> Result<Vec<RecordCsvCampionamentoNISECI>,Vec<csv::Error>> {
+pub fn check_campionamento_niseci_path<T>(path: PathBuf) -> Result<Vec<T>,Vec<csv::Error>>
+where
+    T: RecordCsvCampionamentoNISECI + 'static
+{
     if !check_path_is_file_ends_with_csv(&path) {
         eprintln!("Il file {} non è un .csv", path.display());
         let err = csv::Error::from(Error::new(ErrorKind::Other, "Errore campionamento NISECI: il file non è un .csv"));
@@ -1424,7 +1493,7 @@ pub fn check_campionamento_niseci_path(path: PathBuf) -> Result<Vec<RecordCsvCam
     return check_campionamento_niseci_reader(file);
 }
 
-pub fn check_records_campionamento_niseci(records: Vec<RecordCsvCampionamentoNISECI>, riferimento_specie: Vec<SpecieNISECI>) -> Result<Vec<RecordNISECI>,Vec<RecordCsvCampionamentoNISECIError>> {
+pub fn check_records_campionamento_niseci<T: RecordCsvCampionamentoNISECI>(records: Vec<T>, riferimento_specie: Vec<SpecieNISECI>) -> Result<Vec<RecordNISECI>,Vec<RecordCsvCampionamentoNISECIError>> {
 
     let (records, errors) = parse_recordcsv_campionamento_niseci(records, riferimento_specie);
 

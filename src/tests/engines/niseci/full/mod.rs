@@ -17,7 +17,7 @@
 
 use std::io::Cursor;
 use crate::{engines::niseci::full::calculate_niseci, tests::test_utils::{create_dummy_riferimento, create_dummy_campionamento_full, create_dummy_campionamento_chopped, create_dummy_anagrafica}};
-use crate::core::{VeryItalianRecordCsvRiferimentoNISECI, check_riferimento_niseci_reader, check_records_riferimento_niseci, check_campionamento_niseci_reader, check_records_campionamento_niseci, VeryItalianRecordCsvAnagraficaNISECI, check_anagrafica_niseci_reader, check_records_anagrafica_niseci};
+use crate::core::{VeryItalianRecordCsvRiferimentoNISECI, check_riferimento_niseci_reader, check_records_riferimento_niseci, VeryItalianRecordCsvCampionamentoNISECI, check_campionamento_niseci_reader, check_records_campionamento_niseci, VeryItalianRecordCsvAnagraficaNISECI, check_anagrafica_niseci_reader, check_records_anagrafica_niseci};
 use crate::model::niseci::{RiferimentoNISECI, CampionamentoNISECI};
 
 const RIFERIMENTO_NISECI_TEMPLATE_DATA: &[u8] = include_bytes!("../../../../../templates/riferimento_niseci.csv");
@@ -68,7 +68,7 @@ fn calculate_niseci_template() {
 
     let campionamento_reader = Cursor::new(CAMPIONAMENTO_NISECI_TEMPLATE_DATA);
 
-    let campionamento_csv_check = check_campionamento_niseci_reader(campionamento_reader);
+    let campionamento_csv_check = check_campionamento_niseci_reader::<_, VeryItalianRecordCsvCampionamentoNISECI>(campionamento_reader);
 
     assert!(campionamento_csv_check.is_ok());
 

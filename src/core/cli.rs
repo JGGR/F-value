@@ -137,7 +137,8 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) -> bool {
 
         let mut campionamento_csv_failed = false;
         let mut campionamento_valueparse_failed = false;
-        let campionamento_csv_check_res = check_campionamento_niseci_path(campionamento_path);
+        // Using italian deser for now
+        let campionamento_csv_check_res = check_campionamento_niseci_path::<VeryItalianRecordCsvCampionamentoNISECI>(campionamento_path);
         let mut campionamento_specie = Vec::new(); // Holds parsed RecordNISECI
         match campionamento_csv_check_res {
             Ok(csv_recs) => {
