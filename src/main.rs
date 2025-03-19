@@ -159,11 +159,8 @@ fn main() {
     rl.set_target_fps(30);
 
     let mut logo_texture = None;
-    match logo_img {
-        Some(img) => {
-            logo_texture = Some(rl.load_texture_from_image(&thread, &img).unwrap());
-        }
-        None => {}
+    if let Some(img) = logo_img {
+        logo_texture = Some(rl.load_texture_from_image(&thread, &img).unwrap());
     }
 
     // 10 is way too small for the default font height

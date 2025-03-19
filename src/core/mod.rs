@@ -21,7 +21,7 @@ pub mod cli;
 
 use raylib::prelude::*;
 use std::fmt;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::io::Read;
 use std::fs::File;
 use crate::controllers::Controllers;
@@ -37,11 +37,11 @@ use chrono::format::ParseErrorKind;
 use std::io::{self, Error, ErrorKind};
 use std::any::TypeId;
 
-pub const AUTHOR_JGABAUT: &'static str = "jgabaut";
-pub const AUTHOR_GIONINJO: &'static str = "gioninjo";
-pub const AUTHOR_GIONINJO_LINK: &'static str = "https://github.com/gioninjo";
-pub const AUTHOR_JGABAUT_LINK: &'static str = "https://github.com/jgabaut";
-pub const COPYRIGHT_INFO: &'static str = "Copyright (C) 2024-2025  jgabaut, gioninjo
+pub const AUTHOR_JGABAUT: &str = "jgabaut";
+pub const AUTHOR_GIONINJO: &str = "gioninjo";
+pub const AUTHOR_GIONINJO_LINK: &str = "https://github.com/gioninjo";
+pub const AUTHOR_JGABAUT_LINK: &str = "https://github.com/jgabaut";
+pub const COPYRIGHT_INFO: &str = "Copyright (C) 2024-2025  jgabaut, gioninjo
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -56,14 +56,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.";
 
 pub const EXIT_KEY: raylib::consts::KeyboardKey = raylib::consts::KeyboardKey::KEY_ESCAPE;
-pub const PROJECT_NAME: &'static str = env!("CARGO_PKG_NAME");
-pub const PROJECT_VERSION: &'static str = env!("CARGO_PKG_VERSION");
-pub const PROJECT_VERSION_FULL: &'static str = env!("VERSION_STRING");
-pub const SHORT_PROJECT_VERSION: &'static str = env!("SHORT_VERSION_STRING");
-pub const PROJECT_BUILD_TYPE: &'static str = env!("BUILD_TYPE");
-pub const PROJECT_BRANCH: &'static str = env!("BRANCH_NAME");
-pub const _COMMIT_HASH: &'static str = env!("COMMIT_HASH");
-pub const COMMIT_HASH_PLUS: &'static str = env!("COMMIT_HASH_PLUS");
+pub const PROJECT_NAME: &str = env!("CARGO_PKG_NAME");
+pub const PROJECT_VERSION: &str = env!("CARGO_PKG_VERSION");
+pub const PROJECT_VERSION_FULL: &str = env!("VERSION_STRING");
+pub const SHORT_PROJECT_VERSION: &str = env!("SHORT_VERSION_STRING");
+pub const PROJECT_BUILD_TYPE: &str = env!("BUILD_TYPE");
+pub const PROJECT_BRANCH: &str = env!("BRANCH_NAME");
+pub const _COMMIT_HASH: &str = env!("COMMIT_HASH");
+pub const COMMIT_HASH_PLUS: &str = env!("COMMIT_HASH_PLUS");
 pub const ESOX_SCREEN_WIDTH: i32 = 960;
 pub const ESOX_SCREEN_HEIGHT: i32 = 540;
 pub const DARK_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_dark.rgs");
@@ -115,8 +115,8 @@ pub const GUI_THEME_COMBOBOX_STR: &str = "Light;Dark;Bluish;Candy;Cherry;Cyber;J
 
 #[derive(Copy, Clone)]
 pub enum CurrentView {
-    HOME,
-    SECOND,
+    Home,
+    Second,
     SelezioneIndice,
     SelezioneFileInput,
     ValidazioneFileInput,
@@ -124,14 +124,14 @@ pub enum CurrentView {
     ValidazioneInfoAggiuntive,
     ProduzioneOutput,
     ProduzionePDF,
-    CONSOLE
+    Console
 }
 
 impl fmt::Display for CurrentView {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     let string_representation = match *self {
-      CurrentView::HOME => "HOME",
-      CurrentView::SECOND => "SECOND",
+      CurrentView::Home => "Home",
+      CurrentView::Second => "Second",
       CurrentView::SelezioneIndice => "Selezione Indice",
       CurrentView::SelezioneFileInput => "Selezione File Input",
       CurrentView::ValidazioneFileInput => "Validazione File Input",
@@ -139,7 +139,7 @@ impl fmt::Display for CurrentView {
       CurrentView::ValidazioneInfoAggiuntive => "Validazione Info Aggiuntive",
       CurrentView::ProduzioneOutput => "Produzione Output",
       CurrentView::ProduzionePDF => "Produzione PDF",
-      CurrentView::CONSOLE => "CONSOLE",
+      CurrentView::Console => "Console",
     };
     write!(f, "{}", string_representation)
   }
@@ -226,27 +226,27 @@ impl MainState {
             showing_info_box: false,
             showing_license_box: false,
             showing_settings_box: false,
-            current_view: CurrentView::HOME,
-            previous_view: CurrentView::HOME,
+            current_view: CurrentView::Home,
+            previous_view: CurrentView::Home,
             theme: GuiTheme::Light,
             gui_theme_combobox_active: GuiTheme::Light as i32,
-            default_font_height: default_font_height,
-            current_font_height: current_font_height,
-            default_txt_spacing: default_txt_spacing,
-            default_txt_color: default_txt_color,
-            current_font: current_font,
-            default_bg_color: default_bg_color,
-            logo_texture: logo_texture
+            default_font_height,
+            current_font_height,
+            default_txt_spacing,
+            default_txt_color,
+            current_font,
+            default_bg_color,
+            logo_texture
         }
     }
 
-    pub fn set_current_view(&mut self, view: CurrentView) -> () {
+    pub fn set_current_view(&mut self, view: CurrentView) {
         self.previous_view = self.current_view;
         self.current_view = view;
     }
 
     pub fn get_gui_should_lock(&self) -> bool {
-        return self.showing_quit_win || self.showing_info_box || self.showing_settings_box || self.showing_license_box;
+        self.showing_quit_win || self.showing_info_box || self.showing_settings_box || self.showing_license_box
     }
 
     pub fn mainloop(&mut self, rl: &mut RaylibHandle, thread: &RaylibThread, controllers: &Controllers, views: &mut Views) {
@@ -257,7 +257,7 @@ impl MainState {
 
             controllers.update(rl, self);
 
-            let mut d = rl.begin_drawing(&thread);
+            let mut d = rl.begin_drawing(thread);
 
             let lock_view = self.get_gui_should_lock();
 
@@ -267,7 +267,7 @@ impl MainState {
 
             // Ask the view for render, passing the controller for state changes
             // Current view draw step
-            views.draw(&mut d, &thread, controllers, &self);
+            views.draw(&mut d, thread, controllers, self);
 
             if lock_view {
                 d.gui_unlock();
@@ -282,25 +282,25 @@ impl MainState {
 
 pub fn propwidth(d: &RaylibDrawHandle<'_>, to_scale: i32) -> i32
 {
-    if to_scale < 0 || to_scale > ESOX_SCREEN_WIDTH {
+    if !(0..=ESOX_SCREEN_WIDTH).contains(&to_scale) {
         panic!("propw():  invalid to_scale value received: {to_scale}");
     }
     let current_screen_width = d.get_screen_width();
-    return current_screen_width * to_scale / ESOX_SCREEN_WIDTH;
+    current_screen_width * to_scale / ESOX_SCREEN_WIDTH
 }
 
 pub fn propheight(d: &RaylibDrawHandle<'_>, to_scale: i32) -> i32
 {
-    if to_scale < 0 || to_scale > ESOX_SCREEN_HEIGHT {
+    if !(0..=ESOX_SCREEN_HEIGHT).contains(&to_scale) {
         panic!("proph():  invalid to_scale value received: {to_scale}");
     }
     let current_screen_height = d.get_screen_height();
-    return current_screen_height * to_scale / ESOX_SCREEN_HEIGHT;
+    current_screen_height * to_scale / ESOX_SCREEN_HEIGHT
 }
 
 pub fn parse_date(date_str: &str) -> Result<NaiveDate, chrono::format::ParseError> {
-        let normalized = date_str.replace("/", "-"); // Replace all / with -
-        NaiveDate::parse_from_str(&normalized, "%d-%m-%Y")
+    let normalized = date_str.replace("/", "-"); // Replace all / with -
+    NaiveDate::parse_from_str(&normalized, "%d-%m-%Y")
 }
 
 #[derive(Copy,Clone)]
@@ -600,7 +600,7 @@ pub fn parse_recordcsv_campionamento_niseci<T: RecordCsvCampionamentoNISECI>(rec
     let mut idx = 0;
     for r in records {
         idx += 1;
-        if r.codice_specie().len() < 1 {
+        if r.codice_specie().is_empty() {
             let err = RecordCsvCampionamentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: codice_specie non valido (lunghezza < 1)") };
             errors.push(err);
             continue;
@@ -719,7 +719,7 @@ pub fn parse_recordcsv_riferimento_niseci<T: RecordCsvRiferimentoNISECI>(records
         } else {
             tipo_autoctono = 0;
             match r.allo_nocivita() {
-                0 | 1 | 2 | 3 => {
+                0..=3 => {
                     tipo_alloctono = r.allo_nocivita() as u8;
                 }
                 _ => {
@@ -730,7 +730,7 @@ pub fn parse_recordcsv_riferimento_niseci<T: RecordCsvRiferimentoNISECI>(records
             }
         }
 
-        if r.codice_specie().len() < 1 {
+        if r.codice_specie().is_empty() {
             let err = RecordCsvRiferimentoNISECIError::ValoreInvalido { msg : format!("Record {idx}: codice_specie non valido (lunghezza < 1)") };
             errors.push(err);
             continue;
@@ -798,10 +798,10 @@ pub fn parse_recordcsv_riferimento_niseci<T: RecordCsvRiferimentoNISECI>(records
 
         let specie_rec = SpecieNISECI {
             id: id.clone(),
-            nome: nome,
-            tipo_autoctono: tipo_autoctono,
-            tipo_alloctono: tipo_alloctono,
-            specie_attesa: specie_attesa,
+            nome,
+            tipo_autoctono,
+            tipo_alloctono,
+            specie_attesa,
             cl_soglia1: r.cl_soglia1(), // in cm
             cl_soglia2: r.cl_soglia2(), // in cm
             cl_soglia3: r.cl_soglia3(), // in cm
@@ -979,30 +979,30 @@ pub fn parse_recordcsv_anagrafica_niseci<T: RecordCsvAnagraficaNISECI>(records: 
         let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Troppi record: {}, atteso 1", records.len()) };
         errors.push(err);
     }
-    if records.len() < 1 {
-        let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Nessun record trovato: atteso 1") };
+    if records.is_empty() {
+        let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : "Nessun record trovato: atteso 1".to_string() };
         errors.push(err);
         return Err(errors);
     }
 
-    let r = records.get(0).unwrap();
+    let r = records.first().unwrap();
 
-    if r.codice_stazione().len() < 1 {
+    if r.codice_stazione().is_empty() {
         let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Codice stazione troppo corto: {}", r.codice_stazione()) };
         errors.push(err);
     }
 
-    if r.corpo_idrico().len() < 1 {
+    if r.corpo_idrico().is_empty() {
         let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Corpo idrico troppo corto: {}", r.corpo_idrico()) };
         errors.push(err);
     }
 
-    if r.regione().len() < 1 {
+    if r.regione().is_empty() {
         let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Regione troppo corta: {}", r.regione()) };
         errors.push(err);
     }
 
-    if r.provincia().len() < 1 {
+    if r.provincia().is_empty() {
         let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Provincia troppo corta: {}", r.provincia()) };
         errors.push(err);
     }
@@ -1012,35 +1012,35 @@ pub fn parse_recordcsv_anagrafica_niseci<T: RecordCsvAnagraficaNISECI>(records: 
         Err(e) => {
             match e.kind() {
                 ParseErrorKind::OutOfRange => {
-                    let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Data fornita non valida: fuori range") };
+                    let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : "Data fornita non valida: fuori range".to_string() };
                     errors.push(err);
                 },
                 ParseErrorKind::Impossible => {
-                    let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Data fornita non valida: valori non possibili") };
+                    let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : "Data fornita non valida: valori non possibili".to_string() };
                     errors.push(err);
                 },
                 ParseErrorKind::NotEnough => {
-                    let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Data fornita non valida: specifica insufficiente") };
+                    let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : "Data fornita non valida: specifica insufficiente".to_string() };
                     errors.push(err);
                 },
                 ParseErrorKind::Invalid => {
-                    let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Data fornita non valida: presenza di caratteri non attesi") };
+                    let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : "Data fornita non valida: presenza di caratteri non attesi".to_string() };
                     errors.push(err);
                 },
                 ParseErrorKind::TooShort => {
-                    let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Data fornita non valida: terminazione prematura dell'input") };
+                    let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : "Data fornita non valida: terminazione prematura dell'input".to_string() };
                     errors.push(err);
                 },
                 ParseErrorKind::TooLong => {
-                    let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Data fornita non valida: input in eccesso") };
+                    let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : "Data fornita non valida: input in eccesso".to_string() };
                     errors.push(err);
                 },
                 ParseErrorKind::BadFormat => {
-                    let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Data fornita non valida: errore nella specifica di formattazione") };
+                    let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : "Data fornita non valida: errore nella specifica di formattazione".to_string() };
                     errors.push(err);
                 },
                 _ => {
-                    let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Data fornita non valida: errore sconosciuto") };
+                    let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : "Data fornita non valida: errore sconosciuto".to_string() };
                     errors.push(err);
                 }
             }
@@ -1077,13 +1077,13 @@ pub fn parse_recordcsv_anagrafica_niseci<T: RecordCsvAnagraficaNISECI>(records: 
 
     match tipo_comunita {
         TipoComunitaNISECI::Recuperata => {
-            if r.fonte().len() < 1 {
+            if r.fonte().is_empty() {
                 let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Fonte troppo corta: {}", r.fonte()) };
                 errors.push(err);
             }
         }
         TipoComunitaNISECI::AffinataDalMase => {
-            if r.numero_protocollo().len() < 1 {
+            if r.numero_protocollo().is_empty() {
                 let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Numero protocollo troppo corto: {}", r.numero_protocollo()) };
                 errors.push(err);
             }
@@ -1091,8 +1091,7 @@ pub fn parse_recordcsv_anagrafica_niseci<T: RecordCsvAnagraficaNISECI>(records: 
         _ => {}
     }
 
-    let idro_eco_regione;
-    idro_eco_regione = match r.idro_eco_regione() {
+    let idro_eco_regione = match r.idro_eco_regione() {
         0 => IdroEcoRegioneNISECI::AlpiCentroOrientali,
         1 => IdroEcoRegioneNISECI::AlpiMediterranee,
         2 => IdroEcoRegioneNISECI::AlpiMeridionali,
@@ -1126,12 +1125,12 @@ pub fn parse_recordcsv_anagrafica_niseci<T: RecordCsvAnagraficaNISECI>(records: 
         area = AreaNISECI::Alpina;
     }
 
-    if r.nome_bacino().len() < 1 {
+    if r.nome_bacino().is_empty() {
         let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Nome bacino troppo corto: {}", r.nome_bacino()) };
         errors.push(err);
     }
 
-    if errors.len() > 0 {
+    if !errors.is_empty() {
         return Err(errors);
     }
 
@@ -1143,10 +1142,10 @@ pub fn parse_recordcsv_anagrafica_niseci<T: RecordCsvAnagraficaNISECI>(records: 
         },
         codice_stazione: r.codice_stazione(),
         date_string: r.data(), // Formato gg/mm/aaaa
-        area: area,
+        area,
         corpo_idrico: r.corpo_idrico(),
         bacino_appartenenza: r.nome_bacino(),
-        idro_eco_regione: idro_eco_regione,
+        idro_eco_regione,
         posizione: Location {
             regione: r.regione(),
             provincia: r.provincia()
@@ -1154,7 +1153,7 @@ pub fn parse_recordcsv_anagrafica_niseci<T: RecordCsvAnagraficaNISECI>(records: 
         lunghezza_media_stazione: r.lunghezza_stazione(),
         larghezza_media_stazione: r.larghezza_stazione(),
     };
-    return Ok(res);
+    Ok(res)
 
 }
 
@@ -1192,7 +1191,7 @@ where
             eprintln!("{e}");
         }
         eprintln!("}}");
-        return Err(errors);
+        Err(errors)
     } else {
         //TODO: handle verbosity
         //println!("Tutti i record csv dell'anagrafica NISECI sono stati processati con successo!");
@@ -1201,7 +1200,7 @@ where
             println!("  Record: {{{record}}}");
         }
         */
-        return Ok(records);
+        Ok(records)
     }
 }
 
@@ -1219,7 +1218,7 @@ pub fn check_records_anagrafica_niseci<T: RecordCsvAnagraficaNISECI>(records: Ve
                 println!("  Record: {{{record}}}");
             }
             */
-            return Ok(anagrafica);
+            Ok(anagrafica)
         }
         Err(errors) => {
             println!("Anagrafica NISECI: Numero record non validi: {}", errors.len());
@@ -1229,7 +1228,7 @@ pub fn check_records_anagrafica_niseci<T: RecordCsvAnagraficaNISECI>(records: Ve
                 eprintln!("  {}", error);
             }
             eprintln!("}}");
-            return Err(errors);
+            Err(errors)
         }
     }
 }
@@ -1245,7 +1244,7 @@ where
         return Err(err_vec);
     }
     let file = File::open(path).expect("Unable to open file");
-    return check_anagrafica_niseci_reader(file);
+    check_anagrafica_niseci_reader(file)
 }
 
 pub fn translate_error_message(msg: &str) -> String {
@@ -1305,7 +1304,7 @@ fn parse_csv_pos(pos: &Option<csv::Position>) -> String {
             res = "none".to_string();
         }
     }
-    return res;
+    res
 }
 
 pub fn process_csv_errors(errors: &Vec<csv::Error>, tipo_csv: TipoRecordCsv) -> Vec<String> {
@@ -1349,7 +1348,7 @@ pub fn process_csv_errors(errors: &Vec<csv::Error>, tipo_csv: TipoRecordCsv) -> 
                 }
                 let mut curr_err = format!(
                     "  Errore di deserializzazione alla posizione: {}: campo {}",
-                    parse_csv_pos(&pos),
+                    parse_csv_pos(pos),
                     field_str,
                 );
                 match err.kind() {
@@ -1386,14 +1385,14 @@ pub fn process_csv_errors(errors: &Vec<csv::Error>, tipo_csv: TipoRecordCsv) -> 
             csv::ErrorKind::Utf8 { pos, err } => {
                 res.push(format!(
                     "  Errore UTF-8 alla posizione: {}: {}",
-                    parse_csv_pos(&pos),
+                    parse_csv_pos(pos),
                     translate_error_message(&err.to_string())
                 ));
             }
             csv::ErrorKind::UnequalLengths { pos, expected_len, len } => {
                 res.push(format!(
                     "  Errore numero campi alla posizione: {}: lunghezza attesa {}, trovata {}",
-                    parse_csv_pos(&pos),
+                    parse_csv_pos(pos),
                     expected_len,
                     len
                     // no translate_error_message() anche se teoricamente lo supporta
@@ -1404,16 +1403,16 @@ pub fn process_csv_errors(errors: &Vec<csv::Error>, tipo_csv: TipoRecordCsv) -> 
             }
         }
     }
-    return res;
+    res
 }
 
-fn check_path_is_file_ends_with_csv(path: &PathBuf) -> bool {
+fn check_path_is_file_ends_with_csv(path: &Path) -> bool {
     if !path.exists() {
         eprintln!("Error: Passed path does not exist");
-        return false;
+        false
     } else if !path.is_file() {
         eprintln!("Error: Passed path is not a regular file");
-        return false;
+        false
     } else {
         let ext = path.extension();
         match ext {
@@ -1422,11 +1421,11 @@ fn check_path_is_file_ends_with_csv(path: &PathBuf) -> bool {
                     eprintln!("Error: Passed path does not end with .csv");
                     return false;
                 }
-                return true;
+                true
             }
             None => {
                 eprintln!("Error: Passed path does not end with .csv");
-                return false;
+                false
             }
         }
     }
@@ -1466,7 +1465,7 @@ where
             eprintln!("{e}");
         }
         eprintln!("}}");
-        return Err(errors);
+        Err(errors)
     } else {
         //TODO: handle verbosity
         //println!("Tutti i record csv del campionamento NISECI sono stati processati con successo!");
@@ -1475,7 +1474,7 @@ where
             println!("  Record: {{{record}}}");
         }
         */
-        return Ok(records);
+        Ok(records)
     }
 }
 
@@ -1490,7 +1489,7 @@ where
         return Err(err_vec);
     }
     let file = File::open(path).expect("Unable to open file");
-    return check_campionamento_niseci_reader(file);
+    check_campionamento_niseci_reader(file)
 }
 
 pub fn check_records_campionamento_niseci<T: RecordCsvCampionamentoNISECI>(records: Vec<T>, riferimento_specie: Vec<SpecieNISECI>) -> Result<Vec<RecordNISECI>,Vec<RecordCsvCampionamentoNISECIError>> {
@@ -1507,7 +1506,7 @@ pub fn check_records_campionamento_niseci<T: RecordCsvCampionamentoNISECI>(recor
             eprintln!("  {}", error);
         }
         eprintln!("}}");
-        return Err(errors);
+        Err(errors)
     } else {
         //TODO: handle verbosity
         //println!("Tutti i record del campionamento NISECI sono stati processati con successo!");
@@ -1516,7 +1515,7 @@ pub fn check_records_campionamento_niseci<T: RecordCsvCampionamentoNISECI>(recor
             println!("  Record: {{{record}}}");
         }
         */
-        return Ok(records);
+        Ok(records)
     }
 }
 
@@ -1555,7 +1554,7 @@ where
             eprintln!("{e}");
         }
         eprintln!("}}");
-        return Err(errors);
+        Err(errors)
     } else {
         //TODO: handle verbosity
         //println!("Tutti i record csv del riferimento NISECI sono stati processati con successo!");
@@ -1564,7 +1563,7 @@ where
             println!("  Record: {{{record}}}");
         }
         */
-        return Ok(records);
+        Ok(records)
     }
 }
 
@@ -1579,7 +1578,7 @@ where
         return Err(err_vec);
     }
     let file = File::open(path).expect("Unable to open file");
-    return check_riferimento_niseci_reader(file);
+    check_riferimento_niseci_reader(file)
 }
 
 pub fn check_records_riferimento_niseci<T: RecordCsvRiferimentoNISECI>(records: Vec<T>) -> Result<Vec<SpecieNISECI>,Vec<RecordCsvRiferimentoNISECIError>> {
@@ -1596,7 +1595,7 @@ pub fn check_records_riferimento_niseci<T: RecordCsvRiferimentoNISECI>(records: 
             eprintln!("  {}", error);
         }
         eprintln!("}}");
-        return Err(errors);
+        Err(errors)
     } else {
         //TODO: handle verbosity
         //println!("Tutti i record del riferimento NISECI sono stati processati con successo!");
@@ -1605,7 +1604,7 @@ pub fn check_records_riferimento_niseci<T: RecordCsvRiferimentoNISECI>(records: 
             println!("  Record: {{{record}}}");
         }
         */
-        return Ok(records);
+        Ok(records)
     }
 }
 

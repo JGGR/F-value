@@ -48,8 +48,8 @@ pub struct SpecieNISECI {
 impl fmt::Display for SpecieNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let specie_attesa_str = match self.specie_attesa {
-            true => format!("SI"),
-            false => format!("NO"),
+            true => "SI".to_string(),
+            false => "NO".to_string(),
         };
         let string_representation = format!("SpecieNISECI: {{ id: {{{}}}, nome {{{}}}, tipo_autoctono: {{{}}}, tipo_alloctono: {{{}}}, specie_attesa: {{{}}}",
                 self.id, self.nome, self.tipo_autoctono, self.tipo_alloctono, specie_attesa_str);
@@ -86,7 +86,7 @@ pub struct RiferimentoNISECI {
 
 impl fmt::Display for RiferimentoNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut string_representation = format!("RiferimentoNISECI: {{");
+        let mut string_representation = "RiferimentoNISECI: {".to_string();
         for s in &self.elenco_specie {
             string_representation = format!("{string_representation}\n  {{{s}}},");
         }
@@ -98,7 +98,7 @@ impl fmt::Display for RiferimentoNISECI {
 impl RiferimentoNISECI {
     pub fn new(elenco_specie: Vec<SpecieNISECI>) -> Self {
         Self {
-            elenco_specie: elenco_specie
+            elenco_specie
         }
     }
 }
@@ -126,7 +126,7 @@ pub struct CampionamentoNISECI {
 
 impl fmt::Display for CampionamentoNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut string_representation = format!("CampionaNISECI: {{");
+        let mut string_representation = "CampionaNISECI: {".to_string();
         for r in &self.campionamento {
             string_representation = format!("{string_representation}\n  {{{r}}},");
         }
@@ -165,7 +165,7 @@ impl CampionamentoNISECI {
 
     pub fn new(campionamento: Vec<RecordNISECI>) -> Self {
         Self {
-            campionamento: campionamento,
+            campionamento
         }
     }
 
@@ -183,14 +183,15 @@ impl CampionamentoNISECI {
         }
       }
 
-      return alieni_indigeni
+      alieni_indigeni
     }
 
     pub fn get_tot_specie_autoctone(&self) -> usize {
       let mut map: HashMap<String, bool> = HashMap::new();
 
       for cattura in &self.campionamento {
-        if cattura.specie.tipo_autoctono == 1 || cattura.specie.tipo_autoctono == 1 {
+        if cattura.specie.tipo_autoctono == 1 || cattura.specie.tipo_autoctono == 2 { //TODO: check
+                                                                                      //with Gio
           match map.entry(cattura.specie.id.clone()) {
             Entry::Occupied(_) => {},
             Entry::Vacant(entry) => {
@@ -284,8 +285,8 @@ pub enum AreaNISECI {
 impl fmt::Display for AreaNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let string_representation = match *self {
-            AreaNISECI::Alpina => format!("AreaNISECI: {{ Alpina }}"),
-            AreaNISECI::Mediterranea => format!("AreaNISECI: {{ Mediterranea }}"),
+            AreaNISECI::Alpina => "AreaNISECI: { Alpina }".to_string(),
+            AreaNISECI::Mediterranea => "AreaNISECI: { Mediterranea }".to_string(),
         };
         write!(f, "{}", string_representation)
     }
@@ -435,7 +436,7 @@ impl fmt::Display for ValoriIntermediSpecieNISECI {
             format!("{v}")
         }
         None => {
-            format!("NC")
+            "NC".to_string()
         }
     };
     let string_representation = format!("ValoriIntermediSpecieNISECI: {{ densita stimata: {{{}}}, classi eta: {{{}}}, rapport ad/juv: {{{}}}, x2a_a: {{{}}}, x2a_b: {{{}}} }}",
@@ -460,15 +461,15 @@ impl fmt::Display for ValoriIntermediNISECI {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     let x2_str = match self.x2 {
         Some(v) => format!("{v}"),
-        None => format!("NC")
+        None => "NC".to_string()
     };
     let x3_a_str = match self.x3_a {
         Some(v) => format!("{v}"),
-        None => format!("NC")
+        None => "NC".to_string()
     };
     let x3_b_str = match self.x3_b {
         Some(v) => format!("{v}"),
-        None => format!("NC")
+        None => "NC".to_string()
     };
     let mut string_representation = format!("ValoriIntermediNISECI: {{\n    x1: {{{}}}, x2: {{{}}}, x3: {{{}}},\n    x2_a: {{{}}}, x2_b: {{{}}}, x3_a: {{{}}}, x3_b: {{{}}},\n    specie specifici:",
         self.x1, x2_str, self.x3,
@@ -501,11 +502,11 @@ impl fmt::Display for RisultatoNISECI {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     let valore_str = match self.valore {
         Some(v) => format!("{v}"),
-        None => format!("NC")
+        None => "NC".to_string()
     };
     let rqe_str = match self.rqe {
         Some(v) => format!("{v}"),
-        None => format!("NC")
+        None => "NC".to_string()
     };
     let string_representation = format!("RisultatoNISECI: {{ valore NISECI: {{{}}}, valore RQE NISECI: {{{}}}, valori intermedi: {{{}}} }}", valore_str, rqe_str, self.valori_intermedi);
     write!(f, "{}", string_representation)
@@ -515,25 +516,25 @@ impl fmt::Display for RisultatoNISECI {
 impl RisultatoNISECI {
     pub fn new(valore: Option<f32>, rqe: Option<f32>, valori_intermedi: ValoriIntermediNISECI) -> Self {
         Self {
-            valore: valore,
-            rqe: rqe,
-            valori_intermedi: valori_intermedi,
+            valore,
+            rqe,
+            valori_intermedi
         }
     }
     pub fn get_valore(&self) -> Option<f32> {
-        return self.valore;
+        self.valore
     }
     pub fn get_rqe(&self) -> Option<f32> {
-        return self.rqe;
+        self.rqe
     }
     pub fn get_x1(&self) -> f32 {
-        return self.valori_intermedi.x1;
+        self.valori_intermedi.x1
     }
     pub fn get_x2(&self) -> Option<f32> {
-        return self.valori_intermedi.x2;
+        self.valori_intermedi.x2
     }
     pub fn get_x3(&self) -> f32 {
-        return self.valori_intermedi.x3;
+        self.valori_intermedi.x3
     }
 }
 
@@ -546,15 +547,15 @@ pub struct MetricheX2aB {
 impl MetricheX2aB {
     pub fn new(criterio_b: u8, rapporto_ad_juv: Option<f32>) -> Self {
         Self {
-            criterio_b: criterio_b,
-            rapporto_ad_juv: rapporto_ad_juv,
+            criterio_b,
+            rapporto_ad_juv
         }
     }
     pub fn get_criterio_b(&self) -> u8 {
-        return self.criterio_b;
+        self.criterio_b
     }
     pub fn get_rapporto_ad_juv(&self) -> Option<f32> {
-        return self.rapporto_ad_juv;
+        self.rapporto_ad_juv
     }
 }
 
@@ -567,18 +568,18 @@ pub struct MetricheX2A {
 impl MetricheX2A {
     pub fn new(criterio_a: u8, criteri_x2a_b: MetricheX2aB) -> Self {
         Self {
-            criterio_a: criterio_a,
-            criteri_x2a_b: criteri_x2a_b
+            criterio_a,
+            criteri_x2a_b
         }
     }
     pub fn get_criterio_a(&self) -> u8 {
-        return self.criterio_a;
+        self.criterio_a
     }
     pub fn get_criterio_b(&self) -> u8 {
-        return self.criteri_x2a_b.get_criterio_b();
+        self.criteri_x2a_b.get_criterio_b()
     }
     pub fn get_rapporto_ad_juv(&self) -> Option<f32> {
-        return self.criteri_x2a_b.get_rapporto_ad_juv();
+        self.criteri_x2a_b.get_rapporto_ad_juv()
     }
 }
 
@@ -623,7 +624,7 @@ impl ClassiEtaSpecieNISECI {
     classe
   }
 
-  pub fn update_classi_eta(&mut self, record: &RecordNISECI) -> () {
+  pub fn update_classi_eta(&mut self, record: &RecordNISECI) {
     match ClassiEta::find_classe_eta(record) {
         ClassiEta::CL1 => self.cl1 += 1,
         ClassiEta::CL2 => self.cl2 += 1,
@@ -634,10 +635,10 @@ impl ClassiEtaSpecieNISECI {
   }
 
   fn get_how_many_classes(&self) -> usize {
-    return [self.cl1, self.cl2, self.cl3, self.cl4, self.cl5]
+    [self.cl1, self.cl2, self.cl3, self.cl4, self.cl5]
       .into_iter()
       .filter(|&value| value > 0)
-      .count();
+      .count()
   }
 
   pub fn get_x2_a_criterio_a(&self) -> u8 {
@@ -648,7 +649,7 @@ impl ClassiEtaSpecieNISECI {
     if count == 3 {
       return 2;
     }
-    return 3;
+    3
   }
 
   pub fn get_x2_a_criterio_b(&self) -> (u8, Option<f32>) {
@@ -669,7 +670,7 @@ impl ClassiEtaSpecieNISECI {
     if ad_juv <= self.specie.ad_juv_soglia4 {
       return (2, Some(ad_juv));
     }
-    return (3, Some(ad_juv));
+    (3, Some(ad_juv))
   }
 
   /// questa fn viene usata sia per x2_a che per x3
@@ -693,7 +694,7 @@ impl ClassiEtaSpecieNISECI {
     if criterio_a == 3 {
       return Ok((0.0, MetricheX2A::new(criterio_a, MetricheX2aB::new(criterio_b, ad_juv))));
     }
-    return Err(format!("Il Criterio A o B di x2a è diverso da 1 o 2 o 3. criterio A = {}, criterio B = {}", criterio_a, criterio_b));
+    Err(format!("Il Criterio A o B di x2a è diverso da 1 o 2 o 3. criterio A = {}, criterio B = {}", criterio_a, criterio_b))
   }
 
 }
@@ -712,15 +713,15 @@ pub enum ClassiEta {
 impl ClassiEta {
   pub fn find_classe_eta(record: &RecordNISECI) -> ClassiEta {
     if record.lunghezza < record.specie.cl_soglia1 {
-      return ClassiEta::CL1;
+      ClassiEta::CL1
     } else if record.lunghezza < record.specie.cl_soglia2 {
-      return ClassiEta::CL2;
+      ClassiEta::CL2
     } else if record.lunghezza < record.specie.cl_soglia3 {
-      return ClassiEta::CL3;
+      ClassiEta::CL3
     } else if record.lunghezza < record.specie.cl_soglia4 {
-      return ClassiEta::CL4;
+      ClassiEta::CL4
     } else {
-      return ClassiEta::CL5;
+      ClassiEta::CL5
     }
   }
 }
@@ -758,7 +759,7 @@ impl InfoPopolazioniNISECI {
     let mut info_pop = InfoPopolazioniNISECI::new();
     info_pop.tot_species = map.len();
     let epsilon: f32 = 1e-6;
-    for (_key, classe) in map {
+    for classe in map.values() {
       match classe.calculate_struttura_popolazione() {
         Ok((popolazione, criteri_x2_a)) => {
           if info_pop.popolazione_piu_strutt < popolazione {
@@ -782,7 +783,7 @@ impl InfoPopolazioniNISECI {
       }
     }
 
-    if errors.len() > 0 {
+    if !errors.is_empty() {
       errors.shrink_to_fit();
       return Err(errors);
     }
@@ -817,18 +818,9 @@ impl InfoPopolazioniAlieneNISECI {
   }
 
   pub fn get_info_pop_aliene(classi_eta: &ClassiEtaAlieniNISECI) -> Result<InfoPopolazioniAlieneNISECI, Vec<String>> {
-    let tipo_1 = match InfoPopolazioniNISECI::get_info_pop(&classi_eta.map_tipo_1) {
-      Ok(info) => info,
-      Err(err) => return Err(err),
-    };
-    let tipo_2 = match InfoPopolazioniNISECI::get_info_pop(&classi_eta.map_tipo_2) {
-      Ok(info) => info,
-      Err(err) => return Err(err),
-    };
-    let tipo_3 = match InfoPopolazioniNISECI::get_info_pop(&classi_eta.map_tipo_3) {
-      Ok(info) => info,
-      Err(err) => return Err(err),
-    };
+    let tipo_1 = InfoPopolazioniNISECI::get_info_pop(&classi_eta.map_tipo_1)?;
+    let tipo_2 = InfoPopolazioniNISECI::get_info_pop(&classi_eta.map_tipo_2)?;
+    let tipo_3 = InfoPopolazioniNISECI::get_info_pop(&classi_eta.map_tipo_3)?;
 
     let info_pop_aliene = InfoPopolazioniAlieneNISECI {
       tipo_1,
@@ -889,11 +881,11 @@ impl EsemplariPerCattura {
 
     EsemplariPerCattura {
       specie: specie.clone(),
-      mappa: mappa
+      mappa
     }
   }
 
-  pub fn fill_passaggio(&mut self, numero_passaggio: u8) -> () {
+  pub fn fill_passaggio(&mut self, numero_passaggio: u8) {
     match self.mappa.entry(numero_passaggio) {
         Entry::Occupied(occupied) => {
           let numero_esemplari = occupied.get() + 1;

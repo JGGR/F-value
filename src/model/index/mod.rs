@@ -20,15 +20,15 @@ use std::{fmt};
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
 pub enum Indice {
   #[default]
-  NISECI,
-  HFBI
+  Niseci,
+  Hfbi
 }
 
 impl fmt::Display for Indice {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     let string_representation = match *self {
-      Indice::NISECI => "NISECI",
-      Indice::HFBI => "HFBI"
+      Indice::Niseci => "NISECI",
+      Indice::Hfbi => "HFBI"
     };
     write!(f, "{}", string_representation)
   }

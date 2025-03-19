@@ -37,7 +37,7 @@ pub struct HomeModel {
 
 impl SubModel for HomeModel {
     fn get_frame_counter(&self) -> u32 {
-        return self.frame_counter;
+        self.frame_counter
     }
     fn increment_frame_counter(&mut self) {
         self.frame_counter += 1;
@@ -46,7 +46,7 @@ impl SubModel for HomeModel {
 
 impl HomeModel {
     pub fn get_user_continued(&self) -> bool {
-        return self.user_continued;
+        self.user_continued
     }
     pub fn set_user_continued(&mut self, val: bool) {
         self.user_continued = val;
@@ -65,7 +65,7 @@ pub struct SecondModel {
 
 impl SubModel for SecondModel {
     fn get_frame_counter(&self) -> u32 {
-        return self.frame_counter;
+        self.frame_counter
     }
     fn increment_frame_counter(&mut self) {
         self.frame_counter += 1;
@@ -74,21 +74,21 @@ impl SubModel for SecondModel {
 
 impl SecondModel {
     pub fn get_value(&self) -> i32 {
-        return self.value;
+        self.value
     }
 
     pub fn set_value(&mut self, val: i32) {
         self.value = val;
     }
     pub fn get_name(&self) -> String {
-        return self.name.clone();
+        self.name.clone()
     }
 
     pub fn set_name(&mut self, new_name: String) {
         self.name = new_name;
     }
     pub fn get_user_continued(&self) -> bool {
-        return self.user_continued;
+        self.user_continued
     }
     pub fn set_user_continued(&mut self, val: bool) {
         self.user_continued = val;
@@ -104,7 +104,7 @@ pub struct IndiceModel {
 
 impl SubModel for IndiceModel {
     fn get_frame_counter(&self) -> u32 {
-        return self.frame_counter;
+        self.frame_counter
     }
     fn increment_frame_counter(&mut self) {
         self.frame_counter += 1;
@@ -112,12 +112,12 @@ impl SubModel for IndiceModel {
 }
 
 impl IndiceModel {
-    pub fn set_selected_index(&mut self, index: Indice) -> () {
+    pub fn set_selected_index(&mut self, index: Indice) {
         self.selected_index = Some(index);
     }
 
     pub fn get_selected_index(&self) -> Option<Indice> {
-        return self.selected_index;
+        self.selected_index
     }
 }
 
@@ -134,7 +134,7 @@ pub struct FileInputModel {
 
 impl SubModel for FileInputModel {
     fn get_frame_counter(&self) -> u32 {
-        return self.frame_counter;
+        self.frame_counter
     }
     fn increment_frame_counter(&mut self) {
         self.frame_counter += 1;
@@ -147,7 +147,7 @@ impl FileInputModel {
     }
 
     pub fn get_riferimento_path(&self) -> Option<PathBuf> {
-        return self.riferimento_path.clone();
+        self.riferimento_path.clone()
     }
 
     pub fn set_riferimento_path_valid(&mut self, valid: bool) {
@@ -155,7 +155,7 @@ impl FileInputModel {
     }
 
     pub fn get_riferimento_path_valid(&self) -> bool {
-        return self.riferimento_path_valid;
+        self.riferimento_path_valid
     }
 
     pub fn set_campionamento_path(&mut self, path: Option<PathBuf>) {
@@ -163,7 +163,7 @@ impl FileInputModel {
     }
 
     pub fn get_campionamento_path(&self) -> Option<PathBuf> {
-        return self.campionamento_path.clone();
+        self.campionamento_path.clone()
     }
 
     pub fn set_campionamento_path_valid(&mut self, valid: bool) {
@@ -171,11 +171,11 @@ impl FileInputModel {
     }
 
     pub fn get_campionamento_path_valid(&self) -> bool {
-        return self.campionamento_path_valid;
+        self.campionamento_path_valid
     }
 
     pub fn get_errors_occurred(&self) -> bool {
-        return self.errors_occurred;
+        self.errors_occurred
     }
 
     pub fn set_errors_occurred(&mut self, val: bool) {
@@ -194,7 +194,7 @@ pub struct InfoAggiuntiveModel {
 
 impl SubModel for InfoAggiuntiveModel {
     fn get_frame_counter(&self) -> u32 {
-        return self.frame_counter;
+        self.frame_counter
     }
 
     fn increment_frame_counter(&mut self) {
@@ -204,7 +204,7 @@ impl SubModel for InfoAggiuntiveModel {
 
 impl InfoAggiuntiveModel {
     pub fn is_done_editing(&self) -> bool {
-        return self.done_editing;
+        self.done_editing
     }
 
     pub fn set_done_editing(&mut self, val: bool) {
@@ -212,7 +212,7 @@ impl InfoAggiuntiveModel {
     }
 
     pub fn is_valid(&self) -> bool {
-        return self.valid;
+        self.valid
     }
 
     pub fn set_valid(&mut self, val: bool) {
@@ -220,7 +220,7 @@ impl InfoAggiuntiveModel {
     }
 
     pub fn get_errors_occurred(&self) -> bool {
-        return self.errors_occurred;
+        self.errors_occurred
     }
 
     pub fn set_errors_occurred(&mut self, val: bool) {
@@ -238,7 +238,7 @@ pub struct OutputModel {
 
 impl SubModel for OutputModel {
     fn get_frame_counter(&self) -> u32 {
-        return self.frame_counter;
+        self.frame_counter
     }
     fn increment_frame_counter(&mut self) {
         self.frame_counter += 1;
@@ -247,7 +247,7 @@ impl SubModel for OutputModel {
 
 impl OutputModel {
     pub fn is_done_calc(&self) -> bool {
-        return self.done_calc;
+        self.done_calc
     }
 
     pub fn set_done_calc(&mut self, val: bool) {
@@ -255,7 +255,7 @@ impl OutputModel {
     }
 
     pub fn is_done_user_confirm(&self) -> bool {
-        return self.done_user_confirm;
+        self.done_user_confirm
     }
 
     pub fn set_done_user_confirm(&mut self, val: bool) {
@@ -273,7 +273,7 @@ pub struct ConsoleModel {
 
 impl SubModel for ConsoleModel {
     fn get_frame_counter(&self) -> u32 {
-        return self.frame_counter;
+        self.frame_counter
     }
     fn increment_frame_counter(&mut self) {
         self.frame_counter += 1;
@@ -282,7 +282,7 @@ impl SubModel for ConsoleModel {
 
 impl ConsoleModel {
     pub fn _get_name(&self) -> String {
-        return self.name.clone();
+        self.name.clone()
     }
 
     pub fn set_name(&mut self, new_name: String) {
@@ -290,7 +290,7 @@ impl ConsoleModel {
     }
 
     pub fn should_backout(&self) -> bool {
-        return self.should_backout;
+        self.should_backout
     }
     pub fn set_should_backout(&mut self, val: bool) {
         self.should_backout = val;
@@ -314,7 +314,7 @@ pub struct DataModel {
 
 impl SubModel for DataModel {
     fn get_frame_counter(&self) -> u32 {
-        return self.frame_counter;
+        self.frame_counter
     }
     fn increment_frame_counter(&mut self) {
         self.frame_counter += 1;
@@ -326,36 +326,36 @@ impl DataModel {
         Self {
             frame_counter: 0,
             errors_occurred: false,
-            niseci: niseci,
+            niseci,
         }
     }
     pub fn get_riferimento_niseci(&self) -> Option<RiferimentoNISECI> {
-        return self.niseci.riferimento.clone();
+        self.niseci.riferimento.clone()
     }
     pub fn set_riferimento_niseci(&mut self, riferimento: Option<RiferimentoNISECI>) {
         self.niseci.riferimento = riferimento;
     }
     pub fn get_campionamento_niseci(&self) -> Option<CampionamentoNISECI> {
-        return self.niseci.campionamento.clone();
+        self.niseci.campionamento.clone()
     }
     pub fn set_campionamento_niseci(&mut self, campionamento: Option<CampionamentoNISECI>) {
         self.niseci.campionamento = campionamento;
     }
     pub fn get_anagrafica_niseci(&self) -> Option<AnagraficaNISECI> {
-        return self.niseci.anagrafica.clone();
+        self.niseci.anagrafica.clone()
     }
     pub fn set_anagrafica_niseci(&mut self, anagrafica: Option<AnagraficaNISECI>) {
         self.niseci.anagrafica = anagrafica;
     }
     pub fn get_risultato_niseci(&self) -> Option<RisultatoNISECI> {
-        return self.niseci.risultato.clone();
+        self.niseci.risultato.clone()
     }
     pub fn set_risultato_niseci(&mut self, risultato: Option<RisultatoNISECI>) {
         self.niseci.risultato = risultato;
     }
 
     pub fn get_errors_occurred(&self) -> bool {
-        return self.errors_occurred;
+        self.errors_occurred
     }
 
     pub fn set_errors_occurred(&mut self, val: bool) {

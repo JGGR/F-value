@@ -32,7 +32,7 @@ pub fn esox_usage() {
   --help, -h               Print this message and quit");
 }
 
-pub fn run_headless(do_niseci: bool, args: &Vec<String>) -> bool {
+pub fn run_headless(do_niseci: bool, args: &[String]) -> bool {
     let mut arg_i = 0;
     let mut campionamento_path_str = "";
     let mut riferimento_path_str = "";
@@ -337,11 +337,10 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) -> bool {
             }
 
         }
-        let final_res = !had_failures && !niseci_calc_failed;
-        return final_res;
+        !had_failures && !niseci_calc_failed
     } else {
         let campionamento_check_res = check_campionamento_hfbi_path(campionamento_path);
         println!("Result: {campionamento_check_res}");
-        return true;
+        true
     }
 }

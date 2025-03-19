@@ -53,10 +53,10 @@ impl Controllers {
     pub fn update(&self, rl: &mut RaylibHandle, main_state: &mut MainState) {
         // Current view update step
         match main_state.current_view {
-            CurrentView::HOME => {
+            CurrentView::Home => {
                 self.home_controller.update(rl, main_state);
             }
-            CurrentView::SECOND => {
+            CurrentView::Second => {
                 self.second_controller.update(rl, main_state);
             }
             CurrentView::SelezioneIndice => {
@@ -71,7 +71,7 @@ impl Controllers {
             CurrentView::ProduzioneOutput | CurrentView::ProduzionePDF=> {
                 self.output_controller.update(rl, main_state);
             }
-            CurrentView::CONSOLE => {
+            CurrentView::Console => {
                 self.console_controller.update(rl, main_state);
             }
         }
@@ -88,7 +88,7 @@ pub trait Controller {
     }
     fn get_current_index(&self) -> Option<Indice> {
         let state = GLOBAL_STATE.lock().unwrap();
-        return state.indice_model.get_selected_index();
+        state.indice_model.get_selected_index()
     }
 }
 
@@ -101,19 +101,16 @@ impl Controller for HomeController {
     fn update(&self, _rl: &mut RaylibHandle, main_state: &mut MainState) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.home_model.increment_frame_counter();
-        match state.home_model.get_user_continued() {
-            true => {
-                eprintln!("HomeController:  L'utente ha premuto Continua");
-                eprintln!("HomeController:  Let's update current view and go to SelezioneIndice.");
-                main_state.set_current_view(CurrentView::SelezioneIndice)
-            }
-            false => {}
+        if state.home_model.get_user_continued() {
+            eprintln!("HomeController:  L'utente ha premuto Continua");
+            eprintln!("HomeController:  Let's update current view and go to SelezioneIndice.");
+            main_state.set_current_view(CurrentView::SelezioneIndice)
         }
     }
 
     fn get_state(&self) -> Self::SubModel {
         let state = GLOBAL_STATE.lock().unwrap();
-        return state.home_model.clone();
+        state.home_model.clone()
     }
 }
 
@@ -136,19 +133,16 @@ impl Controller for SecondController {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.second_model.increment_frame_counter();
         state.second_model.set_name("Updated".to_string());
-        match state.second_model.get_user_continued() {
-            true => {
-                eprintln!("SecondController:  L'utente ha premuto Continua");
-                eprintln!("SecondController:  Let's update current view and go to SelezioneIndice.");
-                main_state.set_current_view(CurrentView::SelezioneIndice)
-            }
-            false => {}
+        if state.second_model.get_user_continued() {
+            eprintln!("SecondController:  L'utente ha premuto Continua");
+            eprintln!("SecondController:  Let's update current view and go to SelezioneIndice.");
+            main_state.set_current_view(CurrentView::SelezioneIndice)
         }
     }
 
     fn get_state(&self) -> Self::SubModel {
         let state = GLOBAL_STATE.lock().unwrap();
-        return state.second_model.clone();
+        state.second_model.clone()
     }
 }
 
@@ -182,18 +176,15 @@ impl Controller for IndiceController {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.indice_model.increment_frame_counter();
 
-        match state.indice_model.get_selected_index() {
-            Some(index) => {
-                eprintln!("IndiceController:  L'utente ha selezionato indice {index}");
-                eprintln!("IndiceController:  Let's update current view and go to SelezioneFileInput.");
-                main_state.set_current_view(CurrentView::SelezioneFileInput)
-            },
-            None => ()
+        if let Some(index) = state.indice_model.get_selected_index() {
+            eprintln!("IndiceController:  L'utente ha selezionato indice {index}");
+            eprintln!("IndiceController:  Let's update current view and go to SelezioneFileInput.");
+            main_state.set_current_view(CurrentView::SelezioneFileInput)
         }
     }
     fn get_state(&self) -> Self::SubModel {
         let state = GLOBAL_STATE.lock().unwrap();
-        return state.indice_model.clone();
+        state.indice_model.clone()
     }
 }
 
@@ -202,7 +193,7 @@ impl IndiceController {
         Self
     }
 
-    pub fn set_indice_corrente(&self, index: Indice) -> () {
+    pub fn set_indice_corrente(&self, index: Indice) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.indice_model.set_selected_index(index);
     }
@@ -220,7 +211,7 @@ impl Controller for FileInputController {
         if state.fileinput_model.get_errors_occurred() {
             eprintln!("FileInputController:  Errors occurred");
             eprintln!("FileInputController:  Let's update current view and go to CONSOLE.");
-            main_state.set_current_view(CurrentView::CONSOLE);
+            main_state.set_current_view(CurrentView::Console);
             eprintln!("FileInputController:  Clearing error state");
             state.fileinput_model.set_errors_occurred(false);
         }
@@ -237,7 +228,7 @@ impl Controller for FileInputController {
         match main_state.current_view {
             CurrentView::SelezioneFileInput => {
                 match current_indice {
-                    Indice::NISECI => {
+                    Indice::Niseci => {
                         let mut riferimento_ready = false;
 
                         if let Some(_rif_path) = state.fileinput_model.get_riferimento_path() {
@@ -256,7 +247,7 @@ impl Controller for FileInputController {
                             main_state.set_current_view(CurrentView::ValidazioneFileInput);
                         }
                     }
-                    Indice::HFBI => {
+                    Indice::Hfbi => {
                         let mut campionamento_ready = false;
                         if let Some(_campionamento_path) = state.fileinput_model.get_campionamento_path() {
                             // Assumes the path is ready to be used.
@@ -273,7 +264,7 @@ impl Controller for FileInputController {
             },
             CurrentView::ValidazioneFileInput => {
                 match current_indice {
-                    Indice::NISECI => {
+                    Indice::Niseci => {
                         if let Some(_rif_path) = state.fileinput_model.get_riferimento_path() {
                             //
                         } else {
@@ -302,7 +293,7 @@ impl Controller for FileInputController {
                             main_state.set_current_view(CurrentView::SelezioneInfoAggiuntive);
                         }
                     }
-                    Indice::HFBI => {
+                    Indice::Hfbi => {
                         if let Some(_campionamento_path) = state.fileinput_model.get_campionamento_path() {
                             //
                         } else {
@@ -316,7 +307,7 @@ impl Controller for FileInputController {
                         if campionamento_valid {
                             eprintln!("FileInputController:  HFBI - L'utente ha validato campionamento");
                             eprintln!("FileInputController:  Let's update current view and go to SelezioneInfoAggiuntive.");
-                            self.add_console_message(format!("FileInputController:  HFBI - L'utente ha validato campionamento"));
+                            self.add_console_message("FileInputController:  HFBI - L'utente ha validato campionamento".to_string());
                             main_state.set_current_view(CurrentView::SelezioneInfoAggiuntive);
                         }
                     }
@@ -328,7 +319,7 @@ impl Controller for FileInputController {
 
     fn get_state(&self) -> Self::SubModel {
         let state = GLOBAL_STATE.lock().unwrap();
-        return state.fileinput_model.clone();
+        state.fileinput_model.clone()
     }
 
 }
@@ -340,14 +331,14 @@ impl FileInputController {
 
     pub fn get_riferimento_path(&self) -> Option<PathBuf> {
         let state = GLOBAL_STATE.lock().unwrap();
-        return state.fileinput_model.get_riferimento_path();
+        state.fileinput_model.get_riferimento_path()
     }
 
     pub fn set_riferimento_path(&self, riferimento_path: Option<PathBuf>) {
         if let Some(ref rif_path) = riferimento_path {
             self.add_console_message(format!("FileInputController:  Selezione percorso riferimento: {{{}}}", rif_path.display()));
         } else {
-            self.add_console_message(format!("FileInputController:  Deselezione percorso riferimento"));
+            self.add_console_message("FileInputController:  Deselezione percorso riferimento".to_string());
         }
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.fileinput_model.set_riferimento_path(riferimento_path);
@@ -356,7 +347,7 @@ impl FileInputController {
 
     pub fn get_riferimento_path_valid(&self) -> bool {
         let state = GLOBAL_STATE.lock().unwrap();
-        return state.fileinput_model.get_riferimento_path_valid();
+        state.fileinput_model.get_riferimento_path_valid()
     }
 
     fn set_data_riferimento_niseci(&self, riferimento: RiferimentoNISECI) {
@@ -368,7 +359,7 @@ impl FileInputController {
 
     pub fn get_data_riferimento_niseci(&self) -> Option<RiferimentoNISECI> {
         let state = GLOBAL_STATE.lock().unwrap();
-        return state.data_model.get_riferimento_niseci();
+        state.data_model.get_riferimento_niseci()
     }
 
     pub fn valida_riferimento_niseci_path(&self) {
@@ -382,7 +373,7 @@ impl FileInputController {
 
                     match records_check {
                         Ok(species) => {
-                            self.add_console_message(format!("FileInputController:  Validazione RiferimentoNISECI completata!"));
+                            self.add_console_message("FileInputController:  Validazione RiferimentoNISECI completata!".to_string());
                             let riferimento = RiferimentoNISECI::new(species);
                             self.set_data_riferimento_niseci(riferimento);
                         }
@@ -392,7 +383,6 @@ impl FileInputController {
                             }
                             let mut state = GLOBAL_STATE.lock().unwrap();
                             state.fileinput_model.set_errors_occurred(true);
-                            return;
                         }
                     }
                 }
@@ -408,7 +398,6 @@ impl FileInputController {
                     }
                     let mut state = GLOBAL_STATE.lock().unwrap();
                     state.fileinput_model.set_errors_occurred(true);
-                    return;
                 }
             }
         }
@@ -416,14 +405,14 @@ impl FileInputController {
 
     pub fn get_campionamento_path(&self) -> Option<PathBuf> {
         let state = GLOBAL_STATE.lock().unwrap();
-        return state.fileinput_model.get_campionamento_path();
+        state.fileinput_model.get_campionamento_path()
     }
 
     pub fn set_campionamento_path(&self, campionamento_path: Option<PathBuf>) {
         if let Some(ref camp_path) = campionamento_path {
             self.add_console_message(format!("FileInputController:  Selezione percorso campionamento: {{{}}}", camp_path.display()));
         } else {
-            self.add_console_message(format!("FileInputController:  Deselezione percorso campionamento"));
+            self.add_console_message("FileInputController:  Deselezione percorso campionamento".to_string());
         }
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.fileinput_model.set_campionamento_path(campionamento_path);
@@ -432,7 +421,7 @@ impl FileInputController {
 
     pub fn _get_campionamento_path_valid(&self) -> bool {
         let state = GLOBAL_STATE.lock().unwrap();
-        return state.fileinput_model.get_campionamento_path_valid();
+        state.fileinput_model.get_campionamento_path_valid()
     }
 
     fn set_data_campionamento_niseci(&self, campionamento: CampionamentoNISECI) {
@@ -444,7 +433,7 @@ impl FileInputController {
 
     pub fn _get_data_campionamento_niseci(&self) -> Option<CampionamentoNISECI> {
         let state = GLOBAL_STATE.lock().unwrap();
-        return state.data_model.get_campionamento_niseci();
+        state.data_model.get_campionamento_niseci()
     }
 
     pub fn valida_campionamento_niseci_path(&self) {
@@ -471,7 +460,7 @@ impl FileInputController {
                         let records_check = check_records_campionamento_niseci(records, riferimento_niseci.elenco_specie);
                         match records_check {
                             Ok(campioni) => {
-                                self.add_console_message(format!("FileInputController:  Validazione CampionamentoNISECI completata!"));
+                                self.add_console_message("FileInputController:  Validazione CampionamentoNISECI completata!".to_string());
                                 let campionamento = CampionamentoNISECI::new(campioni);
                                 self.set_data_campionamento_niseci(campionamento);
                             }
@@ -481,7 +470,6 @@ impl FileInputController {
                                 }
                                 let mut state = GLOBAL_STATE.lock().unwrap();
                                 state.fileinput_model.set_errors_occurred(true);
-                                return;
                             }
                         }
                     } else {
@@ -490,7 +478,6 @@ impl FileInputController {
                         self.add_console_message(format!("FileInputController:  {error_msg}"));
                         let mut state = GLOBAL_STATE.lock().unwrap();
                         state.fileinput_model.set_errors_occurred(true);
-                        return;
                     }
                 }
                 Err(errors) => { // Csv errors
@@ -505,7 +492,6 @@ impl FileInputController {
                     }
                     let mut state = GLOBAL_STATE.lock().unwrap();
                     state.fileinput_model.set_errors_occurred(true);
-                    return;
                 }
             }
         }
@@ -529,7 +515,7 @@ impl Controller for InfoAggiuntiveController {
         if state.infoaggiuntive_model.get_errors_occurred() {
             eprintln!("InfoAggiuntiveController:  Errors occurred");
             eprintln!("InfoAggiuntiveController:  Let's update current view and go to CONSOLE.");
-            main_state.set_current_view(CurrentView::CONSOLE);
+            main_state.set_current_view(CurrentView::Console);
             eprintln!("InfoAggiuntiveController:  Clearing error state");
             state.infoaggiuntive_model.set_errors_occurred(false);
         }
@@ -546,32 +532,29 @@ impl Controller for InfoAggiuntiveController {
         match main_state.current_view {
             CurrentView::SelezioneInfoAggiuntive => {
                 match current_indice {
-                    Indice::NISECI => {
+                    Indice::Niseci => {
                         if state.infoaggiuntive_model.is_done_editing() {
                             eprintln!("InfoAggiuntiveController:  Let's update current view and go to ValidaInfoAggiuntive");
                             main_state.set_current_view(CurrentView::ValidazioneInfoAggiuntive);
-                            return;
                         }
                     }
-                    Indice::HFBI => {
+                    Indice::Hfbi => {
                     }
                 }
             }
             CurrentView::ValidazioneInfoAggiuntive => {
                 match current_indice {
-                    Indice::NISECI => {
+                    Indice::Niseci => {
                         if !state.infoaggiuntive_model.is_done_editing() {
                             eprintln!("InfoAggiuntiveController:  Let's update current view and go back to SelezionaInfoAggiuntive");
                             main_state.set_current_view(CurrentView::SelezioneInfoAggiuntive);
-                            return;
                         }
                         if state.infoaggiuntive_model.is_valid() {
                             eprintln!("InfoAggiuntiveController:  Let's update current view and go to ProduzioneOutput");
                             main_state.set_current_view(CurrentView::ProduzioneOutput);
-                            return;
                         }
                     }
-                    Indice::HFBI => {
+                    Indice::Hfbi => {
                     }
                 }
             }
@@ -582,7 +565,7 @@ impl Controller for InfoAggiuntiveController {
 
     fn get_state(&self) -> Self::SubModel {
         let state = GLOBAL_STATE.lock().unwrap();
-        return state.infoaggiuntive_model.clone();
+        state.infoaggiuntive_model.clone()
     }
 }
 
@@ -593,7 +576,7 @@ impl InfoAggiuntiveController {
 
     pub fn get_data_anagrafica_niseci(&self) -> Option<AnagraficaNISECI> {
         let state = GLOBAL_STATE.lock().unwrap();
-        return state.data_model.get_anagrafica_niseci();
+        state.data_model.get_anagrafica_niseci()
     }
 
     pub fn submit_anagrafica_niseci(&self, anagrafica: AnagraficaNISECI) {
@@ -610,7 +593,7 @@ impl InfoAggiuntiveController {
         let s = larghezza.replace(',', "."); // Replace comma with dot
         match s.parse::<f32>() {
             Ok(value) => {
-                return Ok(value);
+                Ok(value)
             }
             Err(e) => {
                 let mut err_msg = format!("Errore nella conversione larghezza stazione: {}", e);
@@ -623,7 +606,7 @@ impl InfoAggiuntiveController {
                 state.infoaggiuntive_model.set_done_editing(false);
                 state.infoaggiuntive_model.set_valid(false);
                 state.infoaggiuntive_model.set_errors_occurred(true);
-                return Err(err_msg);
+                Err(err_msg)
             }
         }
     }
@@ -632,7 +615,7 @@ impl InfoAggiuntiveController {
         let s = lunghezza.replace(',', "."); // Replace comma with dot
         match s.parse::<f32>() {
             Ok(value) => {
-                return Ok(value);
+                Ok(value)
             }
             Err(e) => {
                 let mut err_msg = format!("Errore nella conversione lunghezza stazione: {}", e);
@@ -645,7 +628,7 @@ impl InfoAggiuntiveController {
                 state.infoaggiuntive_model.set_done_editing(false);
                 state.infoaggiuntive_model.set_valid(false);
                 state.infoaggiuntive_model.set_errors_occurred(true);
-                return Err(err_msg);
+                Err(err_msg)
             }
         }
     }
@@ -661,20 +644,20 @@ impl InfoAggiuntiveController {
         if let Some(anagrafica) = self.get_data_anagrafica_niseci() {
             let mut errors: Vec<String> = Vec::new();
 
-            if anagrafica.codice_stazione.len() < 1 {
-                errors.push(format!("Codice stazione troppo corto"));
+            if anagrafica.codice_stazione.is_empty() {
+                errors.push("Codice stazione troppo corto".to_string());
             }
 
-            if anagrafica.corpo_idrico.len() < 1 {
-                errors.push(format!("Nome fiume troppo corto"));
+            if anagrafica.corpo_idrico.is_empty() {
+                errors.push("Nome fiume troppo corto".to_string());
             }
 
-            if anagrafica.posizione.regione.len() < 1 {
-                errors.push(format!("Nome regione troppo corto"));
+            if anagrafica.posizione.regione.is_empty() {
+                errors.push("Nome regione troppo corto".to_string());
             }
 
-            if anagrafica.posizione.provincia.len() < 1 {
-                errors.push(format!("Nome provincia troppo corto"));
+            if anagrafica.posizione.provincia.is_empty() {
+                errors.push("Nome provincia troppo corto".to_string());
             }
 
             match parse_date(&anagrafica.date_string) {
@@ -682,28 +665,28 @@ impl InfoAggiuntiveController {
                 Err(e) => {
                     match e.kind() {
                         ParseErrorKind::OutOfRange => {
-                            errors.push(format!("Data fornita non valida: fuori range"));
+                            errors.push("Data fornita non valida: fuori range".to_string());
                         },
                         ParseErrorKind::Impossible => {
-                            errors.push(format!("Data fornita non valida: valori non possibili"));
+                            errors.push("Data fornita non valida: valori non possibili".to_string());
                         },
                         ParseErrorKind::NotEnough => {
-                            errors.push(format!("Data fornita non valida: specifica insufficiente"));
+                            errors.push("Data fornita non valida: specifica insufficiente".to_string());
                         },
                         ParseErrorKind::Invalid => {
-                            errors.push(format!("Data fornita non valida: presenza di caratteri non attesi"));
+                            errors.push("Data fornita non valida: presenza di caratteri non attesi".to_string());
                         },
                         ParseErrorKind::TooShort => {
-                            errors.push(format!("Data fornita non valida: terminazione prematura dell'input"));
+                            errors.push("Data fornita non valida: terminazione prematura dell'input".to_string());
                         },
                         ParseErrorKind::TooLong => {
-                            errors.push(format!("Data fornita non valida: input in eccesso"));
+                            errors.push("Data fornita non valida: input in eccesso".to_string());
                         },
                         ParseErrorKind::BadFormat => {
-                            errors.push(format!("Data fornita non valida: errore nella specifica di formattazione"));
+                            errors.push("Data fornita non valida: errore nella specifica di formattazione".to_string());
                         },
                         _ => {
-                            errors.push(format!("Data fornita non valida: errore sconosciuto"));
+                            errors.push("Data fornita non valida: errore sconosciuto".to_string());
                         }
                     }
                 }
@@ -720,27 +703,27 @@ impl InfoAggiuntiveController {
             match anagrafica.comunita.tipo {
                 TipoComunitaNISECI::Recuperata => {
                     if let Some(fonte) = anagrafica.comunita.fonte {
-                        if fonte.len() < 1 {
-                            errors.push(format!("Fonte troppo corta"));
+                        if fonte.is_empty() {
+                            errors.push("Fonte troppo corta".to_string());
                         }
                     } else {
-                        errors.push(format!("Fonte mancante"));
+                        errors.push("Fonte mancante".to_string());
                     }
                 }
                 TipoComunitaNISECI::AffinataDalMase => {
                     if let Some(num_proto) = anagrafica.comunita.numero_protocollo {
-                        if num_proto.len() < 1 {
-                            errors.push(format!("Numero protocollo troppo corto"));
+                        if num_proto.is_empty() {
+                            errors.push("Numero protocollo troppo corto".to_string());
                         }
                     } else {
-                        errors.push(format!("Numero protocollo mancante"));
+                        errors.push("Numero protocollo mancante".to_string());
                     }
                 }
                 _ => {}
             }
 
-            if anagrafica.bacino_appartenenza.len() < 1 {
-                errors.push(format!("Nome bacino di appartenenza troppo corto"));
+            if anagrafica.bacino_appartenenza.is_empty() {
+                errors.push("Nome bacino di appartenenza troppo corto".to_string());
             }
 
             for e in &errors {
@@ -749,7 +732,7 @@ impl InfoAggiuntiveController {
 
             let mut state = GLOBAL_STATE.lock().unwrap();
 
-            if errors.len() == 0 {
+            if errors.is_empty() {
                 state.infoaggiuntive_model.set_valid(true);
             } else {
                 //TODO: handle validation errors
@@ -797,7 +780,7 @@ impl Controller for OutputController {
         if state.data_model.get_errors_occurred() {
             eprintln!("OutputController:  Errors occurred");
             eprintln!("OutputController:  Let's update current view and go to CONSOLE.");
-            main_state.set_current_view(CurrentView::CONSOLE);
+            main_state.set_current_view(CurrentView::Console);
             eprintln!("OutputController:  Clearing error state");
             state.data_model.set_errors_occurred(false);
         }
@@ -818,7 +801,7 @@ impl Controller for OutputController {
 
     fn get_state(&self) -> Self::SubModel {
         let state = GLOBAL_STATE.lock().unwrap();
-        return state.output_model.clone();
+        state.output_model.clone()
     }
 }
 
@@ -829,7 +812,7 @@ impl OutputController {
 
     pub fn get_is_done_calc(&self) -> bool {
         let state = GLOBAL_STATE.lock().unwrap();
-        return state.output_model.is_done_calc();
+        state.output_model.is_done_calc()
     }
 
     pub fn get_niseci_value(&self) -> Option<f32> {
@@ -837,14 +820,14 @@ impl OutputController {
             let opt_res = self.get_data_risultato_niseci();
             match opt_res {
                 Some(r) => {
-                    return r.get_valore();
+                    r.get_valore()
                 }
                 None => {
-                    return None;
+                    None
                 }
             }
         } else {
-            return None;
+            None
         }
     }
 
@@ -853,14 +836,14 @@ impl OutputController {
             let opt_res = self.get_data_risultato_niseci();
             match opt_res {
                 Some(r) => {
-                    return r.get_rqe();
+                    r.get_rqe()
                 }
                 None => {
-                    return None;
+                    None
                 }
             }
         } else {
-            return None;
+            None
         }
     }
 
@@ -874,35 +857,28 @@ impl OutputController {
                     match opt_anagrafica {
                         Some(anagr) => {
                             let niseci_val = r.get_valore();
-                            return calculate_stato_ecologico(niseci_val, &anagr.area);
+                            calculate_stato_ecologico(niseci_val, &anagr.area)
                         }
                         None => {
-                            return None;
+                            None
                         }
                     }
                 }
                 None => {
-                    return None;
+                    None
                 }
             }
         } else {
-            return None;
+            None
         }
     }
 
     pub fn get_x1_value(&self) -> Option<f32> {
         if self.get_is_done_calc() {
             let opt_res = self.get_data_risultato_niseci();
-            match opt_res {
-                Some(r) => {
-                    return Some(r.get_x1());
-                }
-                None => {
-                    return None;
-                }
-            }
+            opt_res.map(|r| r.get_x1())
         } else {
-            return None;
+            None
         }
     }
 
@@ -911,30 +887,23 @@ impl OutputController {
             let opt_res = self.get_data_risultato_niseci();
             match opt_res {
                 Some(r) => {
-                    return r.get_x2();
+                    r.get_x2()
                 }
                 None => {
-                    return None;
+                    None
                 }
             }
         } else {
-            return None;
+            None
         }
     }
 
     pub fn get_x3_value(&self) -> Option<f32> {
         if self.get_is_done_calc() {
             let opt_res = self.get_data_risultato_niseci();
-            match opt_res {
-                Some(r) => {
-                    return Some(r.get_x3());
-                }
-                None => {
-                    return None;
-                }
-            }
+            opt_res.map(|r| r.get_x3())
         } else {
-            return None;
+            None
         }
     }
 
@@ -949,9 +918,9 @@ impl OutputController {
     pub fn get_data_risultato_niseci(&self) -> Option<RisultatoNISECI> {
         if self.get_is_done_calc() {
             let state = GLOBAL_STATE.lock().unwrap();
-            return state.data_model.get_risultato_niseci();
+            state.data_model.get_risultato_niseci()
         } else {
-            return None;
+            None
         }
     }
 
@@ -971,17 +940,17 @@ impl OutputController {
         if riferimento.is_none() {
             // Implementation error, this should never happen
             valid = false;
-            self.add_console_message(format!("IMPLEMENTATION ERROR: riferimento niseci was None in calc_niseci()"));
+            self.add_console_message("IMPLEMENTATION ERROR: riferimento niseci was None in calc_niseci()".to_string());
         }
         if campionamento.is_none() {
             // Implementation error, this should never happen
             valid = false;
-            self.add_console_message(format!("IMPLEMENTATION ERROR: campionamento niseci was None in calc_niseci()"));
+            self.add_console_message("IMPLEMENTATION ERROR: campionamento niseci was None in calc_niseci()".to_string());
         }
         if anagrafica.is_none() {
             // Implementation error, this should never happen
             valid = false;
-            self.add_console_message(format!("IMPLEMENTATION ERROR: anagrafica niseci was None in calc_niseci()"));
+            self.add_console_message("IMPLEMENTATION ERROR: anagrafica niseci was None in calc_niseci()".to_string());
         }
         if valid {
             let riferimento = riferimento.expect("calc_niseci() checked is_none() before");
@@ -995,7 +964,7 @@ impl OutputController {
                             self.add_console_message(format!("NISECI: {val}"));
                         }
                         None => {
-                            self.add_console_message(format!("NISECI: NC"));
+                            self.add_console_message("NISECI: NC".to_string());
                         }
                     }
 
@@ -1006,7 +975,7 @@ impl OutputController {
                             self.add_console_message(format!("RQE NISECI: {val}"));
                         }
                         None => {
-                            self.add_console_message(format!("RQE NISECI: NC"));
+                            self.add_console_message("RQE NISECI: NC".to_string());
                         }
                     }
 
@@ -1017,7 +986,7 @@ impl OutputController {
                             self.add_console_message(format!("Stato ecologico: {val}"));
                         }
                         None => {
-                            self.add_console_message(format!("Stato ecologico: NC"));
+                            self.add_console_message("Stato ecologico: NC".to_string());
                         }
                     }
 
@@ -1045,7 +1014,7 @@ impl OutputController {
                 }
             }
         } else {
-            self.add_console_message(format!("IMPLEMENTATION ERROR: spurious state in calc_niseci()"));
+            self.add_console_message("IMPLEMENTATION ERROR: spurious state in calc_niseci()".to_string());
             let mut state = GLOBAL_STATE.lock().unwrap();
             state.data_model.set_errors_occurred(true);
         }
@@ -1130,7 +1099,7 @@ impl Controller for ConsoleController {
 
     fn get_state(&self) -> Self::SubModel {
         let state = GLOBAL_STATE.lock().unwrap();
-        return state.console_model.clone();
+        state.console_model.clone()
     }
 }
 

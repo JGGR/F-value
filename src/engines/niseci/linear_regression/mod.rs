@@ -44,8 +44,8 @@ fn gradient_descent(m_now: f32, b_now: f32, points: &[Point<f32>], step: f32) ->
     let n = points.len();
 
     for point in points {
-      let x = point.x as f32;
-      let y = point.y as f32;
+      let x = point.x;
+      let y = point.y;
 
       m_gradient += - (2.0 / (n as f32)) * x * (y - (m_now * x + b_now));
       b_gradient += - (2.0 / (n as f32)) * (y - (m_now * x + b_now));
@@ -111,7 +111,7 @@ pub fn calculate_quantita_with_regression(campionamenti: &[Point<i32>]) -> Resul
   if quantita_stimata < 0 {
     return Err(format!("quantita stimata negativa {}", quantita_stimata));
   }
-  return Ok(quantita_stimata as u32);
+  Ok(quantita_stimata as u32)
 }
 
 /// La denormalizzazione riporta la retta normalizzata (rappresentata da m_norm e b_norm)

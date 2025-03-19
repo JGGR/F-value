@@ -64,5 +64,5 @@ pub fn calculate_x1(campionamento: &CampionamentoNISECI, riferimento: &Riferimen
   }
 
   // this is the formula use in the NISECI docs
-  return (1.2 * n_i + 0.8 * n_a ) / (1.2 * m_i + 0.8 * m_a )
+  (1.2 * n_i + 0.8 * n_a ) / (1.2 * m_i + 0.8 * m_a )
 }

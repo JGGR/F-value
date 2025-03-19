@@ -59,40 +59,40 @@ impl Views {
             validazione_infoaggiuntive_view: ValidazioneInfoAggiuntiveView::new(),
             produzione_output_view: ProduzioneOutputView::new(),
             produzione_pdf_view: ProduzionePDFView::new(),
-            console_view: ConsoleView::new(rl, &thread, gui_current_font_height, txt_spacing),
+            console_view: ConsoleView::new(rl, thread, gui_current_font_height, txt_spacing),
         }
     }
     pub fn draw(&mut self, d: &mut RaylibDrawHandle, thread: &RaylibThread, controllers: &Controllers, main_state: &MainState) {
         match main_state.current_view {
-            CurrentView::HOME => {
-                self.home_view.draw(d, &thread, &controllers.home_controller, &main_state);
+            CurrentView::Home => {
+                self.home_view.draw(d, thread, &controllers.home_controller, main_state);
             }
-            CurrentView::SECOND => {
-                self.second_view.draw(d, &thread, &controllers.second_controller, &main_state);
+            CurrentView::Second => {
+                self.second_view.draw(d, thread, &controllers.second_controller, main_state);
             }
             CurrentView::SelezioneIndice => {
-                self.selezione_indice_view.draw(d, &thread, &controllers.indice_controller, &main_state);
+                self.selezione_indice_view.draw(d, thread, &controllers.indice_controller, main_state);
             }
             CurrentView::SelezioneFileInput => {
-                self.selezione_fileinput_view.draw(d, &thread, &controllers.fileinput_controller, &main_state);
+                self.selezione_fileinput_view.draw(d, thread, &controllers.fileinput_controller, main_state);
             }
             CurrentView::ValidazioneFileInput => {
-                self.validazione_fileinput_view.draw(d, &thread, &controllers.fileinput_controller, &main_state);
+                self.validazione_fileinput_view.draw(d, thread, &controllers.fileinput_controller, main_state);
             }
             CurrentView::SelezioneInfoAggiuntive => {
-                self.selezione_infoaggiuntive_view.draw(d, &thread, &controllers.infoaggiuntive_controller, &main_state);
+                self.selezione_infoaggiuntive_view.draw(d, thread, &controllers.infoaggiuntive_controller, main_state);
             }
             CurrentView::ValidazioneInfoAggiuntive => {
-                self.validazione_infoaggiuntive_view.draw(d, &thread, &controllers.infoaggiuntive_controller, &main_state);
+                self.validazione_infoaggiuntive_view.draw(d, thread, &controllers.infoaggiuntive_controller, main_state);
             }
             CurrentView::ProduzioneOutput => {
-                self.produzione_output_view.draw(d, &thread, &controllers.output_controller, &main_state);
+                self.produzione_output_view.draw(d, thread, &controllers.output_controller, main_state);
             }
             CurrentView::ProduzionePDF => {
-                self.produzione_pdf_view.draw(d, &thread, &controllers.output_controller, &main_state);
+                self.produzione_pdf_view.draw(d, thread, &controllers.output_controller, main_state);
             }
-            CurrentView::CONSOLE => {
-                self.console_view.draw(d, &thread, &controllers.console_controller, &main_state);
+            CurrentView::Console => {
+                self.console_view.draw(d, thread, &controllers.console_controller, main_state);
             }
         }
     }
@@ -117,42 +117,39 @@ impl View for HomeView {
         let state = controller.get_state();
         let frame_counter = state.get_frame_counter();
 
-        let texture_target_width = propwidth(&d, 205);
-        let texture_target_height = propheight(&d, 205);
+        let texture_target_width = propwidth(d, 205);
+        let texture_target_height = propheight(d, 205);
         let texture_target_x = d.get_screen_width()/2 - texture_target_width /2;
-        let texture_target_y = propheight(&d, 50);
-        match main_state.logo_texture {
-            Some(ref texture) => {
-                d.draw_texture_pro(
-                    &texture,
-                    Rectangle {
-                        x: 0.0,
-                        y: 0.0,
-                        width: texture.width() as f32,
-                        height: texture.height() as f32,
-                    },
-                    Rectangle {
-                        x: texture_target_x as f32,
-                        y: texture_target_y as f32,
-                        width: texture_target_width as f32,
-                        height: texture_target_height as f32,
-                    },
-                    Vector2::zero(),
-                    0.0,
-                    Color::WHITE,
-                );
-            }
-            None => {}
+        let texture_target_y = propheight(d, 50);
+        if let Some(ref texture) = main_state.logo_texture {
+            d.draw_texture_pro(
+                texture,
+                Rectangle {
+                    x: 0.0,
+                    y: 0.0,
+                    width: texture.width() as f32,
+                    height: texture.height() as f32,
+                },
+                Rectangle {
+                    x: texture_target_x as f32,
+                    y: texture_target_y as f32,
+                    width: texture_target_width as f32,
+                    height: texture_target_height as f32,
+                },
+                Vector2::zero(),
+                0.0,
+                Color::WHITE,
+            );
         }
 
         let label_version_txt = format!("Version:   {}", SHORT_PROJECT_VERSION);
         let label_target_txt = format!("Target:    {}-{}", std::env::consts::ARCH, std::env::consts::OS);
         let label_version_txt_bounds = main_state.current_font.measure_text(&label_version_txt, main_state.current_font_height as f32, main_state.default_txt_spacing as f32);
         let label_target_txt_bounds = main_state.current_font.measure_text(&label_target_txt, main_state.current_font_height as f32, main_state.default_txt_spacing as f32);
-        let labels_width = propwidth(&d, 25) + max(label_version_txt_bounds.x as i32, label_target_txt_bounds.x as i32);
+        let labels_width = propwidth(d, 25) + max(label_version_txt_bounds.x as i32, label_target_txt_bounds.x as i32);
         let labels_x = d.get_screen_width()/2 - labels_width/2;
-        let labels_y = propheight(&d, 300);
-        let labels_height = propheight(&d, 25);
+        let labels_y = propheight(d, 300);
+        let labels_height = propheight(d, 25);
 
         let labels: Vec<CString> = vec!(
             CString::new(label_version_txt).unwrap(),
@@ -171,10 +168,10 @@ impl View for HomeView {
             );
         }
 
-        let continue_width = propwidth(&d, 150);
+        let continue_width = propwidth(d, 150);
         let continue_x = d.get_screen_width()/2 - continue_width/2;
-        let continue_height = propwidth(&d, 50);
-        let continue_y_padding = propwidth(&d, 25);
+        let continue_height = propwidth(d, 50);
+        let continue_y_padding = propwidth(d, 25);
         let continue_y = labels_y + (labels_height * labels.len() as i32) + continue_y_padding;
 
         let continue_itext = d.gui_icon_text(ICON_PLAYER_NEXT, Some(rstr!(": Continua")));
@@ -233,7 +230,7 @@ impl View for SecondView {
             &line,
             // We use propwidth/height for the text starting position:
             // this is not the bound
-            Vector2::new(propwidth(&d, 100) as f32, propheight(&d, 10) as f32),
+            Vector2::new(propwidth(d, 100) as f32, propheight(d, 10) as f32),
             main_state.current_font_height as f32,
             main_state.default_txt_spacing as f32,
             main_state.default_txt_color
@@ -241,7 +238,7 @@ impl View for SecondView {
 
 
         let updated_spinner = d.gui_spinner(
-            rrect(propwidth(&d, 100), propheight(&d, 50), propwidth(&d, 125), propheight(&d, 30)),
+            rrect(propwidth(d, 100), propheight(d, 50), propwidth(d, 125), propheight(d, 30)),
             None,
             &mut self.spinner_value,
             0,
@@ -258,42 +255,39 @@ impl View for SecondView {
         // the controller.
         controller.set_value(self.spinner_value);
 
-        let texture_target_width = propwidth(&d, 205);
-        let texture_target_height = propheight(&d, 205);
+        let texture_target_width = propwidth(d, 205);
+        let texture_target_height = propheight(d, 205);
         let texture_target_x = d.get_screen_width()/2 - texture_target_width /2;
-        let texture_target_y = propheight(&d, 50);
-        match main_state.logo_texture {
-            Some(ref texture) => {
-                d.draw_texture_pro(
-                    &texture,
-                    Rectangle {
-                        x: 0.0,
-                        y: 0.0,
-                        width: texture.width() as f32,
-                        height: texture.height() as f32,
-                    },
-                    Rectangle {
-                        x: texture_target_x as f32,
-                        y: texture_target_y as f32,
-                        width: texture_target_width as f32,
-                        height: texture_target_height as f32,
-                    },
-                    Vector2::zero(),
-                    0.0,
-                    Color::WHITE,
-                );
-            }
-            None => {}
+        let texture_target_y = propheight(d, 50);
+        if let Some(ref texture) = main_state.logo_texture {
+            d.draw_texture_pro(
+                texture,
+                Rectangle {
+                    x: 0.0,
+                    y: 0.0,
+                    width: texture.width() as f32,
+                    height: texture.height() as f32,
+                },
+                Rectangle {
+                    x: texture_target_x as f32,
+                    y: texture_target_y as f32,
+                    width: texture_target_width as f32,
+                    height: texture_target_height as f32,
+                },
+                Vector2::zero(),
+                0.0,
+                Color::WHITE,
+            );
         }
 
         let label_version_txt = format!("Version:   {}", SHORT_PROJECT_VERSION);
         let label_target_txt = format!("Target:    {}-{}", std::env::consts::ARCH, std::env::consts::OS);
         let label_version_txt_bounds = main_state.current_font.measure_text(&label_version_txt, main_state.current_font_height as f32, main_state.default_txt_spacing as f32);
         let label_target_txt_bounds = main_state.current_font.measure_text(&label_target_txt, main_state.current_font_height as f32, main_state.default_txt_spacing as f32);
-        let labels_width = propwidth(&d, 25) + max(label_version_txt_bounds.x as i32, label_target_txt_bounds.x as i32);
+        let labels_width = propwidth(d, 25) + max(label_version_txt_bounds.x as i32, label_target_txt_bounds.x as i32);
         let labels_x = d.get_screen_width()/2 - labels_width/2;
-        let labels_y = propheight(&d, 300);
-        let labels_height = propheight(&d, 25);
+        let labels_y = propheight(d, 300);
+        let labels_height = propheight(d, 25);
 
         let labels: Vec<CString> = vec!(
             CString::new(label_version_txt).unwrap(),
@@ -312,10 +306,10 @@ impl View for SecondView {
             );
         }
 
-        let continue_width = propwidth(&d, 150);
+        let continue_width = propwidth(d, 150);
         let continue_x = d.get_screen_width()/2 - continue_width/2;
-        let continue_height = propwidth(&d, 50);
-        let continue_y_padding = propwidth(&d, 25);
+        let continue_height = propwidth(d, 50);
+        let continue_y_padding = propwidth(d, 25);
         let continue_y = labels_y + (labels_height * labels.len() as i32) + continue_y_padding;
 
         let continue_itext = d.gui_icon_text(ICON_PLAYER_NEXT, Some(rstr!(": Continua")));
@@ -367,9 +361,9 @@ impl View for SelezioneIndiceView {
 
         d.clear_background(main_state.default_bg_color);
 
-        let button_niseci_width = propwidth(&d, 200);
+        let button_niseci_width = propwidth(d, 200);
         let button_niseci_x = d.get_screen_width() / 2 - button_niseci_width /2;
-        let button_niseci_height = propwidth(&d, 50);
+        let button_niseci_height = propwidth(d, 50);
 
         let button_indice_y_spacing = button_niseci_height;
 
@@ -380,10 +374,10 @@ impl View for SelezioneIndiceView {
         let button_hfbi_height = button_niseci_height;
         let button_hfbi_y = button_niseci_y + button_niseci_height + button_indice_y_spacing;
 
-        let groupbox_width = button_niseci_width + propwidth(&d, 100);
-        let groupbox_x = button_niseci_x - propwidth(&d, 50);
-        let groupbox_height = button_niseci_height * 2 + button_indice_y_spacing + propheight(&d, 100);
-        let groupbox_y = button_niseci_y - propheight(&d, 50);
+        let groupbox_width = button_niseci_width + propwidth(d, 100);
+        let groupbox_x = button_niseci_x - propwidth(d, 50);
+        let groupbox_height = button_niseci_height * 2 + button_indice_y_spacing + propheight(d, 100);
+        let groupbox_y = button_niseci_y - propheight(d, 50);
 
         d.gui_group_box(
             rrect(
@@ -404,7 +398,7 @@ impl View for SelezioneIndiceView {
             ),
             Some(rstr!("NISECI"))
         ) {
-            controller.set_indice_corrente(Indice::NISECI);
+            controller.set_indice_corrente(Indice::Niseci);
         }
 
         if d.gui_button(
@@ -416,7 +410,7 @@ impl View for SelezioneIndiceView {
             ),
             Some(rstr!("HFBI"))
         ) {
-            controller.set_indice_corrente(Indice::HFBI);
+            controller.set_indice_corrente(Indice::Hfbi);
         }
     }
 }
@@ -446,13 +440,13 @@ impl View for SelezioneFileInputView {
             Some(index) => index,
             None => {
                 eprintln!("SelezioneFileInputView: Per qualche assurdo motivo l'indice corrente non è validato. Uso NISECI.");
-                Indice::NISECI
+                Indice::Niseci
             }
         };
 
-        let button_riferimento_width = propwidth(&d, 200);
+        let button_riferimento_width = propwidth(d, 200);
         let button_riferimento_x = d.get_screen_width() / 2 - button_riferimento_width /2;
-        let button_riferimento_height = propwidth(&d, 50);
+        let button_riferimento_height = propwidth(d, 50);
 
         let button_fileinput_y_spacing = button_riferimento_height;
 
@@ -462,14 +456,14 @@ impl View for SelezioneFileInputView {
         let button_campionamento_x = button_riferimento_x;
         let button_campionamento_height = button_riferimento_height;
         let button_campionamento_y = match current_index {
-            Indice::HFBI => button_riferimento_y + button_fileinput_y_spacing,
-            Indice::NISECI => button_riferimento_y + button_riferimento_height + button_fileinput_y_spacing,
+            Indice::Hfbi => button_riferimento_y + button_fileinput_y_spacing,
+            Indice::Niseci => button_riferimento_y + button_riferimento_height + button_fileinput_y_spacing,
         };
 
-        let groupbox_width = button_riferimento_width + propwidth(&d, 100);
-        let groupbox_x = button_riferimento_x - propwidth(&d, 50);
-        let groupbox_height = button_riferimento_height * 2 + button_fileinput_y_spacing + propheight(&d, 100);
-        let groupbox_y = button_riferimento_y - propheight(&d, 50);
+        let groupbox_width = button_riferimento_width + propwidth(d, 100);
+        let groupbox_x = button_riferimento_x - propwidth(d, 50);
+        let groupbox_height = button_riferimento_height * 2 + button_fileinput_y_spacing + propheight(d, 100);
+        let groupbox_y = button_riferimento_y - propheight(d, 50);
 
         d.gui_group_box(
             rrect(
@@ -481,7 +475,7 @@ impl View for SelezioneFileInputView {
             Some(rstr!("Seleziona file di input"))
         );
 
-        if current_index != Indice::HFBI {
+        if current_index != Indice::Hfbi {
             if let Some(_filepath) = controller.get_riferimento_path() { // A file is already set, display button to clear it
                 let rif_itext = d.gui_icon_text(ICON_BIN, Some(rstr!("Annulla Riferimento")));
                 let rif_itext = CString::new(rif_itext).unwrap();
@@ -596,9 +590,9 @@ impl View for ValidazioneFileInputView {
             }
         };
 
-        let button_riferimento_width = propwidth(&d, 200);
+        let button_riferimento_width = propwidth(d, 200);
         let button_riferimento_x = d.get_screen_width() / 2 - button_riferimento_width /2;
-        let button_riferimento_height = propwidth(&d, 50);
+        let button_riferimento_height = propwidth(d, 50);
 
         let button_fileinput_y_spacing = button_riferimento_height;
 
@@ -608,14 +602,14 @@ impl View for ValidazioneFileInputView {
         let button_campionamento_x = button_riferimento_x;
         let button_campionamento_height = button_riferimento_height;
         let button_campionamento_y = match current_index {
-            Indice::HFBI => button_riferimento_y + button_fileinput_y_spacing,
-            Indice::NISECI => button_riferimento_y + button_riferimento_height + button_fileinput_y_spacing,
+            Indice::Hfbi => button_riferimento_y + button_fileinput_y_spacing,
+            Indice::Niseci => button_riferimento_y + button_riferimento_height + button_fileinput_y_spacing,
         };
 
-        let groupbox_width = button_riferimento_width + propwidth(&d, 100);
-        let groupbox_x = button_riferimento_x - propwidth(&d, 50);
-        let groupbox_height = button_riferimento_height * 2 + button_fileinput_y_spacing + propheight(&d, 100);
-        let groupbox_y = button_riferimento_y - propheight(&d, 50);
+        let groupbox_width = button_riferimento_width + propwidth(d, 100);
+        let groupbox_x = button_riferimento_x - propwidth(d, 50);
+        let groupbox_height = button_riferimento_height * 2 + button_fileinput_y_spacing + propheight(d, 100);
+        let groupbox_y = button_riferimento_y - propheight(d, 50);
 
         d.gui_group_box(
             rrect(
@@ -627,8 +621,7 @@ impl View for ValidazioneFileInputView {
             Some(rstr!("Valida file di input"))
         );
 
-        if current_index != Indice::HFBI {
-            if d.gui_button(
+        if current_index != Indice::Hfbi && d.gui_button(
                 rrect(
                     button_riferimento_x,
                     button_riferimento_y,
@@ -636,13 +629,12 @@ impl View for ValidazioneFileInputView {
                     button_riferimento_height
                 ),
                 Some(rstr!("Valida Riferimento"))
-            ) {
+        ) {
                 controller.valida_riferimento_niseci_path();
-            }
         }
 
         let mut turn_off_button_campionamento = false;
-        if current_index == Indice::NISECI && !controller.get_riferimento_path_valid() {
+        if current_index == Indice::Niseci && !controller.get_riferimento_path_valid() {
             turn_off_button_campionamento = true;
             d.gui_lock();
             d.gui_set_state(STATE_DISABLED);
@@ -658,10 +650,10 @@ impl View for ValidazioneFileInputView {
             Some(rstr!("Valida Campionamento"))
         ) {
             match current_index {
-                Indice::NISECI => {
+                Indice::Niseci => {
                     controller.valida_campionamento_niseci_path();
                 }
-                Indice::HFBI => {
+                Indice::Hfbi => {
                     todo!("Implement controller.valida_campionamento_hfbi_path()");
                     // controller.valida_campionamento_hfbi_path();
                 }
@@ -725,13 +717,13 @@ impl View for SelezioneInfoAggiuntiveView {
             Some(index) => index,
             None => {
                 eprintln!("SelezioneInfoAggiuntiveView: Per qualche assurdo motivo l'indice corrente non è validato. Uso NISECI.");
-                Indice::NISECI
+                Indice::Niseci
             }
         };
 
-        let groupbox_width = propwidth(&d, 750);
+        let groupbox_width = propwidth(d, 750);
         let groupbox_x = d.get_screen_width() /2 - groupbox_width /2;
-        let groupbox_height = propheight(&d, 450);
+        let groupbox_height = propheight(d, 450);
         let groupbox_y = d.get_screen_height() / 2 - groupbox_height /2;
 
         d.gui_group_box(
@@ -744,10 +736,10 @@ impl View for SelezioneInfoAggiuntiveView {
             Some(rstr!("Inserisci informazioni aggiuntive"))
         );
 
-        let submit_width = propwidth(&d, 100);
+        let submit_width = propwidth(d, 100);
         let groupbox_x_end = groupbox_x + groupbox_width;
         let submit_x = groupbox_x_end + (d.get_screen_width() - groupbox_x_end)/2 - submit_width/2;
-        let submit_height = propheight(&d, 50);
+        let submit_height = propheight(d, 50);
         let submit_y = d.get_screen_height() /2 - submit_height /2;
 
         let confirm_itext = d.gui_icon_text(ICON_OK_TICK, Some(rstr!("Conferma")));
@@ -805,16 +797,15 @@ impl View for SelezioneInfoAggiuntiveView {
                 }
             };
 
-            let larghezza_stazione;
-            match controller.check_larghezza_stazione_string(&larghezza_stazione_str) {
+            let larghezza_stazione = match controller.check_larghezza_stazione_string(&larghezza_stazione_str) {
                 Ok(v) => {
-                    larghezza_stazione = v;
+                    v
                 }
                 Err(_e) => {
                     return; // This is not very appropriate but we expect the controller to change
                             // the view for us in case of error so it's ok I guess
                 }
-            }
+            };
 
             // Raylib has trouble handling the string downstream if we don't ensure to do this
             let end = self.textbox_lunghezza_stazione_buffer.iter().position(|&b| b == 0).unwrap_or(self.textbox_lunghezza_stazione_buffer.len());
@@ -826,16 +817,15 @@ impl View for SelezioneInfoAggiuntiveView {
                 }
             };
 
-            let lunghezza_stazione;
-            match controller.check_lunghezza_stazione_string(&lunghezza_stazione_str) {
+            let lunghezza_stazione = match controller.check_lunghezza_stazione_string(&lunghezza_stazione_str) {
                 Ok(v) => {
-                    lunghezza_stazione = v;
+                    v
                 }
                 Err(_e) => {
                     return; // This is not very appropriate but we expect the controller to change
                             // the view for us in case of error so it's ok I guess
                 }
-            }
+            };
 
             // Raylib has trouble handling the string downstream if we don't ensure to do this
             let end = self.textbox_codice_stazione_buffer.iter().position(|&b| b == 0).unwrap_or(self.textbox_codice_stazione_buffer.len());
@@ -924,14 +914,14 @@ impl View for SelezioneInfoAggiuntiveView {
             };
 
             let anagrafica = AnagraficaNISECI {
-                comunita: comunita,
-                codice_stazione: codice_stazione,
-                date_string: date_string,
-                area: area,
-                corpo_idrico: corpo_idrico,
+                comunita,
+                codice_stazione,
+                date_string,
+                area,
+                corpo_idrico,
                 bacino_appartenenza: bacino_niseci,
                 idro_eco_regione: idro_ecoregione_niseci,
-                posizione: posizione,
+                posizione,
                 lunghezza_media_stazione: lunghezza_stazione,
                 larghezza_media_stazione: larghezza_stazione,
             };
@@ -1156,7 +1146,7 @@ impl View for SelezioneInfoAggiuntiveView {
         let column_2_groupbox_comunit_height = column_1_labels_height*3 + column_1_fields_y_spacing*4;
 
         match current_index {
-            Indice::NISECI => {
+            Indice::Niseci => {
                 d.gui_group_box(
                     rrect(
                         column_2_groupbox_niseci_x,
@@ -1178,7 +1168,7 @@ impl View for SelezioneInfoAggiuntiveView {
                 );
 
             }
-            Indice::HFBI => {
+            Indice::Hfbi => {
                 d.gui_group_box(
                     rrect(
                         column_2_groupbox_hfbi_x,
@@ -1198,7 +1188,7 @@ impl View for SelezioneInfoAggiuntiveView {
         let column_2_labels_height = column_1_labels_height;
 
         match current_index {
-            Indice::NISECI => {
+            Indice::Niseci => {
                 let column_2_label_tipo_comunit_y = column_2_groupbox_comunit_y + column_2_groupbox_fields_y_spacing;
                 let column_2_label_fonte_comunit_y = column_2_label_tipo_comunit_y + column_2_labels_height + column_2_groupbox_fields_y_spacing;
                 let column_2_label_protocollo_comunit_y = column_2_label_fonte_comunit_y + column_2_labels_height + column_2_groupbox_fields_y_spacing;
@@ -1383,7 +1373,7 @@ impl View for SelezioneInfoAggiuntiveView {
                     self.dropdownbox_tipocomunit_niseci_edit_mode = !self.dropdownbox_tipocomunit_niseci_edit_mode;
                 }
             }
-            Indice::HFBI => {
+            Indice::Hfbi => {
                 let rainbow_speed = 0.03;
                 let todo_hfbi_font_scale = 2;
                 let todo_hfbi_font_height = main_state.current_font_height * todo_hfbi_font_scale;
@@ -1499,13 +1489,13 @@ impl View for ValidazioneInfoAggiuntiveView {
             Some(index) => index,
             None => {
                 eprintln!("ValidazioneInfoAggiuntiveView: Per qualche assurdo motivo l'indice corrente non è validato. Uso NISECI.");
-                Indice::NISECI
+                Indice::Niseci
             }
         };
 
-        let button_valida_width = propwidth(&d, 200);
+        let button_valida_width = propwidth(d, 200);
         let button_valida_x = d.get_screen_width() / 2 - button_valida_width /2;
-        let button_valida_height = propwidth(&d, 50);
+        let button_valida_height = propwidth(d, 50);
         let button_valida_y = d.get_screen_height() / 2 - button_valida_height/2;
 
         let y_spacing = button_valida_height;
@@ -1514,10 +1504,10 @@ impl View for ValidazioneInfoAggiuntiveView {
         let button_backout_height = button_valida_height;
         let button_backout_y = button_valida_y + button_valida_height + y_spacing;
 
-        let groupbox_width = button_valida_width + propwidth(&d, 100);
-        let groupbox_x = button_valida_x - propwidth(&d, 50);
-        let groupbox_height = button_valida_height * 3 + propheight(&d, 100);
-        let groupbox_y = button_valida_y - propheight(&d, 50);
+        let groupbox_width = button_valida_width + propwidth(d, 100);
+        let groupbox_x = button_valida_x - propwidth(d, 50);
+        let groupbox_height = button_valida_height * 3 + propheight(d, 100);
+        let groupbox_y = button_valida_y - propheight(d, 50);
 
         d.gui_group_box(
             rrect(
@@ -1540,10 +1530,10 @@ impl View for ValidazioneInfoAggiuntiveView {
         ) {
             //Ask controller to validate info aggiuntive indice
             match current_index {
-                Indice::NISECI => {
+                Indice::Niseci => {
                     controller.valida_anagrafica_niseci();
                 }
-                Indice::HFBI => {
+                Indice::Hfbi => {
                     //TODO: implement this
                     //controller.valida_anagrafica_hfbi()
                 }
@@ -1563,10 +1553,10 @@ impl View for ValidazioneInfoAggiuntiveView {
         ) {
             //Ask controller to go back and edit further
             match current_index {
-                Indice::NISECI => {
+                Indice::Niseci => {
                     controller.backout_anagrafica_niseci();
                 }
-                Indice::HFBI => {
+                Indice::Hfbi => {
                     //TODO: implement this
                     //controller.backout_anagrafica_hfbi();
                 }
@@ -1600,24 +1590,24 @@ impl View for ProduzioneOutputView {
             Some(index) => index,
             None => {
                 eprintln!("ProduzioneOutputView: Per qualche assurdo motivo l'indice corrente non è validato. Uso NISECI.");
-                Indice::NISECI
+                Indice::Niseci
             }
         };
 
-        let button_calcola_width = propwidth(&d, 200);
+        let button_calcola_width = propwidth(d, 200);
         let button_calcola_x = d.get_screen_width() / 2 - button_calcola_width /2;
-        let button_calcola_height = propwidth(&d, 50);
+        let button_calcola_height = propwidth(d, 50);
         let button_calcola_y = d.get_screen_height() / 4 - button_calcola_height/2;
 
-        let groupbox_width = button_calcola_width + propwidth(&d, 100);
-        let groupbox_x = button_calcola_x - propwidth(&d, 50);
-        let groupbox_height = button_calcola_height + propheight(&d, 100);
-        let groupbox_y = button_calcola_y - propheight(&d, 50);
+        let groupbox_width = button_calcola_width + propwidth(d, 100);
+        let groupbox_x = button_calcola_x - propwidth(d, 50);
+        let groupbox_height = button_calcola_height + propheight(d, 100);
+        let groupbox_y = button_calcola_y - propheight(d, 50);
 
-        let panel_width = groupbox_width + propwidth(&d, 150);
+        let panel_width = groupbox_width + propwidth(d, 150);
         let panel_x = d.get_screen_width() / 2 - panel_width /2;
-        let panel_y = groupbox_y + groupbox_height + propwidth(&d, 50);
-        let panel_height = groupbox_height + propheight(&d, 50);
+        let panel_y = groupbox_y + groupbox_height + propwidth(d, 50);
+        let panel_height = groupbox_height + propheight(d, 50);
 
         d.gui_group_box(
             rrect(
@@ -1640,10 +1630,10 @@ impl View for ProduzioneOutputView {
         ) {
             //TODO: calcola indice
             match current_index {
-                Indice::NISECI => {
+                Indice::Niseci => {
                     controller.calc_niseci();
                 },
-                Indice::HFBI => {
+                Indice::Hfbi => {
                     //TODO: add this
                     println!("TODO: add this.");
                     //controller.calc_hfbi();
@@ -1651,10 +1641,10 @@ impl View for ProduzioneOutputView {
             }
         }
 
-        let submit_width = propwidth(&d, 100);
+        let submit_width = propwidth(d, 100);
         let groupbox_x_end = groupbox_x + groupbox_width;
         let submit_x = groupbox_x_end + (d.get_screen_width() - groupbox_x_end)/2 - submit_width/2;
-        let submit_height = propheight(&d, 50);
+        let submit_height = propheight(d, 50);
         let submit_y = d.get_screen_height() /2 - submit_height /2;
 
         let confirm_itext = d.gui_icon_text(ICON_OK_TICK, Some(rstr!("Conferma")));
@@ -1667,10 +1657,10 @@ impl View for ProduzioneOutputView {
             // It should only really happen when we try to get x2 with a divide-by-zero, as in:
             // our campionamento had no records matching a riferimentore record with specie_attesa == 1
 
-            Indice::NISECI => {
+            Indice::Niseci => {
                 done_calc && controller.get_niseci_value().is_some()
             }
-            Indice::HFBI => {
+            Indice::Hfbi => {
                 false //TODO: Implement this
                        //
                        //Maybe the is_some won't be needed
@@ -1706,9 +1696,9 @@ impl View for ProduzioneOutputView {
         );
 
         match current_index {
-            Indice::NISECI => {
-                let y_spacing = main_state.current_font_height + propwidth(&d, 5);
-                let output_start_y = panel_y + propwidth(&d, 15);
+            Indice::Niseci => {
+                let y_spacing = main_state.current_font_height + propwidth(d, 5);
+                let output_start_y = panel_y + propwidth(d, 15);
                 let niseci_opt = controller.get_niseci_value();
                 let niseci_str = match niseci_opt {
                     Some(v) => {
@@ -1717,9 +1707,9 @@ impl View for ProduzioneOutputView {
                     None => {
                         if controller.get_is_done_calc() { // Could use done_calc and avoid another
                                                            // lock call
-                            format!("NC")
+                            "NC".to_string()
                         } else {
-                            format!("Non calcolato")
+                            "Non calcolato".to_string()
                         }
                     }
                 };
@@ -1729,7 +1719,7 @@ impl View for ProduzioneOutputView {
                     &niseci_line,
                     // We use propwidth/height for the text starting position:
                     // this is not the bound
-                    Vector2::new((panel_x + propwidth(&d, 25)) as f32, (output_start_y + (y_spacing )) as f32),
+                    Vector2::new((panel_x + propwidth(d, 25)) as f32, (output_start_y + (y_spacing )) as f32),
                     main_state.current_font_height as f32,
                     main_state.default_txt_spacing as f32,
                     main_state.default_txt_color
@@ -1741,9 +1731,9 @@ impl View for ProduzioneOutputView {
                     }
                     None => {
                         if controller.get_is_done_calc() {
-                            format!("NC")
+                            "NC".to_string()
                         } else {
-                            format!("Non calcolato")
+                            "Non calcolato".to_string()
                         }
                     }
                 };
@@ -1753,7 +1743,7 @@ impl View for ProduzioneOutputView {
                     &rqe_line,
                     // We use propwidth/height for the text starting position:
                     // this is not the bound
-                    Vector2::new((panel_x + propwidth(&d, 25)) as f32, (output_start_y + (y_spacing * 2)) as f32),
+                    Vector2::new((panel_x + propwidth(d, 25)) as f32, (output_start_y + (y_spacing * 2)) as f32),
                     main_state.current_font_height as f32,
                     main_state.default_txt_spacing as f32,
                     main_state.default_txt_color
@@ -1765,9 +1755,9 @@ impl View for ProduzioneOutputView {
                     }
                     None => {
                         if controller.get_is_done_calc() {
-                            format!("NC")
+                            "NC".to_string()
                         } else {
-                            format!("Non calcolato")
+                            "Non calcolato".to_string()
                         }
                     }
                 };
@@ -1777,7 +1767,7 @@ impl View for ProduzioneOutputView {
                     &stato_eco_line,
                     // We use propwidth/height for the text starting position:
                     // this is not the bound
-                    Vector2::new((panel_x + propwidth(&d, 25)) as f32, (output_start_y + (y_spacing * 3)) as f32),
+                    Vector2::new((panel_x + propwidth(d, 25)) as f32, (output_start_y + (y_spacing * 3)) as f32),
                     main_state.current_font_height as f32,
                     main_state.default_txt_spacing as f32,
                     main_state.default_txt_color
@@ -1790,9 +1780,9 @@ impl View for ProduzioneOutputView {
                     }
                     None => {
                         if controller.get_is_done_calc() {
-                            format!("NC")
+                            "NC".to_string()
                         } else {
-                            format!("Non calcolato")
+                            "Non calcolato".to_string()
                         }
                     }
                 };
@@ -1802,7 +1792,7 @@ impl View for ProduzioneOutputView {
                     &x1_line,
                     // We use propwidth/height for the text starting position:
                     // this is not the bound
-                    Vector2::new((panel_x + propwidth(&d, 25)) as f32, (output_start_y + (y_spacing * 4)) as f32),
+                    Vector2::new((panel_x + propwidth(d, 25)) as f32, (output_start_y + (y_spacing * 4)) as f32),
                     main_state.current_font_height as f32,
                     main_state.default_txt_spacing as f32,
                     main_state.default_txt_color
@@ -1815,9 +1805,9 @@ impl View for ProduzioneOutputView {
                     }
                     None => {
                         if controller.get_is_done_calc() {
-                            format!("NC")
+                            "NC".to_string()
                         } else {
-                            format!("Non calcolato")
+                            "Non calcolato".to_string()
                         }
                     }
                 };
@@ -1827,7 +1817,7 @@ impl View for ProduzioneOutputView {
                     &x2_line,
                     // We use propwidth/height for the text starting position:
                     // this is not the bound
-                    Vector2::new((panel_x + propwidth(&d, 25)) as f32, (output_start_y + (y_spacing * 5)) as f32),
+                    Vector2::new((panel_x + propwidth(d, 25)) as f32, (output_start_y + (y_spacing * 5)) as f32),
                     main_state.current_font_height as f32,
                     main_state.default_txt_spacing as f32,
                     main_state.default_txt_color
@@ -1840,9 +1830,9 @@ impl View for ProduzioneOutputView {
                     }
                     None => {
                         if controller.get_is_done_calc() {
-                            format!("NC")
+                            "NC".to_string()
                         } else {
-                            format!("Non calcolato")
+                            "Non calcolato".to_string()
                         }
                     }
                 };
@@ -1852,13 +1842,13 @@ impl View for ProduzioneOutputView {
                     &x3_line,
                     // We use propwidth/height for the text starting position:
                     // this is not the bound
-                    Vector2::new((panel_x + propwidth(&d, 25)) as f32, (output_start_y + (y_spacing * 6)) as f32),
+                    Vector2::new((panel_x + propwidth(d, 25)) as f32, (output_start_y + (y_spacing * 6)) as f32),
                     main_state.current_font_height as f32,
                     main_state.default_txt_spacing as f32,
                     main_state.default_txt_color
                 );
             },
-            Indice::HFBI => {
+            Indice::Hfbi => {
                 todo!("Implement this!");
             }
         }
@@ -1887,20 +1877,20 @@ impl View for ProduzionePDFView {
 
         let state = controller.get_state();
         let frame_counter = state.get_frame_counter();
-        let button_esporta_width = propwidth(&d, 200);
+        let button_esporta_width = propwidth(d, 200);
         let button_esporta_x = d.get_screen_width() / 2 - button_esporta_width /2;
-        let button_esporta_height = propwidth(&d, 50);
+        let button_esporta_height = propwidth(d, 50);
         let button_esporta_y = d.get_screen_height() / 4 - button_esporta_height/2;
 
-        let groupbox_width = button_esporta_width + propwidth(&d, 100);
-        let groupbox_x = button_esporta_x - propwidth(&d, 50);
-        let groupbox_height = button_esporta_height + propheight(&d, 100);
-        let groupbox_y = button_esporta_y - propheight(&d, 50);
+        let groupbox_width = button_esporta_width + propwidth(d, 100);
+        let groupbox_x = button_esporta_x - propwidth(d, 50);
+        let groupbox_height = button_esporta_height + propheight(d, 100);
+        let groupbox_y = button_esporta_y - propheight(d, 50);
 
-        let panel_width = groupbox_width + propwidth(&d, 100);
+        let panel_width = groupbox_width + propwidth(d, 100);
         let panel_x = d.get_screen_width() / 2 - panel_width /2;
-        let panel_y = groupbox_y + groupbox_height + propwidth(&d, 50);
-        let panel_height = groupbox_height + propheight(&d, 50);
+        let panel_y = groupbox_y + groupbox_height + propwidth(d, 50);
+        let panel_height = groupbox_height + propheight(d, 50);
 
         d.gui_group_box(
             rrect(
@@ -1963,8 +1953,7 @@ fn rainbow_color_from_framecounter(frame_counter: u32, speed: f32) -> Color {
     let green = (0.5 * (1.0 + (frame_counter as f32 * speed + 2.0).sin()) * 255.0) as u8;
     let blue = (0.5 * (1.0 + (frame_counter as f32 * speed + 4.0).sin()) * 255.0) as u8;
 
-    let rainbow_color = Color::new(red, green, blue, 255);
-    return rainbow_color;
+    Color::new(red, green, blue, 255)
 }
 
 fn draw_rainbow_text(d: &mut RaylibDrawHandle, x: i32, y: i32, text: &str, frame_counter: u32, rainbow_speed: f32, font: &WeakFont, text_spacing: i32, current_font_height: i32, font_height_scale: i32) {
@@ -2001,14 +1990,14 @@ impl View for ConsoleView {
 impl ConsoleView {
     pub fn new(rl: &mut RaylibHandle, thread : &RaylibThread, font_size : i32, font_spacing: i32) -> Self {
         Self {
-            font : rl.load_font_from_memory(&thread,
+            font : rl.load_font_from_memory(thread,
                 ".ttf",
                 CONSOLE_FONT_DATA,
                 font_size,// *2,
                 None).expect("failed loading console font"),
             _default_font_size : font_size,
             current_font_size : font_size,
-            font_spacing : font_spacing,
+            font_spacing
         }
     }
 }
