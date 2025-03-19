@@ -3,6 +3,33 @@
 ### Added
 
 - Add `assets/FreeMono.ttf` and use it instead of `assets/ubuntu.mono.ttf`
+- New traits:
+  - `Controller`
+  - `View`
+  - `SubModel`
+- New structs:
+  - `Controllers`
+  - `Views`
+  - `Views`
+- Impl `TryFrom<i32>` for:
+  - `TipoComunitaNISECI`
+  - `AreaNISECI`
+  - `IdroEcoRegioneNISECI`
+
+### Changed
+- Refactor `RecordCsvRiferimentoNISECI`, `RecordCsvCampionamentoNISECI`, `RecordCsvAnagraficaNISECI` structs to be traits
+  - All methods involving them are now generic
+  - Previous struct are renamed to:
+    - `VeryItalianRecordCsvRiferimentoNISECI`
+    - `VeryItalianRecordCsvCampionamentoNISECI`
+    - `VeryItalianRecordCsvAnagraficaNISECI`
+  - New struct without custom deserializers:
+    - `PlainRecordCsvRiferimentoNISECI`
+    - `PlainRecordCsvCampionamentoNISECI`
+    - `PlainRecordCsvAnagraficaNISECI`
+  - Keeps current bevahiour
+- Fix: avoid double check on `tipo_autoctono == 1` in `CampionamentoNISECI::get_tot_specie_autoctone()`
+- Solve most `clippy` hints
 
 ## [0.0.12] - 2025-03-17
 
