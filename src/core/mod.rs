@@ -31,7 +31,7 @@ use crate::core::view::draw_main;
 use crate::model::niseci::{SpecieNISECI, RecordNISECI, AnagraficaNISECI, AreaNISECI, TipoComunitaNISECI, ComunitaNISECI, IdroEcoRegioneNISECI};
 use crate::model::location::Location;
 use serde::Deserialize;
-use serde::de::{self, Deserializer, DeserializeOwned};
+use serde::de::{self, Deserializer};
 use chrono::NaiveDate;
 use chrono::format::ParseErrorKind;
 use std::io::{self, Error, ErrorKind};
@@ -349,6 +349,7 @@ impl<R: Read> Read for NormalizerReader<R> {
 }
 
 pub trait RecordCsvRiferimentoNISECI: serde::de::DeserializeOwned {
+    #[allow(dead_code)]
     fn nome_comune(&self) -> String;
     fn nome_latino(&self) -> String;
     fn codice_specie(&self) -> String;
@@ -368,17 +369,63 @@ pub trait RecordCsvRiferimentoNISECI: serde::de::DeserializeOwned {
     fn dens_soglia2(&self) -> f32;
 }
 
-struct RecordCsvRiferimentoNISECIWrapper<T: RecordCsvRiferimentoNISECI>(T);
+#[derive(Debug, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct VeryItalianRecordCsvRiferimentoNISECI {
+    pub nome_comune: String,
+    pub nome_latino: String,
+    pub codice_specie: String,
+    pub origine: String,
+    pub tipo_autoctono: u32,
+    pub allo_nocivita: u32,
+    pub specie_attesa: u32,
+    pub cl_soglia1: u32, // in mm
+    pub cl_soglia2: u32, // in mm
+    pub cl_soglia3: u32, // in mm
+    pub cl_soglia4: u32, // in mm
+    #[serde(deserialize_with = "deserialize_comma_f32")]
+    pub ad_juv_soglia1: f32,
+    #[serde(deserialize_with = "deserialize_comma_f32")]
+    pub ad_juv_soglia2: f32,
+    #[serde(deserialize_with = "deserialize_comma_f32")]
+    pub ad_juv_soglia3: f32,
+    #[serde(deserialize_with = "deserialize_comma_f32")]
+    pub ad_juv_soglia4: f32,
+    #[serde(deserialize_with = "deserialize_comma_f32")]
+    pub dens_soglia1: f32,
+    #[serde(deserialize_with = "deserialize_comma_f32")]
+    pub dens_soglia2: f32,
+}
 
-impl<T: RecordCsvRiferimentoNISECI> fmt::Display for RecordCsvRiferimentoNISECIWrapper<T> {
+impl RecordCsvRiferimentoNISECI for VeryItalianRecordCsvRiferimentoNISECI {
+    fn nome_comune(&self) -> String { self.nome_comune.clone() }
+    fn nome_latino(&self) -> String { self.nome_latino.clone() }
+    fn codice_specie(&self) -> String { self.codice_specie.clone() }
+    fn origine(&self) -> String { self.origine.clone() }
+    fn tipo_autoctono(&self) -> u32 { self.tipo_autoctono }
+    fn allo_nocivita(&self) -> u32 { self.allo_nocivita }
+    fn specie_attesa(&self) -> u32 { self.specie_attesa }
+    fn cl_soglia1(&self) -> u32 { self.cl_soglia1 }
+    fn cl_soglia2(&self) -> u32 { self.cl_soglia2 }
+    fn cl_soglia3(&self) -> u32 { self.cl_soglia3 }
+    fn cl_soglia4(&self) -> u32 { self.cl_soglia4 }
+    fn ad_juv_soglia1(&self) -> f32 { self.ad_juv_soglia1 }
+    fn ad_juv_soglia2(&self) -> f32 { self.ad_juv_soglia2 }
+    fn ad_juv_soglia3(&self) -> f32 { self.ad_juv_soglia3 }
+    fn ad_juv_soglia4(&self) -> f32 { self.ad_juv_soglia4 }
+    fn dens_soglia1(&self) -> f32 { self.dens_soglia1 }
+    fn dens_soglia2(&self) -> f32 { self.dens_soglia2 }
+}
+
+impl fmt::Display for VeryItalianRecordCsvRiferimentoNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let string_representation = format!(
             "RecordCsvRiferimentoNISECI: {{ nome_comune: [{}], nome_latino: [{}], codice_specie: [{}], origine: [{}], tipo_autoctono: [{}], allo_nocivita: [{}], specie_attesa: [{}], cl_soglia1: [{}], cl_soglia2: [{}], cl_soglia3: [{}], cl_soglia4: [{}], ad_juv_soglia1: [{}], ad_juv_soglia2: [{}], ad_juv_soglia3: [{}], ad_juv_soglia4: [{}], dens_soglia1: [{}], dens_soglia2: [{}] }}",
-              self.0.nome_comune(), self.0.nome_latino(), self.0.codice_specie(), self.0.origine(),
-              self.0.tipo_autoctono(), self.0.allo_nocivita(), self.0.specie_attesa(),
-              self.0.cl_soglia1(), self.0.cl_soglia2(), self.0.cl_soglia3(), self.0.cl_soglia4(),
-              self.0.ad_juv_soglia1(), self.0.ad_juv_soglia2(), self.0.ad_juv_soglia3(), self.0.ad_juv_soglia4(),
-              self.0.dens_soglia1(), self.0.dens_soglia2()
+              self.nome_comune, self.nome_latino, self.codice_specie, self.origine,
+              self.tipo_autoctono, self.allo_nocivita, self.specie_attesa,
+              self.cl_soglia1, self.cl_soglia2, self.cl_soglia3, self.cl_soglia4,
+              self.ad_juv_soglia1, self.ad_juv_soglia2, self.ad_juv_soglia3, self.ad_juv_soglia4,
+              self.dens_soglia1, self.dens_soglia2
         );
         write!(f, "{}", string_representation)
     }
@@ -387,55 +434,7 @@ impl<T: RecordCsvRiferimentoNISECI> fmt::Display for RecordCsvRiferimentoNISECIW
 
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct RecordCsvRiferimentoNISECI_It {
-    pub nome_comune: String,
-    pub nome_latino: String,
-    pub codice_specie: String,
-    pub origine: String,
-    pub tipo_autoctono: u32,
-    pub allo_nocivita: u32,
-    pub specie_attesa: u32,
-    pub cl_soglia1: u32, // in mm
-    pub cl_soglia2: u32, // in mm
-    pub cl_soglia3: u32, // in mm
-    pub cl_soglia4: u32, // in mm
-    #[serde(deserialize_with = "deserialize_comma_f32")]
-    pub ad_juv_soglia1: f32,
-    #[serde(deserialize_with = "deserialize_comma_f32")]
-    pub ad_juv_soglia2: f32,
-    #[serde(deserialize_with = "deserialize_comma_f32")]
-    pub ad_juv_soglia3: f32,
-    #[serde(deserialize_with = "deserialize_comma_f32")]
-    pub ad_juv_soglia4: f32,
-    #[serde(deserialize_with = "deserialize_comma_f32")]
-    pub dens_soglia1: f32,
-    #[serde(deserialize_with = "deserialize_comma_f32")]
-    pub dens_soglia2: f32,
-}
-
-impl RecordCsvRiferimentoNISECI for RecordCsvRiferimentoNISECI_It {
-    fn nome_comune(&self) -> String { self.nome_comune.clone() }
-    fn nome_latino(&self) -> String { self.nome_latino.clone() }
-    fn codice_specie(&self) -> String { self.codice_specie.clone() }
-    fn origine(&self) -> String { self.origine.clone() }
-    fn tipo_autoctono(&self) -> u32 { self.tipo_autoctono }
-    fn allo_nocivita(&self) -> u32 { self.allo_nocivita }
-    fn specie_attesa(&self) -> u32 { self.specie_attesa }
-    fn cl_soglia1(&self) -> u32 { self.cl_soglia1 }
-    fn cl_soglia2(&self) -> u32 { self.cl_soglia2 }
-    fn cl_soglia3(&self) -> u32 { self.cl_soglia3 }
-    fn cl_soglia4(&self) -> u32 { self.cl_soglia4 }
-    fn ad_juv_soglia1(&self) -> f32 { self.ad_juv_soglia1 }
-    fn ad_juv_soglia2(&self) -> f32 { self.ad_juv_soglia2 }
-    fn ad_juv_soglia3(&self) -> f32 { self.ad_juv_soglia3 }
-    fn ad_juv_soglia4(&self) -> f32 { self.ad_juv_soglia4 }
-    fn dens_soglia1(&self) -> f32 { self.dens_soglia1 }
-    fn dens_soglia2(&self) -> f32 { self.dens_soglia2 }
-}
-
-#[derive(Debug, serde::Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct RecordCsvRiferimentoNISECI_Plain {
+pub struct PlainRecordCsvRiferimentoNISECI {
     pub nome_comune: String,
     pub nome_latino: String,
     pub codice_specie: String,
@@ -455,7 +454,7 @@ pub struct RecordCsvRiferimentoNISECI_Plain {
     pub dens_soglia2: f32,
 }
 
-impl RecordCsvRiferimentoNISECI for RecordCsvRiferimentoNISECI_Plain {
+impl RecordCsvRiferimentoNISECI for PlainRecordCsvRiferimentoNISECI {
     fn nome_comune(&self) -> String { self.nome_comune.clone() }
     fn nome_latino(&self) -> String { self.nome_latino.clone() }
     fn codice_specie(&self) -> String { self.codice_specie.clone() }
@@ -473,6 +472,20 @@ impl RecordCsvRiferimentoNISECI for RecordCsvRiferimentoNISECI_Plain {
     fn ad_juv_soglia4(&self) -> f32 { self.ad_juv_soglia4 }
     fn dens_soglia1(&self) -> f32 { self.dens_soglia1 }
     fn dens_soglia2(&self) -> f32 { self.dens_soglia2 }
+}
+
+impl fmt::Display for PlainRecordCsvRiferimentoNISECI {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let string_representation = format!(
+            "RecordCsvRiferimentoNISECI: {{ nome_comune: [{}], nome_latino: [{}], codice_specie: [{}], origine: [{}], tipo_autoctono: [{}], allo_nocivita: [{}], specie_attesa: [{}], cl_soglia1: [{}], cl_soglia2: [{}], cl_soglia3: [{}], cl_soglia4: [{}], ad_juv_soglia1: [{}], ad_juv_soglia2: [{}], ad_juv_soglia3: [{}], ad_juv_soglia4: [{}], dens_soglia1: [{}], dens_soglia2: [{}] }}",
+              self.nome_comune, self.nome_latino, self.codice_specie, self.origine,
+              self.tipo_autoctono, self.allo_nocivita, self.specie_attesa,
+              self.cl_soglia1, self.cl_soglia2, self.cl_soglia3, self.cl_soglia4,
+              self.ad_juv_soglia1, self.ad_juv_soglia2, self.ad_juv_soglia3, self.ad_juv_soglia4,
+              self.dens_soglia1, self.dens_soglia2
+        );
+        write!(f, "{}", string_representation)
+    }
 }
 
 #[derive(Debug, serde::Deserialize)]
@@ -767,9 +780,43 @@ pub trait RecordCsvAnagraficaNISECI: serde::de::DeserializeOwned {
     fn nome_bacino(&self) -> String;
 }
 
-struct RecordCsvAnagraficaNISECIWrapper<T: RecordCsvAnagraficaNISECI>(T);
+#[derive(Debug, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct VeryItalianRecordCsvAnagraficaNISECI {
+    pub codice_stazione: String,
+    pub corpo_idrico: String,
+    pub regione: String,
+    pub provincia: String,
+    pub data: String,
+    #[serde(deserialize_with = "deserialize_comma_f32")]
+    pub lunghezza_stazione: f32,
+    #[serde(deserialize_with = "deserialize_comma_f32")]
+    pub larghezza_stazione: f32,
+    pub tipo_comunita: u32,
+    pub fonte: String,
+    pub numero_protocollo: String,
+    pub idro_eco_regione: u32,
+    pub area_alpina: u32,
+    pub nome_bacino: String,
+}
 
-impl<T: RecordCsvAnagraficaNISECI> fmt::Display for RecordCsvAnagraficaNISECIWrapper<T> {
+impl RecordCsvAnagraficaNISECI for VeryItalianRecordCsvAnagraficaNISECI {
+    fn codice_stazione(&self) -> String { self.codice_stazione.clone() }
+    fn corpo_idrico(&self) -> String { self.corpo_idrico.clone() }
+    fn regione(&self) -> String { self.regione.clone() }
+    fn provincia(&self) -> String { self.provincia.clone() }
+    fn data(&self) -> String { self.data.clone() }
+    fn lunghezza_stazione(&self) -> f32 { self.lunghezza_stazione }
+    fn larghezza_stazione(&self) -> f32 { self.larghezza_stazione }
+    fn tipo_comunita(&self) -> u32 { self.tipo_comunita }
+    fn fonte(&self) -> String { self.fonte.clone() }
+    fn numero_protocollo(&self) -> String { self.numero_protocollo.clone() }
+    fn idro_eco_regione(&self) -> u32 { self.idro_eco_regione }
+    fn area_alpina(&self) -> u32 { self.area_alpina }
+    fn nome_bacino(&self) -> String { self.nome_bacino.clone() }
+}
+
+impl fmt::Display for VeryItalianRecordCsvAnagraficaNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let string_representation = format!(
             "RecordAnagraficaNISECI: {{ codice_stazione: [{}], corpo_idrico: [{}],\
@@ -777,10 +824,10 @@ impl<T: RecordCsvAnagraficaNISECI> fmt::Display for RecordCsvAnagraficaNISECIWra
             larghezza_stazione: [{}], tipo_comunita [{}], fonte [{}],\
             numero_protocollo: [{}], idro_eco_regione: [{}],\
             area_alpina: [{}], nome_bacino: [{}]}}",
-            self.0.codice_stazione(), self.0.corpo_idrico(), self.0.regione(), self.0.provincia(),
-            self.0.data(), self.0.lunghezza_stazione(), self.0.larghezza_stazione(),
-            self.0.tipo_comunita(), self.0.fonte(), self.0.numero_protocollo(),
-            self.0.idro_eco_regione(), self.0.area_alpina(), self.0.nome_bacino()
+            self.codice_stazione, self.corpo_idrico, self.regione, self.provincia,
+            self.data, self.lunghezza_stazione, self.larghezza_stazione,
+            self.tipo_comunita, self.fonte, self.numero_protocollo,
+            self.idro_eco_regione, self.area_alpina, self.nome_bacino
         );
         write!(f, "{}", string_representation)
     }
@@ -788,43 +835,7 @@ impl<T: RecordCsvAnagraficaNISECI> fmt::Display for RecordCsvAnagraficaNISECIWra
 
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct RecordCsvAnagraficaNISECI_It {
-    pub codice_stazione: String,
-    pub corpo_idrico: String,
-    pub regione: String,
-    pub provincia: String,
-    pub data: String,
-    #[serde(deserialize_with = "deserialize_comma_f32")]
-    pub lunghezza_stazione: f32,
-    #[serde(deserialize_with = "deserialize_comma_f32")]
-    pub larghezza_stazione: f32,
-    pub tipo_comunita: u32,
-    pub fonte: String,
-    pub numero_protocollo: String,
-    pub idro_eco_regione: u32,
-    pub area_alpina: u32,
-    pub nome_bacino: String,
-}
-
-impl RecordCsvAnagraficaNISECI for RecordCsvAnagraficaNISECI_It {
-    fn codice_stazione(&self) -> String { self.codice_stazione.clone() }
-    fn corpo_idrico(&self) -> String { self.corpo_idrico.clone() }
-    fn regione(&self) -> String { self.regione.clone() }
-    fn provincia(&self) -> String { self.provincia.clone() }
-    fn data(&self) -> String { self.data.clone() }
-    fn lunghezza_stazione(&self) -> f32 { self.lunghezza_stazione }
-    fn larghezza_stazione(&self) -> f32 { self.larghezza_stazione }
-    fn tipo_comunita(&self) -> u32 { self.tipo_comunita }
-    fn fonte(&self) -> String { self.fonte.clone() }
-    fn numero_protocollo(&self) -> String { self.numero_protocollo.clone() }
-    fn idro_eco_regione(&self) -> u32 { self.idro_eco_regione }
-    fn area_alpina(&self) -> u32 { self.area_alpina }
-    fn nome_bacino(&self) -> String { self.nome_bacino.clone() }
-}
-
-#[derive(Debug, serde::Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct RecordCsvAnagraficaNISECI_Plain {
+pub struct PlainRecordCsvAnagraficaNISECI {
     pub codice_stazione: String,
     pub corpo_idrico: String,
     pub regione: String,
@@ -840,7 +851,7 @@ pub struct RecordCsvAnagraficaNISECI_Plain {
     pub nome_bacino: String,
 }
 
-impl RecordCsvAnagraficaNISECI for RecordCsvAnagraficaNISECI_Plain {
+impl RecordCsvAnagraficaNISECI for PlainRecordCsvAnagraficaNISECI {
     fn codice_stazione(&self) -> String { self.codice_stazione.clone() }
     fn corpo_idrico(&self) -> String { self.corpo_idrico.clone() }
     fn regione(&self) -> String { self.regione.clone() }
@@ -854,6 +865,23 @@ impl RecordCsvAnagraficaNISECI for RecordCsvAnagraficaNISECI_Plain {
     fn idro_eco_regione(&self) -> u32 { self.idro_eco_regione }
     fn area_alpina(&self) -> u32 { self.area_alpina }
     fn nome_bacino(&self) -> String { self.nome_bacino.clone() }
+}
+
+impl fmt::Display for PlainRecordCsvAnagraficaNISECI {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let string_representation = format!(
+            "RecordAnagraficaNISECI: {{ codice_stazione: [{}], corpo_idrico: [{}],\
+            regione: [{}], provincia: [{}], data: [{}], lunghezza_stazione: [{}],\
+            larghezza_stazione: [{}], tipo_comunita [{}], fonte [{}],\
+            numero_protocollo: [{}], idro_eco_regione: [{}],\
+            area_alpina: [{}], nome_bacino: [{}]}}",
+            self.codice_stazione, self.corpo_idrico, self.regione, self.provincia,
+            self.data, self.lunghezza_stazione, self.larghezza_stazione,
+            self.tipo_comunita, self.fonte, self.numero_protocollo,
+            self.idro_eco_regione, self.area_alpina, self.nome_bacino
+        );
+        write!(f, "{}", string_representation)
+    }
 }
 
 #[derive(Debug)]
