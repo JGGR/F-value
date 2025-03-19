@@ -19,6 +19,7 @@ use std::process::exit;
 
 use crate::core::*;
 use crate::controllers::*;
+use crate::model::core::SubModel;
 use crate::model::index::Indice;
 use crate::model::location::Location;
 use crate::model::niseci::TipoComunitaNISECI;

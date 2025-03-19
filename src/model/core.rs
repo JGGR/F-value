@@ -23,6 +23,11 @@ use std::collections::HashMap;
 use crate::console::*;
 use crate::SHORT_PROJECT_VERSION;
 
+pub trait SubModel {
+    fn get_frame_counter(&self) -> u32;
+    fn increment_frame_counter(&mut self);
+}
+
 // State struct holding non-`Copy` types
 #[derive(Clone)]
 pub struct HomeModel {
@@ -30,13 +35,16 @@ pub struct HomeModel {
     user_continued: bool
 }
 
-impl HomeModel {
-    pub fn get_frame_counter(&self) -> u32 {
+impl SubModel for HomeModel {
+    fn get_frame_counter(&self) -> u32 {
         return self.frame_counter;
     }
-    pub fn increment_frame_counter(&mut self) {
+    fn increment_frame_counter(&mut self) {
         self.frame_counter += 1;
     }
+}
+
+impl HomeModel {
     pub fn get_user_continued(&self) -> bool {
         return self.user_continued;
     }
@@ -55,13 +63,16 @@ pub struct SecondModel {
     user_continued: bool
 }
 
-impl SecondModel {
-    pub fn get_frame_counter(&self) -> u32 {
+impl SubModel for SecondModel {
+    fn get_frame_counter(&self) -> u32 {
         return self.frame_counter;
     }
-    pub fn increment_frame_counter(&mut self) {
+    fn increment_frame_counter(&mut self) {
         self.frame_counter += 1;
     }
+}
+
+impl SecondModel {
     pub fn get_value(&self) -> i32 {
         return self.value;
     }
@@ -91,14 +102,16 @@ pub struct IndiceModel {
     selected_index: Option<Indice>
 }
 
-impl IndiceModel {
-    pub fn _get_frame_counter(&self) -> u32 {
+impl SubModel for IndiceModel {
+    fn get_frame_counter(&self) -> u32 {
         return self.frame_counter;
     }
-    pub fn increment_frame_counter(&mut self) {
+    fn increment_frame_counter(&mut self) {
         self.frame_counter += 1;
     }
+}
 
+impl IndiceModel {
     pub fn set_selected_index(&mut self, index: Indice) -> () {
         self.selected_index = Some(index);
     }
@@ -119,13 +132,16 @@ pub struct FileInputModel {
     errors_occurred: bool,
 }
 
-impl FileInputModel {
-    pub fn _get_frame_counter(&self) -> u32 {
+impl SubModel for FileInputModel {
+    fn get_frame_counter(&self) -> u32 {
         return self.frame_counter;
     }
-    pub fn increment_frame_counter(&mut self) {
+    fn increment_frame_counter(&mut self) {
         self.frame_counter += 1;
     }
+}
+
+impl FileInputModel {
     pub fn set_riferimento_path(&mut self, path: Option<PathBuf>) {
         self.riferimento_path = path;
     }
@@ -176,15 +192,17 @@ pub struct InfoAggiuntiveModel {
     errors_occurred: bool,
 }
 
-impl InfoAggiuntiveModel {
-    pub fn get_frame_counter(&self) -> u32 {
+impl SubModel for InfoAggiuntiveModel {
+    fn get_frame_counter(&self) -> u32 {
         return self.frame_counter;
     }
 
-    pub fn increment_frame_counter(&mut self) {
+    fn increment_frame_counter(&mut self) {
         self.frame_counter += 1;
     }
+}
 
+impl InfoAggiuntiveModel {
     pub fn is_done_editing(&self) -> bool {
         return self.done_editing;
     }
@@ -218,14 +236,16 @@ pub struct OutputModel {
     done_user_confirm: bool,
 }
 
-impl OutputModel {
-    pub fn get_frame_counter(&self) -> u32 {
+impl SubModel for OutputModel {
+    fn get_frame_counter(&self) -> u32 {
         return self.frame_counter;
     }
-    pub fn increment_frame_counter(&mut self) {
+    fn increment_frame_counter(&mut self) {
         self.frame_counter += 1;
     }
+}
 
+impl OutputModel {
     pub fn is_done_calc(&self) -> bool {
         return self.done_calc;
     }
@@ -245,9 +265,19 @@ impl OutputModel {
 
 #[derive(Clone)]
 pub struct ConsoleModel {
+    frame_counter: u32,
     pub console: Console,
     name: String,
     should_backout: bool,
+}
+
+impl SubModel for ConsoleModel {
+    fn get_frame_counter(&self) -> u32 {
+        return self.frame_counter;
+    }
+    fn increment_frame_counter(&mut self) {
+        self.frame_counter += 1;
+    }
 }
 
 impl ConsoleModel {
@@ -277,13 +307,24 @@ pub struct DataModelNISECI {
 
 #[derive(Clone)]
 pub struct DataModel {
+    frame_counter: u32,
     pub errors_occurred: bool,
     pub niseci: DataModelNISECI,
+}
+
+impl SubModel for DataModel {
+    fn get_frame_counter(&self) -> u32 {
+        return self.frame_counter;
+    }
+    fn increment_frame_counter(&mut self) {
+        self.frame_counter += 1;
+    }
 }
 
 impl DataModel {
     pub fn _new(niseci: DataModelNISECI) -> Self {
         Self {
+            frame_counter: 0,
             errors_occurred: false,
             niseci: niseci,
         }
@@ -371,6 +412,7 @@ impl Model {
                 done_user_confirm: false,
             },
             console_model: ConsoleModel {
+                frame_counter: 0,
                 console: Console::new(
                     80, // Columns - chars per line
                     1000, // Max messages
@@ -387,6 +429,7 @@ impl Model {
                 should_backout: false,
             },
             data_model: DataModel {
+                frame_counter: 0,
                 errors_occurred: false,
                 niseci: DataModelNISECI {
                     riferimento: None,

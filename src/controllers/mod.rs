@@ -29,9 +29,9 @@ use raylib::consts::KeyboardKey::*;
 use chrono::format::ParseErrorKind;
 
 pub trait Controller {
-    type SubState; // Associated type for controller substate
+    type SubModel: SubModel; // Associated type for controller substate
     fn update(&self, rl: &mut RaylibHandle, main_state: &mut MainState);
-    fn get_state(&self) -> Self::SubState;
+    fn get_state(&self) -> Self::SubModel;
     fn add_console_message(&self, msg: String) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.console_model.console.add_message(msg);
@@ -46,7 +46,7 @@ pub trait Controller {
 pub struct HomeController;
 
 impl Controller for HomeController {
-    type SubState = HomeModel;
+    type SubModel = HomeModel;
 
     fn update(&self, _rl: &mut RaylibHandle, main_state: &mut MainState) {
         let mut state = GLOBAL_STATE.lock().unwrap();
@@ -61,7 +61,7 @@ impl Controller for HomeController {
         }
     }
 
-    fn get_state(&self) -> Self::SubState {
+    fn get_state(&self) -> Self::SubModel {
         let state = GLOBAL_STATE.lock().unwrap();
         return state.home_model.clone();
     }
@@ -81,7 +81,7 @@ impl HomeController {
 pub struct SecondController;
 
 impl Controller for SecondController {
-    type SubState = SecondModel;
+    type SubModel = SecondModel;
     fn update(&self, _rl: &mut RaylibHandle, main_state: &mut MainState) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.second_model.increment_frame_counter();
@@ -96,7 +96,7 @@ impl Controller for SecondController {
         }
     }
 
-    fn get_state(&self) -> Self::SubState {
+    fn get_state(&self) -> Self::SubModel {
         let state = GLOBAL_STATE.lock().unwrap();
         return state.second_model.clone();
     }
@@ -126,7 +126,7 @@ impl SecondController {
 pub struct IndiceController;
 
 impl Controller for IndiceController {
-    type SubState = IndiceModel;
+    type SubModel = IndiceModel;
 
     fn update(&self, _rl: &mut RaylibHandle, main_state: &mut MainState) {
         let mut state = GLOBAL_STATE.lock().unwrap();
@@ -141,7 +141,7 @@ impl Controller for IndiceController {
             None => ()
         }
     }
-    fn get_state(&self) -> Self::SubState {
+    fn get_state(&self) -> Self::SubModel {
         let state = GLOBAL_STATE.lock().unwrap();
         return state.indice_model.clone();
     }
@@ -161,7 +161,7 @@ impl IndiceController {
 pub struct FileInputController;
 
 impl Controller for FileInputController {
-    type SubState = FileInputModel;
+    type SubModel = FileInputModel;
 
     fn update(&self, _rl: &mut RaylibHandle, main_state: &mut MainState) {
         let mut state = GLOBAL_STATE.lock().unwrap();
@@ -276,7 +276,7 @@ impl Controller for FileInputController {
         }
     }
 
-    fn get_state(&self) -> Self::SubState {
+    fn get_state(&self) -> Self::SubModel {
         let state = GLOBAL_STATE.lock().unwrap();
         return state.fileinput_model.clone();
     }
@@ -468,7 +468,7 @@ impl FileInputController {
 pub struct InfoAggiuntiveController;
 
 impl Controller for InfoAggiuntiveController {
-    type SubState = InfoAggiuntiveModel;
+    type SubModel = InfoAggiuntiveModel;
 
     fn update(&self, _rl: &mut RaylibHandle, main_state: &mut MainState) {
         let mut state = GLOBAL_STATE.lock().unwrap();
@@ -528,7 +528,7 @@ impl Controller for InfoAggiuntiveController {
 
     }
 
-    fn get_state(&self) -> Self::SubState {
+    fn get_state(&self) -> Self::SubModel {
         let state = GLOBAL_STATE.lock().unwrap();
         return state.infoaggiuntive_model.clone();
     }
@@ -737,7 +737,7 @@ impl InfoAggiuntiveController {
 pub struct OutputController;
 
 impl Controller for OutputController {
-    type SubState = OutputModel;
+    type SubModel = OutputModel;
 
     fn update(&self, _rl: &mut RaylibHandle, main_state: &mut MainState) {
         let mut state = GLOBAL_STATE.lock().unwrap();
@@ -764,7 +764,7 @@ impl Controller for OutputController {
         }
     }
 
-    fn get_state(&self) -> Self::SubState {
+    fn get_state(&self) -> Self::SubModel {
         let state = GLOBAL_STATE.lock().unwrap();
         return state.output_model.clone();
     }
@@ -1028,7 +1028,7 @@ impl _LogController {
 pub struct ConsoleController;
 
 impl Controller for ConsoleController {
-    type SubState = ConsoleModel;
+    type SubModel = ConsoleModel;
 
     fn update(&self, rl: &mut RaylibHandle, main_state: &mut MainState) {
         let mut state = GLOBAL_STATE.lock().unwrap();
@@ -1076,7 +1076,7 @@ impl Controller for ConsoleController {
         state.console_model.set_name("Updated".to_string());
     }
 
-    fn get_state(&self) -> Self::SubState {
+    fn get_state(&self) -> Self::SubModel {
         let state = GLOBAL_STATE.lock().unwrap();
         return state.console_model.clone();
     }
