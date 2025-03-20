@@ -36,6 +36,8 @@
 - Refactor `core` module:
   - Move gui-related code to `app` module
   - Move parser-related code to `core::csv` module
+    - Deserialize step in `core::csv::lexer`
+    - Value-check step in `core::csv::parser`
 - Refactor `model` module:
   - Moved domain model to `domain`
   - Moved gui model to `app::model`
