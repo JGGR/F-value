@@ -19,7 +19,7 @@ use std::collections::HashMap;
 
 use crate::model::niseci::{CampionamentoNISECI, RecordNISECI, RiferimentoNISECI, SpecieNISECI};
 
-pub fn calculate_x1(campionamento: &CampionamentoNISECI, riferimento: &RiferimentoNISECI) -> f32 {
+pub(crate) fn calculate_x1(campionamento: &CampionamentoNISECI, riferimento: &RiferimentoNISECI) -> f32 {
   // n_i è il numero di specie autoctone di maggiore importanza ecologico-funzionale campionate
   // n_a è il numero di altre specie autoctone campionate
   // m_i è il numero di specie autoctone di maggiore importanza ecologico-funzionale attese

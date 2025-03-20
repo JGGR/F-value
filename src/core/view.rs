@@ -21,7 +21,7 @@ use raylib::consts::GuiIconName::*;
 use raylib::consts::GuiControl::DEFAULT;
 use raylib::consts::GuiDefaultProperty::TEXT_SIZE;
 
-pub fn draw_quit_win(d: &mut RaylibDrawHandle, showing_quit_win: &mut bool, should_quit: &mut bool) {
+pub(crate) fn draw_quit_win(d: &mut RaylibDrawHandle, showing_quit_win: &mut bool, should_quit: &mut bool) {
     if *showing_quit_win {
         d.draw_rectangle(
             0,
@@ -52,7 +52,7 @@ pub fn draw_quit_win(d: &mut RaylibDrawHandle, showing_quit_win: &mut bool, shou
     }
 }
 
-pub fn draw_license_box(d: &mut RaylibDrawHandle, showing_license_box: &mut bool, font: &WeakFont, default_txt_spacing: i32, current_font_height: i32) {
+pub(crate) fn draw_license_box(d: &mut RaylibDrawHandle, showing_license_box: &mut bool, font: &WeakFont, default_txt_spacing: i32, current_font_height: i32) {
     if *showing_license_box {
         let x_padding = propwidth(d, 50);
         let y_padding = propheight(d, 100);
@@ -95,7 +95,7 @@ pub fn draw_license_box(d: &mut RaylibDrawHandle, showing_license_box: &mut bool
     }
 }
 
-pub fn draw_info_box(d: &mut RaylibDrawHandle, showing_info_box: &mut bool, font: &WeakFont, default_txt_spacing: i32, default_txt_color: Color, current_font_height: i32) {
+pub(crate) fn draw_info_box(d: &mut RaylibDrawHandle, showing_info_box: &mut bool, font: &WeakFont, default_txt_spacing: i32, default_txt_color: Color, current_font_height: i32) {
     if *showing_info_box {
         d.draw_rectangle(
             0,
@@ -310,7 +310,7 @@ pub fn draw_info_box(d: &mut RaylibDrawHandle, showing_info_box: &mut bool, font
     }
 }
 
-pub fn draw_settings_box(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
+pub(crate) fn draw_settings_box(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
     if main_state.showing_settings_box {
         d.draw_rectangle(
             0,
@@ -421,7 +421,7 @@ pub fn draw_settings_box(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
     }
 }
 
-pub fn draw_main(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
+pub(crate) fn draw_main(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
 
     let lock_gui = main_state.get_gui_should_lock();
 

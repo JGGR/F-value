@@ -34,7 +34,7 @@ use raylib::consts::GuiIconName::{ICON_FILE_OPEN, ICON_BIN, ICON_OK_TICK, ICON_C
 use std::ffi::CString;
 use std::cmp::max;
 
-pub struct Views {
+pub(crate) struct Views {
     home_view: HomeView,
     second_view: SecondView,
     selezione_indice_view: SelezioneIndiceView,
@@ -48,7 +48,7 @@ pub struct Views {
 }
 
 impl Views {
-    pub fn new(rl: &mut RaylibHandle, thread: &RaylibThread, gui_current_font_height: i32, txt_spacing: i32) -> Self {
+    pub(crate) fn new(rl: &mut RaylibHandle, thread: &RaylibThread, gui_current_font_height: i32, txt_spacing: i32) -> Self {
         Self {
             home_view: HomeView::new(),
             second_view: SecondView::new(),
@@ -62,7 +62,7 @@ impl Views {
             console_view: ConsoleView::new(rl, thread, gui_current_font_height, txt_spacing),
         }
     }
-    pub fn draw(&mut self, d: &mut RaylibDrawHandle, thread: &RaylibThread, controllers: &Controllers, main_state: &MainState) {
+    pub(crate) fn draw(&mut self, d: &mut RaylibDrawHandle, thread: &RaylibThread, controllers: &Controllers, main_state: &MainState) {
         match main_state.current_view {
             CurrentView::Home => {
                 self.home_view.draw(d, thread, &controllers.home_controller, main_state);
@@ -98,14 +98,14 @@ impl Views {
     }
 }
 
-pub trait View {
+pub(crate) trait View {
     type Controller: Controller;
     fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &Self::Controller, main_state: &MainState);
 }
 
 // A view responsible for rendering the state
 // Tightly coupled with its respective controller
-pub struct HomeView {}
+pub(crate) struct HomeView {}
 
 impl View for HomeView {
     type Controller = HomeController;
@@ -204,12 +204,12 @@ impl View for HomeView {
 }
 
 impl HomeView {
-    pub fn new() -> Self {
+    pub(crate) fn new() -> Self {
         Self {}
     }
 }
 
-pub struct SecondView {
+pub(crate) struct SecondView {
     spinner_value: i32,
     spinner_edit_mode: bool,
 }
@@ -342,7 +342,7 @@ impl View for SecondView {
 }
 
 impl SecondView {
-    pub fn new() -> Self {
+    pub(crate) fn new() -> Self {
         Self {
             spinner_value: 0,
             spinner_edit_mode: false,
@@ -350,7 +350,7 @@ impl SecondView {
     }
 }
 
-pub struct SelezioneIndiceView {
+pub(crate) struct SelezioneIndiceView {
 
 }
 
@@ -417,14 +417,14 @@ impl View for SelezioneIndiceView {
 
 impl SelezioneIndiceView {
 
-    pub fn new() -> Self {
+    pub(crate) fn new() -> Self {
         Self {
 
         }
     }
 }
 
-pub struct SelezioneFileInputView {
+pub(crate) struct SelezioneFileInputView {
 
 }
 
@@ -563,14 +563,14 @@ impl View for SelezioneFileInputView {
 
 impl SelezioneFileInputView {
 
-    pub fn new() -> Self {
+    pub(crate) fn new() -> Self {
         Self {
 
         }
     }
 }
 
-pub struct ValidazioneFileInputView {
+pub(crate) struct ValidazioneFileInputView {
 
 }
 
@@ -669,14 +669,14 @@ impl View for ValidazioneFileInputView {
 
 impl ValidazioneFileInputView {
 
-    pub fn new() -> Self {
+    pub(crate) fn new() -> Self {
         Self {
 
         }
     }
 }
 
-pub struct SelezioneInfoAggiuntiveView {
+pub(crate) struct SelezioneInfoAggiuntiveView {
     textbox_codice_stazione_edit_mode: bool,
     textbox_codice_stazione_buffer: [u8; 64],
     textbox_corpo_idrico_edit_mode: bool,
@@ -1392,7 +1392,7 @@ impl View for SelezioneInfoAggiuntiveView {
 
 impl SelezioneInfoAggiuntiveView {
 
-    pub fn new() -> Self {
+    pub(crate) fn new() -> Self {
         let mut codice_stazione_buffer = [0u8; 64];
         let codice_stazione_buffer_bytes = "Inserisci codice stazione".as_bytes();
         let codice_stazione_buffer_len = codice_stazione_buffer_bytes.len().min(64);
@@ -1472,7 +1472,7 @@ impl SelezioneInfoAggiuntiveView {
     }
 }
 
-pub struct ValidazioneInfoAggiuntiveView {
+pub(crate) struct ValidazioneInfoAggiuntiveView {
 
 }
 
@@ -1567,14 +1567,14 @@ impl View for ValidazioneInfoAggiuntiveView {
 
 impl ValidazioneInfoAggiuntiveView {
 
-    pub fn new() -> Self {
+    pub(crate) fn new() -> Self {
         Self {
 
         }
     }
 }
 
-pub struct ProduzioneOutputView {
+pub(crate) struct ProduzioneOutputView {
 
 }
 
@@ -1857,14 +1857,14 @@ impl View for ProduzioneOutputView {
 
 impl ProduzioneOutputView {
 
-    pub fn new() -> Self {
+    pub(crate) fn new() -> Self {
         Self {
 
         }
     }
 }
 
-pub struct ProduzionePDFView {
+pub(crate) struct ProduzionePDFView {
 
 }
 
@@ -1941,7 +1941,7 @@ impl View for ProduzionePDFView {
 
 impl ProduzionePDFView {
 
-    pub fn new() -> Self {
+    pub(crate) fn new() -> Self {
         Self {
 
         }
@@ -1968,7 +1968,7 @@ fn draw_rainbow_text(d: &mut RaylibDrawHandle, x: i32, y: i32, text: &str, frame
     d.draw_text_ex(font, text, Vector2::new(text_x as f32, text_y as f32), text_font_height as f32, text_spacing as f32, rainbow_color);
 }
 
-pub struct ConsoleView {
+pub(crate) struct ConsoleView {
     font : Font,
     current_font_size : i32,
     _default_font_size : i32,
@@ -1988,7 +1988,7 @@ impl View for ConsoleView {
 }
 
 impl ConsoleView {
-    pub fn new(rl: &mut RaylibHandle, thread : &RaylibThread, font_size : i32, font_spacing: i32) -> Self {
+    pub(crate) fn new(rl: &mut RaylibHandle, thread : &RaylibThread, font_size : i32, font_spacing: i32) -> Self {
         Self {
             font : rl.load_font_from_memory(thread,
                 ".ttf",

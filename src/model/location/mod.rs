@@ -18,9 +18,9 @@
 use std::fmt;
 
 #[derive(Clone)]
-pub struct Location {
-  pub regione: String,
-  pub provincia: String
+pub(crate) struct Location {
+  pub(crate) regione: String,
+  pub(crate) provincia: String
 }
 
 impl fmt::Display for Location {

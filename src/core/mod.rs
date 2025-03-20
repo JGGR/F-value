@@ -15,9 +15,9 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-pub mod view;
-pub mod controller;
-pub mod cli;
+pub(crate) mod view;
+pub(crate) mod controller;
+pub(crate) mod cli;
 
 use raylib::prelude::*;
 use std::fmt;
@@ -37,11 +37,11 @@ use chrono::format::ParseErrorKind;
 use std::io::{self, Error, ErrorKind};
 use std::any::TypeId;
 
-pub const AUTHOR_JGABAUT: &str = "jgabaut";
-pub const AUTHOR_GIONINJO: &str = "gioninjo";
-pub const AUTHOR_GIONINJO_LINK: &str = "https://github.com/gioninjo";
-pub const AUTHOR_JGABAUT_LINK: &str = "https://github.com/jgabaut";
-pub const COPYRIGHT_INFO: &str = "Copyright (C) 2024-2025  jgabaut, gioninjo
+pub(crate) const AUTHOR_JGABAUT: &str = "jgabaut";
+pub(crate) const AUTHOR_GIONINJO: &str = "gioninjo";
+pub(crate) const AUTHOR_GIONINJO_LINK: &str = "https://github.com/gioninjo";
+pub(crate) const AUTHOR_JGABAUT_LINK: &str = "https://github.com/jgabaut";
+pub(crate) const COPYRIGHT_INFO: &str = "Copyright (C) 2024-2025  jgabaut, gioninjo
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -55,66 +55,66 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.";
 
-pub const EXIT_KEY: raylib::consts::KeyboardKey = raylib::consts::KeyboardKey::KEY_ESCAPE;
-pub const PROJECT_NAME: &str = env!("CARGO_PKG_NAME");
-pub const PROJECT_VERSION: &str = env!("CARGO_PKG_VERSION");
-pub const PROJECT_VERSION_FULL: &str = env!("VERSION_STRING");
-pub const SHORT_PROJECT_VERSION: &str = env!("SHORT_VERSION_STRING");
-pub const PROJECT_BUILD_TYPE: &str = env!("BUILD_TYPE");
-pub const PROJECT_BRANCH: &str = env!("BRANCH_NAME");
-pub const _COMMIT_HASH: &str = env!("COMMIT_HASH");
-pub const COMMIT_HASH_PLUS: &str = env!("COMMIT_HASH_PLUS");
-pub const ESOX_SCREEN_WIDTH: i32 = 960;
-pub const ESOX_SCREEN_HEIGHT: i32 = 540;
-pub const DARK_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_dark.rgs");
-pub const BLUISH_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_bluish.rgs");
-pub const CANDY_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_candy.rgs");
-pub const CHERRY_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_cherry.rgs");
-pub const CYBER_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_cyber.rgs");
-pub const JUNGLE_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_jungle.rgs");
-pub const LAVANDA_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_lavanda.rgs");
-pub const TERMINAL_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_terminal.rgs");
-pub const ASHES_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_ashes.rgs");
-pub const CONSOLE_FONT_DATA: &[u8] = include_bytes!("../../assets/FreeMono.ttf");
-pub const PROJECT_LOGO_DATA: &[u8] = include_bytes!("../../assets/logo.png");
+pub(crate) const EXIT_KEY: raylib::consts::KeyboardKey = raylib::consts::KeyboardKey::KEY_ESCAPE;
+pub(crate) const PROJECT_NAME: &str = env!("CARGO_PKG_NAME");
+pub(crate) const PROJECT_VERSION: &str = env!("CARGO_PKG_VERSION");
+pub(crate) const PROJECT_VERSION_FULL: &str = env!("VERSION_STRING");
+pub(crate) const SHORT_PROJECT_VERSION: &str = env!("SHORT_VERSION_STRING");
+pub(crate) const PROJECT_BUILD_TYPE: &str = env!("BUILD_TYPE");
+pub(crate) const PROJECT_BRANCH: &str = env!("BRANCH_NAME");
+pub(crate) const _COMMIT_HASH: &str = env!("COMMIT_HASH");
+pub(crate) const COMMIT_HASH_PLUS: &str = env!("COMMIT_HASH_PLUS");
+pub(crate) const ESOX_SCREEN_WIDTH: i32 = 960;
+pub(crate) const ESOX_SCREEN_HEIGHT: i32 = 540;
+pub(crate) const DARK_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_dark.rgs");
+pub(crate) const BLUISH_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_bluish.rgs");
+pub(crate) const CANDY_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_candy.rgs");
+pub(crate) const CHERRY_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_cherry.rgs");
+pub(crate) const CYBER_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_cyber.rgs");
+pub(crate) const JUNGLE_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_jungle.rgs");
+pub(crate) const LAVANDA_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_lavanda.rgs");
+pub(crate) const TERMINAL_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_terminal.rgs");
+pub(crate) const ASHES_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_ashes.rgs");
+pub(crate) const CONSOLE_FONT_DATA: &[u8] = include_bytes!("../../assets/FreeMono.ttf");
+pub(crate) const PROJECT_LOGO_DATA: &[u8] = include_bytes!("../../assets/logo.png");
 
 #[cfg(all(windows, debug_assertions))]
-pub const SUPPORT_HEADLESS: bool = true;
+pub(crate) const SUPPORT_HEADLESS: bool = true;
 
 #[cfg(all(windows, not(debug_assertions)))]
-pub const SUPPORT_HEADLESS: bool = false; // This is due to windows_subsystem being "windows"
+pub(crate) const SUPPORT_HEADLESS: bool = false; // This is due to windows_subsystem being "windows"
 
 #[cfg(not(windows))]
-pub const SUPPORT_HEADLESS: bool = true;
+pub(crate) const SUPPORT_HEADLESS: bool = true;
 
 
 // This must be kept aligned with RecordCsvRiferimentoNISECI definition.
 // TODO: get this stuff with some macro?
-pub const RIFERIMENTO_NISECI_HEADER_FIELDS: [&str; 17] = [ "nomeComune", "nomeLatino", "codiceSpecie", "origine", "tipoAutoctono", "alloNocivita", "specieAttesa", "clSoglia1", "clSoglia2", "clSoglia3", "clSoglia4", "adJuvSoglia1", "adJuvSoglia2", "adJuvSoglia3", "adJuvSoglia4", "densSoglia1", "densSoglia2" ];
-pub const RIFERIMENTO_NISECI_HEADER_FIELD_TYPES: [&str; 17] = [ "String", "String", "String", "String", "u32", "u32", "u32", "u32", "u32", "u32", "u32", "f32", "f32", "f32", "f32", "f32", "f32" ];
-pub const RIFERIMENTO_NISECI_HEADER: &str = "\
+pub(crate) const RIFERIMENTO_NISECI_HEADER_FIELDS: [&str; 17] = [ "nomeComune", "nomeLatino", "codiceSpecie", "origine", "tipoAutoctono", "alloNocivita", "specieAttesa", "clSoglia1", "clSoglia2", "clSoglia3", "clSoglia4", "adJuvSoglia1", "adJuvSoglia2", "adJuvSoglia3", "adJuvSoglia4", "densSoglia1", "densSoglia2" ];
+pub(crate) const RIFERIMENTO_NISECI_HEADER_FIELD_TYPES: [&str; 17] = [ "String", "String", "String", "String", "u32", "u32", "u32", "u32", "u32", "u32", "u32", "f32", "f32", "f32", "f32", "f32", "f32" ];
+pub(crate) const RIFERIMENTO_NISECI_HEADER: &str = "\
 nomeComune;nomeLatino;codiceSpecie;origine;tipoAutoctono;alloNocivita;specieAttesa;clSoglia1;clSoglia2;clSoglia3;clSoglia4;adJuvSoglia1;adJuvSoglia2;adJuvSoglia3;adJuvSoglia4;densSoglia1;densSoglia2";
 
 // This must be kept aligned with RecordCsvCampionamentoNISECI definition.
 // TODO: get this stuff with some macro?
-pub const CAMPIONAMENTO_NISECI_HEADER_FIELDS: [&str; 6] = [ "data", "stazione", "numPassaggio", "codiceSpecie", "lunghezza", "peso" ];
-pub const CAMPIONAMENTO_NISECI_HEADER_FIELD_TYPES: [&str; 6] = [ "String", "String", "u32", "String", "u32", "u32" ];
-pub const CAMPIONAMENTO_NISECI_HEADER: &str = "\
+pub(crate) const CAMPIONAMENTO_NISECI_HEADER_FIELDS: [&str; 6] = [ "data", "stazione", "numPassaggio", "codiceSpecie", "lunghezza", "peso" ];
+pub(crate) const CAMPIONAMENTO_NISECI_HEADER_FIELD_TYPES: [&str; 6] = [ "String", "String", "u32", "String", "u32", "u32" ];
+pub(crate) const CAMPIONAMENTO_NISECI_HEADER: &str = "\
 data;stazione;numPassaggio;codiceSpecie;lunghezza;peso";
 
 // This must be kept aligned with RecordCsvAnagraficaNISECI definition.
 // TODO: get this stuff with some macro?
-pub const ANAGRAFICA_NISECI_HEADER_FIELDS: [&str; 13] = [
+pub(crate) const ANAGRAFICA_NISECI_HEADER_FIELDS: [&str; 13] = [
 "codiceStazione", "corpoIdrico", "regione", "provincia", "data", "lunghezzaStazione", "larghezzaStazione", "tipoComunita", "fonte", "numeroProtocollo", "idroEcoRegione", "areaAlpina", "nomeBacino" ];
-pub const ANAGRAFICA_NISECI_HEADER_FIELD_TYPES: [&str; 13] = [ "String", "String", "String", "String", "String", "f32", "f32", "u32", "String", "String", "u32", "u32", "String"];
-pub const ANAGRAFICA_NISECI_HEADER: &str = "\
+pub(crate) const ANAGRAFICA_NISECI_HEADER_FIELD_TYPES: [&str; 13] = [ "String", "String", "String", "String", "String", "f32", "f32", "u32", "String", "String", "u32", "u32", "String"];
+pub(crate) const ANAGRAFICA_NISECI_HEADER: &str = "\
 codiceStazione;corpoIdrico;regione;provincia;data;lunghezzaStazione;larghezzaStazione;tipoComunita;fonte;numeroProtocollo;idroEcoRegione;areaAlpina;nomeBacino";
 
 //TODO: add test to check if this string respects the discriminant ordering in GuiTheme
-pub const GUI_THEME_COMBOBOX_STR: &str = "Light;Dark;Bluish;Candy;Cherry;Cyber;Jungle;Lavanda;Terminal;Ashes";
+pub(crate) const GUI_THEME_COMBOBOX_STR: &str = "Light;Dark;Bluish;Candy;Cherry;Cyber;Jungle;Lavanda;Terminal;Ashes";
 
 #[derive(Copy, Clone)]
-pub enum CurrentView {
+pub(crate) enum CurrentView {
     Home,
     Second,
     SelezioneIndice,
@@ -146,7 +146,7 @@ impl fmt::Display for CurrentView {
 }
 
 #[derive(Copy,Clone)]
-pub enum GuiTheme {
+pub(crate) enum GuiTheme {
     Light,
     Dark,
     Bluish,
@@ -197,28 +197,28 @@ impl TryFrom<i32> for GuiTheme {
     }
 }
 
-pub struct MainState {
-    pub frame_counter: u32,
-    pub showing_quit_win: bool,
-    pub should_quit: bool,
-    pub showing_info_box: bool,
-    pub showing_license_box: bool,
-    pub showing_settings_box: bool,
-    pub current_view: CurrentView,
-    pub previous_view: CurrentView,
-    pub theme: GuiTheme,
-    pub gui_theme_combobox_active: i32,
-    pub default_font_height: i32,
-    pub current_font_height: i32,
-    pub default_txt_spacing: i32,
-    pub default_txt_color: Color,
-    pub current_font: WeakFont,
-    pub default_bg_color: Color,
-    pub logo_texture: Option<Texture2D>,
+pub(crate) struct MainState {
+    pub(crate) frame_counter: u32,
+    pub(crate) showing_quit_win: bool,
+    pub(crate) should_quit: bool,
+    pub(crate) showing_info_box: bool,
+    pub(crate) showing_license_box: bool,
+    pub(crate) showing_settings_box: bool,
+    pub(crate) current_view: CurrentView,
+    pub(crate) previous_view: CurrentView,
+    pub(crate) theme: GuiTheme,
+    pub(crate) gui_theme_combobox_active: i32,
+    pub(crate) default_font_height: i32,
+    pub(crate) current_font_height: i32,
+    pub(crate) default_txt_spacing: i32,
+    pub(crate) default_txt_color: Color,
+    pub(crate) current_font: WeakFont,
+    pub(crate) default_bg_color: Color,
+    pub(crate) logo_texture: Option<Texture2D>,
 }
 
 impl MainState {
-    pub fn new(default_font_height: i32, current_font_height: i32, default_txt_spacing: i32, current_font: WeakFont, default_txt_color: Color, default_bg_color: Color, logo_texture: Option<Texture2D>) -> Self {
+    pub(crate) fn new(default_font_height: i32, current_font_height: i32, default_txt_spacing: i32, current_font: WeakFont, default_txt_color: Color, default_bg_color: Color, logo_texture: Option<Texture2D>) -> Self {
         Self {
             frame_counter: 0,
             showing_quit_win: false,
@@ -240,16 +240,16 @@ impl MainState {
         }
     }
 
-    pub fn set_current_view(&mut self, view: CurrentView) {
+    pub(crate) fn set_current_view(&mut self, view: CurrentView) {
         self.previous_view = self.current_view;
         self.current_view = view;
     }
 
-    pub fn get_gui_should_lock(&self) -> bool {
+    pub(crate) fn get_gui_should_lock(&self) -> bool {
         self.showing_quit_win || self.showing_info_box || self.showing_settings_box || self.showing_license_box
     }
 
-    pub fn mainloop(&mut self, rl: &mut RaylibHandle, thread: &RaylibThread, controllers: &Controllers, views: &mut Views) {
+    pub(crate) fn mainloop(&mut self, rl: &mut RaylibHandle, thread: &RaylibThread, controllers: &Controllers, views: &mut Views) {
         while !self.should_quit {
 
             // Base update step
@@ -280,7 +280,7 @@ impl MainState {
     }
 }
 
-pub fn propwidth(d: &RaylibDrawHandle<'_>, to_scale: i32) -> i32
+pub(crate) fn propwidth(d: &RaylibDrawHandle<'_>, to_scale: i32) -> i32
 {
     if !(0..=ESOX_SCREEN_WIDTH).contains(&to_scale) {
         panic!("propw():  invalid to_scale value received: {to_scale}");
@@ -289,7 +289,7 @@ pub fn propwidth(d: &RaylibDrawHandle<'_>, to_scale: i32) -> i32
     current_screen_width * to_scale / ESOX_SCREEN_WIDTH
 }
 
-pub fn propheight(d: &RaylibDrawHandle<'_>, to_scale: i32) -> i32
+pub(crate) fn propheight(d: &RaylibDrawHandle<'_>, to_scale: i32) -> i32
 {
     if !(0..=ESOX_SCREEN_HEIGHT).contains(&to_scale) {
         panic!("proph():  invalid to_scale value received: {to_scale}");
@@ -298,13 +298,13 @@ pub fn propheight(d: &RaylibDrawHandle<'_>, to_scale: i32) -> i32
     current_screen_height * to_scale / ESOX_SCREEN_HEIGHT
 }
 
-pub fn parse_date(date_str: &str) -> Result<NaiveDate, chrono::format::ParseError> {
+pub(crate) fn parse_date(date_str: &str) -> Result<NaiveDate, chrono::format::ParseError> {
     let normalized = date_str.replace("/", "-"); // Replace all / with -
     NaiveDate::parse_from_str(&normalized, "%d-%m-%Y")
 }
 
 #[derive(Copy,Clone)]
-pub enum TipoRecordCsv {
+pub(crate) enum TipoRecordCsv {
     RiferimentoNISECI,
     CampionamentoNISECI,
     AnagraficaNISECI,
@@ -349,7 +349,7 @@ impl<R: Read> Read for NormalizerReader<R> {
     }
 }
 
-pub trait RecordCsvRiferimentoNISECI: serde::de::DeserializeOwned {
+pub(crate) trait RecordCsvRiferimentoNISECI: serde::de::DeserializeOwned {
     #[allow(dead_code)]
     fn nome_comune(&self) -> String;
     fn nome_latino(&self) -> String;
@@ -372,30 +372,30 @@ pub trait RecordCsvRiferimentoNISECI: serde::de::DeserializeOwned {
 
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct VeryItalianRecordCsvRiferimentoNISECI {
-    pub nome_comune: String,
-    pub nome_latino: String,
-    pub codice_specie: String,
-    pub origine: String,
-    pub tipo_autoctono: u32,
-    pub allo_nocivita: u32,
-    pub specie_attesa: u32,
-    pub cl_soglia1: u32, // in mm
-    pub cl_soglia2: u32, // in mm
-    pub cl_soglia3: u32, // in mm
-    pub cl_soglia4: u32, // in mm
+pub(crate) struct VeryItalianRecordCsvRiferimentoNISECI {
+    pub(crate) nome_comune: String,
+    pub(crate) nome_latino: String,
+    pub(crate) codice_specie: String,
+    pub(crate) origine: String,
+    pub(crate) tipo_autoctono: u32,
+    pub(crate) allo_nocivita: u32,
+    pub(crate) specie_attesa: u32,
+    pub(crate) cl_soglia1: u32, // in mm
+    pub(crate) cl_soglia2: u32, // in mm
+    pub(crate) cl_soglia3: u32, // in mm
+    pub(crate) cl_soglia4: u32, // in mm
     #[serde(deserialize_with = "deserialize_comma_f32")]
-    pub ad_juv_soglia1: f32,
+    pub(crate) ad_juv_soglia1: f32,
     #[serde(deserialize_with = "deserialize_comma_f32")]
-    pub ad_juv_soglia2: f32,
+    pub(crate) ad_juv_soglia2: f32,
     #[serde(deserialize_with = "deserialize_comma_f32")]
-    pub ad_juv_soglia3: f32,
+    pub(crate) ad_juv_soglia3: f32,
     #[serde(deserialize_with = "deserialize_comma_f32")]
-    pub ad_juv_soglia4: f32,
+    pub(crate) ad_juv_soglia4: f32,
     #[serde(deserialize_with = "deserialize_comma_f32")]
-    pub dens_soglia1: f32,
+    pub(crate) dens_soglia1: f32,
     #[serde(deserialize_with = "deserialize_comma_f32")]
-    pub dens_soglia2: f32,
+    pub(crate) dens_soglia2: f32,
 }
 
 impl RecordCsvRiferimentoNISECI for VeryItalianRecordCsvRiferimentoNISECI {
@@ -435,24 +435,24 @@ impl fmt::Display for VeryItalianRecordCsvRiferimentoNISECI {
 
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct PlainRecordCsvRiferimentoNISECI {
-    pub nome_comune: String,
-    pub nome_latino: String,
-    pub codice_specie: String,
-    pub origine: String,
-    pub tipo_autoctono: u32,
-    pub allo_nocivita: u32,
-    pub specie_attesa: u32,
-    pub cl_soglia1: u32, // in mm
-    pub cl_soglia2: u32, // in mm
-    pub cl_soglia3: u32, // in mm
-    pub cl_soglia4: u32, // in mm
-    pub ad_juv_soglia1: f32,
-    pub ad_juv_soglia2: f32,
-    pub ad_juv_soglia3: f32,
-    pub ad_juv_soglia4: f32,
-    pub dens_soglia1: f32,
-    pub dens_soglia2: f32,
+pub(crate) struct PlainRecordCsvRiferimentoNISECI {
+    pub(crate) nome_comune: String,
+    pub(crate) nome_latino: String,
+    pub(crate) codice_specie: String,
+    pub(crate) origine: String,
+    pub(crate) tipo_autoctono: u32,
+    pub(crate) allo_nocivita: u32,
+    pub(crate) specie_attesa: u32,
+    pub(crate) cl_soglia1: u32, // in mm
+    pub(crate) cl_soglia2: u32, // in mm
+    pub(crate) cl_soglia3: u32, // in mm
+    pub(crate) cl_soglia4: u32, // in mm
+    pub(crate) ad_juv_soglia1: f32,
+    pub(crate) ad_juv_soglia2: f32,
+    pub(crate) ad_juv_soglia3: f32,
+    pub(crate) ad_juv_soglia4: f32,
+    pub(crate) dens_soglia1: f32,
+    pub(crate) dens_soglia2: f32,
 }
 
 impl RecordCsvRiferimentoNISECI for PlainRecordCsvRiferimentoNISECI {
@@ -489,7 +489,7 @@ impl fmt::Display for PlainRecordCsvRiferimentoNISECI {
     }
 }
 
-pub trait RecordCsvCampionamentoNISECI: serde::de::DeserializeOwned {
+pub(crate) trait RecordCsvCampionamentoNISECI: serde::de::DeserializeOwned {
     #[allow(dead_code)]
     fn data(&self) -> String;
     #[allow(dead_code)]
@@ -502,13 +502,13 @@ pub trait RecordCsvCampionamentoNISECI: serde::de::DeserializeOwned {
 
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct VeryItalianRecordCsvCampionamentoNISECI {
-    pub data: String,
-    pub stazione: String,
-    pub num_passaggio: u32,
-    pub codice_specie: String,
-    pub lunghezza: u32,
-    pub peso: u32,
+pub(crate) struct VeryItalianRecordCsvCampionamentoNISECI {
+    pub(crate) data: String,
+    pub(crate) stazione: String,
+    pub(crate) num_passaggio: u32,
+    pub(crate) codice_specie: String,
+    pub(crate) lunghezza: u32,
+    pub(crate) peso: u32,
 }
 
 impl RecordCsvCampionamentoNISECI for VeryItalianRecordCsvCampionamentoNISECI {
@@ -533,13 +533,13 @@ impl fmt::Display for VeryItalianRecordCsvCampionamentoNISECI {
 
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct PlainRecordCsvCampionamentoNISECI {
-    pub data: String,
-    pub stazione: String,
-    pub num_passaggio: u32,
-    pub codice_specie: String,
-    pub lunghezza: u32,
-    pub peso: u32,
+pub(crate) struct PlainRecordCsvCampionamentoNISECI {
+    pub(crate) data: String,
+    pub(crate) stazione: String,
+    pub(crate) num_passaggio: u32,
+    pub(crate) codice_specie: String,
+    pub(crate) lunghezza: u32,
+    pub(crate) peso: u32,
 }
 
 impl RecordCsvCampionamentoNISECI for PlainRecordCsvCampionamentoNISECI {
@@ -562,7 +562,7 @@ impl fmt::Display for PlainRecordCsvCampionamentoNISECI {
     }
 }
 
-pub fn parse_csv_campionamento_niseci<R, T>(mut rdr: csv::Reader<R>) -> (Vec<T>, Vec<csv::Error>)
+pub(crate) fn parse_csv_campionamento_niseci<R, T>(mut rdr: csv::Reader<R>) -> (Vec<T>, Vec<csv::Error>)
 where
     R: std::io::Read,
     T: RecordCsvCampionamentoNISECI + 'static
@@ -581,7 +581,7 @@ where
 }
 
 #[derive(Debug)]
-pub enum RecordCsvCampionamentoNISECIError {
+pub(crate) enum RecordCsvCampionamentoNISECIError {
     ValoreInvalido { msg : String }, //TODO: add position?
 }
 
@@ -594,7 +594,7 @@ impl fmt::Display for RecordCsvCampionamentoNISECIError {
   }
 }
 
-pub fn parse_recordcsv_campionamento_niseci<T: RecordCsvCampionamentoNISECI>(records: Vec<T>, riferimento_specie: Vec<SpecieNISECI>) -> (Vec<RecordNISECI>,Vec<RecordCsvCampionamentoNISECIError>) {
+pub(crate) fn parse_recordcsv_campionamento_niseci<T: RecordCsvCampionamentoNISECI>(records: Vec<T>, riferimento_specie: Vec<SpecieNISECI>) -> (Vec<RecordNISECI>,Vec<RecordCsvCampionamentoNISECIError>) {
     let mut campioni = Vec::new();
     let mut errors = Vec::new();
     let mut idx = 0;
@@ -644,7 +644,7 @@ pub fn parse_recordcsv_campionamento_niseci<T: RecordCsvCampionamentoNISECI>(rec
     (campioni, errors)
 }
 
-pub fn parse_csv_riferimento_niseci<R, T>(mut rdr: csv::Reader<R>) -> (Vec<T>, Vec<csv::Error>)
+pub(crate) fn parse_csv_riferimento_niseci<R, T>(mut rdr: csv::Reader<R>) -> (Vec<T>, Vec<csv::Error>)
 where
     R: std::io::Read,
     T: RecordCsvRiferimentoNISECI
@@ -663,7 +663,7 @@ where
 }
 
 #[derive(Debug)]
-pub enum RecordCsvRiferimentoNISECIError {
+pub(crate) enum RecordCsvRiferimentoNISECIError {
     ValoreInvalido { msg : String }, //TODO: add position?
     SoglieCLNonCrescenti { msg : String },
     SoglieADJUVNonCrescenti { msg: String }
@@ -680,7 +680,7 @@ let string_representation = match self {
   }
 }
 
-pub fn parse_recordcsv_riferimento_niseci<T: RecordCsvRiferimentoNISECI>(records: Vec<T>) -> (Vec<SpecieNISECI>,Vec<RecordCsvRiferimentoNISECIError>)
+pub(crate) fn parse_recordcsv_riferimento_niseci<T: RecordCsvRiferimentoNISECI>(records: Vec<T>) -> (Vec<SpecieNISECI>,Vec<RecordCsvRiferimentoNISECIError>)
 {
     let mut specie = Vec::new();
     let mut errors = Vec::new();
@@ -820,7 +820,7 @@ pub fn parse_recordcsv_riferimento_niseci<T: RecordCsvRiferimentoNISECI>(records
     (specie, errors)
 }
 
-pub trait RecordCsvAnagraficaNISECI: serde::de::DeserializeOwned {
+pub(crate) trait RecordCsvAnagraficaNISECI: serde::de::DeserializeOwned {
     fn codice_stazione(&self) -> String;
     fn corpo_idrico(&self) -> String;
     fn regione(&self) -> String;
@@ -838,22 +838,22 @@ pub trait RecordCsvAnagraficaNISECI: serde::de::DeserializeOwned {
 
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct VeryItalianRecordCsvAnagraficaNISECI {
-    pub codice_stazione: String,
-    pub corpo_idrico: String,
-    pub regione: String,
-    pub provincia: String,
-    pub data: String,
+pub(crate) struct VeryItalianRecordCsvAnagraficaNISECI {
+    pub(crate) codice_stazione: String,
+    pub(crate) corpo_idrico: String,
+    pub(crate) regione: String,
+    pub(crate) provincia: String,
+    pub(crate) data: String,
     #[serde(deserialize_with = "deserialize_comma_f32")]
-    pub lunghezza_stazione: f32,
+    pub(crate) lunghezza_stazione: f32,
     #[serde(deserialize_with = "deserialize_comma_f32")]
-    pub larghezza_stazione: f32,
-    pub tipo_comunita: u32,
-    pub fonte: String,
-    pub numero_protocollo: String,
-    pub idro_eco_regione: u32,
-    pub area_alpina: u32,
-    pub nome_bacino: String,
+    pub(crate) larghezza_stazione: f32,
+    pub(crate) tipo_comunita: u32,
+    pub(crate) fonte: String,
+    pub(crate) numero_protocollo: String,
+    pub(crate) idro_eco_regione: u32,
+    pub(crate) area_alpina: u32,
+    pub(crate) nome_bacino: String,
 }
 
 impl RecordCsvAnagraficaNISECI for VeryItalianRecordCsvAnagraficaNISECI {
@@ -891,20 +891,20 @@ impl fmt::Display for VeryItalianRecordCsvAnagraficaNISECI {
 
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct PlainRecordCsvAnagraficaNISECI {
-    pub codice_stazione: String,
-    pub corpo_idrico: String,
-    pub regione: String,
-    pub provincia: String,
-    pub data: String,
-    pub lunghezza_stazione: f32,
-    pub larghezza_stazione: f32,
-    pub tipo_comunita: u32,
-    pub fonte: String,
-    pub numero_protocollo: String,
-    pub idro_eco_regione: u32,
-    pub area_alpina: u32,
-    pub nome_bacino: String,
+pub(crate) struct PlainRecordCsvAnagraficaNISECI {
+    pub(crate) codice_stazione: String,
+    pub(crate) corpo_idrico: String,
+    pub(crate) regione: String,
+    pub(crate) provincia: String,
+    pub(crate) data: String,
+    pub(crate) lunghezza_stazione: f32,
+    pub(crate) larghezza_stazione: f32,
+    pub(crate) tipo_comunita: u32,
+    pub(crate) fonte: String,
+    pub(crate) numero_protocollo: String,
+    pub(crate) idro_eco_regione: u32,
+    pub(crate) area_alpina: u32,
+    pub(crate) nome_bacino: String,
 }
 
 impl RecordCsvAnagraficaNISECI for PlainRecordCsvAnagraficaNISECI {
@@ -941,7 +941,7 @@ impl fmt::Display for PlainRecordCsvAnagraficaNISECI {
 }
 
 #[derive(Debug)]
-pub enum RecordCsvAnagraficaNISECIError {
+pub(crate) enum RecordCsvAnagraficaNISECIError {
     ValoreInvalido { msg : String }, //TODO: add position?
 }
 
@@ -955,7 +955,7 @@ impl fmt::Display for RecordCsvAnagraficaNISECIError {
 }
 
 
-pub fn parse_csv_anagrafica_niseci<R, T>(mut rdr: csv::Reader<R>) -> (Vec<T>, Vec<csv::Error>)
+pub(crate) fn parse_csv_anagrafica_niseci<R, T>(mut rdr: csv::Reader<R>) -> (Vec<T>, Vec<csv::Error>)
 where
     R: std::io::Read,
     T: RecordCsvAnagraficaNISECI
@@ -973,7 +973,7 @@ where
     (records, errors)
 }
 
-pub fn parse_recordcsv_anagrafica_niseci<T: RecordCsvAnagraficaNISECI>(records: Vec<T>) -> Result<AnagraficaNISECI, Vec<RecordCsvAnagraficaNISECIError>> {
+pub(crate) fn parse_recordcsv_anagrafica_niseci<T: RecordCsvAnagraficaNISECI>(records: Vec<T>) -> Result<AnagraficaNISECI, Vec<RecordCsvAnagraficaNISECIError>> {
     let mut errors = Vec::new();
     if records.len() > 1 {
         let err = RecordCsvAnagraficaNISECIError::ValoreInvalido { msg : format!("Troppi record: {}, atteso 1", records.len()) };
@@ -1157,7 +1157,7 @@ pub fn parse_recordcsv_anagrafica_niseci<T: RecordCsvAnagraficaNISECI>(records: 
 
 }
 
-pub fn check_anagrafica_niseci_reader<R: Read, T>(reader: R) -> Result<Vec<T>,Vec<csv::Error>>
+pub(crate) fn check_anagrafica_niseci_reader<R: Read, T>(reader: R) -> Result<Vec<T>,Vec<csv::Error>>
 where
     T: RecordCsvAnagraficaNISECI + 'static
 {
@@ -1204,7 +1204,7 @@ where
     }
 }
 
-pub fn check_records_anagrafica_niseci<T: RecordCsvAnagraficaNISECI>(records: Vec<T>) -> Result<AnagraficaNISECI,Vec<RecordCsvAnagraficaNISECIError>> {
+pub(crate) fn check_records_anagrafica_niseci<T: RecordCsvAnagraficaNISECI>(records: Vec<T>) -> Result<AnagraficaNISECI,Vec<RecordCsvAnagraficaNISECIError>> {
 
     let res = parse_recordcsv_anagrafica_niseci(records);
 
@@ -1233,7 +1233,7 @@ pub fn check_records_anagrafica_niseci<T: RecordCsvAnagraficaNISECI>(records: Ve
     }
 }
 
-pub fn check_anagrafica_niseci_path<T>(path: PathBuf) -> Result<Vec<T>,Vec<csv::Error>>
+pub(crate) fn check_anagrafica_niseci_path<T>(path: PathBuf) -> Result<Vec<T>,Vec<csv::Error>>
 where
     T: RecordCsvAnagraficaNISECI + 'static
 {
@@ -1247,7 +1247,7 @@ where
     check_anagrafica_niseci_reader(file)
 }
 
-pub fn translate_error_message(msg: &str) -> String {
+pub(crate) fn translate_error_message(msg: &str) -> String {
     if msg.starts_with("missing field") {
         msg.replace("missing field", "campo mancante")
     } else if msg.starts_with("invalid type") {
@@ -1307,7 +1307,7 @@ fn parse_csv_pos(pos: &Option<csv::Position>) -> String {
     res
 }
 
-pub fn process_csv_errors(errors: &Vec<csv::Error>, tipo_csv: TipoRecordCsv) -> Vec<String> {
+pub(crate) fn process_csv_errors(errors: &Vec<csv::Error>, tipo_csv: TipoRecordCsv) -> Vec<String> {
     let mut res = Vec::new();
     for error in errors {
         match error.kind() {
@@ -1431,7 +1431,7 @@ fn check_path_is_file_ends_with_csv(path: &Path) -> bool {
     }
 }
 
-pub fn check_campionamento_niseci_reader<R: Read, T>(reader: R) -> Result<Vec<T>,Vec<csv::Error>>
+pub(crate) fn check_campionamento_niseci_reader<R: Read, T>(reader: R) -> Result<Vec<T>,Vec<csv::Error>>
 where
     T: RecordCsvCampionamentoNISECI + 'static
 {
@@ -1478,7 +1478,7 @@ where
     }
 }
 
-pub fn check_campionamento_niseci_path<T>(path: PathBuf) -> Result<Vec<T>,Vec<csv::Error>>
+pub(crate) fn check_campionamento_niseci_path<T>(path: PathBuf) -> Result<Vec<T>,Vec<csv::Error>>
 where
     T: RecordCsvCampionamentoNISECI + 'static
 {
@@ -1492,7 +1492,7 @@ where
     check_campionamento_niseci_reader(file)
 }
 
-pub fn check_records_campionamento_niseci<T: RecordCsvCampionamentoNISECI>(records: Vec<T>, riferimento_specie: Vec<SpecieNISECI>) -> Result<Vec<RecordNISECI>,Vec<RecordCsvCampionamentoNISECIError>> {
+pub(crate) fn check_records_campionamento_niseci<T: RecordCsvCampionamentoNISECI>(records: Vec<T>, riferimento_specie: Vec<SpecieNISECI>) -> Result<Vec<RecordNISECI>,Vec<RecordCsvCampionamentoNISECIError>> {
 
     let (records, errors) = parse_recordcsv_campionamento_niseci(records, riferimento_specie);
 
@@ -1519,7 +1519,7 @@ pub fn check_records_campionamento_niseci<T: RecordCsvCampionamentoNISECI>(recor
     }
 }
 
-pub fn check_riferimento_niseci_reader<R: Read, T>(reader: R) -> Result<Vec<T>,Vec<csv::Error>>
+pub(crate) fn check_riferimento_niseci_reader<R: Read, T>(reader: R) -> Result<Vec<T>,Vec<csv::Error>>
 where
     T: RecordCsvRiferimentoNISECI + 'static
 {
@@ -1567,7 +1567,7 @@ where
     }
 }
 
-pub fn check_riferimento_niseci_path<T>(path: PathBuf) -> Result<Vec<T>,Vec<csv::Error>>
+pub(crate) fn check_riferimento_niseci_path<T>(path: PathBuf) -> Result<Vec<T>,Vec<csv::Error>>
 where
     T: RecordCsvRiferimentoNISECI + 'static
 {
@@ -1581,7 +1581,7 @@ where
     check_riferimento_niseci_reader(file)
 }
 
-pub fn check_records_riferimento_niseci<T: RecordCsvRiferimentoNISECI>(records: Vec<T>) -> Result<Vec<SpecieNISECI>,Vec<RecordCsvRiferimentoNISECIError>> {
+pub(crate) fn check_records_riferimento_niseci<T: RecordCsvRiferimentoNISECI>(records: Vec<T>) -> Result<Vec<SpecieNISECI>,Vec<RecordCsvRiferimentoNISECIError>> {
 
     let (records, errors) = parse_recordcsv_riferimento_niseci(records);
 
@@ -1608,7 +1608,7 @@ pub fn check_records_riferimento_niseci<T: RecordCsvRiferimentoNISECI>(records: 
     }
 }
 
-pub fn check_campionamento_hfbi_path(_path: PathBuf) -> bool {
+pub(crate) fn check_campionamento_hfbi_path(_path: PathBuf) -> bool {
     todo!("Implement check campionamento HFBI");
 }
 
@@ -1627,7 +1627,7 @@ fn check_soglie_ad_juv<T: RecordCsvRiferimentoNISECI>(r: &T) -> bool {
     false
 }
 
-pub fn print_warranty_info() {
+pub(crate) fn print_warranty_info() {
     println!("  THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY
   APPLICABLE LAW.  EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT
   HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM \"AS IS\" WITHOUT WARRANTY
@@ -1638,7 +1638,7 @@ pub fn print_warranty_info() {
   ALL NECESSARY SERVICING, REPAIR OR CORRECTION.\n");
 }
 
-pub fn print_copyright_splash() {
+pub(crate) fn print_copyright_splash() {
     let splash: String = format!("{PROJECT_VERSION_FULL}\n\n{COPYRIGHT_INFO}");
     println!("{splash}\n");
 }

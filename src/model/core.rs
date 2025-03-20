@@ -23,14 +23,14 @@ use std::collections::HashMap;
 use crate::console::*;
 use crate::SHORT_PROJECT_VERSION;
 
-pub trait SubModel {
+pub(crate) trait SubModel {
     fn get_frame_counter(&self) -> u32;
     fn increment_frame_counter(&mut self);
 }
 
 // State struct holding non-`Copy` types
 #[derive(Clone)]
-pub struct HomeModel {
+pub(crate) struct HomeModel {
     frame_counter: u32,
     user_continued: bool
 }
@@ -45,10 +45,10 @@ impl SubModel for HomeModel {
 }
 
 impl HomeModel {
-    pub fn get_user_continued(&self) -> bool {
+    pub(crate) fn get_user_continued(&self) -> bool {
         self.user_continued
     }
-    pub fn set_user_continued(&mut self, val: bool) {
+    pub(crate) fn set_user_continued(&mut self, val: bool) {
         self.user_continued = val;
     }
 }
@@ -56,7 +56,7 @@ impl HomeModel {
 
 // State struct holding non-`Copy` types
 #[derive(Clone)]
-pub struct SecondModel {
+pub(crate) struct SecondModel {
     frame_counter: u32,
     value: i32,
     name: String,
@@ -73,31 +73,31 @@ impl SubModel for SecondModel {
 }
 
 impl SecondModel {
-    pub fn get_value(&self) -> i32 {
+    pub(crate) fn get_value(&self) -> i32 {
         self.value
     }
 
-    pub fn set_value(&mut self, val: i32) {
+    pub(crate) fn set_value(&mut self, val: i32) {
         self.value = val;
     }
-    pub fn get_name(&self) -> String {
+    pub(crate) fn get_name(&self) -> String {
         self.name.clone()
     }
 
-    pub fn set_name(&mut self, new_name: String) {
+    pub(crate) fn set_name(&mut self, new_name: String) {
         self.name = new_name;
     }
-    pub fn get_user_continued(&self) -> bool {
+    pub(crate) fn get_user_continued(&self) -> bool {
         self.user_continued
     }
-    pub fn set_user_continued(&mut self, val: bool) {
+    pub(crate) fn set_user_continued(&mut self, val: bool) {
         self.user_continued = val;
     }
 }
 
 // State struct holding non-`Copy` types
 #[derive(Clone)]
-pub struct IndiceModel {
+pub(crate) struct IndiceModel {
     frame_counter: u32,
     selected_index: Option<Indice>
 }
@@ -112,18 +112,18 @@ impl SubModel for IndiceModel {
 }
 
 impl IndiceModel {
-    pub fn set_selected_index(&mut self, index: Indice) {
+    pub(crate) fn set_selected_index(&mut self, index: Indice) {
         self.selected_index = Some(index);
     }
 
-    pub fn get_selected_index(&self) -> Option<Indice> {
+    pub(crate) fn get_selected_index(&self) -> Option<Indice> {
         self.selected_index
     }
 }
 
 // State struct holding non-`Copy` types
 #[derive(Clone)]
-pub struct FileInputModel {
+pub(crate) struct FileInputModel {
     frame_counter: u32,
     riferimento_path: Option<PathBuf>,
     riferimento_path_valid: bool,
@@ -142,50 +142,50 @@ impl SubModel for FileInputModel {
 }
 
 impl FileInputModel {
-    pub fn set_riferimento_path(&mut self, path: Option<PathBuf>) {
+    pub(crate) fn set_riferimento_path(&mut self, path: Option<PathBuf>) {
         self.riferimento_path = path;
     }
 
-    pub fn get_riferimento_path(&self) -> Option<PathBuf> {
+    pub(crate) fn get_riferimento_path(&self) -> Option<PathBuf> {
         self.riferimento_path.clone()
     }
 
-    pub fn set_riferimento_path_valid(&mut self, valid: bool) {
+    pub(crate) fn set_riferimento_path_valid(&mut self, valid: bool) {
         self.riferimento_path_valid = valid;
     }
 
-    pub fn get_riferimento_path_valid(&self) -> bool {
+    pub(crate) fn get_riferimento_path_valid(&self) -> bool {
         self.riferimento_path_valid
     }
 
-    pub fn set_campionamento_path(&mut self, path: Option<PathBuf>) {
+    pub(crate) fn set_campionamento_path(&mut self, path: Option<PathBuf>) {
         self.campionamento_path = path;
     }
 
-    pub fn get_campionamento_path(&self) -> Option<PathBuf> {
+    pub(crate) fn get_campionamento_path(&self) -> Option<PathBuf> {
         self.campionamento_path.clone()
     }
 
-    pub fn set_campionamento_path_valid(&mut self, valid: bool) {
+    pub(crate) fn set_campionamento_path_valid(&mut self, valid: bool) {
         self.campionamento_path_valid = valid;
     }
 
-    pub fn get_campionamento_path_valid(&self) -> bool {
+    pub(crate) fn get_campionamento_path_valid(&self) -> bool {
         self.campionamento_path_valid
     }
 
-    pub fn get_errors_occurred(&self) -> bool {
+    pub(crate) fn get_errors_occurred(&self) -> bool {
         self.errors_occurred
     }
 
-    pub fn set_errors_occurred(&mut self, val: bool) {
+    pub(crate) fn set_errors_occurred(&mut self, val: bool) {
         self.errors_occurred = val;
     }
 }
 
 // State struct holding non-`Copy` types
 #[derive(Clone)]
-pub struct InfoAggiuntiveModel {
+pub(crate) struct InfoAggiuntiveModel {
     frame_counter: u32,
     done_editing: bool,
     valid: bool,
@@ -203,34 +203,34 @@ impl SubModel for InfoAggiuntiveModel {
 }
 
 impl InfoAggiuntiveModel {
-    pub fn is_done_editing(&self) -> bool {
+    pub(crate) fn is_done_editing(&self) -> bool {
         self.done_editing
     }
 
-    pub fn set_done_editing(&mut self, val: bool) {
+    pub(crate) fn set_done_editing(&mut self, val: bool) {
         self.done_editing = val;
     }
 
-    pub fn is_valid(&self) -> bool {
+    pub(crate) fn is_valid(&self) -> bool {
         self.valid
     }
 
-    pub fn set_valid(&mut self, val: bool) {
+    pub(crate) fn set_valid(&mut self, val: bool) {
         self.valid = val;
     }
 
-    pub fn get_errors_occurred(&self) -> bool {
+    pub(crate) fn get_errors_occurred(&self) -> bool {
         self.errors_occurred
     }
 
-    pub fn set_errors_occurred(&mut self, val: bool) {
+    pub(crate) fn set_errors_occurred(&mut self, val: bool) {
         self.errors_occurred = val;
     }
 }
 
 // State struct holding non-`Copy` types
 #[derive(Clone)]
-pub struct OutputModel {
+pub(crate) struct OutputModel {
     frame_counter: u32,
     done_calc: bool,
     done_user_confirm: bool,
@@ -246,27 +246,27 @@ impl SubModel for OutputModel {
 }
 
 impl OutputModel {
-    pub fn is_done_calc(&self) -> bool {
+    pub(crate) fn is_done_calc(&self) -> bool {
         self.done_calc
     }
 
-    pub fn set_done_calc(&mut self, val: bool) {
+    pub(crate) fn set_done_calc(&mut self, val: bool) {
         self.done_calc = val;
     }
 
-    pub fn is_done_user_confirm(&self) -> bool {
+    pub(crate) fn is_done_user_confirm(&self) -> bool {
         self.done_user_confirm
     }
 
-    pub fn set_done_user_confirm(&mut self, val: bool) {
+    pub(crate) fn set_done_user_confirm(&mut self, val: bool) {
         self.done_user_confirm = val;
     }
 }
 
 #[derive(Clone)]
-pub struct ConsoleModel {
+pub(crate) struct ConsoleModel {
     frame_counter: u32,
-    pub console: Console,
+    pub(crate) console: Console,
     name: String,
     should_backout: bool,
 }
@@ -281,24 +281,24 @@ impl SubModel for ConsoleModel {
 }
 
 impl ConsoleModel {
-    pub fn _get_name(&self) -> String {
+    pub(crate) fn _get_name(&self) -> String {
         self.name.clone()
     }
 
-    pub fn set_name(&mut self, new_name: String) {
+    pub(crate) fn set_name(&mut self, new_name: String) {
         self.name = new_name;
     }
 
-    pub fn should_backout(&self) -> bool {
+    pub(crate) fn should_backout(&self) -> bool {
         self.should_backout
     }
-    pub fn set_should_backout(&mut self, val: bool) {
+    pub(crate) fn set_should_backout(&mut self, val: bool) {
         self.should_backout = val;
     }
 }
 
 #[derive(Clone)]
-pub struct DataModelNISECI {
+pub(crate) struct DataModelNISECI {
     riferimento: Option<RiferimentoNISECI>,
     campionamento: Option<CampionamentoNISECI>,
     anagrafica: Option<AnagraficaNISECI>,
@@ -306,10 +306,10 @@ pub struct DataModelNISECI {
 }
 
 #[derive(Clone)]
-pub struct DataModel {
+pub(crate) struct DataModel {
     frame_counter: u32,
-    pub errors_occurred: bool,
-    pub niseci: DataModelNISECI,
+    pub(crate) errors_occurred: bool,
+    pub(crate) niseci: DataModelNISECI,
 }
 
 impl SubModel for DataModel {
@@ -322,61 +322,61 @@ impl SubModel for DataModel {
 }
 
 impl DataModel {
-    pub fn _new(niseci: DataModelNISECI) -> Self {
+    pub(crate) fn _new(niseci: DataModelNISECI) -> Self {
         Self {
             frame_counter: 0,
             errors_occurred: false,
             niseci,
         }
     }
-    pub fn get_riferimento_niseci(&self) -> Option<RiferimentoNISECI> {
+    pub(crate) fn get_riferimento_niseci(&self) -> Option<RiferimentoNISECI> {
         self.niseci.riferimento.clone()
     }
-    pub fn set_riferimento_niseci(&mut self, riferimento: Option<RiferimentoNISECI>) {
+    pub(crate) fn set_riferimento_niseci(&mut self, riferimento: Option<RiferimentoNISECI>) {
         self.niseci.riferimento = riferimento;
     }
-    pub fn get_campionamento_niseci(&self) -> Option<CampionamentoNISECI> {
+    pub(crate) fn get_campionamento_niseci(&self) -> Option<CampionamentoNISECI> {
         self.niseci.campionamento.clone()
     }
-    pub fn set_campionamento_niseci(&mut self, campionamento: Option<CampionamentoNISECI>) {
+    pub(crate) fn set_campionamento_niseci(&mut self, campionamento: Option<CampionamentoNISECI>) {
         self.niseci.campionamento = campionamento;
     }
-    pub fn get_anagrafica_niseci(&self) -> Option<AnagraficaNISECI> {
+    pub(crate) fn get_anagrafica_niseci(&self) -> Option<AnagraficaNISECI> {
         self.niseci.anagrafica.clone()
     }
-    pub fn set_anagrafica_niseci(&mut self, anagrafica: Option<AnagraficaNISECI>) {
+    pub(crate) fn set_anagrafica_niseci(&mut self, anagrafica: Option<AnagraficaNISECI>) {
         self.niseci.anagrafica = anagrafica;
     }
-    pub fn get_risultato_niseci(&self) -> Option<RisultatoNISECI> {
+    pub(crate) fn get_risultato_niseci(&self) -> Option<RisultatoNISECI> {
         self.niseci.risultato.clone()
     }
-    pub fn set_risultato_niseci(&mut self, risultato: Option<RisultatoNISECI>) {
+    pub(crate) fn set_risultato_niseci(&mut self, risultato: Option<RisultatoNISECI>) {
         self.niseci.risultato = risultato;
     }
 
-    pub fn get_errors_occurred(&self) -> bool {
+    pub(crate) fn get_errors_occurred(&self) -> bool {
         self.errors_occurred
     }
 
-    pub fn set_errors_occurred(&mut self, val: bool) {
+    pub(crate) fn set_errors_occurred(&mut self, val: bool) {
         self.errors_occurred = val;
     }
 }
 
 #[derive(Clone)]
-pub struct Model {
-    pub home_model: HomeModel,
-    pub second_model: SecondModel,
-    pub indice_model: IndiceModel,
-    pub fileinput_model: FileInputModel,
-    pub infoaggiuntive_model: InfoAggiuntiveModel,
-    pub output_model: OutputModel,
-    pub console_model: ConsoleModel,
-    pub data_model: DataModel,
+pub(crate) struct Model {
+    pub(crate) home_model: HomeModel,
+    pub(crate) second_model: SecondModel,
+    pub(crate) indice_model: IndiceModel,
+    pub(crate) fileinput_model: FileInputModel,
+    pub(crate) infoaggiuntive_model: InfoAggiuntiveModel,
+    pub(crate) output_model: OutputModel,
+    pub(crate) console_model: ConsoleModel,
+    pub(crate) data_model: DataModel,
 }
 
 impl Model {
-    pub fn new() -> Self {
+    pub(crate) fn new() -> Self {
         Self {
             home_model: HomeModel {
                 frame_counter: 0,

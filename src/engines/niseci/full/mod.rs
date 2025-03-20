@@ -30,7 +30,7 @@ const STATO_ECOLOGICO_NISECI_SOGLIA_BUONO_AREA_MEDITERRANEA: f32 = 0.6;
 const STATO_ECOLOGICO_NISECI_SOGLIA_MODERATO: f32 = 0.4;
 const STATO_ECOLOGICO_NISECI_SOGLIA_SCADENTE: f32 = 0.2;
 
-pub fn calculate_niseci(campionamento: &CampionamentoNISECI, riferimento: &RiferimentoNISECI, anagrafica: &AnagraficaNISECI) -> Result<(Option<f32>, ValoriIntermediNISECI), Vec<String>> {
+pub(crate) fn calculate_niseci(campionamento: &CampionamentoNISECI, riferimento: &RiferimentoNISECI, anagrafica: &AnagraficaNISECI) -> Result<(Option<f32>, ValoriIntermediNISECI), Vec<String>> {
     let mut errors = Vec::new();
     let x1 = calculate_x1(campionamento, riferimento);
 
@@ -122,11 +122,11 @@ pub fn calculate_niseci(campionamento: &CampionamentoNISECI, riferimento: &Rifer
     }
 }
 
-pub fn calculate_rqe_niseci(niseci: Option<f32>) -> Option<f32> {
+pub(crate) fn calculate_rqe_niseci(niseci: Option<f32>) -> Option<f32> {
     niseci.map(|val| (val.log(10.0) +  RQE_NISECI_MAGIC_ADDEND ) / RQE_NISECI_MAGIC_QUOTIENT)
 }
 
-pub fn calculate_stato_ecologico(niseci: Option<f32>, area: &AreaNISECI) -> Option<StatoEcologicoNISECI> {
+pub(crate) fn calculate_stato_ecologico(niseci: Option<f32>, area: &AreaNISECI) -> Option<StatoEcologicoNISECI> {
     let rqe_niseci = calculate_rqe_niseci(niseci);
     match rqe_niseci {
         Some(val) => {

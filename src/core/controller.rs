@@ -25,7 +25,7 @@ use std::ffi::CString;
 use uuid::Uuid;
 use std::io::Write;
 
-pub fn update_main(rl: &mut RaylibHandle, main_state: &mut MainState) {
+pub(crate) fn update_main(rl: &mut RaylibHandle, main_state: &mut MainState) {
     main_state.should_quit = rl.window_should_close();
 
     main_state.frame_counter += 1;

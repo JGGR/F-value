@@ -18,7 +18,7 @@
 use std::{fmt};
 
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
-pub enum Indice {
+pub(crate) enum Indice {
   #[default]
   Niseci,
   Hfbi

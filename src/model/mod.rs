@@ -15,8 +15,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-pub mod core;
-pub mod index;
-pub mod location;
-pub mod niseci;
-pub mod logger;
+pub(crate) mod core;
+pub(crate) mod index;
+pub(crate) mod location;
+pub(crate) mod niseci;
+pub(crate) mod logger;

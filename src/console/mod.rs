@@ -23,7 +23,7 @@ use raylib::consts::GuiIconName::ICON_MONITOR;
 use std::ffi::CString;
 
 #[derive(Clone)]
-pub struct Console {
+pub(crate) struct Console {
     columns: usize,             // How many chars are shown per line
     messages: VecDeque<String>, // Stores all console messages
     max_messages: usize,        // Limit on messages to keep in memory
@@ -35,7 +35,7 @@ pub struct Console {
 }
 
 impl Console {
-    pub fn new(columns: usize, max_messages: usize, max_lines_visible: usize, env: HashMap<String,String>) -> Self {
+    pub(crate) fn new(columns: usize, max_messages: usize, max_lines_visible: usize, env: HashMap<String,String>) -> Self {
         Console {
             columns,
             messages: VecDeque::with_capacity(max_messages),
@@ -48,15 +48,15 @@ impl Console {
         }
     }
 
-    pub fn set_env(&mut self, (key, val): (String,String)) {
+    pub(crate) fn set_env(&mut self, (key, val): (String,String)) {
         self.env.insert(key, val);
     }
 
-    pub fn remove_env(&mut self, key: String) -> Option<String> {
+    pub(crate) fn remove_env(&mut self, key: String) -> Option<String> {
         self.env.remove(&key)
     }
 
-    pub fn _get_len(&self) -> usize {
+    pub(crate) fn _get_len(&self) -> usize {
         self.messages.len()
     }
 
@@ -68,7 +68,7 @@ impl Console {
         self.view_offset == self.messages.len().saturating_sub(self.max_lines_visible)
     }
 
-    pub fn add_message(&mut self, msg: String) {
+    pub(crate) fn add_message(&mut self, msg: String) {
         let lines = msg.lines();
 
         for line in lines {
@@ -97,7 +97,7 @@ impl Console {
     }
 
     /// Handle character input (e.g., from `raylib` key events)
-    pub fn handle_input(&mut self, _rl: &RaylibHandle, input_char: Option<char>, is_enter_pressed: bool, is_backspace_pressed: bool) {
+    pub(crate) fn handle_input(&mut self, _rl: &RaylibHandle, input_char: Option<char>, is_enter_pressed: bool, is_backspace_pressed: bool) {
         if let Some(c) = input_char {
             self.prompt.push(c);
         }
@@ -195,12 +195,12 @@ impl Console {
         }
     }
 
-    pub fn scroll_up(&mut self, lines: usize) {
+    pub(crate) fn scroll_up(&mut self, lines: usize) {
         self.view_offset = self.view_offset.saturating_sub(lines);
         self.autoscroll = false; // Disable autoscroll when user scrolls up
     }
 
-    pub fn scroll_down(&mut self, lines: usize) {
+    pub(crate) fn scroll_down(&mut self, lines: usize) {
         // Ensure we don't scroll beyond the available messages
         let max_offset = self.messages.len().saturating_sub(self.max_lines_visible);
 
@@ -216,7 +216,7 @@ impl Console {
         }
     }
 
-    pub fn draw(&self, d: &mut RaylibDrawHandle, controller: &ConsoleController, txt_color: Color, font_size: i32, font_spacing: i32, font: &Font) {
+    pub(crate) fn draw(&self, d: &mut RaylibDrawHandle, controller: &ConsoleController, txt_color: Color, font_size: i32, font_spacing: i32, font: &Font) {
         let line_height = propheight(d, font_size + 4); // Adjust as needed
         let console_height = (self.max_lines_visible +1) * line_height as usize; // +1 for user
                                                                                  // prompt

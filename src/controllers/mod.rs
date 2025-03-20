@@ -28,7 +28,7 @@ use std::path::PathBuf;
 use raylib::consts::KeyboardKey::*;
 use chrono::format::ParseErrorKind;
 
-pub struct Controllers {
+pub(crate) struct Controllers {
     pub(crate) home_controller: HomeController,
     pub(crate) second_controller: SecondController,
     pub(crate) indice_controller: IndiceController,
@@ -39,7 +39,7 @@ pub struct Controllers {
 }
 
 impl Controllers {
-    pub fn new() -> Self {
+    pub(crate) fn new() -> Self {
         Self {
             home_controller: HomeController::new(),
             second_controller: SecondController::new(),
@@ -50,7 +50,7 @@ impl Controllers {
             console_controller: ConsoleController::new()
         }
     }
-    pub fn update(&self, rl: &mut RaylibHandle, main_state: &mut MainState) {
+    pub(crate) fn update(&self, rl: &mut RaylibHandle, main_state: &mut MainState) {
         // Current view update step
         match main_state.current_view {
             CurrentView::Home => {
@@ -78,7 +78,7 @@ impl Controllers {
     }
 }
 
-pub trait Controller {
+pub(crate) trait Controller {
     type SubModel: SubModel; // Associated type for controller substate
     fn update(&self, rl: &mut RaylibHandle, main_state: &mut MainState);
     fn get_state(&self) -> Self::SubModel;
@@ -93,7 +93,7 @@ pub trait Controller {
 }
 
 // Controller to update and access the state
-pub struct HomeController;
+pub(crate) struct HomeController;
 
 impl Controller for HomeController {
     type SubModel = HomeModel;
@@ -115,17 +115,17 @@ impl Controller for HomeController {
 }
 
 impl HomeController {
-    pub fn new() -> Self {
+    pub(crate) fn new() -> Self {
         Self
     }
 
-    pub fn set_user_continued(&self, val: bool) {
+    pub(crate) fn set_user_continued(&self, val: bool) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.home_model.set_user_continued(val);
     }
 }
 
-pub struct SecondController;
+pub(crate) struct SecondController;
 
 impl Controller for SecondController {
     type SubModel = SecondModel;
@@ -148,26 +148,26 @@ impl Controller for SecondController {
 
 impl SecondController {
 
-    pub fn new() -> Self {
+    pub(crate) fn new() -> Self {
         Self
     }
 
-    pub fn _set_name(&self, name: String) {
+    pub(crate) fn _set_name(&self, name: String) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.second_model.set_name(name);
     }
 
-    pub fn set_value(&self, val: i32) {
+    pub(crate) fn set_value(&self, val: i32) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.second_model.set_value(val);
     }
-    pub fn set_user_continued(&self, val: bool) {
+    pub(crate) fn set_user_continued(&self, val: bool) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.second_model.set_user_continued(val);
     }
 }
 
-pub struct IndiceController;
+pub(crate) struct IndiceController;
 
 impl Controller for IndiceController {
     type SubModel = IndiceModel;
@@ -189,17 +189,17 @@ impl Controller for IndiceController {
 }
 
 impl IndiceController {
-    pub fn new() -> Self {
+    pub(crate) fn new() -> Self {
         Self
     }
 
-    pub fn set_indice_corrente(&self, index: Indice) {
+    pub(crate) fn set_indice_corrente(&self, index: Indice) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.indice_model.set_selected_index(index);
     }
 }
 
-pub struct FileInputController;
+pub(crate) struct FileInputController;
 
 impl Controller for FileInputController {
     type SubModel = FileInputModel;
@@ -325,16 +325,16 @@ impl Controller for FileInputController {
 }
 
 impl FileInputController {
-    pub fn new() -> Self {
+    pub(crate) fn new() -> Self {
         Self
     }
 
-    pub fn get_riferimento_path(&self) -> Option<PathBuf> {
+    pub(crate) fn get_riferimento_path(&self) -> Option<PathBuf> {
         let state = GLOBAL_STATE.lock().unwrap();
         state.fileinput_model.get_riferimento_path()
     }
 
-    pub fn set_riferimento_path(&self, riferimento_path: Option<PathBuf>) {
+    pub(crate) fn set_riferimento_path(&self, riferimento_path: Option<PathBuf>) {
         if let Some(ref rif_path) = riferimento_path {
             self.add_console_message(format!("FileInputController:  Selezione percorso riferimento: {{{}}}", rif_path.display()));
         } else {
@@ -345,7 +345,7 @@ impl FileInputController {
         state.fileinput_model.set_riferimento_path_valid(false); // Refresh the validity
     }
 
-    pub fn get_riferimento_path_valid(&self) -> bool {
+    pub(crate) fn get_riferimento_path_valid(&self) -> bool {
         let state = GLOBAL_STATE.lock().unwrap();
         state.fileinput_model.get_riferimento_path_valid()
     }
@@ -357,12 +357,12 @@ impl FileInputController {
         state.fileinput_model.set_riferimento_path_valid(true);
     }
 
-    pub fn get_data_riferimento_niseci(&self) -> Option<RiferimentoNISECI> {
+    pub(crate) fn get_data_riferimento_niseci(&self) -> Option<RiferimentoNISECI> {
         let state = GLOBAL_STATE.lock().unwrap();
         state.data_model.get_riferimento_niseci()
     }
 
-    pub fn valida_riferimento_niseci_path(&self) {
+    pub(crate) fn valida_riferimento_niseci_path(&self) {
         if let Some(path) = self.get_riferimento_path() {
             // Using italian deser for now
             let csv_check = check_riferimento_niseci_path::<VeryItalianRecordCsvRiferimentoNISECI>(path);
@@ -403,12 +403,12 @@ impl FileInputController {
         }
     }
 
-    pub fn get_campionamento_path(&self) -> Option<PathBuf> {
+    pub(crate) fn get_campionamento_path(&self) -> Option<PathBuf> {
         let state = GLOBAL_STATE.lock().unwrap();
         state.fileinput_model.get_campionamento_path()
     }
 
-    pub fn set_campionamento_path(&self, campionamento_path: Option<PathBuf>) {
+    pub(crate) fn set_campionamento_path(&self, campionamento_path: Option<PathBuf>) {
         if let Some(ref camp_path) = campionamento_path {
             self.add_console_message(format!("FileInputController:  Selezione percorso campionamento: {{{}}}", camp_path.display()));
         } else {
@@ -419,7 +419,7 @@ impl FileInputController {
         state.fileinput_model.set_campionamento_path_valid(false); // Refresh the validity
     }
 
-    pub fn _get_campionamento_path_valid(&self) -> bool {
+    pub(crate) fn _get_campionamento_path_valid(&self) -> bool {
         let state = GLOBAL_STATE.lock().unwrap();
         state.fileinput_model.get_campionamento_path_valid()
     }
@@ -431,12 +431,12 @@ impl FileInputController {
         state.fileinput_model.set_campionamento_path_valid(true);
     }
 
-    pub fn _get_data_campionamento_niseci(&self) -> Option<CampionamentoNISECI> {
+    pub(crate) fn _get_data_campionamento_niseci(&self) -> Option<CampionamentoNISECI> {
         let state = GLOBAL_STATE.lock().unwrap();
         state.data_model.get_campionamento_niseci()
     }
 
-    pub fn valida_campionamento_niseci_path(&self) {
+    pub(crate) fn valida_campionamento_niseci_path(&self) {
         if let Some(path) = self.get_campionamento_path() {
             // Using italian deser for now
             let csv_check = check_campionamento_niseci_path::<VeryItalianRecordCsvCampionamentoNISECI>(path);
@@ -496,14 +496,14 @@ impl FileInputController {
             }
         }
     }
-    pub fn set_console_env(&self, (key, val): (String,String)) {
+    pub(crate) fn set_console_env(&self, (key, val): (String,String)) {
         let mut state = GLOBAL_STATE.lock().unwrap();
 
         state.console_model.console.set_env((key,val));
     }
 }
 
-pub struct InfoAggiuntiveController;
+pub(crate) struct InfoAggiuntiveController;
 
 impl Controller for InfoAggiuntiveController {
     type SubModel = InfoAggiuntiveModel;
@@ -570,16 +570,16 @@ impl Controller for InfoAggiuntiveController {
 }
 
 impl InfoAggiuntiveController {
-    pub fn new() -> Self {
+    pub(crate) fn new() -> Self {
         Self
     }
 
-    pub fn get_data_anagrafica_niseci(&self) -> Option<AnagraficaNISECI> {
+    pub(crate) fn get_data_anagrafica_niseci(&self) -> Option<AnagraficaNISECI> {
         let state = GLOBAL_STATE.lock().unwrap();
         state.data_model.get_anagrafica_niseci()
     }
 
-    pub fn submit_anagrafica_niseci(&self, anagrafica: AnagraficaNISECI) {
+    pub(crate) fn submit_anagrafica_niseci(&self, anagrafica: AnagraficaNISECI) {
         self.set_console_env(("anagrafica_niseci".to_string(), format!("{anagrafica}")));
         self.add_console_message("InfoAggiuntiveController: L'utente ha completato l'inserimento info aggiuntive.".to_string());
         let mut state = GLOBAL_STATE.lock().unwrap();
@@ -589,7 +589,7 @@ impl InfoAggiuntiveController {
         state.infoaggiuntive_model.set_valid(false);
     }
 
-    pub fn check_larghezza_stazione_string(&self, larghezza: &str) -> Result<f32,String> {
+    pub(crate) fn check_larghezza_stazione_string(&self, larghezza: &str) -> Result<f32,String> {
         let s = larghezza.replace(',', "."); // Replace comma with dot
         match s.parse::<f32>() {
             Ok(value) => {
@@ -611,7 +611,7 @@ impl InfoAggiuntiveController {
         }
     }
 
-    pub fn check_lunghezza_stazione_string(&self, lunghezza: &str) -> Result<f32,String> {
+    pub(crate) fn check_lunghezza_stazione_string(&self, lunghezza: &str) -> Result<f32,String> {
         let s = lunghezza.replace(',', "."); // Replace comma with dot
         match s.parse::<f32>() {
             Ok(value) => {
@@ -633,7 +633,7 @@ impl InfoAggiuntiveController {
         }
     }
 
-    pub fn valida_anagrafica_niseci(&self) {
+    pub(crate) fn valida_anagrafica_niseci(&self) {
 
         //We grab the state in a scope to ensure we don't get lock problems
         {
@@ -747,7 +747,7 @@ impl InfoAggiuntiveController {
         };
     }
 
-    pub fn backout_anagrafica_niseci(&self) {
+    pub(crate) fn backout_anagrafica_niseci(&self) {
         self.unset_console_env("anagrafica_niseci".to_string());
         self.add_console_message("InfoAggiuntiveController: L'utente ha annullato l'inserimento info aggiuntive.".to_string());
         let mut state = GLOBAL_STATE.lock().unwrap();
@@ -757,19 +757,19 @@ impl InfoAggiuntiveController {
         state.infoaggiuntive_model.set_valid(false);
     }
 
-    pub fn set_console_env(&self, (key, val): (String,String)) {
+    pub(crate) fn set_console_env(&self, (key, val): (String,String)) {
         let mut state = GLOBAL_STATE.lock().unwrap();
 
         state.console_model.console.set_env((key,val));
     }
 
-    pub fn unset_console_env(&self, key: String) {
+    pub(crate) fn unset_console_env(&self, key: String) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.console_model.console.remove_env(key);
     }
 }
 
-pub struct OutputController;
+pub(crate) struct OutputController;
 
 impl Controller for OutputController {
     type SubModel = OutputModel;
@@ -806,16 +806,16 @@ impl Controller for OutputController {
 }
 
 impl OutputController {
-    pub fn new() -> Self {
+    pub(crate) fn new() -> Self {
         Self
     }
 
-    pub fn get_is_done_calc(&self) -> bool {
+    pub(crate) fn get_is_done_calc(&self) -> bool {
         let state = GLOBAL_STATE.lock().unwrap();
         state.output_model.is_done_calc()
     }
 
-    pub fn get_niseci_value(&self) -> Option<f32> {
+    pub(crate) fn get_niseci_value(&self) -> Option<f32> {
         if self.get_is_done_calc() {
             let opt_res = self.get_data_risultato_niseci();
             match opt_res {
@@ -831,7 +831,7 @@ impl OutputController {
         }
     }
 
-    pub fn get_rqe_niseci_value(&self) -> Option<f32> {
+    pub(crate) fn get_rqe_niseci_value(&self) -> Option<f32> {
         if self.get_is_done_calc() {
             let opt_res = self.get_data_risultato_niseci();
             match opt_res {
@@ -847,7 +847,7 @@ impl OutputController {
         }
     }
 
-    pub fn get_stato_eco_niseci_value(&self) -> Option<StatoEcologicoNISECI> {
+    pub(crate) fn get_stato_eco_niseci_value(&self) -> Option<StatoEcologicoNISECI> {
         if self.get_is_done_calc() {
             let opt_res = self.get_data_risultato_niseci();
             match opt_res {
@@ -873,7 +873,7 @@ impl OutputController {
         }
     }
 
-    pub fn get_x1_value(&self) -> Option<f32> {
+    pub(crate) fn get_x1_value(&self) -> Option<f32> {
         if self.get_is_done_calc() {
             let opt_res = self.get_data_risultato_niseci();
             opt_res.map(|r| r.get_x1())
@@ -882,7 +882,7 @@ impl OutputController {
         }
     }
 
-    pub fn get_x2_value(&self) -> Option<f32> {
+    pub(crate) fn get_x2_value(&self) -> Option<f32> {
         if self.get_is_done_calc() {
             let opt_res = self.get_data_risultato_niseci();
             match opt_res {
@@ -898,7 +898,7 @@ impl OutputController {
         }
     }
 
-    pub fn get_x3_value(&self) -> Option<f32> {
+    pub(crate) fn get_x3_value(&self) -> Option<f32> {
         if self.get_is_done_calc() {
             let opt_res = self.get_data_risultato_niseci();
             opt_res.map(|r| r.get_x3())
@@ -915,7 +915,7 @@ impl OutputController {
         state.output_model.set_done_calc(true);
     }
 
-    pub fn get_data_risultato_niseci(&self) -> Option<RisultatoNISECI> {
+    pub(crate) fn get_data_risultato_niseci(&self) -> Option<RisultatoNISECI> {
         if self.get_is_done_calc() {
             let state = GLOBAL_STATE.lock().unwrap();
             state.data_model.get_risultato_niseci()
@@ -924,7 +924,7 @@ impl OutputController {
         }
     }
 
-    pub fn calc_niseci(&self) {
+    pub(crate) fn calc_niseci(&self) {
         let riferimento;
         let campionamento;
         let anagrafica;
@@ -1020,33 +1020,33 @@ impl OutputController {
         }
     }
 
-    pub fn user_confirm_calc(&self) {
+    pub(crate) fn user_confirm_calc(&self) {
         let mut state = GLOBAL_STATE.lock().unwrap();
 
         state.output_model.set_done_user_confirm(true);
     }
 
-    pub fn set_console_env(&self, (key, val): (String,String)) {
+    pub(crate) fn set_console_env(&self, (key, val): (String,String)) {
         let mut state = GLOBAL_STATE.lock().unwrap();
 
         state.console_model.console.set_env((key,val));
     }
 }
 
-pub struct _LogController;
+pub(crate) struct _LogController;
 
 impl _LogController {
-    pub fn _new() -> Self {
+    pub(crate) fn _new() -> Self {
         Self
     }
 
-    pub fn _update(&self, _rl: &RaylibHandle) {
+    pub(crate) fn _update(&self, _rl: &RaylibHandle) {
         //let mut state = GLOBAL_STATE.lock().unwrap();
         //state.second_model.set_name("Updated".to_string());
     }
 }
 
-pub struct ConsoleController;
+pub(crate) struct ConsoleController;
 
 impl Controller for ConsoleController {
     type SubModel = ConsoleModel;
@@ -1105,16 +1105,16 @@ impl Controller for ConsoleController {
 
 impl ConsoleController {
 
-    pub fn new() -> Self {
+    pub(crate) fn new() -> Self {
         Self
     }
 
-    pub fn backout(&self) {
+    pub(crate) fn backout(&self) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.console_model.set_should_backout(true);
     }
 
-    pub fn _set_console_env(&self, (key, val): (String,String)) {
+    pub(crate) fn _set_console_env(&self, (key, val): (String,String)) {
         let mut state = GLOBAL_STATE.lock().unwrap();
 
         state.console_model.console.set_env((key,val));

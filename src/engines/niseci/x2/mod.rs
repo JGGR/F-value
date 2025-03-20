@@ -22,78 +22,78 @@ use crate::model::niseci::{AnagraficaNISECI, CampionamentoNISECI, ClassiEtaSpeci
 use super::linear_regression::{calculate_quantita_with_regression, Point};
 
 #[derive(Clone)]
-pub struct SubmetricheX2 {
+pub(crate) struct SubmetricheX2 {
     metriche_x2_a: MetricheX2A,
     classi_eta: ClassiEtaSpecieNISECI,
     metriche_x2_b: MetricheX2B
 }
 
 impl SubmetricheX2 {
-    pub fn new(metriche_x2_a: MetricheX2A, classi_eta: ClassiEtaSpecieNISECI, metriche_x2_b: MetricheX2B) -> Self {
+    pub(crate) fn new(metriche_x2_a: MetricheX2A, classi_eta: ClassiEtaSpecieNISECI, metriche_x2_b: MetricheX2B) -> Self {
         Self {
             metriche_x2_a,
             classi_eta,
             metriche_x2_b
         }
     }
-    pub fn get_metriche_x2_a(&self) -> MetricheX2A {
+    pub(crate) fn get_metriche_x2_a(&self) -> MetricheX2A {
         self.metriche_x2_a
     }
-    pub fn get_classi_eta(&self) -> ClassiEtaSpecieNISECI {
+    pub(crate) fn get_classi_eta(&self) -> ClassiEtaSpecieNISECI {
         self.classi_eta.clone()
     }
-    pub fn get_metriche_x2_b(&self) -> MetricheX2B {
+    pub(crate) fn get_metriche_x2_b(&self) -> MetricheX2B {
         self.metriche_x2_b.clone()
     }
 }
 
-pub struct MetricheX2 {
+pub(crate) struct MetricheX2 {
     criterio_a: f32,
     criterio_b: f32,
     submetriche_map: HashMap<String, SubmetricheX2>
 }
 
 impl MetricheX2 {
-    pub fn new(criterio_a: f32, criterio_b: f32, submetriche_map: HashMap<String, SubmetricheX2>) -> Self {
+    pub(crate) fn new(criterio_a: f32, criterio_b: f32, submetriche_map: HashMap<String, SubmetricheX2>) -> Self {
         Self {
             criterio_a,
             criterio_b,
             submetriche_map
         }
     }
-    pub fn get_criterio_a(&self) -> f32 {
+    pub(crate) fn get_criterio_a(&self) -> f32 {
         self.criterio_a
     }
-    pub fn get_criterio_b(&self) -> f32 {
+    pub(crate) fn get_criterio_b(&self) -> f32 {
         self.criterio_b
     }
-    pub fn get_submetriche_map(&self) -> HashMap<String, SubmetricheX2> {
+    pub(crate) fn get_submetriche_map(&self) -> HashMap<String, SubmetricheX2> {
         self.submetriche_map.clone()
     }
 }
 
 #[derive(Clone)]
-pub struct MetricheX2B {
+pub(crate) struct MetricheX2B {
     id_specie: String,
     densita_stimata: f32
 }
 
 impl MetricheX2B {
-    pub fn new(id_specie: String, densita_stimata: f32) -> Self {
+    pub(crate) fn new(id_specie: String, densita_stimata: f32) -> Self {
         Self {
             id_specie,
             densita_stimata
         }
     }
-    pub fn get_id(&self) -> String {
+    pub(crate) fn get_id(&self) -> String {
         self.id_specie.clone()
     }
-    pub fn get_densita_stimata(&self) -> f32 {
+    pub(crate) fn get_densita_stimata(&self) -> f32 {
         self.densita_stimata
     }
 }
 
-pub fn calculate_x2(campionamento: &CampionamentoNISECI, anagrafica: &AnagraficaNISECI) -> Result<(Option<f32>, MetricheX2), Vec<String>> {
+pub(crate) fn calculate_x2(campionamento: &CampionamentoNISECI, anagrafica: &AnagraficaNISECI) -> Result<(Option<f32>, MetricheX2), Vec<String>> {
   let (x2_a, criteri_vec) = calculate_sommatoria_x2_a(campionamento)?;
   let (x2_b, densita_vec) = calculate_sommatoria_x2_b(campionamento, anagrafica)?;
 
@@ -163,20 +163,20 @@ struct RecordSubmetricheX2A {
 }
 
 impl RecordSubmetricheX2A {
-    pub fn new(codice_specie: String, metriche_x2a: MetricheX2A, classi_eta: ClassiEtaSpecieNISECI) -> Self {
+    pub(crate) fn new(codice_specie: String, metriche_x2a: MetricheX2A, classi_eta: ClassiEtaSpecieNISECI) -> Self {
         Self {
             codice_specie,
             metriche_x2a,
             classi_eta
         }
     }
-    pub fn get_codice_specie(&self) -> String {
+    pub(crate) fn get_codice_specie(&self) -> String {
         self.codice_specie.clone()
     }
-    pub fn get_metriche_x2a(&self) -> MetricheX2A {
+    pub(crate) fn get_metriche_x2a(&self) -> MetricheX2A {
         self.metriche_x2a
     }
-    pub fn get_classi_eta(&self) -> ClassiEtaSpecieNISECI {
+    pub(crate) fn get_classi_eta(&self) -> ClassiEtaSpecieNISECI {
         self.classi_eta.clone()
     }
 }

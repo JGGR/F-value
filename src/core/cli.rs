@@ -19,7 +19,7 @@ use crate::core::*;
 use crate::engines::niseci::full::{calculate_niseci, calculate_rqe_niseci, calculate_stato_ecologico};
 use crate::model::niseci::{ CampionamentoNISECI, RiferimentoNISECI };
 
-pub fn esox_usage() {
+pub(crate) fn esox_usage() {
     println!("{PROJECT_NAME} v{SHORT_PROJECT_VERSION}");
     println!("Usage: {PROJECT_NAME} [--headless] <campionamento.csv> <riferimento.csv> <anagrafica.csv>");
     println!("       {PROJECT_NAME} [--headless] --hfbi <campionamento.csv> <anagrafica.csv>");
@@ -32,7 +32,7 @@ pub fn esox_usage() {
   --help, -h               Print this message and quit");
 }
 
-pub fn run_headless(do_niseci: bool, args: &[String]) -> bool {
+pub(crate) fn run_headless(do_niseci: bool, args: &[String]) -> bool {
     let mut arg_i = 0;
     let mut campionamento_path_str = "";
     let mut riferimento_path_str = "";
