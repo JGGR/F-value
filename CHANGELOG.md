@@ -35,6 +35,7 @@
 - Mark all previously `pub` APIs as `pub(crate)`
 - Refactor `core` module:
   - Move gui-related code to `app` module
+  - Move parser-related code to `core::csv` module
 - Refactor `model` module:
   - Moved domain model to `domain`
   - Moved gui model to `app::model`

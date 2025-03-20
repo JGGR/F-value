@@ -15,9 +15,12 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::core::*;
+use std::path::PathBuf;
 use crate::engines::niseci::full::{calculate_niseci, calculate_rqe_niseci, calculate_stato_ecologico};
-use crate::domain::niseci::{CampionamentoNISECI, RiferimentoNISECI};
+use crate::domain::niseci::{CampionamentoNISECI, RiferimentoNISECI, AnagraficaNISECI, TipoComunitaNISECI, ComunitaNISECI, AreaNISECI, IdroEcoRegioneNISECI};
+use crate::domain::location::Location;
+use crate::core::{COPYRIGHT_INFO, PROJECT_NAME, SHORT_PROJECT_VERSION, PROJECT_VERSION_FULL};
+use crate::core::csv::{check_path_is_file_ends_with_csv, check_riferimento_niseci_path, VeryItalianRecordCsvRiferimentoNISECI, check_records_riferimento_niseci, check_campionamento_niseci_path, VeryItalianRecordCsvCampionamentoNISECI, check_records_campionamento_niseci, check_anagrafica_niseci_path, VeryItalianRecordCsvAnagraficaNISECI, check_records_anagrafica_niseci, check_campionamento_hfbi_path};
 
 pub(crate) fn esox_usage() {
     println!("{PROJECT_NAME} v{SHORT_PROJECT_VERSION}");

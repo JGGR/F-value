@@ -19,12 +19,11 @@ use std::path::PathBuf;
 use raylib::RaylibHandle;
 use raylib::consts::KeyboardKey::*;
 use chrono::format::ParseErrorKind;
-use crate::core::{parse_date, TipoRecordCsv, VeryItalianRecordCsvRiferimentoNISECI, VeryItalianRecordCsvCampionamentoNISECI, check_campionamento_niseci_path, check_riferimento_niseci_path, check_records_riferimento_niseci, check_records_campionamento_niseci};
+use crate::core::csv::{parse_date, process_csv_errors, TipoRecordCsv, VeryItalianRecordCsvRiferimentoNISECI, VeryItalianRecordCsvCampionamentoNISECI, check_campionamento_niseci_path, check_riferimento_niseci_path, check_records_riferimento_niseci, check_records_campionamento_niseci};
 use crate::app::core::{CurrentView, MainState};
 use crate::app::model::{SubModel, HomeModel, SecondModel, IndiceModel, FileInputModel, InfoAggiuntiveModel, OutputModel, ConsoleModel};
 use crate::domain::{index::Indice, niseci::{RiferimentoNISECI, CampionamentoNISECI, AnagraficaNISECI, TipoComunitaNISECI, RisultatoNISECI, StatoEcologicoNISECI}};
 use crate::state::GLOBAL_STATE;
-use crate::core::process_csv_errors;
 use crate::engines::niseci::full::{calculate_niseci, calculate_rqe_niseci, calculate_stato_ecologico};
 
 pub(crate) struct Controllers {
