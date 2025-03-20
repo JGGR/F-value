@@ -10,7 +10,8 @@
 - New structs:
   - `Controllers`
   - `Views`
-  - `Views`
+  - `RecordSubmetricheX2A`
+    - Used to relax the last tuple non-type left after the intermediates refactor: `(String, MetricheX2A, ClassiEtaSpecieNISECI)`
 - Impl `TryFrom<i32>` for:
   - `TipoComunitaNISECI`
   - `AreaNISECI`
@@ -27,7 +28,7 @@
     - `PlainRecordCsvRiferimentoNISECI`
     - `PlainRecordCsvCampionamentoNISECI`
     - `PlainRecordCsvAnagraficaNISECI`
-  - Keeps current bevahiour
+  - Keeps current behaviour
 - Fix: avoid double check on `tipo_autoctono == 1` in `CampionamentoNISECI::get_tot_specie_autoctone()`
 - Solve most `clippy` hints
 - Set `Console.columns` to `65` rather than `80` for new font, to keep the look

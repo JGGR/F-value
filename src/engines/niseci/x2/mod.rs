@@ -100,12 +100,12 @@ pub fn calculate_x2(campionamento: &CampionamentoNISECI, anagrafica: &Anagrafica
   let mut submetriche = HashMap::<String, SubmetricheX2>::new();
 
   for crit in &criteri_vec {
-    match submetriche.entry(crit.0.clone()) {
+    match submetriche.entry(crit.get_codice_specie()) {
         Entry::Occupied(_) => {},
         Entry::Vacant(vacant_entry) => {
             vacant_entry.insert(
                 // We fill densita_stimata later
-                SubmetricheX2::new(crit.1, crit.2.clone(), MetricheX2B::new(crit.0.clone(), -1.0))
+                SubmetricheX2::new(crit.get_metriche_x2a(), crit.get_classi_eta(), MetricheX2B::new(crit.get_codice_specie(), -1.0))
             );
         }
     }
@@ -156,7 +156,32 @@ pub fn calculate_x2(campionamento: &CampionamentoNISECI, anagrafica: &Anagrafica
   Ok((Some(result), metriche_x2))
 }
 
-fn calculate_sommatoria_x2_a(c: &CampionamentoNISECI) -> Result<(f32, Vec<(String, MetricheX2A, ClassiEtaSpecieNISECI)>), Vec<String>> {
+struct RecordSubmetricheX2A {
+    codice_specie: String,
+    metriche_x2a: MetricheX2A,
+    classi_eta: ClassiEtaSpecieNISECI
+}
+
+impl RecordSubmetricheX2A {
+    pub fn new(codice_specie: String, metriche_x2a: MetricheX2A, classi_eta: ClassiEtaSpecieNISECI) -> Self {
+        Self {
+            codice_specie,
+            metriche_x2a,
+            classi_eta
+        }
+    }
+    pub fn get_codice_specie(&self) -> String {
+        self.codice_specie.clone()
+    }
+    pub fn get_metriche_x2a(&self) -> MetricheX2A {
+        self.metriche_x2a
+    }
+    pub fn get_classi_eta(&self) -> ClassiEtaSpecieNISECI {
+        self.classi_eta.clone()
+    }
+}
+
+fn calculate_sommatoria_x2_a(c: &CampionamentoNISECI) -> Result<(f32, Vec<RecordSubmetricheX2A>), Vec<String>> {
 
   // ad ogni specie associo le loro classi che andrò poi a riempire
   // ho controllato i campionamenti di andrea e trovto massimo 9 specie diverse
@@ -183,15 +208,15 @@ fn calculate_sommatoria_x2_a(c: &CampionamentoNISECI) -> Result<(f32, Vec<(Strin
 
   let mut sommatoria_x2_a = 0.0;
   let mut errors: Vec<String> = Vec::with_capacity(classi_eta_map.len()); // prenoto ora e poi restringo dopo
-  let mut criteri_vec: Vec<(String, MetricheX2A, ClassiEtaSpecieNISECI)> = Vec::with_capacity(classi_eta_map.len());
-  for (_key, classe) in classi_eta_map {
+  let mut criteri_vec: Vec<RecordSubmetricheX2A> = Vec::with_capacity(classi_eta_map.len());
+  for classe in classi_eta_map.values() {
     match calculate_x2_a(&classe) {
       Ok((x2_a, criteri_x2_a)) => {
           let criterio_a = criteri_x2_a.get_criterio_a();
           let criterio_b = criteri_x2_a.get_criterio_b();
           let ad_juv = criteri_x2_a.get_rapporto_ad_juv();
           sommatoria_x2_a += x2_a;
-          criteri_vec.push((classe.specie.id.clone(), MetricheX2A::new(criterio_a, MetricheX2aB::new(criterio_b, ad_juv)), classe));
+          criteri_vec.push(RecordSubmetricheX2A::new(classe.specie.id.clone(), MetricheX2A::new(criterio_a, MetricheX2aB::new(criterio_b, ad_juv)), classe.clone()));
       }
       Err(error) => errors.push(error),
     }
