@@ -210,7 +210,7 @@ fn calculate_sommatoria_x2_a(c: &CampionamentoNISECI) -> Result<(f32, Vec<Record
   let mut errors: Vec<String> = Vec::with_capacity(classi_eta_map.len()); // prenoto ora e poi restringo dopo
   let mut criteri_vec: Vec<RecordSubmetricheX2A> = Vec::with_capacity(classi_eta_map.len());
   for classe in classi_eta_map.values() {
-    match calculate_x2_a(&classe) {
+    match calculate_x2_a(classe) {
       Ok((x2_a, criteri_x2_a)) => {
           let criterio_a = criteri_x2_a.get_criterio_a();
           let criterio_b = criteri_x2_a.get_criterio_b();
