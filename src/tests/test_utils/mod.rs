@@ -15,7 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::model::{niseci::{CampionamentoNISECI, RecordNISECI, RiferimentoNISECI, SpecieNISECI, TipoComunitaNISECI, ComunitaNISECI, AreaNISECI, IdroEcoRegioneNISECI, AnagraficaNISECI}, location::Location};
+use crate::domain::{niseci::{CampionamentoNISECI, RecordNISECI, RiferimentoNISECI, SpecieNISECI, TipoComunitaNISECI, ComunitaNISECI, AreaNISECI, IdroEcoRegioneNISECI, AnagraficaNISECI}, location::Location};
 
 pub fn create_dummy_anagrafica() -> AnagraficaNISECI {
     return AnagraficaNISECI {

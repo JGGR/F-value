@@ -35,6 +35,9 @@
 - Mark all previously `pub` APIs as `pub(crate)`
 - Refactor `core` module:
   - Move gui-related code to `app` module
+- Refactor `model` module:
+  - Moved domain model to `domain`
+  - Moved gui model to `app::model`
 - Clean up star imports
 
 ## [0.0.12] - 2025-03-17

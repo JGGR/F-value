@@ -15,7 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::{engines::niseci::x3::calculate_x3, model::niseci::RecordNISECI, tests::test_utils::{create_massive_campionamento_ciacci_2, create_massive_campionamento_ciacci_con_bronzi_strutt, create_massive_campionamento_ciacci_con_tappi_destrutt, create_massive_campionamento_ciacci_con_tappi_mediam_strutt, create_massive_campionamento_ciacci_con_tappi_strutt, create_massive_campionamento_ciacci_con_trocchi_strutt, create_massive_campionamento_ciacci_solo_autoctoni_1, get_ciaccio}};
+use crate::{engines::niseci::x3::calculate_x3, domain::niseci::RecordNISECI, tests::test_utils::{create_massive_campionamento_ciacci_2, create_massive_campionamento_ciacci_con_bronzi_strutt, create_massive_campionamento_ciacci_con_tappi_destrutt, create_massive_campionamento_ciacci_con_tappi_mediam_strutt, create_massive_campionamento_ciacci_con_tappi_strutt, create_massive_campionamento_ciacci_con_trocchi_strutt, create_massive_campionamento_ciacci_solo_autoctoni_1, get_ciaccio}};
 
 
 #[test]

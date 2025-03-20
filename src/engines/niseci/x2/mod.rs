@@ -17,7 +17,7 @@
 
 use std::collections::{hash_map::Entry, HashMap};
 
-use crate::model::niseci::{AnagraficaNISECI, CampionamentoNISECI, ClassiEtaSpecieNISECI, EsemplariPerCattura, RecordNISECI, MetricheX2A, MetricheX2aB};
+use crate::domain::niseci::{AnagraficaNISECI, CampionamentoNISECI, ClassiEtaSpecieNISECI, EsemplariPerCattura, RecordNISECI, MetricheX2A, MetricheX2aB};
 
 use super::linear_regression::{calculate_quantita_with_regression, Point};
 

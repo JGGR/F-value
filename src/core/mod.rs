@@ -27,8 +27,8 @@ use serde::Deserialize;
 use serde::de::{self, Deserializer};
 use chrono::NaiveDate;
 use chrono::format::ParseErrorKind;
-use crate::model::niseci::{SpecieNISECI, RecordNISECI, AnagraficaNISECI, AreaNISECI, TipoComunitaNISECI, ComunitaNISECI, IdroEcoRegioneNISECI};
-use crate::model::location::Location;
+use crate::domain::niseci::{SpecieNISECI, RecordNISECI, AnagraficaNISECI, AreaNISECI, TipoComunitaNISECI, ComunitaNISECI, IdroEcoRegioneNISECI};
+use crate::domain::location::Location;
 
 pub(crate) const AUTHOR_JGABAUT: &str = "jgabaut";
 pub(crate) const AUTHOR_GIONINJO: &str = "gioninjo";

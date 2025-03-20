@@ -18,3 +18,4 @@
 pub(crate) mod view;
 pub(crate) mod controller;
 pub(crate) mod core;
+pub(crate) mod model;

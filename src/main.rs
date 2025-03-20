@@ -17,8 +17,8 @@
 
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+mod domain;
 mod state;
-mod model;
 mod views;
 mod controllers;
 mod console;

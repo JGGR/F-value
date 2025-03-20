@@ -17,6 +17,6 @@
 
 use once_cell::sync::Lazy;
 use std::sync::Mutex;
-use crate::model::core::*;
+use crate::app::model::Model;
 // Global shared state using Mutex for thread safety
 pub(crate) static GLOBAL_STATE: Lazy<Mutex<Model>> = Lazy::new(|| Mutex::new(Model::new()));

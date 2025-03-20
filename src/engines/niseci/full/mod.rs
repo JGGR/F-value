@@ -16,7 +16,7 @@
 */
 
 use std::collections::{hash_map::Entry, HashMap};
-use crate::model::niseci::{CampionamentoNISECI, RiferimentoNISECI, AnagraficaNISECI, AreaNISECI, StatoEcologicoNISECI, ValoriIntermediSpecieNISECI, ValoriIntermediNISECI};
+use crate::domain::niseci::{CampionamentoNISECI, RiferimentoNISECI, AnagraficaNISECI, AreaNISECI, StatoEcologicoNISECI, ValoriIntermediSpecieNISECI, ValoriIntermediNISECI};
 
 use super::x1::calculate_x1;
 use super::x2::calculate_x2;

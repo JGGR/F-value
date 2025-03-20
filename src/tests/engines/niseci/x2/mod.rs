@@ -15,7 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::{engines::niseci::x2::calculate_x2, model::{location::Location, niseci::{AnagraficaNISECI, ClassiEtaSpecieNISECI, ComunitaNISECI, IdroEcoRegioneNISECI, TipoComunitaNISECI, AreaNISECI}}, tests::test_utils::{create_massive_campionamento_ciacci, create_massive_campionamento_ciacci_2, get_ciaccio}};
+use crate::{engines::niseci::x2::calculate_x2, domain::{location::Location, niseci::{AnagraficaNISECI, ClassiEtaSpecieNISECI, ComunitaNISECI, IdroEcoRegioneNISECI, TipoComunitaNISECI, AreaNISECI}}, tests::test_utils::{create_massive_campionamento_ciacci, create_massive_campionamento_ciacci_2, get_ciaccio}};
 
 
 #[test]

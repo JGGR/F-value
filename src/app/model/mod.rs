@@ -15,11 +15,10 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use super::index::Indice;
-use super::niseci::{RiferimentoNISECI, CampionamentoNISECI, AnagraficaNISECI, RisultatoNISECI};
 use std::path::PathBuf;
 use std::collections::HashMap;
-
+use crate::domain::index::Indice;
+use crate::domain::niseci::{RiferimentoNISECI, CampionamentoNISECI, AnagraficaNISECI, RisultatoNISECI};
 use crate::console::Console;
 use crate::core::SHORT_PROJECT_VERSION;
 

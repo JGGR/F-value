@@ -17,7 +17,7 @@
 
 use crate::core::*;
 use crate::engines::niseci::full::{calculate_niseci, calculate_rqe_niseci, calculate_stato_ecologico};
-use crate::model::niseci::{ CampionamentoNISECI, RiferimentoNISECI };
+use crate::domain::niseci::{CampionamentoNISECI, RiferimentoNISECI};
 
 pub(crate) fn esox_usage() {
     println!("{PROJECT_NAME} v{SHORT_PROJECT_VERSION}");

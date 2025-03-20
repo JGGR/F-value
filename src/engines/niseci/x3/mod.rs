@@ -16,6 +16,7 @@
 */
 
 use std::collections::hash_map::Entry;
+use crate::domain::niseci::{CampionamentoNISECI, ClassiEtaAlieniNISECI, ClassiEtaSpecieNISECI, InfoPopolazioniAlieneNISECI};
 
 pub(crate) struct MetricheX3 {
     criterio_a: f32,
@@ -36,8 +37,6 @@ impl MetricheX3 {
         self.criterio_b
     }
 }
-
-use crate::model::niseci::{CampionamentoNISECI, ClassiEtaAlieniNISECI, ClassiEtaSpecieNISECI, InfoPopolazioniAlieneNISECI};
 
 pub(crate) fn calculate_x3(c: &CampionamentoNISECI) -> Result<(f32, Option<MetricheX3>), Vec<String>> {
 
