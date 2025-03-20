@@ -30,6 +30,7 @@
   - Keeps current bevahiour
 - Fix: avoid double check on `tipo_autoctono == 1` in `CampionamentoNISECI::get_tot_specie_autoctone()`
 - Solve most `clippy` hints
+- Set `Console.columns` to `65` rather than `80` for new font, to keep the look
 
 ## [0.0.12] - 2025-03-17
 

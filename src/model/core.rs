@@ -414,7 +414,7 @@ impl Model {
             console_model: ConsoleModel {
                 frame_counter: 0,
                 console: Console::new(
-                    80, // Columns - chars per line
+                    65, // Columns - chars per line
                     1000, // Max messages
                     17, // Max messages shown at a time
                     HashMap::<String,String>::from([
