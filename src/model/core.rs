@@ -20,8 +20,8 @@ use super::niseci::{RiferimentoNISECI, CampionamentoNISECI, AnagraficaNISECI, Ri
 use std::path::PathBuf;
 use std::collections::HashMap;
 
-use crate::console::*;
-use crate::SHORT_PROJECT_VERSION;
+use crate::console::Console;
+use crate::core::SHORT_PROJECT_VERSION;
 
 pub(crate) trait SubModel {
     fn get_frame_counter(&self) -> u32;

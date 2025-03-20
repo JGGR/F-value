@@ -15,12 +15,12 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+use std::ffi::CString;
 use std::collections::{VecDeque, HashMap};
 use raylib::prelude::*;
-use crate::{propwidth, propheight};
-use crate::controllers::ConsoleController;
 use raylib::consts::GuiIconName::ICON_MONITOR;
-use std::ffi::CString;
+use crate::app::core::{propwidth, propheight};
+use crate::controllers::ConsoleController;
 
 #[derive(Clone)]
 pub(crate) struct Console {

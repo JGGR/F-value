@@ -15,15 +15,18 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::core::*;
+use std::ffi::CString;
+use std::io::Write;
+use std::path::PathBuf;
+use std::fs::File;
 use raylib::RaylibHandle;
 use raylib::consts::GuiDefaultProperty::{BACKGROUND_COLOR, TEXT_SIZE, TEXT_SPACING};
 use raylib::consts::KeyboardKey::*;
 use raylib::consts::GuiControl::DEFAULT;
 use raylib::consts::GuiControlProperty::TEXT_COLOR_NORMAL;
-use std::ffi::CString;
+use raylib::color::Color;
 use uuid::Uuid;
-use std::io::Write;
+use super::core::{GuiTheme, MainState, EXIT_KEY, DARK_THEME_DATA, BLUISH_THEME_DATA, CANDY_THEME_DATA, CHERRY_THEME_DATA, CYBER_THEME_DATA, JUNGLE_THEME_DATA, LAVANDA_THEME_DATA, TERMINAL_THEME_DATA, ASHES_THEME_DATA};
 
 pub(crate) fn update_main(rl: &mut RaylibHandle, main_state: &mut MainState) {
     main_state.should_quit = rl.window_should_close();
@@ -41,7 +44,7 @@ pub(crate) fn update_main(rl: &mut RaylibHandle, main_state: &mut MainState) {
         }
     }
 
-    if rl.is_key_pressed(crate::EXIT_KEY) {
+    if rl.is_key_pressed(EXIT_KEY) {
         main_state.showing_quit_win = true;
     }
 

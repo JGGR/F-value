@@ -16,8 +16,8 @@
 */
 
 use std::io::Cursor;
-
-use crate::{check_campionamento_niseci_reader, check_records_campionamento_niseci, check_records_riferimento_niseci, check_riferimento_niseci_reader, check_anagrafica_niseci_reader, check_records_anagrafica_niseci, model::niseci::SpecieNISECI, translate_error_message, VeryItalianRecordCsvRiferimentoNISECI, VeryItalianRecordCsvCampionamentoNISECI, VeryItalianRecordCsvAnagraficaNISECI, CAMPIONAMENTO_NISECI_HEADER, RIFERIMENTO_NISECI_HEADER, ANAGRAFICA_NISECI_HEADER};
+use crate::core::{check_campionamento_niseci_reader, check_records_campionamento_niseci, check_records_riferimento_niseci, check_riferimento_niseci_reader, check_anagrafica_niseci_reader, check_records_anagrafica_niseci, translate_error_message, VeryItalianRecordCsvRiferimentoNISECI, VeryItalianRecordCsvCampionamentoNISECI, VeryItalianRecordCsvAnagraficaNISECI, CAMPIONAMENTO_NISECI_HEADER, RIFERIMENTO_NISECI_HEADER, ANAGRAFICA_NISECI_HEADER};
+use crate::model::niseci::SpecieNISECI;
 
 #[test]
 fn test_csv_riferimento_niseci_found_string_expect_int() {

@@ -15,18 +15,18 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::model::core::*;
-use crate::core::{MainState, parse_date, TipoRecordCsv, VeryItalianRecordCsvRiferimentoNISECI, VeryItalianRecordCsvCampionamentoNISECI, check_campionamento_niseci_path, check_riferimento_niseci_path, check_records_riferimento_niseci, check_records_campionamento_niseci};
+use std::path::PathBuf;
+use raylib::RaylibHandle;
+use raylib::consts::KeyboardKey::*;
+use chrono::format::ParseErrorKind;
+use crate::model::core::{SubModel, HomeModel, SecondModel, IndiceModel, FileInputModel, InfoAggiuntiveModel, OutputModel, ConsoleModel};
+use crate::core::{parse_date, TipoRecordCsv, VeryItalianRecordCsvRiferimentoNISECI, VeryItalianRecordCsvCampionamentoNISECI, check_campionamento_niseci_path, check_riferimento_niseci_path, check_records_riferimento_niseci, check_records_campionamento_niseci};
+use crate::app::core::{CurrentView, MainState};
 use crate::model::index::Indice;
 use crate::model::niseci::{RiferimentoNISECI, CampionamentoNISECI, AnagraficaNISECI, TipoComunitaNISECI, RisultatoNISECI, StatoEcologicoNISECI};
 use crate::state::GLOBAL_STATE;
-use crate::CurrentView;
-use crate::process_csv_errors;
+use crate::core::process_csv_errors;
 use crate::engines::niseci::full::{calculate_niseci, calculate_rqe_niseci, calculate_stato_ecologico};
-use raylib::RaylibHandle;
-use std::path::PathBuf;
-use raylib::consts::KeyboardKey::*;
-use chrono::format::ParseErrorKind;
 
 pub(crate) struct Controllers {
     pub(crate) home_controller: HomeController,

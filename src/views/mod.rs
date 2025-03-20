@@ -16,9 +16,12 @@
 */
 
 use std::process::exit;
-
-use crate::core::*;
-use crate::controllers::*;
+use std::ffi::CString;
+use std::cmp::max;
+use raylib::prelude::*;
+use raylib::consts::GuiState::{STATE_NORMAL, STATE_DISABLED};
+use raylib::consts::GuiIconName::{ICON_FILE_OPEN, ICON_BIN, ICON_OK_TICK, ICON_CROSS, ICON_PLAYER_NEXT};
+use rfd::FileDialog;
 use crate::model::core::SubModel;
 use crate::model::index::Indice;
 use crate::model::location::Location;
@@ -27,12 +30,9 @@ use crate::model::niseci::ComunitaNISECI;
 use crate::model::niseci::AreaNISECI;
 use crate::model::niseci::IdroEcoRegioneNISECI;
 use crate::model::niseci::AnagraficaNISECI;
-use raylib::prelude::*;
-use rfd::FileDialog;
-use raylib::consts::GuiState::{STATE_NORMAL, STATE_DISABLED};
-use raylib::consts::GuiIconName::{ICON_FILE_OPEN, ICON_BIN, ICON_OK_TICK, ICON_CROSS, ICON_PLAYER_NEXT};
-use std::ffi::CString;
-use std::cmp::max;
+use crate::controllers::{Controller, Controllers, HomeController, SecondController, IndiceController, FileInputController, InfoAggiuntiveController, OutputController, ConsoleController};
+use crate::app::core::{CurrentView, MainState, propwidth, propheight, CONSOLE_FONT_DATA};
+use crate::core::SHORT_PROJECT_VERSION;
 
 pub(crate) struct Views {
     home_view: HomeView,

@@ -33,6 +33,9 @@
 - Solve most `clippy` hints
 - Set `Console.columns` to `65` rather than `80` for new font, to keep the look
 - Mark all previously `pub` APIs as `pub(crate)`
+- Refactor `core` module:
+  - Move gui-related code to `app` module
+- Clean up star imports
 
 ## [0.0.12] - 2025-03-17
 
