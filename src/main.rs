@@ -174,7 +174,8 @@ fn main() {
 
     let txt_color_int = rl.gui_get_style(DEFAULT, TEXT_COLOR_NORMAL as i32);
     let bg_color_int = rl.gui_get_style(DEFAULT, BACKGROUND_COLOR as i32);
-    let txt_spacing = rl.gui_get_style(DEFAULT, TEXT_SPACING as i32);
+    let txt_spacing = rl.gui_get_style(DEFAULT, TEXT_SPACING as i32) *2;
+    rl.gui_set_style(DEFAULT, TEXT_SPACING as i32, txt_spacing);
     let current_font = rl.gui_get_font();
     let mut main_state = MainState::new(
         gui_default_font_height,

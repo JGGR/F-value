@@ -1598,7 +1598,7 @@ impl View for ProduzioneOutputView {
         let groupbox_height = button_calcola_height + propheight(d, 100);
         let groupbox_y = button_calcola_y - propheight(d, 50);
 
-        let panel_width = groupbox_width + propwidth(d, 150);
+        let panel_width = groupbox_width + propwidth(d, 175);
         let panel_x = d.get_screen_width() / 2 - panel_width /2;
         let panel_y = groupbox_y + groupbox_height + propwidth(d, 50);
         let panel_height = groupbox_height + propheight(d, 50);
@@ -1635,9 +1635,9 @@ impl View for ProduzioneOutputView {
             }
         }
 
-        let submit_width = propwidth(d, 100);
-        let groupbox_x_end = groupbox_x + groupbox_width;
-        let submit_x = groupbox_x_end + (d.get_screen_width() - groupbox_x_end)/2 - submit_width/2;
+        let submit_width = propwidth(d, 125);
+        let panel_x_end = panel_x + panel_width;
+        let submit_x = panel_x_end + (d.get_screen_width() - panel_x_end)/2 - submit_width/2;
         let submit_height = propheight(d, 50);
         let submit_y = d.get_screen_height() /2 - submit_height /2;
 
@@ -1989,9 +1989,9 @@ impl ConsoleView {
                 CONSOLE_FONT_DATA,
                 font_size,// *2,
                 None).expect("failed loading console font"),
-            _default_font_size : font_size,
-            current_font_size : font_size,
-            font_spacing
+            _default_font_size: font_size,
+            current_font_size: font_size,
+            font_spacing: font_spacing*2
         }
     }
 }

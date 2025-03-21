@@ -135,10 +135,15 @@ impl GuiTheme {
             GuiTheme::Light => 2, // 10 is way too small for the default font height
             _ => 1
         };
+        let font_spacing_scale = match self {
+            GuiTheme::Light => 2,
+            _ => 1
+        };
         main_state.default_font_height = rl.gui_get_style(DEFAULT, TEXT_SIZE as i32) * font_height_scale;
         rl.gui_set_style(DEFAULT, TEXT_SIZE as i32, main_state.default_font_height);
         main_state.current_font_height = main_state.default_font_height;
-        main_state.default_txt_spacing = rl.gui_get_style(DEFAULT, TEXT_SPACING as i32);
+        main_state.default_txt_spacing = rl.gui_get_style(DEFAULT, TEXT_SPACING as i32) * font_spacing_scale;
+        rl.gui_set_style(DEFAULT, TEXT_SPACING as i32, main_state.default_txt_spacing);
         let txt_color_int = rl.gui_get_style(DEFAULT, TEXT_COLOR_NORMAL as i32);
         let bg_color_int = rl.gui_get_style(DEFAULT, BACKGROUND_COLOR as i32);
         main_state.default_txt_color = Color::get_color(txt_color_int as u32);

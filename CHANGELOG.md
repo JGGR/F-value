@@ -42,6 +42,7 @@
   - Moved domain model to `domain`
   - Moved gui model to `app::model`
 - Clean up star imports
+- Use double text spacing for `Light` theme
 
 ## [0.0.12] - 2025-03-17
 
