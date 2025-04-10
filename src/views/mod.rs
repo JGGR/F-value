@@ -1388,51 +1388,51 @@ impl SelezioneInfoAggiuntiveView {
 
     pub(crate) fn new() -> Self {
         let mut codice_stazione_buffer = [0u8; 64];
-        let codice_stazione_buffer_bytes = "Inserisci codice stazione".as_bytes();
+        let codice_stazione_buffer_bytes = "".as_bytes();
         let codice_stazione_buffer_len = codice_stazione_buffer_bytes.len().min(64);
         codice_stazione_buffer[..codice_stazione_buffer_len].copy_from_slice(&codice_stazione_buffer_bytes[..codice_stazione_buffer_len]);
 
         let mut corpo_idrico_buffer = [0u8; 64];
-        let corpo_idrico_buffer_bytes = "Inserisci nome".as_bytes();
+        let corpo_idrico_buffer_bytes = "".as_bytes();
         let corpo_idrico_buffer_len = corpo_idrico_buffer_bytes.len().min(64);
         corpo_idrico_buffer[..corpo_idrico_buffer_len].copy_from_slice(&corpo_idrico_buffer_bytes[..corpo_idrico_buffer_len]);
 
         let mut regione_buffer = [0u8; 64];
-        let regione_buffer_bytes = "Inserisci regione".as_bytes();
+        let regione_buffer_bytes = "".as_bytes();
         let regione_buffer_len = regione_buffer_bytes.len().min(64);
         regione_buffer[..regione_buffer_len].copy_from_slice(&regione_buffer_bytes[..regione_buffer_len]);
 
         let mut provincia_buffer = [0u8; 64];
-        let provincia_buffer_bytes = "Inserisci provincia".as_bytes();
+        let provincia_buffer_bytes = "".as_bytes();
         let provincia_buffer_len = provincia_buffer_bytes.len().min(64);
         provincia_buffer[..provincia_buffer_len].copy_from_slice(&provincia_buffer_bytes[..provincia_buffer_len]);
         let mut data_buffer = [0u8; 64];
-        let data_buffer_bytes = "Inserisci data".as_bytes();
+        let data_buffer_bytes = "".as_bytes();
         let data_buffer_len = data_buffer_bytes.len().min(64);
         data_buffer[..data_buffer_len].copy_from_slice(&data_buffer_bytes[..data_buffer_len]);
 
         let mut lunghezza_stazione_buffer = [0u8; 64];
-        let lunghezza_stazione_buffer_bytes = "Inserisci lunghezza".as_bytes();
+        let lunghezza_stazione_buffer_bytes = "".as_bytes();
         let lunghezza_stazione_buffer_len = lunghezza_stazione_buffer_bytes.len().min(64);
         lunghezza_stazione_buffer[..lunghezza_stazione_buffer_len].copy_from_slice(&lunghezza_stazione_buffer_bytes[..lunghezza_stazione_buffer_len]);
 
         let mut larghezza_stazione_buffer = [0u8; 64];
-        let larghezza_stazione_buffer_bytes = "Inserisci larghezza".as_bytes();
+        let larghezza_stazione_buffer_bytes = "".as_bytes();
         let larghezza_stazione_buffer_len = larghezza_stazione_buffer_bytes.len().min(64);
         larghezza_stazione_buffer[..larghezza_stazione_buffer_len].copy_from_slice(&larghezza_stazione_buffer_bytes[..larghezza_stazione_buffer_len]);
 
         let mut fonte_comunit_buffer = [0u8; 64];
-        let fonte_comunit_buffer_bytes = "Inserisci fonte".as_bytes();
+        let fonte_comunit_buffer_bytes = "".as_bytes();
         let fonte_comunit_buffer_len = fonte_comunit_buffer_bytes.len().min(64);
         fonte_comunit_buffer[..fonte_comunit_buffer_len].copy_from_slice(&fonte_comunit_buffer_bytes[..fonte_comunit_buffer_len]);
 
         let mut protocollo_comunit_buffer = [0u8; 64];
-        let protocollo_comunit_buffer_bytes = "Inserisci protocollo".as_bytes();
+        let protocollo_comunit_buffer_bytes = "".as_bytes();
         let protocollo_comunit_buffer_len = protocollo_comunit_buffer_bytes.len().min(64);
         protocollo_comunit_buffer[..protocollo_comunit_buffer_len].copy_from_slice(&protocollo_comunit_buffer_bytes[..protocollo_comunit_buffer_len]);
 
         let mut bacino_buffer = [0u8; 64];
-        let bacino_buffer_bytes = "Inserisci bacino".as_bytes();
+        let bacino_buffer_bytes = "".as_bytes();
         let bacino_buffer_len = bacino_buffer_bytes.len().min(64);
         bacino_buffer[..bacino_buffer_len].copy_from_slice(&bacino_buffer_bytes[..bacino_buffer_len]);
 

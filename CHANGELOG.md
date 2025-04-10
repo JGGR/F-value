@@ -43,6 +43,7 @@
   - Moved gui model to `app::model`
 - Clean up star imports
 - Use double text spacing for `Light` theme
+- Empty string fields in `SelezioneInfoAggiuntiveView`
 
 ## [0.0.12] - 2025-03-17
 
