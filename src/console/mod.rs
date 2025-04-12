@@ -21,6 +21,7 @@ use raylib::prelude::*;
 use raylib::consts::GuiIconName::ICON_MONITOR;
 use crate::app::core::{propwidth, propheight};
 use crate::controllers::ConsoleController;
+use log::info;
 
 #[derive(Clone)]
 pub(crate) struct Console {
@@ -72,6 +73,9 @@ impl Console {
         let lines = msg.lines();
 
         for line in lines {
+
+            // Hacky log
+            info!("{line}");
 
             let chunk_size = self.columns;
 
