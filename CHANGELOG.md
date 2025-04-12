@@ -16,7 +16,8 @@
   - `TipoComunitaNISECI`
   - `AreaNISECI`
   - `IdroEcoRegioneNISECI`
-  - Added `dirs` and `flexi_logger` crates to implement `prep_logger()`
+- New `logged` feature, enabling `prep_logger()`
+  - Uses `dirs` and `flexi_logger` crates
 
 ### Changed
 - Refactor `RecordCsvRiferimentoNISECI`, `RecordCsvCampionamentoNISECI`, `RecordCsvAnagraficaNISECI` structs to be traits

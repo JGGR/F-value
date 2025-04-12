@@ -45,10 +45,14 @@ pub(crate) const PROJECT_BRANCH: &str = env!("BRANCH_NAME");
 pub(crate) const _COMMIT_HASH: &str = env!("COMMIT_HASH");
 pub(crate) const COMMIT_HASH_PLUS: &str = env!("COMMIT_HASH_PLUS");
 
+#[cfg(feature="logged")]
 use flexi_logger::{FileSpec, Logger, WriteMode};
+#[cfg(feature="logged")]
 use std::path::PathBuf;
+#[cfg(feature="logged")]
 use dirs::document_dir;
 
+#[cfg(feature="logged")]
 pub(crate) fn prep_logger() -> Result<(),String> {
     let log_file_path;
     if let Some(documents_dir) = document_dir() {
