@@ -44,3 +44,34 @@ pub(crate) const PROJECT_BUILD_TYPE: &str = env!("BUILD_TYPE");
 pub(crate) const PROJECT_BRANCH: &str = env!("BRANCH_NAME");
 pub(crate) const _COMMIT_HASH: &str = env!("COMMIT_HASH");
 pub(crate) const COMMIT_HASH_PLUS: &str = env!("COMMIT_HASH_PLUS");
+
+use flexi_logger::{FileSpec, Logger, WriteMode};
+use std::path::PathBuf;
+use dirs::document_dir;
+
+pub(crate) fn prep_logger() -> Result<(),String> {
+    let log_file_path;
+    if let Some(documents_dir) = document_dir() {
+        log_file_path = documents_dir.join("esox").join("log.txt");
+    } else {
+        log_file_path = PathBuf::from("./esox/log.txt");
+    }
+
+    if let Ok(logger_filespec) = FileSpec::try_from(log_file_path) {
+        if let Ok(logger) = Logger::try_with_str("info, core=trace") {
+            if let Err(e) = logger
+            .log_to_file(logger_filespec)
+            .write_mode(WriteMode::BufferAndFlush)
+            .start() {
+                eprintln!("Failed starting logger.");
+                eprintln!("Error was: {e}");
+                return Err(format!("Failed starting logger: {e}"));
+            }
+        } else {
+            return Err("Failed loading logger from str LogSpecification".to_string());
+        }
+    } else {
+        return Err("Failed loading logger filespec".to_string());
+    }
+    Ok(())
+}
