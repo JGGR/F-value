@@ -20,7 +20,7 @@ use raylib::RaylibHandle;
 use raylib::consts::KeyboardKey::*;
 use chrono::format::ParseErrorKind;
 use crate::core::csv::{TipoRecordCsv};
-use crate::core::csv::lexer::{process_csv_errors, VeryItalianRecordCsvRiferimentoNISECI, VeryItalianRecordCsvCampionamentoNISECI, check_campionamento_niseci_path, check_riferimento_niseci_path};
+use crate::core::csv::deser::{process_csv_errors, VeryItalianRecordCsvRiferimentoNISECI, VeryItalianRecordCsvCampionamentoNISECI, check_campionamento_niseci_path, check_riferimento_niseci_path};
 use crate::core::csv::parser::{check_records_riferimento_niseci, check_records_campionamento_niseci, parse_date};
 use crate::app::core::{CurrentView, MainState};
 use crate::app::model::{SubModel, HomeModel, SecondModel, IndiceModel, FileInputModel, InfoAggiuntiveModel, OutputModel, ConsoleModel};
