@@ -15,13 +15,15 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::core::*;
+use raylib::prelude::*;
 use std::ffi::CString;
 use raylib::consts::GuiIconName::*;
 use raylib::consts::GuiControl::DEFAULT;
 use raylib::consts::GuiDefaultProperty::TEXT_SIZE;
+use super::core::{GuiTheme, CurrentView, MainState, propwidth, propheight, GUI_THEME_COMBOBOX_STR};
+use crate::core::{COPYRIGHT_INFO, SHORT_PROJECT_VERSION, AUTHOR_JGABAUT, AUTHOR_GIONINJO, AUTHOR_JGABAUT_LINK, AUTHOR_GIONINJO_LINK};
 
-pub fn draw_quit_win(d: &mut RaylibDrawHandle, showing_quit_win: &mut bool, should_quit: &mut bool) {
+pub(crate) fn draw_quit_win(d: &mut RaylibDrawHandle, showing_quit_win: &mut bool, should_quit: &mut bool) {
     if *showing_quit_win {
         d.draw_rectangle(
             0,
@@ -34,10 +36,10 @@ pub fn draw_quit_win(d: &mut RaylibDrawHandle, showing_quit_win: &mut bool, shou
         let itext = CString::new(itext).unwrap();
         let result = d.gui_message_box(
             rrect(
-                d.get_screen_width() / 2 - propwidth(&d, 125),
-                d.get_screen_height() / 2 - propheight(&d, 50),
-                propwidth(&d, 250),
-                propheight(&d, 100)
+                d.get_screen_width() / 2 - propwidth(d, 125),
+                d.get_screen_height() / 2 - propheight(d, 50),
+                propwidth(d, 250),
+                propheight(d, 100)
             ),
             Some(itext.as_c_str()),
             Some(rstr!("Vuoi davvero uscire?")),
@@ -52,12 +54,12 @@ pub fn draw_quit_win(d: &mut RaylibDrawHandle, showing_quit_win: &mut bool, shou
     }
 }
 
-pub fn draw_license_box(d: &mut RaylibDrawHandle, showing_license_box: &mut bool, font: &WeakFont, default_txt_spacing: i32, current_font_height: i32) {
+pub(crate) fn draw_license_box(d: &mut RaylibDrawHandle, showing_license_box: &mut bool, font: &WeakFont, default_txt_spacing: i32, current_font_height: i32) {
     if *showing_license_box {
-        let x_padding = propwidth(&d, 50);
-        let y_padding = propheight(&d, 100);
+        let x_padding = propwidth(d, 50);
+        let y_padding = propheight(d, 100);
         let bar_height = 23; // Height of the "x" bar
-        let copyright_notice_txt_bounds = font.measure_text(&COPYRIGHT_INFO, current_font_height as f32, default_txt_spacing as f32);
+        let copyright_notice_txt_bounds = font.measure_text(COPYRIGHT_INFO, current_font_height as f32, default_txt_spacing as f32);
         let licensebox_height = copyright_notice_txt_bounds.y as i32 + bar_height;
         let licensebox_y = d.get_screen_height() / 2 - licensebox_height / 2;
         let licensebox_width = x_padding *2 + copyright_notice_txt_bounds.x as i32;
@@ -89,13 +91,13 @@ pub fn draw_license_box(d: &mut RaylibDrawHandle, showing_license_box: &mut bool
             Some(copyright_label.as_c_str())
         );
 
-        if result == true {
+        if result {
             *showing_license_box = false;
         }
     }
 }
 
-pub fn draw_info_box(d: &mut RaylibDrawHandle, showing_info_box: &mut bool, font: &WeakFont, default_txt_spacing: i32, default_txt_color: Color, current_font_height: i32) {
+pub(crate) fn draw_info_box(d: &mut RaylibDrawHandle, showing_info_box: &mut bool, font: &WeakFont, default_txt_spacing: i32, default_txt_color: Color, current_font_height: i32) {
     if *showing_info_box {
         d.draw_rectangle(
             0,
@@ -105,7 +107,7 @@ pub fn draw_info_box(d: &mut RaylibDrawHandle, showing_info_box: &mut bool, font
             Color::RAYWHITE.alpha(0.8),
         );
 
-        let bar_height = propheight(&d, 23); // Height of the "x" bar
+        let bar_height = propheight(d, 23); // Height of the "x" bar
 
         let itext = d.gui_icon_text(ICON_INFO, Some(rstr!("Program Info")));
         let itext = CString::new(itext).unwrap();
@@ -115,8 +117,8 @@ pub fn draw_info_box(d: &mut RaylibDrawHandle, showing_info_box: &mut bool, font
         //let proj_info_str_y = propheight(&d, 100) - current_font_height / 2;
 
         // No multiline text.
-        let proj_name_str1 = format!("Strumento per il calcolo");
-        let proj_name_str2 = format!("NISECI e HFBI");
+        let proj_name_str1 = "Strumento per il calcolo".to_string();
+        let proj_name_str2 = "NISECI e HFBI".to_string();
 
         let proj_name_str1_txt_bounds = font.measure_text(&proj_name_str1, current_font_height as f32, default_txt_spacing as f32);
         let proj_name_str2_txt_bounds = font.measure_text(&proj_name_str2, current_font_height as f32, default_txt_spacing as f32);
@@ -127,13 +129,13 @@ pub fn draw_info_box(d: &mut RaylibDrawHandle, showing_info_box: &mut bool, font
         let copyright_display_link = "Copyright (C) 2024-2025 jgabaut, gioninjo";
         let copyright_actual_link = "https://spdx.org/licenses/GPL-3.0-only.html";
 
-        let copyright_display_link_txt_bounds = font.measure_text(&copyright_display_link, current_font_height as f32, default_txt_spacing as f32);
+        let copyright_display_link_txt_bounds = font.measure_text(copyright_display_link, current_font_height as f32, default_txt_spacing as f32);
 
         let widest_line_x_bound: i32 = copyright_display_link_txt_bounds.x as i32;
 
-        let infobox_height = propheight(&d, 200) + proj_info_txt_bounds.y as i32 + proj_name_str1_txt_bounds.y as i32 + proj_name_str2_txt_bounds.y as i32;
+        let infobox_height = propheight(d, 200) + proj_info_txt_bounds.y as i32 + proj_name_str1_txt_bounds.y as i32 + proj_name_str2_txt_bounds.y as i32;
         let infobox_y = d.get_screen_height() / 2 - infobox_height / 2;
-        let infobox_width = propwidth(&d, 100) + widest_line_x_bound as i32;
+        let infobox_width = propwidth(d, 100) + widest_line_x_bound;
         let infobox_x = d.get_screen_width() / 2 - infobox_width / 2;
         let result = d.gui_window_box(
             rrect(
@@ -145,8 +147,8 @@ pub fn draw_info_box(d: &mut RaylibDrawHandle, showing_info_box: &mut bool, font
             Some(itext.as_c_str()),
         );
 
-        let text_y_spacing = propheight(&d, 12);
-        let text_x_spacing = propwidth(&d, 70);
+        let text_y_spacing = propheight(d, 12);
+        let text_x_spacing = propwidth(d, 70);
         let proj_info_str_y = infobox_y + bar_height + text_y_spacing;
         let proj_info_str_x = infobox_x + text_x_spacing;
         let proj_name_str1_y = proj_info_str_y + (proj_info_txt_bounds.y as i32 * 2);
@@ -191,10 +193,10 @@ pub fn draw_info_box(d: &mut RaylibDrawHandle, showing_info_box: &mut bool, font
         );
 
         let copyright_link_str = CString::new(copyright_display_link).unwrap();
-        let copyright_link_x = infobox_x + propwidth(&d, 10);
+        let copyright_link_x = infobox_x + propwidth(d, 10);
         let copyright_link_y = proj_name_str2_y + proj_name_str2_txt_bounds.y as i32 + text_y_spacing*2;
         let copyright_link_width = infobox_width - text_x_spacing;
-        let copyright_link_height = propheight(&d, 25);
+        let copyright_link_height = propheight(d, 25);
 
         if d.gui_label_button(
             rrect(
@@ -214,11 +216,11 @@ pub fn draw_info_box(d: &mut RaylibDrawHandle, showing_info_box: &mut bool, font
         let link_x = proj_name_str2_x;
         let link_y = copyright_link_y + copyright_link_height;
         let link_width = infobox_width - text_x_spacing;
-        let link_height = propheight(&d, 25);
+        let link_height = propheight(d, 25);
 
         d.gui_label(
             rrect(
-                infobox_x + propwidth(&d, 10),
+                infobox_x + propwidth(d, 10),
                 link_y,
                 text_x_spacing,
                 link_height
@@ -249,7 +251,7 @@ pub fn draw_info_box(d: &mut RaylibDrawHandle, showing_info_box: &mut bool, font
 
         d.gui_label(
             rrect(
-                infobox_x + propwidth(&d, 10),
+                infobox_x + propwidth(d, 10),
                 mail_link_y,
                 text_x_spacing,
                 mail_link_height
@@ -283,7 +285,7 @@ pub fn draw_info_box(d: &mut RaylibDrawHandle, showing_info_box: &mut bool, font
 
         d.gui_label(
             rrect(
-                infobox_x + propwidth(&d, 10),
+                infobox_x + propwidth(d, 10),
                 author_links_y,
                 text_x_spacing,
                 author_links_height
@@ -304,13 +306,13 @@ pub fn draw_info_box(d: &mut RaylibDrawHandle, showing_info_box: &mut bool, font
             }
         }
 
-        if result == true {
+        if result {
             *showing_info_box = false;
         }
     }
 }
 
-pub fn draw_settings_box(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
+pub(crate) fn draw_settings_box(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
     if main_state.showing_settings_box {
         d.draw_rectangle(
             0,
@@ -321,9 +323,9 @@ pub fn draw_settings_box(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
         );
         let itext = d.gui_icon_text(ICON_GEAR, Some(rstr!("Impostazioni")));
         let itext = CString::new(itext).unwrap();
-        let settingsbox_width = propwidth(&d, 250);
+        let settingsbox_width = propwidth(d, 250);
         let settingsbox_x =  d.get_screen_width() / 2 - settingsbox_width / 2;
-        let settingsbox_height = propheight(&d, 300);
+        let settingsbox_height = propheight(d, 300);
         let settingsbox_y = d.get_screen_height() / 2 - settingsbox_height / 2;
         let result = d.gui_window_box(
             rrect(
@@ -334,13 +336,13 @@ pub fn draw_settings_box(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
             ),
             Some(itext.as_c_str()),
         );
-        let y_spacing = propheight(&d, 15);
-        let x_spacing = propwidth(&d, 15);
+        let y_spacing = propheight(d, 15);
+        let x_spacing = propwidth(d, 15);
         let fontsize_label_width = settingsbox_width / 2 - x_spacing - x_spacing / 2;
         let fontsize_label_x = settingsbox_x + x_spacing;
         let fontsize_label_height = settingsbox_height / 10;
         let fontsize_label_y = settingsbox_y + y_spacing * 2;
-        if d.gui_label(
+        d.gui_label(
             rrect(
                 fontsize_label_x,
                 fontsize_label_y,
@@ -348,7 +350,7 @@ pub fn draw_settings_box(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
                 fontsize_label_height
             ),
             Some(rstr!("Dimensione Font"))
-        ) { }
+        );
         let fontspinner_x = fontsize_label_x + fontsize_label_width + x_spacing;
         let fontspinner_y = fontsize_label_y;
         let fontspinner_width = fontsize_label_width;
@@ -382,7 +384,7 @@ pub fn draw_settings_box(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
         let gui_theme_label_x = fontsize_label_x;
         let gui_theme_label_height = fontsize_label_height;
         let gui_theme_label_y = fontsize_label_y + y_spacing *2;
-        if d.gui_label(
+        d.gui_label(
             rrect(
                 gui_theme_label_x,
                 gui_theme_label_y,
@@ -390,7 +392,7 @@ pub fn draw_settings_box(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
                 gui_theme_label_height
             ),
             Some(rstr!("Tema"))
-        ) { }
+        );
         let gui_theme_button_x = gui_theme_label_x + gui_theme_label_width + x_spacing;
         let gui_theme_button_y = gui_theme_label_y;
         let gui_theme_button_width = gui_theme_label_width;
@@ -415,13 +417,13 @@ pub fn draw_settings_box(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
             main_state.gui_theme_combobox_active = GuiTheme::Light as i32;
         }
 
-        if result == true {
+        if result {
             main_state.showing_settings_box = false;
         }
     }
 }
 
-pub fn draw_main(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
+pub(crate) fn draw_main(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
 
     let lock_gui = main_state.get_gui_should_lock();
 
@@ -429,14 +431,14 @@ pub fn draw_main(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
         d.gui_lock();
     }
 
-    let status_bar_height = propheight(&d, 35);
+    let status_bar_height = propheight(d, 35);
     let status_bar_width = d.get_screen_width();
     let status_bar_x = 0;
     let status_bar_y = d.get_screen_height() - status_bar_height;
 
     let current_view_name = main_state.current_view.to_string();
 
-    let status_bar_txt = CString::new(format!("{}", current_view_name)).unwrap();
+    let status_bar_txt = CString::new(current_view_name).unwrap();
 
     d.gui_status_bar(
         rrect(
@@ -453,10 +455,10 @@ pub fn draw_main(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
     let navbar_x = 0;
     let navbar_y = 0;
 
-    let core_button_width = propwidth(&d, 25);
+    let core_button_width = propwidth(d, 25);
     let core_button_heigth = core_button_width;
     let core_buttons_count = 5;
-    let core_buttons_x_padding = propwidth(&d, 5);
+    let core_buttons_x_padding = propwidth(d, 5);
     let core_buttons_y_padding = core_buttons_x_padding;
     let core_buttons_panel_height = navbar_height;
     let core_buttons_panel_y = navbar_y;
@@ -493,10 +495,10 @@ pub fn draw_main(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
     let itext = CString::new(itext).unwrap();
     if d.gui_button(rrect(changeview_button_x, changeview_button_y, changeview_button_width, changeview_button_height), Some(itext.as_c_str())) {
         match main_state.current_view {
-            CurrentView::HOME => {
-                main_state.set_current_view(CurrentView::SECOND);
+            CurrentView::Home => {
+                main_state.set_current_view(CurrentView::Second);
             }
-            CurrentView::SECOND => {
+            CurrentView::Second => {
                 main_state.set_current_view(CurrentView::SelezioneIndice);
             }
             CurrentView::SelezioneIndice => {
@@ -518,7 +520,7 @@ pub fn draw_main(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
                 main_state.set_current_view(CurrentView::ProduzionePDF);
             }
             CurrentView::ProduzionePDF => {
-                main_state.set_current_view(CurrentView::HOME);
+                main_state.set_current_view(CurrentView::Home);
             }
             _ => {}
         }
@@ -557,12 +559,12 @@ pub fn draw_main(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
     let itext = CString::new(itext).unwrap();
     if d.gui_button(rrect(console_button_x, console_button_y, console_button_width, console_button_height), Some(itext.as_c_str())) {
         match main_state.current_view {
-            CurrentView::CONSOLE => {
+            CurrentView::Console => {
                 let prev = main_state.previous_view;
                 main_state.set_current_view(prev);
             }
             _ => {
-                main_state.set_current_view(CurrentView::CONSOLE);
+                main_state.set_current_view(CurrentView::Console);
             }
         }
     }

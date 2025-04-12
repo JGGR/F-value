@@ -15,17 +15,20 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::core::*;
+use std::ffi::CString;
+use std::io::Write;
+use std::path::PathBuf;
+use std::fs::File;
 use raylib::RaylibHandle;
 use raylib::consts::GuiDefaultProperty::{BACKGROUND_COLOR, TEXT_SIZE, TEXT_SPACING};
 use raylib::consts::KeyboardKey::*;
 use raylib::consts::GuiControl::DEFAULT;
 use raylib::consts::GuiControlProperty::TEXT_COLOR_NORMAL;
-use std::ffi::CString;
+use raylib::color::Color;
 use uuid::Uuid;
-use std::io::Write;
+use super::core::{GuiTheme, MainState, EXIT_KEY, DARK_THEME_DATA, BLUISH_THEME_DATA, CANDY_THEME_DATA, CHERRY_THEME_DATA, CYBER_THEME_DATA, JUNGLE_THEME_DATA, LAVANDA_THEME_DATA, TERMINAL_THEME_DATA, ASHES_THEME_DATA};
 
-pub fn update_main(rl: &mut RaylibHandle, main_state: &mut MainState) {
+pub(crate) fn update_main(rl: &mut RaylibHandle, main_state: &mut MainState) {
     main_state.should_quit = rl.window_should_close();
 
     main_state.frame_counter += 1;
@@ -33,7 +36,7 @@ pub fn update_main(rl: &mut RaylibHandle, main_state: &mut MainState) {
     let current_theme_idx = main_state.gui_theme_combobox_active;
 
     if current_theme_idx != main_state.theme as i32 {
-        match <i32 as TryInto<GuiTheme>>::try_into(current_theme_idx) {
+        match <GuiTheme as TryFrom<i32>>::try_from(current_theme_idx) {
             Ok(theme) => {
                 theme.load_and_set(rl, main_state);
             }
@@ -41,7 +44,7 @@ pub fn update_main(rl: &mut RaylibHandle, main_state: &mut MainState) {
         }
     }
 
-    if rl.is_key_pressed(crate::EXIT_KEY) {
+    if rl.is_key_pressed(EXIT_KEY) {
         main_state.showing_quit_win = true;
     }
 
@@ -132,10 +135,15 @@ impl GuiTheme {
             GuiTheme::Light => 2, // 10 is way too small for the default font height
             _ => 1
         };
+        let font_spacing_scale = match self {
+            GuiTheme::Light => 2,
+            _ => 1
+        };
         main_state.default_font_height = rl.gui_get_style(DEFAULT, TEXT_SIZE as i32) * font_height_scale;
         rl.gui_set_style(DEFAULT, TEXT_SIZE as i32, main_state.default_font_height);
         main_state.current_font_height = main_state.default_font_height;
-        main_state.default_txt_spacing = rl.gui_get_style(DEFAULT, TEXT_SPACING as i32);
+        main_state.default_txt_spacing = rl.gui_get_style(DEFAULT, TEXT_SPACING as i32) * font_spacing_scale;
+        rl.gui_set_style(DEFAULT, TEXT_SPACING as i32, main_state.default_txt_spacing);
         let txt_color_int = rl.gui_get_style(DEFAULT, TEXT_COLOR_NORMAL as i32);
         let bg_color_int = rl.gui_get_style(DEFAULT, BACKGROUND_COLOR as i32);
         main_state.default_txt_color = Color::get_color(txt_color_int as u32);

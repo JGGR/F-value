@@ -17,101 +17,95 @@
 
 use std::collections::{hash_map::Entry, HashMap};
 
-use crate::model::niseci::{AnagraficaNISECI, CampionamentoNISECI, ClassiEtaSpecieNISECI, EsemplariPerCattura, RecordNISECI, MetricheX2A, MetricheX2aB};
+use crate::domain::niseci::{AnagraficaNISECI, CampionamentoNISECI, ClassiEtaSpecieNISECI, EsemplariPerCattura, RecordNISECI, MetricheX2A, MetricheX2aB};
 
 use super::linear_regression::{calculate_quantita_with_regression, Point};
 
 #[derive(Clone)]
-pub struct SubmetricheX2 {
+pub(crate) struct SubmetricheX2 {
     metriche_x2_a: MetricheX2A,
     classi_eta: ClassiEtaSpecieNISECI,
     metriche_x2_b: MetricheX2B
 }
 
 impl SubmetricheX2 {
-    pub fn new(metriche_x2_a: MetricheX2A, classi_eta: ClassiEtaSpecieNISECI, metriche_x2_b: MetricheX2B) -> Self {
+    pub(crate) fn new(metriche_x2_a: MetricheX2A, classi_eta: ClassiEtaSpecieNISECI, metriche_x2_b: MetricheX2B) -> Self {
         Self {
-            metriche_x2_a: metriche_x2_a,
-            classi_eta: classi_eta,
-            metriche_x2_b: metriche_x2_b
+            metriche_x2_a,
+            classi_eta,
+            metriche_x2_b
         }
     }
-    pub fn get_metriche_x2_a(&self) -> MetricheX2A {
-        return self.metriche_x2_a;
+    pub(crate) fn get_metriche_x2_a(&self) -> MetricheX2A {
+        self.metriche_x2_a
     }
-    pub fn get_classi_eta(&self) -> ClassiEtaSpecieNISECI {
-        return self.classi_eta.clone();
+    pub(crate) fn get_classi_eta(&self) -> ClassiEtaSpecieNISECI {
+        self.classi_eta.clone()
     }
-    pub fn get_metriche_x2_b(&self) -> MetricheX2B {
-        return self.metriche_x2_b.clone();
+    pub(crate) fn get_metriche_x2_b(&self) -> MetricheX2B {
+        self.metriche_x2_b.clone()
     }
 }
 
-pub struct MetricheX2 {
+pub(crate) struct MetricheX2 {
     criterio_a: f32,
     criterio_b: f32,
     submetriche_map: HashMap<String, SubmetricheX2>
 }
 
 impl MetricheX2 {
-    pub fn new(criterio_a: f32, criterio_b: f32, submetriche_map: HashMap<String, SubmetricheX2>) -> Self {
+    pub(crate) fn new(criterio_a: f32, criterio_b: f32, submetriche_map: HashMap<String, SubmetricheX2>) -> Self {
         Self {
-            criterio_a: criterio_a,
-            criterio_b: criterio_b,
-            submetriche_map: submetriche_map
+            criterio_a,
+            criterio_b,
+            submetriche_map
         }
     }
-    pub fn get_criterio_a(&self) -> f32 {
-        return self.criterio_a;
+    pub(crate) fn get_criterio_a(&self) -> f32 {
+        self.criterio_a
     }
-    pub fn get_criterio_b(&self) -> f32 {
-        return self.criterio_b;
+    pub(crate) fn get_criterio_b(&self) -> f32 {
+        self.criterio_b
     }
-    pub fn get_submetriche_map(&self) -> HashMap<String, SubmetricheX2> {
-        return self.submetriche_map.clone();
+    pub(crate) fn get_submetriche_map(&self) -> HashMap<String, SubmetricheX2> {
+        self.submetriche_map.clone()
     }
 }
 
 #[derive(Clone)]
-pub struct MetricheX2B {
+pub(crate) struct MetricheX2B {
     id_specie: String,
     densita_stimata: f32
 }
 
 impl MetricheX2B {
-    pub fn new(id_specie: String, densita_stimata: f32) -> Self {
+    pub(crate) fn new(id_specie: String, densita_stimata: f32) -> Self {
         Self {
-            id_specie: id_specie,
-            densita_stimata: densita_stimata
+            id_specie,
+            densita_stimata
         }
     }
-    pub fn get_id(&self) -> String {
-        return self.id_specie.clone();
+    pub(crate) fn get_id(&self) -> String {
+        self.id_specie.clone()
     }
-    pub fn get_densita_stimata(&self) -> f32 {
-        return self.densita_stimata;
+    pub(crate) fn get_densita_stimata(&self) -> f32 {
+        self.densita_stimata
     }
 }
 
-pub fn calculate_x2(campionamento: &CampionamentoNISECI, anagrafica: &AnagraficaNISECI) -> Result<(Option<f32>, MetricheX2), Vec<String>> {
-  let (x2_a, criteri_vec) = match calculate_sommatoria_x2_a(campionamento) {
-    Ok(x2_a) => x2_a,
-    Err(errors) => return Err(errors),
-  };
-  let (x2_b, densita_vec) = match calculate_sommatoria_x2_b(campionamento, anagrafica) {
-    Ok(result) => result,
-    Err(errors) => return Err(errors),
-  };
+pub(crate) fn calculate_x2(campionamento: &CampionamentoNISECI, anagrafica: &AnagraficaNISECI) -> Result<(Option<f32>, MetricheX2), Vec<String>> {
+  let (x2_a, criteri_vec) = calculate_sommatoria_x2_a(campionamento)?;
+  let (x2_b, densita_vec) = calculate_sommatoria_x2_b(campionamento, anagrafica)?;
 
   let mut submetriche = HashMap::<String, SubmetricheX2>::new();
 
   for crit in &criteri_vec {
-    match submetriche.entry(crit.0.clone()) {
+    match submetriche.entry(crit.get_codice_specie()) {
         Entry::Occupied(_) => {},
         Entry::Vacant(vacant_entry) => {
             vacant_entry.insert(
                 // We fill densita_stimata later
-                SubmetricheX2::new(crit.1, crit.2.clone(), MetricheX2B::new(crit.0.clone(), -1.0))
+                SubmetricheX2::new(crit.get_metriche_x2a(), crit.get_classi_eta(), MetricheX2B::new(crit.get_codice_specie(), -1.0))
             );
         }
     }
@@ -132,7 +126,7 @@ pub fn calculate_x2(campionamento: &CampionamentoNISECI, anagrafica: &Anagrafica
     }
   }
 
-  if errors.len() > 0 { // In case the densita_vec had some problems
+  if !errors.is_empty() { // In case the densita_vec had some problems
     return Err(errors);
   }
 
@@ -162,7 +156,32 @@ pub fn calculate_x2(campionamento: &CampionamentoNISECI, anagrafica: &Anagrafica
   Ok((Some(result), metriche_x2))
 }
 
-fn calculate_sommatoria_x2_a(c: &CampionamentoNISECI) -> Result<(f32, Vec<(String, MetricheX2A, ClassiEtaSpecieNISECI)>), Vec<String>> {
+struct RecordSubmetricheX2A {
+    codice_specie: String,
+    metriche_x2a: MetricheX2A,
+    classi_eta: ClassiEtaSpecieNISECI
+}
+
+impl RecordSubmetricheX2A {
+    pub(crate) fn new(codice_specie: String, metriche_x2a: MetricheX2A, classi_eta: ClassiEtaSpecieNISECI) -> Self {
+        Self {
+            codice_specie,
+            metriche_x2a,
+            classi_eta
+        }
+    }
+    pub(crate) fn get_codice_specie(&self) -> String {
+        self.codice_specie.clone()
+    }
+    pub(crate) fn get_metriche_x2a(&self) -> MetricheX2A {
+        self.metriche_x2a
+    }
+    pub(crate) fn get_classi_eta(&self) -> ClassiEtaSpecieNISECI {
+        self.classi_eta.clone()
+    }
+}
+
+fn calculate_sommatoria_x2_a(c: &CampionamentoNISECI) -> Result<(f32, Vec<RecordSubmetricheX2A>), Vec<String>> {
 
   // ad ogni specie associo le loro classi che andrò poi a riempire
   // ho controllato i campionamenti di andrea e trovto massimo 9 specie diverse
@@ -174,10 +193,10 @@ fn calculate_sommatoria_x2_a(c: &CampionamentoNISECI) -> Result<(f32, Vec<(Strin
     if cattura.specie.specie_attesa && (cattura.specie.tipo_autoctono == 1 || cattura.specie.tipo_autoctono == 2) {
       match classi_eta_map.entry(cattura.specie.id.clone()) {
         Entry::Occupied(mut entry) => {
-          entry.get_mut().update_classi_eta(&cattura);
+          entry.get_mut().update_classi_eta(cattura);
         },
         Entry::Vacant(entry) => {
-          entry.insert(ClassiEtaSpecieNISECI::new_cl_prevalorizzata(&cattura));
+          entry.insert(ClassiEtaSpecieNISECI::new_cl_prevalorizzata(cattura));
         }
       };
     }
@@ -189,21 +208,21 @@ fn calculate_sommatoria_x2_a(c: &CampionamentoNISECI) -> Result<(f32, Vec<(Strin
 
   let mut sommatoria_x2_a = 0.0;
   let mut errors: Vec<String> = Vec::with_capacity(classi_eta_map.len()); // prenoto ora e poi restringo dopo
-  let mut criteri_vec: Vec<(String, MetricheX2A, ClassiEtaSpecieNISECI)> = Vec::with_capacity(classi_eta_map.len());
-  for (_key, classe) in classi_eta_map {
-    match calculate_x2_a(&classe) {
+  let mut criteri_vec: Vec<RecordSubmetricheX2A> = Vec::with_capacity(classi_eta_map.len());
+  for classe in classi_eta_map.values() {
+    match calculate_x2_a(classe) {
       Ok((x2_a, criteri_x2_a)) => {
           let criterio_a = criteri_x2_a.get_criterio_a();
           let criterio_b = criteri_x2_a.get_criterio_b();
           let ad_juv = criteri_x2_a.get_rapporto_ad_juv();
           sommatoria_x2_a += x2_a;
-          criteri_vec.push((classe.specie.id.clone(), MetricheX2A::new(criterio_a, MetricheX2aB::new(criterio_b, ad_juv)), classe));
+          criteri_vec.push(RecordSubmetricheX2A::new(classe.specie.id.clone(), MetricheX2A::new(criterio_a, MetricheX2aB::new(criterio_b, ad_juv)), classe.clone()));
       }
       Err(error) => errors.push(error),
     }
   }
 
-  if errors.len() > 0 {
+  if !errors.is_empty() {
     errors.shrink_to_fit();
     return Err(errors);
   }
@@ -236,7 +255,7 @@ fn calculate_sommatoria_x2_b(c: &CampionamentoNISECI, anagrafica: &AnagraficaNIS
   let mut sommatoria_x2_b = 0.0;
   let mut errors: Vec<String> = Vec::with_capacity(esemplari_per_cattura_map.len()); // prenoto ora e poi restringo dopo
   let mut densita_vec: Vec<MetricheX2B> = Vec::with_capacity(esemplari_per_cattura_map.len());
-  for (_key, catture) in &esemplari_per_cattura_map {
+  for catture in esemplari_per_cattura_map.values() {
     match calculate_x2_b(catture, &superficie) {
         Ok((x2_b, densita_stimata)) => {
             sommatoria_x2_b += x2_b;
@@ -247,7 +266,7 @@ fn calculate_sommatoria_x2_b(c: &CampionamentoNISECI, anagrafica: &AnagraficaNIS
   }
 
   // controllo se ci sono errori, se sì allora ritorno gli errori
-  if errors.len() > 0 {
+  if !errors.is_empty() {
     errors.shrink_to_fit(); // restringo
     return Err(errors);
   }
@@ -257,7 +276,7 @@ fn calculate_sommatoria_x2_b(c: &CampionamentoNISECI, anagrafica: &AnagraficaNIS
   Ok((sommatoria_x2_b, densita_vec)) // finally
 }
 
-fn _update_classi_eta(cl: &mut ClassiEtaSpecieNISECI, record: &RecordNISECI) -> () {
+fn _update_classi_eta(cl: &mut ClassiEtaSpecieNISECI, record: &RecordNISECI) {
   if record.lunghezza < record.specie.cl_soglia1 {
     cl.cl1 += 1;
   } else if record.lunghezza < record.specie.cl_soglia2 {
@@ -273,7 +292,7 @@ fn _update_classi_eta(cl: &mut ClassiEtaSpecieNISECI, record: &RecordNISECI) -> 
 
 /// fn wrapper del calcolo della struttura di una popolazione
 fn calculate_x2_a(classe: &ClassiEtaSpecieNISECI) -> Result<(f32, MetricheX2A), String> {
-  return classe.calculate_struttura_popolazione();
+  classe.calculate_struttura_popolazione()
 }
 
 fn calculate_x2_b(e: &EsemplariPerCattura, superficie: &f32) -> Result<(f32,f32), String> {
@@ -290,11 +309,10 @@ fn calculate_x2_b(e: &EsemplariPerCattura, superficie: &f32) -> Result<(f32,f32)
       if densita_stimata > e.specie.dens_soglia1 {
         return Ok((0.5, densita_stimata));
       }
-      return Ok((0.0, densita_stimata));
-
+      Ok((0.0, densita_stimata))
     },
-    Err(err_message) => return Err(err_message)
-  };
+    Err(err_message) => { Err(err_message) }
+  }
 }
 
 fn get_quantita_stimata(passaggi: &HashMap<u8, u32>) -> Result<u32, String> {
@@ -309,14 +327,13 @@ fn get_quantita_stimata(passaggi: &HashMap<u8, u32>) -> Result<u32, String> {
 
     return calculate_passaggi_ripetuti(c1, c2);
   }
-  return calculate_q_stimata_regression(passaggi);
+  calculate_q_stimata_regression(passaggi)
 }
 
 fn calculate_passaggi_ripetuti(c1: u32, c2: u32) -> Result<u32, String> {
 
-  match c1 == c2 || c1 == 0 || c2 == 0 {
-    true => return Ok(c1 + c2),
-    false => {},
+  if c1 == c2 || c1 == 0 || c2 == 0 {
+    return Ok(c1 + c2);
   }
 
   let c = c1 + c2;
@@ -326,11 +343,9 @@ fn calculate_passaggi_ripetuti(c1: u32, c2: u32) -> Result<u32, String> {
 
 
   match result > 0 {
-    true => return Ok(result as u32),
-    false => return Ok(c1 + c2), // ritorno somma come da accordi
+    true => Ok(result as u32),
+    false => Ok(c1 + c2), // ritorno somma come da accordi
   }
-
-
 }
 
 fn calculate_q_stimata_regression(passaggi: &HashMap<u8, u32>) -> Result<u32, String> {
@@ -338,7 +353,7 @@ fn calculate_q_stimata_regression(passaggi: &HashMap<u8, u32>) -> Result<u32, St
 
   // dalla mappa non riesco a capire se ci siano o meno dei passaggi in cui non è stato trovato pesce
   // quindi mi creo un vettore che rappresenta i pesci trovati per ogni passaggio in ordine di passaggio
-  let mut esemplari_per_passaggio = vec![0 as u32; ultimo_passaggio as usize];
+  let mut esemplari_per_passaggio = vec![0_u32; ultimo_passaggio as usize];
 
   for (key, value) in passaggi {
     esemplari_per_passaggio[(*key - 1) as usize] = *value;
@@ -351,12 +366,11 @@ fn calculate_q_stimata_regression(passaggi: &HashMap<u8, u32>) -> Result<u32, St
     .iter()
     .map(|esemplari: &u32| {
       current_tot += esemplari;
-      return Point::new(current_tot as i32, *esemplari as i32);
+      Point::new(current_tot as i32, *esemplari as i32)
     })
     .collect();
 
-  return calculate_quantita_with_regression(points.as_slice());
-
+  calculate_quantita_with_regression(points.as_slice())
 }
 
 #[cfg(test)]

@@ -17,30 +17,43 @@
 
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+mod domain;
 mod state;
-mod model;
 mod views;
 mod controllers;
 mod console;
 mod core;
 mod engines;
+mod app;
 #[cfg(test)]
 mod tests;
 
-use crate::core::*;
-use crate::core::view::*;
-use crate::core::controller::*;
-use crate::core::cli::*;
-use crate::controllers::*;
-use crate::views::*;
-use raylib::prelude::*;
+use std::env;
+use raylib::consts::TraceLogLevel;
 use raylib::consts::GuiControl::DEFAULT;
 use raylib::consts::GuiDefaultProperty::{BACKGROUND_COLOR, TEXT_SIZE, TEXT_SPACING};
 use raylib::consts::GuiControlProperty::TEXT_COLOR_NORMAL;
+use raylib::core::texture::Image;
+use raylib::color::Color;
+use crate::app::core::{SUPPORT_HEADLESS, PROJECT_LOGO_DATA, ESOX_SCREEN_WIDTH, ESOX_SCREEN_HEIGHT, MainState};
+use crate::core::{PROJECT_NAME, SHORT_PROJECT_VERSION, PROJECT_VERSION, COMMIT_HASH_PLUS, PROJECT_BUILD_TYPE, PROJECT_BRANCH};
+use crate::core::csv::{RIFERIMENTO_NISECI_HEADER, RIFERIMENTO_NISECI_HEADER_FIELDS, RIFERIMENTO_NISECI_HEADER_FIELD_TYPES, CAMPIONAMENTO_NISECI_HEADER, CAMPIONAMENTO_NISECI_HEADER_FIELDS, CAMPIONAMENTO_NISECI_HEADER_FIELD_TYPES, ANAGRAFICA_NISECI_HEADER, ANAGRAFICA_NISECI_HEADER_FIELDS, ANAGRAFICA_NISECI_HEADER_FIELD_TYPES};
+use crate::core::cli::{esox_usage, print_warranty_info, print_copyright_splash, run_headless};
+use crate::controllers::Controllers;
+use crate::views::Views;
 
-use std::env;
+#[cfg(feature="logged")]
+use log::info;
+#[cfg(feature="logged")]
+use crate::core::prep_logger;
 
 fn main() {
+
+    #[cfg(feature="logged")]
+    let _ = prep_logger();
+
+    #[cfg(feature="logged")]
+    info!("FOO");
 
     let args: Vec<String> = env::args().collect(); // Using this panics on receiving invalid Unicode
 
@@ -147,23 +160,6 @@ fn main() {
         }
     }
 
-    let home_controller = HomeController::new();
-    let mut home_view = HomeView::new();
-    let second_controller = SecondController::new();
-    let mut second_view = SecondView::new();
-    let indice_controller = IndiceController::new();
-    let mut selezione_indice_view = SelezioneIndiceView::new();
-    let fileinput_controller = FileInputController::new();
-    let mut selezione_fileinput_view = SelezioneFileInputView::new();
-    let mut validazione_fileinput_view = ValidazioneFileInputView::new();
-    let infoaggiuntive_controller = InfoAggiuntiveController::new();
-    let mut selezione_infoaggiuntive_view = SelezioneInfoAggiuntiveView::new();
-    let mut validazione_infoaggiuntive_view = ValidazioneInfoAggiuntiveView::new();
-    let output_controller = OutputController::new();
-    let mut produzione_output_view = ProduzioneOutputView::new();
-    let mut produzione_pdf_view = ProduzionePDFView::new();
-    let console_controller = ConsoleController::new();
-
     let window_title = format!("esox v{SHORT_PROJECT_VERSION}");
 
     let (mut rl, thread) = raylib::init()
@@ -178,11 +174,8 @@ fn main() {
     rl.set_target_fps(30);
 
     let mut logo_texture = None;
-    match logo_img {
-        Some(img) => {
-            logo_texture = Some(rl.load_texture_from_image(&thread, &img).unwrap());
-        }
-        None => {}
+    if let Some(img) = logo_img {
+        logo_texture = Some(rl.load_texture_from_image(&thread, &img).unwrap());
     }
 
     // 10 is way too small for the default font height
@@ -192,7 +185,8 @@ fn main() {
 
     let txt_color_int = rl.gui_get_style(DEFAULT, TEXT_COLOR_NORMAL as i32);
     let bg_color_int = rl.gui_get_style(DEFAULT, BACKGROUND_COLOR as i32);
-    let txt_spacing = rl.gui_get_style(DEFAULT, TEXT_SPACING as i32);
+    let txt_spacing = rl.gui_get_style(DEFAULT, TEXT_SPACING as i32) *2;
+    rl.gui_set_style(DEFAULT, TEXT_SPACING as i32, txt_spacing);
     let current_font = rl.gui_get_font();
     let mut main_state = MainState::new(
         gui_default_font_height,
@@ -204,87 +198,10 @@ fn main() {
         logo_texture
     );
 
-    let mut console_view = ConsoleView::new(&mut rl, &thread, gui_current_font_height, txt_spacing);
+    let controllers = Controllers::new();
 
-    while !main_state.should_quit {
+    let mut views = Views::new(&mut rl, &thread, gui_current_font_height, txt_spacing);
 
-        // Base update step
-        update_main(&mut rl, &mut main_state);
+    main_state.mainloop(&mut rl, &thread, &controllers, &mut views);
 
-        // Current view update step
-        match main_state.current_view {
-            CurrentView::HOME => {
-                home_controller.update(&rl, &mut main_state);
-            }
-            CurrentView::SECOND => {
-                second_controller.update(&rl, &mut main_state);
-            }
-            CurrentView::SelezioneIndice => {
-                indice_controller.update(&rl, &mut main_state);
-            }
-            CurrentView::SelezioneFileInput | CurrentView::ValidazioneFileInput => {
-                fileinput_controller.update(&rl, &mut main_state);
-            }
-            CurrentView::SelezioneInfoAggiuntive | CurrentView::ValidazioneInfoAggiuntive => {
-                infoaggiuntive_controller.update(&rl, &mut main_state);
-            }
-            CurrentView::ProduzioneOutput | CurrentView::ProduzionePDF=> {
-                output_controller.update(&rl, &mut main_state);
-            }
-            CurrentView::CONSOLE => {
-                console_controller.update(&mut rl, &mut main_state);
-            }
-        }
-
-        let mut d = rl.begin_drawing(&thread);
-
-        let lock_view = main_state.get_gui_should_lock();
-
-        if lock_view {
-            d.gui_lock();
-        }
-
-        // Ask the view for render, passing the controller for state changes
-        // Current view draw step
-        match main_state.current_view {
-            CurrentView::HOME => {
-                home_view.draw(&mut d, &thread, &home_controller, &main_state);
-            }
-            CurrentView::SECOND => {
-                second_view.draw(&mut d, &thread, &second_controller, &main_state);
-            }
-            CurrentView::SelezioneIndice => {
-                selezione_indice_view.draw(&mut d, &thread, &indice_controller, &main_state);
-            }
-            CurrentView::SelezioneFileInput => {
-                selezione_fileinput_view.draw(&mut d, &thread, &fileinput_controller, &main_state);
-            }
-            CurrentView::ValidazioneFileInput => {
-                validazione_fileinput_view.draw(&mut d, &thread, &fileinput_controller, &main_state);
-            }
-            CurrentView::SelezioneInfoAggiuntive => {
-                selezione_infoaggiuntive_view.draw(&mut d, &thread, &infoaggiuntive_controller, &main_state);
-            }
-            CurrentView::ValidazioneInfoAggiuntive => {
-                validazione_infoaggiuntive_view.draw(&mut d, &thread, &infoaggiuntive_controller, &main_state);
-            }
-            CurrentView::ProduzioneOutput => {
-                produzione_output_view.draw(&mut d, &thread, &output_controller, &main_state);
-            }
-            CurrentView::ProduzionePDF => {
-                produzione_pdf_view.draw(&mut d, &thread, &output_controller, &main_state);
-            }
-            CurrentView::CONSOLE => {
-                console_view.draw(&mut d, &thread, &console_controller, &main_state);
-            }
-        }
-
-        if lock_view {
-            d.gui_unlock();
-        }
-
-        // Base draw step
-        // Render stuff not depending on view
-        draw_main(&mut d, &mut main_state);
-    }
 }

@@ -16,30 +16,29 @@
 */
 
 use std::collections::hash_map::Entry;
+use crate::domain::niseci::{CampionamentoNISECI, ClassiEtaAlieniNISECI, ClassiEtaSpecieNISECI, InfoPopolazioniAlieneNISECI};
 
-pub struct MetricheX3 {
+pub(crate) struct MetricheX3 {
     criterio_a: f32,
     criterio_b: f32
 }
 
 impl MetricheX3 {
-    pub fn new(criterio_a: f32, criterio_b: f32) -> Self {
+    pub(crate) fn new(criterio_a: f32, criterio_b: f32) -> Self {
         Self {
-            criterio_a: criterio_a,
-            criterio_b: criterio_b
+            criterio_a,
+            criterio_b
         }
     }
-    pub fn get_criterio_a(&self) -> f32 {
-        return self.criterio_a;
+    pub(crate) fn get_criterio_a(&self) -> f32 {
+        self.criterio_a
     }
-    pub fn get_criterio_b(&self) -> f32 {
-        return self.criterio_b;
+    pub(crate) fn get_criterio_b(&self) -> f32 {
+        self.criterio_b
     }
 }
 
-use crate::model::niseci::{CampionamentoNISECI, ClassiEtaAlieniNISECI, ClassiEtaSpecieNISECI, InfoPopolazioniAlieneNISECI};
-
-pub fn calculate_x3(c: &CampionamentoNISECI) -> Result<(f32, Option<MetricheX3>), Vec<String>> {
+pub(crate) fn calculate_x3(c: &CampionamentoNISECI) -> Result<(f32, Option<MetricheX3>), Vec<String>> {
 
   let alieni_indigeni = c.get_numero_pesci_alieni_e_indigeni();
 
@@ -62,10 +61,7 @@ pub fn calculate_x3(c: &CampionamentoNISECI) -> Result<(f32, Option<MetricheX3>)
 
   // ora ho ottenuto le classi di eta per ogni specie aliena trovata
 
-  let info_pop_aliene = match InfoPopolazioniAlieneNISECI::get_info_pop_aliene(&classi_eta) {
-    Ok(info) => info,
-    Err(errors) => return Err(errors)
-  };
+  let info_pop_aliene = InfoPopolazioniAlieneNISECI::get_info_pop_aliene(&classi_eta)?;
 
   // condizione 3
   let epsilon: f32 = 1e-6;
@@ -94,28 +90,28 @@ fn calculate_classi_eta_alieni(c: &CampionamentoNISECI) -> ClassiEtaAlieniNISECI
     if cattura.specie.tipo_alloctono == 1 {
       match classi_eta.map_tipo_1.entry(cattura.specie.id.clone()) {
         Entry::Occupied(mut entry) => {
-          entry.get_mut().update_classi_eta(&cattura);
+          entry.get_mut().update_classi_eta(cattura);
         },
         Entry::Vacant(entry) => {
-          entry.insert(ClassiEtaSpecieNISECI::new_cl_prevalorizzata(&cattura));
+          entry.insert(ClassiEtaSpecieNISECI::new_cl_prevalorizzata(cattura));
         }
       };
     } else if cattura.specie.tipo_alloctono == 2 {
       match classi_eta.map_tipo_2.entry(cattura.specie.id.clone()) {
         Entry::Occupied(mut entry) => {
-          entry.get_mut().update_classi_eta(&cattura);
+          entry.get_mut().update_classi_eta(cattura);
         },
         Entry::Vacant(entry) => {
-          entry.insert(ClassiEtaSpecieNISECI::new_cl_prevalorizzata(&cattura));
+          entry.insert(ClassiEtaSpecieNISECI::new_cl_prevalorizzata(cattura));
         }
       };
     } else if cattura.specie.tipo_alloctono == 3 {
       match classi_eta.map_tipo_3.entry(cattura.specie.id.clone()) {
         Entry::Occupied(mut entry) => {
-          entry.get_mut().update_classi_eta(&cattura);
+          entry.get_mut().update_classi_eta(cattura);
         },
         Entry::Vacant(entry) => {
-          entry.insert(ClassiEtaSpecieNISECI::new_cl_prevalorizzata(&cattura));
+          entry.insert(ClassiEtaSpecieNISECI::new_cl_prevalorizzata(cattura));
         }
       };
     }
@@ -163,7 +159,7 @@ fn calculate_b(info: &InfoPopolazioniAlieneNISECI) -> f32 {
 
 // tutte le fn private le mettiamo qua
 #[cfg(test)]
-pub mod tests {
+pub(crate) mod tests {
   use super::*;
 
   #[test]

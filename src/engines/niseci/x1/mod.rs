@@ -17,9 +17,9 @@
 
 use std::collections::HashMap;
 
-use crate::model::niseci::{CampionamentoNISECI, RecordNISECI, RiferimentoNISECI, SpecieNISECI};
+use crate::domain::niseci::{CampionamentoNISECI, RecordNISECI, RiferimentoNISECI, SpecieNISECI};
 
-pub fn calculate_x1(campionamento: &CampionamentoNISECI, riferimento: &RiferimentoNISECI) -> f32 {
+pub(crate) fn calculate_x1(campionamento: &CampionamentoNISECI, riferimento: &RiferimentoNISECI) -> f32 {
   // n_i è il numero di specie autoctone di maggiore importanza ecologico-funzionale campionate
   // n_a è il numero di altre specie autoctone campionate
   // m_i è il numero di specie autoctone di maggiore importanza ecologico-funzionale attese
@@ -64,5 +64,5 @@ pub fn calculate_x1(campionamento: &CampionamentoNISECI, riferimento: &Riferimen
   }
 
   // this is the formula use in the NISECI docs
-  return (1.2 * n_i + 0.8 * n_a ) / (1.2 * m_i + 0.8 * m_a )
+  (1.2 * n_i + 0.8 * n_a ) / (1.2 * m_i + 0.8 * m_a )
 }

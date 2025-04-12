@@ -1,3 +1,52 @@
+## [0.0.13] - 2025-04-12
+
+### Added
+
+- Add `assets/FreeMono.ttf` and use it instead of `assets/ubuntu.mono.ttf`
+- New traits:
+  - `Controller`
+  - `View`
+  - `SubModel`
+- New structs:
+  - `Controllers`
+  - `Views`
+  - `RecordSubmetricheX2A`
+    - Used to relax the last tuple non-type left after the intermediates refactor: `(String, MetricheX2A, ClassiEtaSpecieNISECI)`
+- Impl `TryFrom<i32>` for:
+  - `TipoComunitaNISECI`
+  - `AreaNISECI`
+  - `IdroEcoRegioneNISECI`
+- New `logged` feature, enabling `prep_logger()`
+  - Uses `dirs` and `flexi_logger` crates
+
+### Changed
+- Refactor `RecordCsvRiferimentoNISECI`, `RecordCsvCampionamentoNISECI`, `RecordCsvAnagraficaNISECI` structs to be traits
+  - All methods involving them are now generic
+  - Previous struct are renamed to:
+    - `VeryItalianRecordCsvRiferimentoNISECI`
+    - `VeryItalianRecordCsvCampionamentoNISECI`
+    - `VeryItalianRecordCsvAnagraficaNISECI`
+  - New struct without custom deserializers:
+    - `PlainRecordCsvRiferimentoNISECI`
+    - `PlainRecordCsvCampionamentoNISECI`
+    - `PlainRecordCsvAnagraficaNISECI`
+  - Keeps current behaviour
+- Fix: avoid double check on `tipo_autoctono == 1` in `CampionamentoNISECI::get_tot_specie_autoctone()`
+- Solve most `clippy` hints
+- Set `Console.columns` to `65` rather than `80` for new font, to keep the look
+- Mark all previously `pub` APIs as `pub(crate)`
+- Refactor `core` module:
+  - Move gui-related code to `app` module
+  - Move parser-related code to `core::csv` module
+    - Deserialize step in `core::csv::lexer`
+    - Value-check step in `core::csv::parser`
+- Refactor `model` module:
+  - Moved domain model to `domain`
+  - Moved gui model to `app::model`
+- Clean up star imports
+- Use double text spacing for `Light` theme
+- Empty string fields in `SelezioneInfoAggiuntiveView`
+
 ## [0.0.12] - 2025-03-17
 
 ### Added

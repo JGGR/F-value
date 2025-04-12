@@ -15,8 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use once_cell::sync::Lazy;
-use std::sync::Mutex;
-use crate::app::model::Model;
-// Global shared state using Mutex for thread safety
-pub(crate) static GLOBAL_STATE: Lazy<Mutex<Model>> = Lazy::new(|| Mutex::new(Model::new()));
+pub(crate) mod view;
+pub(crate) mod controller;
+pub(crate) mod core;
+pub(crate) mod model;

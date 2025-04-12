@@ -15,8 +15,21 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-pub mod core;
-pub mod index;
-pub mod location;
-pub mod niseci;
-pub mod logger;
+use std::{fmt};
+
+#[derive(Debug, Default, Clone, Copy, PartialEq)]
+pub(crate) enum Indice {
+  #[default]
+  Niseci,
+  Hfbi
+}
+
+impl fmt::Display for Indice {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    let string_representation = match *self {
+      Indice::Niseci => "NISECI",
+      Indice::Hfbi => "HFBI"
+    };
+    write!(f, "{}", string_representation)
+  }
+}

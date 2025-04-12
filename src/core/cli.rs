@@ -15,11 +15,15 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::core::*;
+use std::path::PathBuf;
 use crate::engines::niseci::full::{calculate_niseci, calculate_rqe_niseci, calculate_stato_ecologico};
-use crate::model::niseci::{ CampionamentoNISECI, RiferimentoNISECI };
+use crate::domain::niseci::{CampionamentoNISECI, RiferimentoNISECI, AnagraficaNISECI, TipoComunitaNISECI, ComunitaNISECI, AreaNISECI, IdroEcoRegioneNISECI};
+use crate::domain::location::Location;
+use crate::core::{COPYRIGHT_INFO, PROJECT_NAME, SHORT_PROJECT_VERSION, PROJECT_VERSION_FULL};
+use crate::core::csv::lexer::{check_path_is_file_ends_with_csv, check_riferimento_niseci_path, VeryItalianRecordCsvRiferimentoNISECI, check_campionamento_niseci_path, VeryItalianRecordCsvCampionamentoNISECI, check_anagrafica_niseci_path, VeryItalianRecordCsvAnagraficaNISECI, check_campionamento_hfbi_path};
+use crate::core::csv::parser::{check_records_campionamento_niseci, check_records_riferimento_niseci, check_records_anagrafica_niseci};
 
-pub fn esox_usage() {
+pub(crate) fn esox_usage() {
     println!("{PROJECT_NAME} v{SHORT_PROJECT_VERSION}");
     println!("Usage: {PROJECT_NAME} [--headless] <campionamento.csv> <riferimento.csv> <anagrafica.csv>");
     println!("       {PROJECT_NAME} [--headless] --hfbi <campionamento.csv> <anagrafica.csv>");
@@ -32,7 +36,23 @@ pub fn esox_usage() {
   --help, -h               Print this message and quit");
 }
 
-pub fn run_headless(do_niseci: bool, args: &Vec<String>) -> bool {
+pub(crate) fn print_warranty_info() {
+    println!("  THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY
+  APPLICABLE LAW.  EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT
+  HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM \"AS IS\" WITHOUT WARRANTY
+  OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
+  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+  PURPOSE.  THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM
+  IS WITH YOU.  SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF
+  ALL NECESSARY SERVICING, REPAIR OR CORRECTION.\n");
+}
+
+pub(crate) fn print_copyright_splash() {
+    let splash: String = format!("{PROJECT_VERSION_FULL}\n\n{COPYRIGHT_INFO}");
+    println!("{splash}\n");
+}
+
+pub(crate) fn run_headless(do_niseci: bool, args: &[String]) -> bool {
     let mut arg_i = 0;
     let mut campionamento_path_str = "";
     let mut riferimento_path_str = "";
@@ -81,7 +101,8 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) -> bool {
         }
         let mut riferimento_csv_failed = false;
         let mut riferimento_valueparse_failed = false;
-        let riferimento_csv_check_res = check_riferimento_niseci_path(riferimento_path);
+        // Using italian deser for now
+        let riferimento_csv_check_res = check_riferimento_niseci_path::<VeryItalianRecordCsvRiferimentoNISECI>(riferimento_path);
         let mut riferimento_specie = Vec::new(); // Holds parsed SpecieNISECI
         match riferimento_csv_check_res {
             Ok(csv_recs) => {
@@ -136,7 +157,8 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) -> bool {
 
         let mut campionamento_csv_failed = false;
         let mut campionamento_valueparse_failed = false;
-        let campionamento_csv_check_res = check_campionamento_niseci_path(campionamento_path);
+        // Using italian deser for now
+        let campionamento_csv_check_res = check_campionamento_niseci_path::<VeryItalianRecordCsvCampionamentoNISECI>(campionamento_path);
         let mut campionamento_specie = Vec::new(); // Holds parsed RecordNISECI
         match campionamento_csv_check_res {
             Ok(csv_recs) => {
@@ -233,7 +255,8 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) -> bool {
                 println!("Campione:  {:?}", c);
             }
             */
-            let anagrafica_csv_check_res = check_anagrafica_niseci_path(anagrafica_path);
+            // Using italian deser for now
+            let anagrafica_csv_check_res = check_anagrafica_niseci_path::<VeryItalianRecordCsvAnagraficaNISECI>(anagrafica_path);
             match anagrafica_csv_check_res {
                 Ok(csv_recs) => {
                     /* TODO: handle verbosity
@@ -334,11 +357,10 @@ pub fn run_headless(do_niseci: bool, args: &Vec<String>) -> bool {
             }
 
         }
-        let final_res = !had_failures && !niseci_calc_failed;
-        return final_res;
+        !had_failures && !niseci_calc_failed
     } else {
         let campionamento_check_res = check_campionamento_hfbi_path(campionamento_path);
         println!("Result: {campionamento_check_res}");
-        return true;
+        true
     }
 }

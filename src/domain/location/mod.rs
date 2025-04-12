@@ -15,21 +15,18 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use std::{fmt};
+use std::fmt;
 
-#[derive(Debug, Default, Clone, Copy, PartialEq)]
-pub enum Indice {
-  #[default]
-  NISECI,
-  HFBI
+#[derive(Clone)]
+pub(crate) struct Location {
+  pub(crate) regione: String,
+  pub(crate) provincia: String
 }
 
-impl fmt::Display for Indice {
+impl fmt::Display for Location {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    let string_representation = match *self {
-      Indice::NISECI => "NISECI",
-      Indice::HFBI => "HFBI"
-    };
+    let string_representation = format!("{{ regione: {{{}}}, provincia: {{{}}} }}",
+        self.regione, self.provincia);
     write!(f, "{}", string_representation)
   }
 }

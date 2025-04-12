@@ -16,13 +16,13 @@
 */
 
 use std::collections::{hash_map::Entry, HashMap};
-use crate::model::niseci::{CampionamentoNISECI, RiferimentoNISECI, AnagraficaNISECI, AreaNISECI, StatoEcologicoNISECI, ValoriIntermediSpecieNISECI, ValoriIntermediNISECI};
+use crate::domain::niseci::{CampionamentoNISECI, RiferimentoNISECI, AnagraficaNISECI, AreaNISECI, StatoEcologicoNISECI, ValoriIntermediSpecieNISECI, ValoriIntermediNISECI};
 
 use super::x1::calculate_x1;
 use super::x2::calculate_x2;
 use super::x3::calculate_x3;
 
-const RQE_NISECI_MAGIC_ADDEND: f32 = 1.1283;
+const RQE_NISECI_MAGIC_ADDEND: f32 = std::f32::consts::FRAC_2_SQRT_PI;
 const RQE_NISECI_MAGIC_QUOTIENT: f32 = 1.0603;
 const STATO_ECOLOGICO_NISECI_SOGLIA_ELEVATO: f32 = 0.8;
 const STATO_ECOLOGICO_NISECI_SOGLIA_BUONO_AREA_ALPINA: f32 = 0.52;
@@ -30,7 +30,7 @@ const STATO_ECOLOGICO_NISECI_SOGLIA_BUONO_AREA_MEDITERRANEA: f32 = 0.6;
 const STATO_ECOLOGICO_NISECI_SOGLIA_MODERATO: f32 = 0.4;
 const STATO_ECOLOGICO_NISECI_SOGLIA_SCADENTE: f32 = 0.2;
 
-pub fn calculate_niseci(campionamento: &CampionamentoNISECI, riferimento: &RiferimentoNISECI, anagrafica: &AnagraficaNISECI) -> Result<(Option<f32>, ValoriIntermediNISECI), Vec<String>> {
+pub(crate) fn calculate_niseci(campionamento: &CampionamentoNISECI, riferimento: &RiferimentoNISECI, anagrafica: &AnagraficaNISECI) -> Result<(Option<f32>, ValoriIntermediNISECI), Vec<String>> {
     let mut errors = Vec::new();
     let x1 = calculate_x1(campionamento, riferimento);
 
@@ -55,8 +55,8 @@ pub fn calculate_niseci(campionamento: &CampionamentoNISECI, riferimento: &Rifer
         let specie = key.clone();
         let densita_stimata = val.get_metriche_x2_b().get_densita_stimata();
         let val = ValoriIntermediSpecieNISECI {
-            classi_eta: classi_eta,
-            densita_stimata: densita_stimata,
+            classi_eta,
+            densita_stimata,
             x2_a_a: criteri_x2_a.get_criterio_a(),
             x2_a_b: criteri_x2_a.get_criterio_b(),
             rapporto_ad_juv: criteri_x2_a.get_rapporto_ad_juv(),
@@ -85,33 +85,24 @@ pub fn calculate_niseci(campionamento: &CampionamentoNISECI, riferimento: &Rifer
     if x1 < 0.0 {
         x1_x2_errors.push(format!("Errore risultato x1: valore negativo: {}", x1));
     }
-    match x2 {
-        Some(val) => {
-            if val < 0.0 {
-                x1_x2_errors.push(format!("Errore risultato x2: valore negativo: {}", val));
-            }
+    if let Some(val) = x2 {
+        if val < 0.0 {
+            x1_x2_errors.push(format!("Errore risultato x2: valore negativo: {}", val));
         }
-        None => {}
     }
-    if x1_x2_errors.len() != 0 {
+    if !x1_x2_errors.is_empty() {
         return Err(x1_x2_errors);
     }
 
     let intermediates = ValoriIntermediNISECI {
-        x1: x1,
-        x2: x2,
-        x3: x3,
+        x1,
+        x2,
+        x3,
         specie_specifici: valori_intermedi_specie,
         x2_a: criteri_x2.get_criterio_a(),
         x2_b: criteri_x2.get_criterio_b(),
-        x3_a: match criteri_x3 {
-            Some(ref v) => Some(v.get_criterio_a()),
-            None => None
-        },
-        x3_b: match criteri_x3 {
-            Some(v) => Some(v.get_criterio_b()),
-            None => None
-        },
+        x3_a: criteri_x3.as_ref().map(|v| v.get_criterio_a()),
+        x3_b: criteri_x3.as_ref().map(|v| v.get_criterio_b())
     };
 
     match x2 {
@@ -122,27 +113,20 @@ pub fn calculate_niseci(campionamento: &CampionamentoNISECI, riferimento: &Rifer
                 ( (0.1 * (1.0 - x3)) *
                   ((0.1 * x1.sqrt()) + (0.1 * x2_val.sqrt()) + (0.8 * (x1 * x2_val)))
                 );
-            return Ok((Some(niseci), intermediates));
+            Ok((Some(niseci), intermediates))
         },
         None => {
             // Nel caso in cui nessuna specie attesa sia presente nel campionamento
-            return Ok((None, intermediates));
+            Ok((None, intermediates))
         }
     }
 }
 
-pub fn calculate_rqe_niseci(niseci: Option<f32>) -> Option<f32> {
-    match niseci {
-        Some(val) => {
-            return Some((val.log(10.0) +  RQE_NISECI_MAGIC_ADDEND ) / RQE_NISECI_MAGIC_QUOTIENT);
-        }
-        None => {
-            return None;
-        }
-    }
+pub(crate) fn calculate_rqe_niseci(niseci: Option<f32>) -> Option<f32> {
+    niseci.map(|val| (val.log(10.0) +  RQE_NISECI_MAGIC_ADDEND ) / RQE_NISECI_MAGIC_QUOTIENT)
 }
 
-pub fn calculate_stato_ecologico(niseci: Option<f32>, area: &AreaNISECI) -> Option<StatoEcologicoNISECI> {
+pub(crate) fn calculate_stato_ecologico(niseci: Option<f32>, area: &AreaNISECI) -> Option<StatoEcologicoNISECI> {
     let rqe_niseci = calculate_rqe_niseci(niseci);
     match rqe_niseci {
         Some(val) => {
@@ -167,10 +151,10 @@ pub fn calculate_stato_ecologico(niseci: Option<f32>, area: &AreaNISECI) -> Opti
             if val >= STATO_ECOLOGICO_NISECI_SOGLIA_SCADENTE {
                 return Some(StatoEcologicoNISECI::Scadente);
             }
-            return Some(StatoEcologicoNISECI::Cattivo);
+            Some(StatoEcologicoNISECI::Cattivo)
         }
         None => {
-            return None;
+            None
         }
     }
 }

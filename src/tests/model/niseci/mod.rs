@@ -15,7 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::{engines::niseci::linear_regression::Point, model::niseci::{CampionamentoNISECI, RecordNISECI, SpecieNISECI}};
+use crate::{engines::niseci::linear_regression::Point, domain::niseci::{CampionamentoNISECI, RecordNISECI, SpecieNISECI}};
 
 
 #[test]
@@ -44,7 +44,7 @@ fn test_calcolo_pesci_per_passaggio() {
         lunghezza: 100, // in millimetri
         peso: 100 // in grammi
     };
-    
+
     let record_2 = RecordNISECI {
         specie: specie_1.clone(),
         passaggio_cattura: 2,
@@ -68,7 +68,7 @@ fn test_calcolo_pesci_per_passaggio() {
     let campionamento = CampionamentoNISECI {
         campionamento: c1
     };
-    
+
     let pesci_per_passaggio = campionamento.fishes_for_every_passage();
 
     assert_eq!(pesci_per_passaggio[0], Point::new(20, 20));
