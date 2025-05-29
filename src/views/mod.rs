@@ -16,7 +16,6 @@
 */
 
 use std::process::exit;
-use std::ffi::CString;
 use std::cmp::max;
 use raylib::prelude::*;
 use raylib::consts::GuiState::{STATE_NORMAL, STATE_DISABLED};
@@ -145,9 +144,9 @@ impl View for HomeView {
         let labels_y = propheight(d, 300);
         let labels_height = propheight(d, 25);
 
-        let labels: Vec<CString> = vec!(
-            CString::new(label_version_txt).unwrap(),
-            CString::new(label_target_txt).unwrap(),
+        let labels: Vec<String> = vec!(
+            label_version_txt,
+            label_target_txt
         );
 
         for (i, label) in labels.iter().enumerate() {
@@ -158,7 +157,7 @@ impl View for HomeView {
                     labels_width,
                     labels_height
                 ),
-                Some(label.as_c_str())
+                label.as_str()
             );
         }
 
@@ -168,8 +167,7 @@ impl View for HomeView {
         let continue_y_padding = propwidth(d, 25);
         let continue_y = labels_y + (labels_height * labels.len() as i32) + continue_y_padding;
 
-        let continue_itext = d.gui_icon_text(ICON_PLAYER_NEXT, Some(rstr!(": Continua")));
-        let continue_itext = CString::new(continue_itext).unwrap();
+        let continue_itext = d.gui_icon_text(ICON_PLAYER_NEXT, ": Continua");
 
         if d.gui_button(
             rrect(
@@ -178,7 +176,7 @@ impl View for HomeView {
                 continue_width,
                 continue_height
             ),
-            Some(continue_itext.as_c_str())
+            continue_itext.as_str()
         ) {
             controller.set_user_continued(true);
         }
@@ -233,7 +231,7 @@ impl View for SecondView {
 
         let updated_spinner = d.gui_spinner(
             rrect(propwidth(d, 100), propheight(d, 50), propwidth(d, 125), propheight(d, 30)),
-            None,
+            "",
             &mut self.spinner_value,
             0,
             100,
@@ -283,9 +281,9 @@ impl View for SecondView {
         let labels_y = propheight(d, 300);
         let labels_height = propheight(d, 25);
 
-        let labels: Vec<CString> = vec!(
-            CString::new(label_version_txt).unwrap(),
-            CString::new(label_target_txt).unwrap(),
+        let labels: Vec<String> = vec!(
+            label_version_txt,
+            label_target_txt
         );
 
         for (i, label) in labels.iter().enumerate() {
@@ -296,7 +294,7 @@ impl View for SecondView {
                     labels_width,
                     labels_height
                 ),
-                Some(label.as_c_str())
+                label.as_str()
             );
         }
 
@@ -306,8 +304,7 @@ impl View for SecondView {
         let continue_y_padding = propwidth(d, 25);
         let continue_y = labels_y + (labels_height * labels.len() as i32) + continue_y_padding;
 
-        let continue_itext = d.gui_icon_text(ICON_PLAYER_NEXT, Some(rstr!(": Continua")));
-        let continue_itext = CString::new(continue_itext).unwrap();
+        let continue_itext = d.gui_icon_text(ICON_PLAYER_NEXT, ": Continua");
 
         if d.gui_button(
             rrect(
@@ -316,7 +313,7 @@ impl View for SecondView {
                 continue_width,
                 continue_height
             ),
-            Some(continue_itext.as_c_str())
+            continue_itext.as_str()
         ) {
             controller.set_user_continued(true);
         }
@@ -380,7 +377,7 @@ impl View for SelezioneIndiceView {
                 groupbox_width,
                 groupbox_height
             ),
-            Some(rstr!("Seleziona Indice"))
+            "Seleziona Indice"
         );
 
         if d.gui_button(
@@ -390,7 +387,7 @@ impl View for SelezioneIndiceView {
                 button_niseci_width,
                 button_niseci_height
             ),
-            Some(rstr!("NISECI"))
+            "NISECI"
         ) {
             controller.set_indice_corrente(Indice::Niseci);
         }
@@ -402,7 +399,7 @@ impl View for SelezioneIndiceView {
                 button_hfbi_width,
                 button_hfbi_height,
             ),
-            Some(rstr!("HFBI"))
+            "HFBI"
         ) {
             controller.set_indice_corrente(Indice::Hfbi);
         }
@@ -466,13 +463,12 @@ impl View for SelezioneFileInputView {
                 groupbox_width,
                 groupbox_height
             ),
-            Some(rstr!("Seleziona file di input"))
+            "Seleziona file di input"
         );
 
         if current_index != Indice::Hfbi {
             if let Some(_filepath) = controller.get_riferimento_path() { // A file is already set, display button to clear it
-                let rif_itext = d.gui_icon_text(ICON_BIN, Some(rstr!("Annulla Riferimento")));
-                let rif_itext = CString::new(rif_itext).unwrap();
+                let rif_itext = d.gui_icon_text(ICON_BIN, "Annulla Riferimento");
                 if d.gui_button(
                     rrect(
                         button_riferimento_x,
@@ -480,14 +476,13 @@ impl View for SelezioneFileInputView {
                         button_riferimento_width,
                         button_riferimento_height
                     ),
-                    Some(rif_itext.as_c_str())
+                    rif_itext.as_str()
                 ) {
                     controller.set_riferimento_path(None); // Should already also clear the path_valid
                                                            // state inside it
                 }
             } else {
-                let rif_itext = d.gui_icon_text(ICON_FILE_OPEN, Some(rstr!("Riferimento")));
-                let rif_itext = CString::new(rif_itext).unwrap();
+                let rif_itext = d.gui_icon_text(ICON_FILE_OPEN, "Riferimento");
                 if d.gui_button(
                     rrect(
                         button_riferimento_x,
@@ -495,7 +490,7 @@ impl View for SelezioneFileInputView {
                         button_riferimento_width,
                         button_riferimento_height
                     ),
-                    Some(rif_itext.as_c_str())
+                    rif_itext.as_str()
                 ) {
                     let file = FileDialog::new()
                             .add_filter("csv", &["csv"])
@@ -513,8 +508,7 @@ impl View for SelezioneFileInputView {
         }
 
         if let Some(_filepath) = controller.get_campionamento_path() { // A file is already set, display button to clear it
-            let camp_itext = d.gui_icon_text(ICON_BIN, Some(rstr!("Annulla Campionamento")));
-            let camp_itext = CString::new(camp_itext).unwrap();
+            let camp_itext = d.gui_icon_text(ICON_BIN, "Annulla Campionamento");
             if d.gui_button(
                 rrect(
                     button_campionamento_x,
@@ -522,14 +516,13 @@ impl View for SelezioneFileInputView {
                     button_campionamento_width,
                     button_campionamento_height,
                 ),
-                Some(camp_itext.as_c_str())
+                camp_itext.as_str()
             ) {
                 controller.set_campionamento_path(None); // Should already also clear the path_valid
                                                        // state inside it
             }
         } else {
-            let camp_itext = d.gui_icon_text(ICON_FILE_OPEN, Some(rstr!("Campionamento")));
-            let camp_itext = CString::new(camp_itext).unwrap();
+            let camp_itext = d.gui_icon_text(ICON_FILE_OPEN, "Campionamento");
             if d.gui_button(
                 rrect(
                     button_campionamento_x,
@@ -537,7 +530,7 @@ impl View for SelezioneFileInputView {
                     button_campionamento_width,
                     button_campionamento_height,
                 ),
-                Some(camp_itext.as_c_str())
+                camp_itext.as_str()
             ) {
                 let file = FileDialog::new()
                         .add_filter("csv", &["csv"])
@@ -612,7 +605,7 @@ impl View for ValidazioneFileInputView {
                 groupbox_width,
                 groupbox_height
             ),
-            Some(rstr!("Valida file di input"))
+            "Valida file di input"
         );
 
         if current_index != Indice::Hfbi && d.gui_button(
@@ -622,7 +615,7 @@ impl View for ValidazioneFileInputView {
                     button_riferimento_width,
                     button_riferimento_height
                 ),
-                Some(rstr!("Valida Riferimento"))
+                "Valida Riferimento"
         ) {
                 controller.valida_riferimento_niseci_path();
         }
@@ -641,7 +634,7 @@ impl View for ValidazioneFileInputView {
                 button_campionamento_width,
                 button_campionamento_height,
             ),
-            Some(rstr!("Valida Campionamento"))
+            "Valida Campionamento"
         ) {
             match current_index {
                 Indice::Niseci => {
@@ -672,30 +665,30 @@ impl ValidazioneFileInputView {
 
 pub(crate) struct SelezioneInfoAggiuntiveView {
     textbox_codice_stazione_edit_mode: bool,
-    textbox_codice_stazione_buffer: [u8; 64],
+    textbox_codice_stazione_buffer: String,
     textbox_corpo_idrico_edit_mode: bool,
-    textbox_corpo_idrico_buffer: [u8; 64],
+    textbox_corpo_idrico_buffer: String,
     listview_regione_value: i32,
     listview_regione_scroll_value: i32,
     textbox_provincia_edit_mode: bool,
-    textbox_provincia_buffer: [u8; 64],
+    textbox_provincia_buffer: String,
     textbox_data_edit_mode: bool,
-    textbox_data_buffer: [u8; 64],
+    textbox_data_buffer: String,
     textbox_lunghezza_stazione_edit_mode: bool,
-    textbox_lunghezza_stazione_buffer: [u8; 64],
+    textbox_lunghezza_stazione_buffer: String,
     textbox_larghezza_stazione_edit_mode: bool,
-    textbox_larghezza_stazione_buffer: [u8; 64],
+    textbox_larghezza_stazione_buffer: String,
     dropdownbox_tipocomunit_niseci_edit_mode: bool,
     dropdownbox_tipocomunit_niseci_value: i32,
     textbox_fontecomunit_niseci_edit_mode: bool,
-    textbox_fontecomunit_niseci_buffer: [u8; 64],
+    textbox_fontecomunit_niseci_buffer: String,
     textbox_protocollocomunit_niseci_edit_mode: bool,
-    textbox_protocollocomunit_niseci_buffer: [u8; 64],
+    textbox_protocollocomunit_niseci_buffer: String,
     listview_idroecoregione_niseci_value: i32,
     listview_idroecoregione_niseci_scroll_value: i32,
     combobox_area_niseci_value: i32,
     textbox_bacino_niseci_edit_mode: bool,
-    textbox_bacino_niseci_buffer: [u8; 64],
+    textbox_bacino_niseci_buffer: String,
 }
 
 impl View for SelezioneInfoAggiuntiveView {
@@ -727,7 +720,7 @@ impl View for SelezioneInfoAggiuntiveView {
                 groupbox_width,
                 groupbox_height
             ),
-            Some(rstr!("Inserisci informazioni aggiuntive"))
+            "Inserisci informazioni aggiuntive"
         );
 
         let submit_width = propwidth(d, 100);
@@ -736,9 +729,8 @@ impl View for SelezioneInfoAggiuntiveView {
         let submit_height = propheight(d, 50);
         let submit_y = d.get_screen_height() /2 - submit_height /2;
 
-        let confirm_itext = d.gui_icon_text(ICON_OK_TICK, Some(rstr!("Conferma")));
-        let confirm_itext = CString::new(confirm_itext).unwrap();
-        if d.gui_button(rrect(submit_x, submit_y, submit_width, submit_height), Some(confirm_itext.as_c_str())) {
+        let confirm_itext = d.gui_icon_text(ICON_OK_TICK, "Conferma");
+        if d.gui_button(rrect(submit_x, submit_y, submit_width, submit_height), confirm_itext.as_str()) {
 
             //TODO: impl TryInto<u32> for a new custom RegioneItaliana or smth ?
             //But this was request as a free string originally...
@@ -767,14 +759,8 @@ impl View for SelezioneInfoAggiuntiveView {
             };
 
             // Raylib has trouble handling the string downstream if we don't ensure to do this
-            let end = self.textbox_provincia_buffer.iter().position(|&b| b == 0).unwrap_or(self.textbox_provincia_buffer.len());
-            let provincia_string = match String::from_utf8(self.textbox_provincia_buffer[..end].to_vec()) {
-                Ok(s) => s,
-                Err(_) => {
-                    //TODO: signal error: invalid UTF-8
-                    "ERROR".to_string()
-                }
-            };
+            let end = self.textbox_provincia_buffer.chars().position(|b| b == '\0').unwrap_or(self.textbox_provincia_buffer.len());
+            let provincia_string = String::from(&self.textbox_provincia_buffer[..end]);
             let posizione = Location {
                 regione: regione_string,
                 provincia: provincia_string,
@@ -782,14 +768,8 @@ impl View for SelezioneInfoAggiuntiveView {
 
 
             // Raylib has trouble handling the string downstream if we don't ensure to do this
-            let end = self.textbox_larghezza_stazione_buffer.iter().position(|&b| b == 0).unwrap_or(self.textbox_larghezza_stazione_buffer.len());
-            let larghezza_stazione_str = match String::from_utf8(self.textbox_larghezza_stazione_buffer[..end].to_vec()) {
-                Ok(s) => s,
-                Err(_) => {
-                    //TODO: signal error: invalid UTF-8
-                    "ERROR".to_string()
-                }
-            };
+            let end = self.textbox_larghezza_stazione_buffer.chars().position(|b| b == '\0').unwrap_or(self.textbox_larghezza_stazione_buffer.len());
+            let larghezza_stazione_str = String::from(&self.textbox_larghezza_stazione_buffer[..end]);
 
             let larghezza_stazione = match controller.check_larghezza_stazione_string(&larghezza_stazione_str) {
                 Ok(v) => {
@@ -802,14 +782,8 @@ impl View for SelezioneInfoAggiuntiveView {
             };
 
             // Raylib has trouble handling the string downstream if we don't ensure to do this
-            let end = self.textbox_lunghezza_stazione_buffer.iter().position(|&b| b == 0).unwrap_or(self.textbox_lunghezza_stazione_buffer.len());
-            let lunghezza_stazione_str = match String::from_utf8(self.textbox_lunghezza_stazione_buffer[..end].to_vec()) {
-                Ok(s) => s,
-                Err(_) => {
-                    //TODO: signal error: invalid UTF-8
-                    "ERROR".to_string()
-                }
-            };
+            let end = self.textbox_lunghezza_stazione_buffer.chars().position(|b| b == '\0').unwrap_or(self.textbox_lunghezza_stazione_buffer.len());
+            let lunghezza_stazione_str = String::from(&self.textbox_lunghezza_stazione_buffer[..end]);
 
             let lunghezza_stazione = match controller.check_lunghezza_stazione_string(&lunghezza_stazione_str) {
                 Ok(v) => {
@@ -822,34 +796,15 @@ impl View for SelezioneInfoAggiuntiveView {
             };
 
             // Raylib has trouble handling the string downstream if we don't ensure to do this
-            let end = self.textbox_codice_stazione_buffer.iter().position(|&b| b == 0).unwrap_or(self.textbox_codice_stazione_buffer.len());
-            let codice_stazione = match String::from_utf8(self.textbox_codice_stazione_buffer[..end].to_vec()) {
-                Ok(s) => s,
-                Err(_) => {
-                    //TODO: signal error: invalid UTF-8
-                    "ERROR".to_string()
-                }
-            };
+            let end = self.textbox_codice_stazione_buffer.chars().position(|b| b == '\0').unwrap_or(self.textbox_codice_stazione_buffer.len());
+            let codice_stazione = String::from(&self.textbox_codice_stazione_buffer[..end]);
+            // Raylib has trouble handling the string downstream if we don't ensure to do this
+            let end = self.textbox_data_buffer.chars().position(|b| b == '\0').unwrap_or(self.textbox_data_buffer.len());
+            let date_string =  String::from(&self.textbox_data_buffer[..end]);
 
             // Raylib has trouble handling the string downstream if we don't ensure to do this
-            let end = self.textbox_data_buffer.iter().position(|&b| b == 0).unwrap_or(self.textbox_data_buffer.len());
-            let date_string = match String::from_utf8(self.textbox_data_buffer[..end].to_vec()) {
-                Ok(s) => s,
-                Err(_) => {
-                    //TODO: signal error: invalid UTF-8
-                    "ERROR".to_string()
-                }
-            };
-
-            // Raylib has trouble handling the string downstream if we don't ensure to do this
-            let end = self.textbox_corpo_idrico_buffer.iter().position(|&b| b == 0).unwrap_or(self.textbox_corpo_idrico_buffer.len());
-            let corpo_idrico = match String::from_utf8(self.textbox_corpo_idrico_buffer[..end].to_vec()) {
-                Ok(s) => s,
-                Err(_) => {
-                    //TODO: signal error: invalid UTF-8
-                    "ERROR".to_string()
-                }
-            };
+            let end = self.textbox_corpo_idrico_buffer.chars().position(|b| b == '\0').unwrap_or(self.textbox_corpo_idrico_buffer.len());
+            let corpo_idrico = String::from(&self.textbox_corpo_idrico_buffer[..end]);
 
             let tipo_comunita = match <TipoComunitaNISECI as TryFrom<i32>>::try_from(self.dropdownbox_tipocomunit_niseci_value) {
                 Ok(v) => v,
@@ -860,25 +815,11 @@ impl View for SelezioneInfoAggiuntiveView {
             match tipo_comunita {
                 TipoComunitaNISECI::Recuperata => {
                     // Raylib has trouble handling the string downstream if we don't ensure to do this
-                    let end = self.textbox_fontecomunit_niseci_buffer.iter().position(|&b| b == 0).unwrap_or(self.textbox_fontecomunit_niseci_buffer.len());
-                    opt_fonte = Some(match String::from_utf8(self.textbox_fontecomunit_niseci_buffer[..end].to_vec()) {
-                        Ok(s) => s,
-                        Err(_) => {
-                            //TODO: signal error: invalid UTF-8
-                            "ERROR".to_string()
-                        }
-                    });
+                    opt_fonte = Some(self.textbox_fontecomunit_niseci_buffer.clone());
                 }
                 TipoComunitaNISECI::AffinataDalMase => {
                     // Raylib has trouble handling the string downstream if we don't ensure to do this
-                    let end = self.textbox_protocollocomunit_niseci_buffer.iter().position(|&b| b == 0).unwrap_or(self.textbox_protocollocomunit_niseci_buffer.len());
-                    opt_num_protocollo = Some(match String::from_utf8(self.textbox_protocollocomunit_niseci_buffer[..end].to_vec()) {
-                        Ok(s) => s,
-                        Err(_) => {
-                            //TODO: signal error: invalid UTF-8
-                            "ERROR".to_string()
-                        }
-                    });
+                    opt_num_protocollo = Some(self.textbox_protocollocomunit_niseci_buffer.clone());
                 }
                 _ => {}
             }
@@ -893,14 +834,8 @@ impl View for SelezioneInfoAggiuntiveView {
             };
 
             // Raylib has trouble handling the string downstream if we don't ensure to do this
-            let end = self.textbox_bacino_niseci_buffer.iter().position(|&b| b == 0).unwrap_or(self.textbox_bacino_niseci_buffer.len());
-            let bacino_niseci = match String::from_utf8(self.textbox_bacino_niseci_buffer[..end].to_vec()) {
-                Ok(s) => s,
-                Err(_) => {
-                    //TODO: signal error: invalid UTF-8
-                    "ERROR".to_string()
-                }
-            };
+            let end = self.textbox_bacino_niseci_buffer.chars().position(|b| b == '\0').unwrap_or(self.textbox_bacino_niseci_buffer.len());
+            let bacino_niseci = String::from(&self.textbox_bacino_niseci_buffer[..end]);
 
             let idro_ecoregione_niseci = match <IdroEcoRegioneNISECI as TryFrom<i32>>::try_from(self.listview_idroecoregione_niseci_value) {
                 Ok(v) => v,
@@ -960,7 +895,7 @@ impl View for SelezioneInfoAggiuntiveView {
                 column_1_labels_width,
                 column_1_labels_height
             ),
-            Some(rstr!("Codice stazione"))
+            "Codice stazione"
         );
 
         d.gui_label(
@@ -970,7 +905,7 @@ impl View for SelezioneInfoAggiuntiveView {
                 column_1_labels_width,
                 column_1_labels_height
             ),
-            Some(rstr!("Nome del corpo idrico"))
+            "Nome del corpo idrico"
         );
 
         d.gui_label(
@@ -980,7 +915,7 @@ impl View for SelezioneInfoAggiuntiveView {
                 column_1_labels_width,
                 column_1_labels_height
             ),
-            Some(rstr!("Regione"))
+            "Regione"
         );
 
         d.gui_label(
@@ -990,7 +925,7 @@ impl View for SelezioneInfoAggiuntiveView {
                 column_1_labels_width,
                 column_1_labels_height
             ),
-            Some(rstr!("Provincia"))
+            "Provincia"
         );
 
         d.gui_label(
@@ -1000,7 +935,7 @@ impl View for SelezioneInfoAggiuntiveView {
                 column_1_labels_width,
                 column_1_labels_height
             ),
-            Some(rstr!("Data"))
+            "Data"
         );
 
         d.gui_label(
@@ -1010,7 +945,7 @@ impl View for SelezioneInfoAggiuntiveView {
                 column_1_labels_width,
                 column_1_labels_height
             ),
-            Some(rstr!("Lunghezza stazione"))
+            "Lunghezza stazione"
         );
 
         d.gui_label(
@@ -1020,7 +955,7 @@ impl View for SelezioneInfoAggiuntiveView {
                 column_1_labels_width,
                 column_1_labels_height
             ),
-            Some(rstr!("Larghezza stazione"))
+            "Larghezza stazione"
         );
 
         let column_1_boxes_width = column_1_labels_width;
@@ -1060,12 +995,10 @@ impl View for SelezioneInfoAggiuntiveView {
                 column_1_boxes_width,
                 column_1_boxes_height*3
             ),
-            Some(rstr!(
-                "Abruzzo;Basilicata;Calabria;Campania;Emilia-Romagna;\
-                Friuli-Venezia-Giulia;Lazio;Liguria;Lombardia;Marche;\
-                Molise;Piemonte;Puglia;Sardegna;Sicilia;Toscana;\
-                Trentino-Alto-Adige;Umbria;Valle d'Aosta;Veneto"
-            )),
+            "Abruzzo;Basilicata;Calabria;Campania;Emilia-Romagna;\
+            Friuli-Venezia-Giulia;Lazio;Liguria;Lombardia;Marche;\
+            Molise;Piemonte;Puglia;Sardegna;Sicilia;Toscana;\
+            Trentino-Alto-Adige;Umbria;Valle d'Aosta;Veneto",
             &mut self.listview_regione_scroll_value,
             &mut self.listview_regione_value,
         );
@@ -1148,7 +1081,7 @@ impl View for SelezioneInfoAggiuntiveView {
                         column_2_groupbox_niseci_width,
                         column_2_groupbox_niseci_height
                     ),
-                    Some(rstr!("NISECI"))
+                    "NISECI"
                 );
 
                 d.gui_group_box(
@@ -1158,7 +1091,7 @@ impl View for SelezioneInfoAggiuntiveView {
                         column_2_groupbox_comunit_width,
                         column_2_groupbox_comunit_height
                     ),
-                    Some(rstr!("Comunità NISECI"))
+                    "Comunità NISECI"
                 );
 
             }
@@ -1170,7 +1103,7 @@ impl View for SelezioneInfoAggiuntiveView {
                         column_2_groupbox_hfbi_width,
                         column_2_groupbox_hfbi_height
                     ),
-                    Some(rstr!("HFBI"))
+                    "HFBI"
                 );
             }
         }
@@ -1197,7 +1130,7 @@ impl View for SelezioneInfoAggiuntiveView {
                         column_2_groupbox_labels_width,
                         column_2_labels_height
                     ),
-                    Some(rstr!("Tipo"))
+                    "Tipo"
                 );
 
                 d.gui_label(
@@ -1207,7 +1140,7 @@ impl View for SelezioneInfoAggiuntiveView {
                         column_2_groupbox_labels_width,
                         column_2_labels_height
                     ),
-                    Some(rstr!("Fonte"))
+                    "Fonte"
                 );
 
                 d.gui_label(
@@ -1217,7 +1150,7 @@ impl View for SelezioneInfoAggiuntiveView {
                         column_2_groupbox_labels_width,
                         column_2_labels_height
                     ),
-                    Some(rstr!("Protocollo"))
+                    "Protocollo"
                 );
 
                 d.gui_label(
@@ -1227,7 +1160,7 @@ impl View for SelezioneInfoAggiuntiveView {
                         column_2_groupbox_labels_width,
                         column_2_labels_height
                     ),
-                    Some(rstr!("Idroecoregione"))
+                    "Idroecoregione"
                 );
 
                 d.gui_label(
@@ -1237,7 +1170,7 @@ impl View for SelezioneInfoAggiuntiveView {
                         column_2_groupbox_labels_width,
                         column_2_labels_height
                     ),
-                    Some(rstr!("Area"))
+                    "Area"
                 );
 
 
@@ -1248,7 +1181,7 @@ impl View for SelezioneInfoAggiuntiveView {
                         column_2_groupbox_labels_width,
                         column_2_labels_height
                     ),
-                    Some(rstr!("Bacino"))
+                    "Bacino"
                 );
 
                 let column_2_groupbox_boxes_width = column_2_groupbox_labels_width;
@@ -1317,14 +1250,12 @@ impl View for SelezioneInfoAggiuntiveView {
                         column_2_groupbox_boxes_width,
                         column_2_groupbox_boxes_height*4
                     ),
-                    Some(rstr!(
-                        "AlpiCentroOrientali;AlpiMediterranee;AlpiMeridionali;\
-                        AlpiOccidentali;AppenninoCentrale;AppenninoMeridionale;\
-                        AppenninoPiemontese;AppenninoSettentrionale;BasilicataTavoliere;\
-                        BassoLazio;CalabriaNebrodi;Carso;CostaAdriatica;Monferrato;\
-                        PianuraPadana;PrealpiDolomiti;PugliaGargano;RomaViterbeseVesuvio;\
-                        Sardegna;Sicilia;Toscana"
-                    )),
+                    "AlpiCentroOrientali;AlpiMediterranee;AlpiMeridionali;\
+                    AlpiOccidentali;AppenninoCentrale;AppenninoMeridionale;\
+                    AppenninoPiemontese;AppenninoSettentrionale;BasilicataTavoliere;\
+                    BassoLazio;CalabriaNebrodi;Carso;CostaAdriatica;Monferrato;\
+                    PianuraPadana;PrealpiDolomiti;PugliaGargano;RomaViterbeseVesuvio;\
+                    Sardegna;Sicilia;Toscana",
                     &mut self.listview_idroecoregione_niseci_scroll_value,
                     &mut self.listview_idroecoregione_niseci_value,
                 );
@@ -1336,7 +1267,7 @@ impl View for SelezioneInfoAggiuntiveView {
                         column_2_groupbox_boxes_width,
                         column_2_groupbox_boxes_height
                     ),
-                    Some(rstr!("Alpina;Mediterranea")),
+                    "Alpina;Mediterranea",
                     &mut self.combobox_area_niseci_value,
                 );
 
@@ -1360,7 +1291,7 @@ impl View for SelezioneInfoAggiuntiveView {
                         column_2_groupbox_boxes_width,
                         column_2_groupbox_boxes_height,
                     ),
-                    Some(rstr!("Redatta;Fonti;DM260/2010;Mase")),
+                    "Redatta;Fonti;DM260/2010;Mase",
                     &mut self.dropdownbox_tipocomunit_niseci_value,
                     self.dropdownbox_tipocomunit_niseci_edit_mode,
                 ) {
@@ -1387,54 +1318,22 @@ impl View for SelezioneInfoAggiuntiveView {
 impl SelezioneInfoAggiuntiveView {
 
     pub(crate) fn new() -> Self {
-        let mut codice_stazione_buffer = [0u8; 64];
-        let codice_stazione_buffer_bytes = "".as_bytes();
-        let codice_stazione_buffer_len = codice_stazione_buffer_bytes.len().min(64);
-        codice_stazione_buffer[..codice_stazione_buffer_len].copy_from_slice(&codice_stazione_buffer_bytes[..codice_stazione_buffer_len]);
+        let codice_stazione_buffer = String::from("Inserisci codice stazione\0");
+        let corpo_idrico_buffer = String::from("Inserisci nome\0");
 
-        let mut corpo_idrico_buffer = [0u8; 64];
-        let corpo_idrico_buffer_bytes = "".as_bytes();
-        let corpo_idrico_buffer_len = corpo_idrico_buffer_bytes.len().min(64);
-        corpo_idrico_buffer[..corpo_idrico_buffer_len].copy_from_slice(&corpo_idrico_buffer_bytes[..corpo_idrico_buffer_len]);
+        let provincia_buffer = String::from("Inserisci provincia\0");
 
-        let mut regione_buffer = [0u8; 64];
-        let regione_buffer_bytes = "".as_bytes();
-        let regione_buffer_len = regione_buffer_bytes.len().min(64);
-        regione_buffer[..regione_buffer_len].copy_from_slice(&regione_buffer_bytes[..regione_buffer_len]);
+        let data_buffer = String::from("Inserisci data\0");
 
-        let mut provincia_buffer = [0u8; 64];
-        let provincia_buffer_bytes = "".as_bytes();
-        let provincia_buffer_len = provincia_buffer_bytes.len().min(64);
-        provincia_buffer[..provincia_buffer_len].copy_from_slice(&provincia_buffer_bytes[..provincia_buffer_len]);
-        let mut data_buffer = [0u8; 64];
-        let data_buffer_bytes = "".as_bytes();
-        let data_buffer_len = data_buffer_bytes.len().min(64);
-        data_buffer[..data_buffer_len].copy_from_slice(&data_buffer_bytes[..data_buffer_len]);
+        let lunghezza_stazione_buffer = String::from("Inserisci lunghezza\0");
 
-        let mut lunghezza_stazione_buffer = [0u8; 64];
-        let lunghezza_stazione_buffer_bytes = "".as_bytes();
-        let lunghezza_stazione_buffer_len = lunghezza_stazione_buffer_bytes.len().min(64);
-        lunghezza_stazione_buffer[..lunghezza_stazione_buffer_len].copy_from_slice(&lunghezza_stazione_buffer_bytes[..lunghezza_stazione_buffer_len]);
+        let larghezza_stazione_buffer = String::from("Inserisci larghezza\0");
 
-        let mut larghezza_stazione_buffer = [0u8; 64];
-        let larghezza_stazione_buffer_bytes = "".as_bytes();
-        let larghezza_stazione_buffer_len = larghezza_stazione_buffer_bytes.len().min(64);
-        larghezza_stazione_buffer[..larghezza_stazione_buffer_len].copy_from_slice(&larghezza_stazione_buffer_bytes[..larghezza_stazione_buffer_len]);
+        let fonte_comunit_buffer = String::from("Inserisci fonte\0");
 
-        let mut fonte_comunit_buffer = [0u8; 64];
-        let fonte_comunit_buffer_bytes = "".as_bytes();
-        let fonte_comunit_buffer_len = fonte_comunit_buffer_bytes.len().min(64);
-        fonte_comunit_buffer[..fonte_comunit_buffer_len].copy_from_slice(&fonte_comunit_buffer_bytes[..fonte_comunit_buffer_len]);
+        let protocollo_comunit_buffer = String::from("Inserisci protocollo\0");
 
-        let mut protocollo_comunit_buffer = [0u8; 64];
-        let protocollo_comunit_buffer_bytes = "".as_bytes();
-        let protocollo_comunit_buffer_len = protocollo_comunit_buffer_bytes.len().min(64);
-        protocollo_comunit_buffer[..protocollo_comunit_buffer_len].copy_from_slice(&protocollo_comunit_buffer_bytes[..protocollo_comunit_buffer_len]);
-
-        let mut bacino_buffer = [0u8; 64];
-        let bacino_buffer_bytes = "".as_bytes();
-        let bacino_buffer_len = bacino_buffer_bytes.len().min(64);
-        bacino_buffer[..bacino_buffer_len].copy_from_slice(&bacino_buffer_bytes[..bacino_buffer_len]);
+        let bacino_buffer = String::from("Inserisci bacino\0");
 
         Self {
             textbox_codice_stazione_edit_mode: false,
@@ -1510,7 +1409,7 @@ impl View for ValidazioneInfoAggiuntiveView {
                 groupbox_width,
                 groupbox_height
             ),
-            Some(rstr!("Valida informazioni aggiuntive"))
+            "Valida informazioni aggiuntive"
         );
 
         if d.gui_button(
@@ -1520,7 +1419,7 @@ impl View for ValidazioneInfoAggiuntiveView {
                 button_valida_width,
                 button_valida_height
             ),
-            Some(rstr!("Valida info aggiuntive"))
+            "Valida info aggiuntive"
         ) {
             //Ask controller to validate info aggiuntive indice
             match current_index {
@@ -1534,8 +1433,7 @@ impl View for ValidazioneInfoAggiuntiveView {
             }
         }
 
-        let indietro_itext = d.gui_icon_text(ICON_CROSS, Some(rstr!("Indietro")));
-        let indietro_itext = CString::new(indietro_itext).unwrap();
+        let indietro_itext = d.gui_icon_text(ICON_CROSS, "Indietro");
         if d.gui_button(
             rrect(
                 button_backout_x,
@@ -1543,7 +1441,7 @@ impl View for ValidazioneInfoAggiuntiveView {
                 button_backout_width,
                 button_backout_height,
             ),
-            Some(indietro_itext.as_c_str())
+            indietro_itext.as_str()
         ) {
             //Ask controller to go back and edit further
             match current_index {
@@ -1610,7 +1508,7 @@ impl View for ProduzioneOutputView {
                 groupbox_width,
                 groupbox_height
             ),
-            Some(rstr!("Produzione output"))
+            "Produzione output"
         );
 
         if d.gui_button(
@@ -1620,7 +1518,7 @@ impl View for ProduzioneOutputView {
                 button_calcola_width,
                 button_calcola_height
             ),
-            Some(rstr!("Calcola"))
+            "Calcola"
         ) {
             //TODO: calcola indice
             match current_index {
@@ -1641,8 +1539,7 @@ impl View for ProduzioneOutputView {
         let submit_height = propheight(d, 50);
         let submit_y = d.get_screen_height() /2 - submit_height /2;
 
-        let confirm_itext = d.gui_icon_text(ICON_OK_TICK, Some(rstr!("Conferma")));
-        let confirm_itext = CString::new(confirm_itext).unwrap();
+        let confirm_itext = d.gui_icon_text(ICON_OK_TICK, "Conferma");
 
         let done_calc = controller.get_is_done_calc();
 
@@ -1671,7 +1568,7 @@ impl View for ProduzioneOutputView {
             d.gui_lock();
             d.gui_set_state(STATE_DISABLED);
         }
-        if d.gui_button(rrect(submit_x, submit_y, submit_width, submit_height), Some(confirm_itext.as_c_str())) {
+        if d.gui_button(rrect(submit_x, submit_y, submit_width, submit_height), confirm_itext.as_str()) {
             controller.user_confirm_calc();
         }
         if lock_user_submit {
@@ -1686,7 +1583,7 @@ impl View for ProduzioneOutputView {
                 panel_width,
                 panel_height
             ),
-            Some(rstr!("Output"))
+            "Output"
         );
 
         match current_index {
@@ -1893,7 +1790,7 @@ impl View for ProduzionePDFView {
                 groupbox_width,
                 groupbox_height
             ),
-            Some(rstr!("Produzione PDF"))
+            "Produzione PDF"
         );
 
         if d.gui_button(
@@ -1903,7 +1800,7 @@ impl View for ProduzionePDFView {
                 button_esporta_width,
                 button_esporta_height
             ),
-            Some(rstr!("Esporta"))
+            "Esporta"
         ) {
             //TODO: esporta pdf
             println!("TODO: call controller to update model.");
@@ -1916,7 +1813,7 @@ impl View for ProduzionePDFView {
                 panel_width,
                 panel_height
             ),
-            Some(rstr!("TODO: Output qui"))
+            "TODO: Output qui"
         );
 
         let rainbow_speed = 0.03;

@@ -15,7 +15,6 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use std::ffi::CString;
 use std::io::Write;
 use std::path::PathBuf;
 use std::fs::File;
@@ -57,7 +56,7 @@ pub(crate) fn update_main(rl: &mut RaylibHandle, main_state: &mut MainState) {
     }
 }
 
-fn write_temp_style_file(data: &[u8]) -> Result<(CString, PathBuf), Box<dyn std::error::Error>> {
+fn write_temp_style_file(data: &[u8]) -> Result<(String, PathBuf), Box<dyn std::error::Error>> {
     // We employ a UUID to randomise the filename, as required
     // to avoid insecure temporary files vulnerabilities
     // See: https://doc.rust-lang.org/nightly/std/env/fn.temp_dir.html
@@ -68,8 +67,8 @@ fn write_temp_style_file(data: &[u8]) -> Result<(CString, PathBuf), Box<dyn std:
     let mut file = File::create(&temp_path)?;
     file.write_all(data)?;
 
-    let c_string = CString::new(temp_path.to_string_lossy().as_bytes())?;
-    Ok((c_string, temp_path))
+    let string = String::from(temp_path.to_string_lossy());
+    Ok((string, temp_path))
 }
 
 fn load_style_from_memory(rl: &mut RaylibHandle, data: &[u8]) {
@@ -81,7 +80,7 @@ fn load_style_from_memory(rl: &mut RaylibHandle, data: &[u8]) {
     let (temp_file_cstring, temp_file_path) = write_temp_style_file(data).expect("Failed to write temp style file");
 
     // Load the style
-    rl.gui_load_style(Some(temp_file_cstring.as_c_str()));
+    rl.gui_load_style(temp_file_cstring.as_str());
 
     // Remove the temp file after loading the style
     std::fs::remove_file(temp_file_path).expect("Failed to delete temp style file");
@@ -139,15 +138,15 @@ impl GuiTheme {
             GuiTheme::Light => 2,
             _ => 1
         };
-        main_state.default_font_height = rl.gui_get_style(DEFAULT, TEXT_SIZE as i32) * font_height_scale;
-        rl.gui_set_style(DEFAULT, TEXT_SIZE as i32, main_state.default_font_height);
+        main_state.default_font_height = rl.gui_get_style(DEFAULT, TEXT_SIZE) * font_height_scale;
+        rl.gui_set_style(DEFAULT, TEXT_SIZE, main_state.default_font_height);
         main_state.current_font_height = main_state.default_font_height;
-        main_state.default_txt_spacing = rl.gui_get_style(DEFAULT, TEXT_SPACING as i32) * font_spacing_scale;
-        rl.gui_set_style(DEFAULT, TEXT_SPACING as i32, main_state.default_txt_spacing);
-        let txt_color_int = rl.gui_get_style(DEFAULT, TEXT_COLOR_NORMAL as i32);
-        let bg_color_int = rl.gui_get_style(DEFAULT, BACKGROUND_COLOR as i32);
-        main_state.default_txt_color = Color::get_color(txt_color_int as u32);
-        main_state.default_bg_color = Color::get_color(bg_color_int as u32);
+        main_state.default_txt_spacing = rl.gui_get_style(DEFAULT, TEXT_SPACING) * font_spacing_scale;
+        rl.gui_set_style(DEFAULT, TEXT_SPACING, main_state.default_txt_spacing);
+        let txt_color_int = rl.gui_get_style(DEFAULT, TEXT_COLOR_NORMAL) as u32;
+        let bg_color_int = rl.gui_get_style(DEFAULT, BACKGROUND_COLOR) as u32;
+        main_state.default_txt_color = Color::get_color(txt_color_int);
+        main_state.default_bg_color = Color::get_color(bg_color_int);
         main_state.current_font = rl.gui_get_font();
     }
 }

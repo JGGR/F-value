@@ -20,7 +20,7 @@ use crate::engines::niseci::full::{calculate_niseci, calculate_rqe_niseci, calcu
 use crate::domain::niseci::{CampionamentoNISECI, RiferimentoNISECI, AnagraficaNISECI, TipoComunitaNISECI, ComunitaNISECI, AreaNISECI, IdroEcoRegioneNISECI};
 use crate::domain::location::Location;
 use crate::core::{COPYRIGHT_INFO, PROJECT_NAME, SHORT_PROJECT_VERSION, PROJECT_VERSION_FULL};
-use crate::core::csv::lexer::{check_path_is_file_ends_with_csv, check_riferimento_niseci_path, VeryItalianRecordCsvRiferimentoNISECI, check_campionamento_niseci_path, VeryItalianRecordCsvCampionamentoNISECI, check_anagrafica_niseci_path, VeryItalianRecordCsvAnagraficaNISECI, check_campionamento_hfbi_path};
+use crate::core::csv::deser::{check_path_is_file_ends_with_csv, check_riferimento_niseci_path, VeryItalianRecordCsvRiferimentoNISECI, check_campionamento_niseci_path, VeryItalianRecordCsvCampionamentoNISECI, check_anagrafica_niseci_path, VeryItalianRecordCsvAnagraficaNISECI, check_campionamento_hfbi_path};
 use crate::core::csv::parser::{check_records_campionamento_niseci, check_records_riferimento_niseci, check_records_anagrafica_niseci};
 
 pub(crate) fn esox_usage() {

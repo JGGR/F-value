@@ -15,7 +15,6 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use std::ffi::CString;
 use std::collections::{VecDeque, HashMap};
 use raylib::prelude::*;
 use raylib::consts::GuiIconName::ICON_MONITOR;
@@ -252,8 +251,7 @@ impl Console {
 
         let userinfo_y_padding = propheight(d, 75);
         // Backout button
-        let backout_itext = d.gui_icon_text(ICON_MONITOR, Some(rstr!(": Indietro")));
-        let backout_itext = CString::new(backout_itext).unwrap();
+        let backout_itext = d.gui_icon_text(ICON_MONITOR, ": Indietro");
         let backout_x = sidebox_x + sidebox_x_padding;
         let backout_y = userinfo_y_padding;
         let backout_width = sidebox_width - sidebox_x_padding*2;
@@ -266,7 +264,7 @@ impl Console {
                 backout_width,
                 backout_height
             ),
-            Some(backout_itext.as_c_str())
+            backout_itext.as_str()
         ) {
             controller.backout();
         }

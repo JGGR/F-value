@@ -15,7 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-pub(crate) mod lexer;
+pub(crate) mod deser;
 pub(crate) mod parser;
 
 // This must be kept aligned with RecordCsvRiferimentoNISECI definition.

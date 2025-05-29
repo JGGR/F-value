@@ -1,3 +1,11 @@
+## [0.0.14] - 2025-05-29
+
+### Changed
+
+- Bump `raylib` to `5.5.1`
+- Avoid using `gui_panel()` until `5.5.x` behaves like `5.0.x`
+- Rename `core::csv::lexer` to `core::csv::deser`
+
 ## [0.0.13] - 2025-04-12
 
 ### Added
