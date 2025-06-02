@@ -51,6 +51,8 @@ use flexi_logger::{FileSpec, Logger, WriteMode};
 use std::path::PathBuf;
 #[cfg(feature="logged")]
 use dirs::document_dir;
+#[cfg(feature="logged")]
+use log::Record;
 
 #[cfg(feature="logged")]
 pub(crate) fn prep_logger() -> Result<(),String> {
@@ -66,6 +68,9 @@ pub(crate) fn prep_logger() -> Result<(),String> {
             if let Err(e) = logger
             .log_to_file(logger_filespec)
             .write_mode(WriteMode::BufferAndFlush)
+            .format(|_writer, _now, record: &Record| {
+                writeln!(_writer, "{}", record.args())
+            })
             .start() {
                 eprintln!("Failed starting logger.");
                 eprintln!("Error was: {e}");
