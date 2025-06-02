@@ -28,6 +28,9 @@ use crate::domain::{index::Indice, niseci::{RiferimentoNISECI, CampionamentoNISE
 use crate::state::GLOBAL_STATE;
 use crate::engines::niseci::full::{calculate_niseci, calculate_rqe_niseci, calculate_stato_ecologico};
 
+#[cfg(feature="logged")]
+use log::info;
+
 pub(crate) struct Controllers {
     pub(crate) home_controller: HomeController,
     pub(crate) second_controller: SecondController,
@@ -962,9 +965,17 @@ impl OutputController {
                     match niseci {
                         Some(val) => {
                             self.add_console_message(format!("NISECI: {val}"));
+
+                            //TODO: log to a separate file?
+                            #[cfg(feature="logged")]
+                            info!("{}", format!("NISECI: {val}"));
                         }
                         None => {
                             self.add_console_message("NISECI: NC".to_string());
+
+                            //TODO: log to a separate file?
+                            #[cfg(feature="logged")]
+                            info!("NISECI: NC");
                         }
                     }
 
@@ -973,9 +984,17 @@ impl OutputController {
                     match rqe_niseci {
                         Some(val) => {
                             self.add_console_message(format!("RQE NISECI: {val}"));
+
+                            //TODO: log to a separate file?
+                            #[cfg(feature="logged")]
+                            info!("{}", format!("RQE NISECI: {val}"));
                         }
                         None => {
                             self.add_console_message("RQE NISECI: NC".to_string());
+
+                            //TODO: log to a separate file?
+                            #[cfg(feature="logged")]
+                            info!("RQE NISECI: NC");
                         }
                     }
 
@@ -984,15 +1003,28 @@ impl OutputController {
                     match stato_ecologico {
                         Some(val) => {
                             self.add_console_message(format!("Stato ecologico: {val}"));
+
+                            //TODO: log to a separate file?
+                            #[cfg(feature="logged")]
+                            info!("{}", format!("Stato ecologico: {val}"));
                         }
                         None => {
                             self.add_console_message("Stato ecologico: NC".to_string());
+
+                            //TODO: log to a separate file?
+                            #[cfg(feature="logged")]
+                            info!("Stato ecologico: NC");
                         }
                     }
 
+                    //This logs to stdout
                     intermediates.log();
 
                     self.add_console_message(format!("{intermediates}"));
+
+                    //TODO: format intermediates properly
+                    #[cfg(feature="logged")]
+                    info!("{}", format!("{intermediates}"));
 
                     let risultato_niseci = RisultatoNISECI::new(
                         niseci,
