@@ -1,3 +1,13 @@
+## [0.0.15] - 2025-06-03
+
+### Changed
+
+- Use git reference for raylib
+- Add own definition for rrect() since it was dropped from raylib crate
+- Refactor Display for domain::niseci to allow a csv-like output
+- Refactor textbox components in views module to avoid using null-terminated strings
+- Changed window title to F-value
+
 ## [0.0.14] - 2025-05-29
 
 ### Changed

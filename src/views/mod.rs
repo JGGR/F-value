@@ -26,6 +26,7 @@ use crate::controllers::{Controller, Controllers, HomeController, SecondControll
 use crate::app::core::{CurrentView, MainState, propwidth, propheight, CONSOLE_FONT_DATA};
 use crate::app::model::SubModel;
 use crate::core::SHORT_PROJECT_VERSION;
+use crate::core::rrect;
 
 pub(crate) struct Views {
     home_view: HomeView,
@@ -129,7 +130,7 @@ impl View for HomeView {
                     width: texture_target_width as f32,
                     height: texture_target_height as f32,
                 },
-                Vector2::zero(),
+                Vector2::new(0.0, 0.0),
                 0.0,
                 Color::WHITE,
             );
@@ -266,7 +267,7 @@ impl View for SecondView {
                     width: texture_target_width as f32,
                     height: texture_target_height as f32,
                 },
-                Vector2::zero(),
+                Vector2::new(0.0, 0.0),
                 0.0,
                 Color::WHITE,
             );
@@ -758,18 +759,14 @@ impl View for SelezioneInfoAggiuntiveView {
                 _ => { panic!("Unexpected regione_string in SelezioneInfoAggiuntiveView::draw()"); }
             };
 
-            // Raylib has trouble handling the string downstream if we don't ensure to do this
-            let end = self.textbox_provincia_buffer.chars().position(|b| b == '\0').unwrap_or(self.textbox_provincia_buffer.len());
-            let provincia_string = String::from(&self.textbox_provincia_buffer[..end]);
+            let provincia_string = String::from(&self.textbox_provincia_buffer);
             let posizione = Location {
                 regione: regione_string,
                 provincia: provincia_string,
             };
 
 
-            // Raylib has trouble handling the string downstream if we don't ensure to do this
-            let end = self.textbox_larghezza_stazione_buffer.chars().position(|b| b == '\0').unwrap_or(self.textbox_larghezza_stazione_buffer.len());
-            let larghezza_stazione_str = String::from(&self.textbox_larghezza_stazione_buffer[..end]);
+            let larghezza_stazione_str = String::from(&self.textbox_larghezza_stazione_buffer);
 
             let larghezza_stazione = match controller.check_larghezza_stazione_string(&larghezza_stazione_str) {
                 Ok(v) => {
@@ -781,9 +778,7 @@ impl View for SelezioneInfoAggiuntiveView {
                 }
             };
 
-            // Raylib has trouble handling the string downstream if we don't ensure to do this
-            let end = self.textbox_lunghezza_stazione_buffer.chars().position(|b| b == '\0').unwrap_or(self.textbox_lunghezza_stazione_buffer.len());
-            let lunghezza_stazione_str = String::from(&self.textbox_lunghezza_stazione_buffer[..end]);
+            let lunghezza_stazione_str = String::from(&self.textbox_lunghezza_stazione_buffer);
 
             let lunghezza_stazione = match controller.check_lunghezza_stazione_string(&lunghezza_stazione_str) {
                 Ok(v) => {
@@ -795,16 +790,10 @@ impl View for SelezioneInfoAggiuntiveView {
                 }
             };
 
-            // Raylib has trouble handling the string downstream if we don't ensure to do this
-            let end = self.textbox_codice_stazione_buffer.chars().position(|b| b == '\0').unwrap_or(self.textbox_codice_stazione_buffer.len());
-            let codice_stazione = String::from(&self.textbox_codice_stazione_buffer[..end]);
-            // Raylib has trouble handling the string downstream if we don't ensure to do this
-            let end = self.textbox_data_buffer.chars().position(|b| b == '\0').unwrap_or(self.textbox_data_buffer.len());
-            let date_string =  String::from(&self.textbox_data_buffer[..end]);
+            let codice_stazione = String::from(&self.textbox_codice_stazione_buffer);
+            let date_string =  String::from(&self.textbox_data_buffer);
 
-            // Raylib has trouble handling the string downstream if we don't ensure to do this
-            let end = self.textbox_corpo_idrico_buffer.chars().position(|b| b == '\0').unwrap_or(self.textbox_corpo_idrico_buffer.len());
-            let corpo_idrico = String::from(&self.textbox_corpo_idrico_buffer[..end]);
+            let corpo_idrico = String::from(&self.textbox_corpo_idrico_buffer);
 
             let tipo_comunita = match <TipoComunitaNISECI as TryFrom<i32>>::try_from(self.dropdownbox_tipocomunit_niseci_value) {
                 Ok(v) => v,
@@ -833,9 +822,7 @@ impl View for SelezioneInfoAggiuntiveView {
                 _ => { panic!("Unexpected area_niseci in SelezioneInfoAggiuntiveView::draw()"); }
             };
 
-            // Raylib has trouble handling the string downstream if we don't ensure to do this
-            let end = self.textbox_bacino_niseci_buffer.chars().position(|b| b == '\0').unwrap_or(self.textbox_bacino_niseci_buffer.len());
-            let bacino_niseci = String::from(&self.textbox_bacino_niseci_buffer[..end]);
+            let bacino_niseci = String::from(&self.textbox_bacino_niseci_buffer);
 
             let idro_ecoregione_niseci = match <IdroEcoRegioneNISECI as TryFrom<i32>>::try_from(self.listview_idroecoregione_niseci_value) {
                 Ok(v) => v,
@@ -1318,22 +1305,22 @@ impl View for SelezioneInfoAggiuntiveView {
 impl SelezioneInfoAggiuntiveView {
 
     pub(crate) fn new() -> Self {
-        let codice_stazione_buffer = String::from("\0");
-        let corpo_idrico_buffer = String::from("\0");
+        let codice_stazione_buffer = String::from("");
+        let corpo_idrico_buffer = String::from("");
 
-        let provincia_buffer = String::from("\0");
+        let provincia_buffer = String::from("");
 
-        let data_buffer = String::from("\0");
+        let data_buffer = String::from("");
 
-        let lunghezza_stazione_buffer = String::from("\0");
+        let lunghezza_stazione_buffer = String::from("");
 
-        let larghezza_stazione_buffer = String::from("\0");
+        let larghezza_stazione_buffer = String::from("");
 
-        let fonte_comunit_buffer = String::from("\0");
+        let fonte_comunit_buffer = String::from("");
 
-        let protocollo_comunit_buffer = String::from("\0");
+        let protocollo_comunit_buffer = String::from("");
 
-        let bacino_buffer = String::from("\0");
+        let bacino_buffer = String::from("");
 
         Self {
             textbox_codice_stazione_edit_mode: false,

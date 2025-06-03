@@ -43,17 +43,12 @@ use crate::controllers::Controllers;
 use crate::views::Views;
 
 #[cfg(feature="logged")]
-use log::info;
-#[cfg(feature="logged")]
 use crate::core::prep_logger;
 
 fn main() {
 
     #[cfg(feature="logged")]
     let _ = prep_logger();
-
-    #[cfg(feature="logged")]
-    info!("FOO");
 
     let args: Vec<String> = env::args().collect(); // Using this panics on receiving invalid Unicode
 
@@ -160,7 +155,7 @@ fn main() {
         }
     }
 
-    let window_title = format!("esox v{SHORT_PROJECT_VERSION}");
+    let window_title = format!("F-value v{SHORT_PROJECT_VERSION}");
 
     let (mut rl, thread) = raylib::init()
         .size(ESOX_SCREEN_WIDTH, ESOX_SCREEN_HEIGHT)
