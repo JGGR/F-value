@@ -51,7 +51,7 @@ impl fmt::Display for SpecieNISECI {
             true => "SI".to_string(),
             false => "NO".to_string(),
         };
-        let string_representation = format!("SpecieNISECI: {{ id: {{{}}}, nome {{{}}}, tipo_autoctono: {{{}}}, tipo_alloctono: {{{}}}, specie_attesa: {{{}}}",
+        let string_representation = format!("{}, {}, {}, {}, {}",
                 self.id, self.nome, self.tipo_autoctono, self.tipo_alloctono, specie_attesa_str);
         write!(f, "{}", string_representation)
     }
@@ -439,8 +439,8 @@ impl fmt::Display for ValoriIntermediSpecieNISECI {
             "NC".to_string()
         }
     };
-    let string_representation = format!("ValoriIntermediSpecieNISECI: {{ densita stimata: {{{}}}, classi eta: {{{}}}, rapport ad/juv: {{{}}}, x2a_a: {{{}}}, x2a_b: {{{}}} }}",
-        self.densita_stimata, self.classi_eta, rapporto_ad_juv_str, self.x2_a_a, self.x2_a_b);
+    let string_representation = format!("{}, {}, {}, {}, {}",
+        self.classi_eta, self.densita_stimata, rapporto_ad_juv_str, self.x2_a_a, self.x2_a_b);
     write!(f, "{}", string_representation)
   }
 }
@@ -471,14 +471,14 @@ impl fmt::Display for ValoriIntermediNISECI {
         Some(v) => format!("{v}"),
         None => "NC".to_string()
     };
-    let mut string_representation = format!("ValoriIntermediNISECI: {{\n    x1: {{{}}}, x2: {{{}}}, x3: {{{}}},\n    x2_a: {{{}}}, x2_b: {{{}}}, x3_a: {{{}}}, x3_b: {{{}}},\n    specie specifici:",
+    let mut string_representation = format!("x1: {}, x2: {}, x3: {},\nx2_a: {}, x2_b: {}, x3_a: {}, x3_b: {},\n\nspecie, nome latino, tipo autoctono, tipo alloctono, specie attesa, cl1, cl2, cl3, cl4, cl5, densita stimata, rapporto ad/juv, x2a_a, x2a_b\n",
         self.x1, x2_str, self.x3,
         self.x2_a, self.x2_b, x3_a_str, x3_b_str);
 
-    for (k, v) in self.specie_specifici.iter() {
-        string_representation = format!("{}\n        specie: {{{}}}, valori: {{{}}}", string_representation, k, v);
+    for (_k, v) in self.specie_specifici.iter() {
+        string_representation = format!("{}\n{}", string_representation, v);
     }
-    string_representation = format!("{}\n}}", string_representation);
+    string_representation = format!("{}\n", string_representation);
     write!(f, "{}", string_representation)
   }
 }
@@ -598,7 +598,7 @@ pub(crate) struct ClassiEtaSpecieNISECI {
 
 impl fmt::Display for ClassiEtaSpecieNISECI {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    let string_representation = format!("ClassiEtaSpecieNISECI: {{ specie: {{{}}}, cl1: {{{}}}, cl2: {{{}}}, cl3: {{{}}}, cl4: {{{}}}, cl5: {{{}}} }}",
+    let string_representation = format!("{}, {}, {}, {}, {}, {}",
         self.specie, self.cl1, self.cl2, self.cl3, self.cl4, self.cl5);
     write!(f, "{}", string_representation)
   }
