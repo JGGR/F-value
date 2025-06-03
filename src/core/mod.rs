@@ -54,6 +54,20 @@ use dirs::document_dir;
 #[cfg(feature="logged")]
 use log::Record;
 
+use raylib::misc::AsF32;
+use raylib::math::Rectangle;
+
+/// A convenience function for making a new `Rectangle`.
+#[inline]
+pub fn rrect<T1: AsF32, T2: AsF32, T3: AsF32, T4: AsF32>(
+    x: T1,
+    y: T2,
+    width: T3,
+    height: T4,
+) -> Rectangle {
+    Rectangle::new(x.as_f32(), y.as_f32(), width.as_f32(), height.as_f32())
+}
+
 #[cfg(feature="logged")]
 pub(crate) fn prep_logger() -> Result<(),String> {
     let log_file_path;

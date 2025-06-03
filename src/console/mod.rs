@@ -20,6 +20,7 @@ use raylib::prelude::*;
 use raylib::consts::GuiIconName::ICON_MONITOR;
 use crate::app::core::{propwidth, propheight};
 use crate::controllers::ConsoleController;
+use crate::core::rrect;
 
 #[derive(Clone)]
 pub(crate) struct Console {

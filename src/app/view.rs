@@ -20,7 +20,7 @@ use raylib::consts::GuiIconName::*;
 use raylib::consts::GuiControl::DEFAULT;
 use raylib::consts::GuiDefaultProperty::TEXT_SIZE;
 use super::core::{GuiTheme, CurrentView, MainState, propwidth, propheight, GUI_THEME_COMBOBOX_STR};
-use crate::core::{COPYRIGHT_INFO, SHORT_PROJECT_VERSION, AUTHOR_JGABAUT, AUTHOR_GIONINJO, AUTHOR_JGABAUT_LINK, AUTHOR_GIONINJO_LINK};
+use crate::core::{COPYRIGHT_INFO, SHORT_PROJECT_VERSION, AUTHOR_JGABAUT, AUTHOR_GIONINJO, AUTHOR_JGABAUT_LINK, AUTHOR_GIONINJO_LINK, rrect};
 
 pub(crate) fn draw_quit_win(d: &mut RaylibDrawHandle, showing_quit_win: &mut bool, should_quit: &mut bool) {
     if *showing_quit_win {
