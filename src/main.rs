@@ -155,7 +155,7 @@ fn main() {
         }
     }
 
-    let window_title = format!("esox v{SHORT_PROJECT_VERSION}");
+    let window_title = format!("F-value v{SHORT_PROJECT_VERSION}");
 
     let (mut rl, thread) = raylib::init()
         .size(ESOX_SCREEN_WIDTH, ESOX_SCREEN_HEIGHT)
