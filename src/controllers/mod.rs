@@ -31,6 +31,14 @@ use crate::engines::niseci::full::{calculate_niseci, calculate_rqe_niseci, calcu
 #[cfg(feature="logged")]
 use log::info;
 
+#[cfg(feature="logged")]
+use dirs::document_dir;
+
+#[cfg(feature="logged")]
+use std::fs::OpenOptions;
+#[cfg(feature="logged")]
+use std::io::Write;
+
 pub(crate) struct Controllers {
     pub(crate) home_controller: HomeController,
     pub(crate) second_controller: SecondController,
@@ -1024,7 +1032,32 @@ impl OutputController {
 
                     //TODO: format intermediates properly
                     #[cfg(feature="logged")]
-                    info!("{}", format!("{intermediates}"));
+                    {
+                        let log_file_path;
+                        if let Some(documents_dir) = document_dir() {
+                            log_file_path = documents_dir.join("esox").join("log_intermediates.txt");
+                        } else {
+                            log_file_path = PathBuf::from("./esox/log_intermediates.txt");
+                        }
+
+                        let file_result = OpenOptions::new()
+                            .append(false)
+                            .create(true)
+                            .open(log_file_path);
+
+                        match file_result {
+                            Ok(mut file) => {
+                                let write_result = writeln!(file, "{}", format!("{intermediates}"));
+                                match write_result {
+                                    Ok(_) => println!("Successfully wrote to file."),
+                                    Err(e) => eprintln!("Failed to write to file: {}", e),
+                                }
+                            }
+                            Err(e) => {
+                                eprintln!("Failed to open file: {}", e);
+                            }
+                        }
+                    }
 
                     let risultato_niseci = RisultatoNISECI::new(
                         niseci,
