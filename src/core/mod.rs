@@ -72,9 +72,9 @@ pub fn rrect<T1: AsF32, T2: AsF32, T3: AsF32, T4: AsF32>(
 pub(crate) fn prep_logger() -> Result<(),String> {
     let log_file_path;
     if let Some(documents_dir) = document_dir() {
-        log_file_path = documents_dir.join("esox").join("log.txt");
+        log_file_path = documents_dir.join("esox").join("log.csv");
     } else {
-        log_file_path = PathBuf::from("./esox/log.txt");
+        log_file_path = PathBuf::from("./esox/log.csv");
     }
 
     if let Ok(logger_filespec) = FileSpec::try_from(log_file_path) {
