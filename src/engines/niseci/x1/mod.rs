@@ -37,9 +37,9 @@ pub(crate) fn calculate_x1(campionamento: &CampionamentoNISECI, riferimento: &Ri
   let mut n_a: f32 = 0.0;
   for spec in set_specie_campionate {
     if spec.specie.tipo_autoctono == 1 { // tipo_autoctono == 1 allora specie importante
-      n_a += 1.0;
-    } else if spec.specie.tipo_autoctono == 2 {
       n_i += 1.0;
+    } else if spec.specie.tipo_autoctono == 2 {
+      n_a += 1.0;
     }
   }
 
@@ -57,9 +57,9 @@ pub(crate) fn calculate_x1(campionamento: &CampionamentoNISECI, riferimento: &Ri
   let mut m_a: f32 = 0.0;
   for spec in set_specie_attese {
     if spec.tipo_autoctono == 1 { // tipo_autoctono == 1 allora specie importante
-      m_a += 1.0;
-    } else if spec.tipo_autoctono == 2 {
       m_i += 1.0;
+    } else if spec.tipo_autoctono == 2 {
+      m_a += 1.0;
     }
   }
 
