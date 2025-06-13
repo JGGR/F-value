@@ -1,3 +1,11 @@
+## [0.0.16] - 2025-06-13
+
+### Changed
+
+- Split log in two files
+- Fix error in x1 calc
+- Fix wrong text spacing in info box
+
 ## [0.0.15] - 2025-06-03
 
 ### Changed
