@@ -145,7 +145,7 @@ pub(crate) fn draw_info_box(d: &mut RaylibDrawHandle, showing_info_box: &mut boo
         );
 
         let text_y_spacing = propheight(d, 12);
-        let text_x_spacing = propwidth(d, 70);
+        let text_x_spacing = propwidth(d, 120);
         let proj_info_str_y = infobox_y + bar_height + text_y_spacing;
         let proj_info_str_x = infobox_x + text_x_spacing;
         let proj_name_str1_y = proj_info_str_y + (proj_info_txt_bounds.y as i32 * 2);
