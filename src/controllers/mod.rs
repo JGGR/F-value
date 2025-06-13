@@ -31,6 +31,14 @@ use crate::engines::niseci::full::{calculate_niseci, calculate_rqe_niseci, calcu
 #[cfg(feature="logged")]
 use log::info;
 
+#[cfg(feature="logged")]
+use dirs::document_dir;
+
+#[cfg(feature="logged")]
+use std::fs::OpenOptions;
+#[cfg(feature="logged")]
+use std::io::Write;
+
 pub(crate) struct Controllers {
     pub(crate) home_controller: HomeController,
     pub(crate) second_controller: SecondController,
@@ -962,59 +970,67 @@ impl OutputController {
 
             match calculate_niseci(&campionamento, &riferimento, &anagrafica) {
                 Ok((niseci, intermediates)) => {
+                    let niseci_str;
                     match niseci {
                         Some(val) => {
-                            self.add_console_message(format!("NISECI: {val}"));
-
-                            //TODO: log to a separate file?
-                            #[cfg(feature="logged")]
-                            info!("{}", format!("NISECI: {val}"));
+                            niseci_str = format!("{val}");
                         }
                         None => {
-                            self.add_console_message("NISECI: NC".to_string());
-
-                            //TODO: log to a separate file?
-                            #[cfg(feature="logged")]
-                            info!("NISECI: NC");
+                            niseci_str = format!("NC");
                         }
                     }
+                    self.add_console_message(format!("NISECI: {niseci_str}"));
 
                     let rqe_niseci = calculate_rqe_niseci(niseci);
+                    let rqe_niseci_str;
 
                     match rqe_niseci {
                         Some(val) => {
-                            self.add_console_message(format!("RQE NISECI: {val}"));
-
-                            //TODO: log to a separate file?
-                            #[cfg(feature="logged")]
-                            info!("{}", format!("RQE NISECI: {val}"));
+                            rqe_niseci_str = format!("{val}");
                         }
                         None => {
-                            self.add_console_message("RQE NISECI: NC".to_string());
-
-                            //TODO: log to a separate file?
-                            #[cfg(feature="logged")]
-                            info!("RQE NISECI: NC");
+                            rqe_niseci_str = format!("NC");
                         }
                     }
+                    self.add_console_message(format!("RQE NISECI: {rqe_niseci_str}"));
 
                     let stato_ecologico = calculate_stato_ecologico(niseci, &anagrafica.area);
+                    let stato_ecologico_str;
 
                     match stato_ecologico {
                         Some(val) => {
-                            self.add_console_message(format!("Stato ecologico: {val}"));
-
-                            //TODO: log to a separate file?
-                            #[cfg(feature="logged")]
-                            info!("{}", format!("Stato ecologico: {val}"));
+                            stato_ecologico_str = format!("{val}");
                         }
                         None => {
-                            self.add_console_message("Stato ecologico: NC".to_string());
-
-                            //TODO: log to a separate file?
-                            #[cfg(feature="logged")]
-                            info!("Stato ecologico: NC");
+                            stato_ecologico_str = format!("NC");
                         }
+                    }
+                    self.add_console_message(format!("Stato ecologico: {stato_ecologico_str}"));
+
+                    #[cfg(feature="logged")]
+                    {
+                        info!("NISECI, RQE NISECI, Stato ecologico, x1, x2, x3, x2_a, x2_b, x3_a, x3_b");
+                        info!("{}", format!("{}, {}, {}, {}, {}, {}, {}, {}, {}, {}",
+                            niseci_str,
+                            rqe_niseci_str,
+                            stato_ecologico_str,
+                            intermediates.x1,
+                            match intermediates.x2 {
+                                Some(v) => format!("{v}"),
+                                None => "NC".to_string(),
+                            },
+                            intermediates.x3,
+                            intermediates.x2_a,
+                            intermediates.x2_b,
+                            match intermediates.x3_a {
+                                Some(v) => format!("{v}"),
+                                None => "NC".to_string(),
+                            },
+                            match intermediates.x3_b {
+                                Some(v) => format!("{v}"),
+                                None => "NC".to_string(),
+                            }
+                        ));
                     }
 
                     //This logs to stdout
@@ -1024,7 +1040,37 @@ impl OutputController {
 
                     //TODO: format intermediates properly
                     #[cfg(feature="logged")]
-                    info!("{}", format!("{intermediates}"));
+                    {
+                        let log_file_path;
+                        if let Some(documents_dir) = document_dir() {
+                            log_file_path = documents_dir.join("esox").join("log_intermediates.csv");
+                        } else {
+                            log_file_path = PathBuf::from("./esox/log_intermediates.csv");
+                        }
+
+                        let file_result = OpenOptions::new()
+                            .write(true)
+                            .truncate(true)
+                            .create(true)
+                            .open(log_file_path);
+
+                        match file_result {
+                            Ok(mut file) => {
+                                let mut string_representation = format!("specie, nome latino, tipo autoctono, tipo alloctono, specie attesa, cl1, cl2, cl3, cl4, cl5, densita stimata, rapporto ad/juv, x2a_a, x2a_b\n");
+                                for (_k, v) in intermediates.specie_specifici.iter() {
+                                    string_representation = format!("{}\n{}", string_representation, v);
+                                }
+                                let write_result = writeln!(file, "{}", format!("{string_representation}"));
+                                match write_result {
+                                    Ok(_) => println!("Successfully wrote to file."),
+                                    Err(e) => eprintln!("Failed to write to file: {}", e),
+                                }
+                            }
+                            Err(e) => {
+                                eprintln!("Failed to open file: {}", e);
+                            }
+                        }
+                    }
 
                     let risultato_niseci = RisultatoNISECI::new(
                         niseci,
