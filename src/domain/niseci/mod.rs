@@ -186,12 +186,11 @@ impl CampionamentoNISECI {
       alieni_indigeni
     }
 
-    pub(crate) fn get_tot_specie_autoctone(&self) -> usize {
+    pub(crate) fn get_tot_specie_autoctone_attese(&self) -> usize {
       let mut map: HashMap<String, bool> = HashMap::new();
 
       for cattura in &self.campionamento {
-        if cattura.specie.tipo_autoctono == 1 || cattura.specie.tipo_autoctono == 2 { //TODO: check
-                                                                                      //with Gio
+        if cattura.specie.specie_attesa && (cattura.specie.tipo_autoctono == 1 || cattura.specie.tipo_autoctono == 2) {
           match map.entry(cattura.specie.id.clone()) {
             Entry::Occupied(_) => {},
             Entry::Vacant(entry) => {

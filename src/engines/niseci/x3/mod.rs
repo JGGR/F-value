@@ -115,7 +115,7 @@ fn calculate_classi_eta_alieni(c: &CampionamentoNISECI) -> ClassiEtaAlieniNISECI
         }
       };
     }
-    classi_eta.tot_specie_autoctone = c.get_tot_specie_autoctone();
+    classi_eta.tot_specie_autoctone = c.get_tot_specie_autoctone_attese();
   }
 
   classi_eta.tot_specie_aliene = classi_eta.map_tipo_1.len() + classi_eta.map_tipo_2.len() + classi_eta.map_tipo_3.len();
