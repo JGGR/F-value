@@ -17,3 +17,4 @@
 
 
 pub(crate) mod dhzp;
+pub(crate) mod dbent;
