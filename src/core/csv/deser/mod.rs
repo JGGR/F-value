@@ -21,8 +21,8 @@ use std::any::TypeId;
 use std::path::{Path, PathBuf};
 use std::fs::File;
 use serde::{de, Deserialize, Deserializer};
-use crate::core::csv::{TipoRecordCsv, RecordCsvRiferimentoNISECI, RecordCsvCampionamentoNISECI, RecordCsvAnagraficaNISECI};
-use super::{RIFERIMENTO_NISECI_HEADER_FIELDS, CAMPIONAMENTO_NISECI_HEADER_FIELDS, ANAGRAFICA_NISECI_HEADER_FIELDS};
+use crate::core::csv::{TipoRecordCsv, RecordCsvRiferimentoNISECI, RecordCsvCampionamentoNISECI, RecordCsvAnagraficaNISECI, RecordCsvCampionamentoHFBI};
+use super::{RIFERIMENTO_NISECI_HEADER_FIELDS, CAMPIONAMENTO_NISECI_HEADER_FIELDS, ANAGRAFICA_NISECI_HEADER_FIELDS, CAMPIONAMENTO_HFBI_HEADER_FIELDS};
 
 struct NormalizerReader<R: Read> {
     inner: R,
@@ -260,10 +260,6 @@ where
     }
     let file = File::open(path).expect("Unable to open file");
     check_riferimento_niseci_reader(file)
-}
-
-pub(crate) fn check_campionamento_hfbi_path(_path: PathBuf) -> bool {
-    todo!("Implement check campionamento HFBI");
 }
 
 #[derive(Debug, serde::Deserialize)]
@@ -590,6 +586,133 @@ where
     check_anagrafica_niseci_reader(file)
 }
 
+#[derive(Debug, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct VeryItalianRecordCsvCampionamentoHFBI {
+    pub(crate) codice_specie: String,
+    pub(crate) numero_individui: u32,
+    pub(crate) peso: u32,
+}
+
+impl RecordCsvCampionamentoHFBI for VeryItalianRecordCsvCampionamentoHFBI {
+    fn codice_specie(&self) -> String { self.codice_specie.clone() }
+    fn numero_individui(&self) -> u32 { self.numero_individui }
+    fn peso(&self) -> u32 { self.peso }
+}
+
+impl fmt::Display for VeryItalianRecordCsvCampionamentoHFBI {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let string_representation = format!(
+            "RecordCsvCampionamentoHFBI: {{ codice_specie: [{}], numero_individui: [{}], peso: [{}] }}",
+              self.codice_specie, self.numero_individui, self.peso
+        );
+        write!(f, "{}", string_representation)
+    }
+}
+
+#[derive(Debug, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct PlainRecordCsvCampionamentoHFBI {
+    pub(crate) codice_specie: String,
+    pub(crate) numero_individui: u32,
+    pub(crate) peso: u32,
+}
+
+impl RecordCsvCampionamentoHFBI for PlainRecordCsvCampionamentoHFBI {
+    fn codice_specie(&self) -> String { self.codice_specie.clone() }
+    fn numero_individui(&self) -> u32 { self.numero_individui }
+    fn peso(&self) -> u32 { self.peso }
+}
+
+impl fmt::Display for PlainRecordCsvCampionamentoHFBI {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let string_representation = format!(
+            "RecordCsvCampionamentoHFBI: {{ codice_specie: [{}], numero_individui: [{}], peso: [{}] }}",
+              self.codice_specie, self.numero_individui, self.peso
+        );
+        write!(f, "{}", string_representation)
+    }
+}
+
+pub(crate) fn parse_csv_campionamento_hfbi<R, T>(mut rdr: csv::Reader<R>) -> (Vec<T>, Vec<csv::Error>)
+where
+    R: std::io::Read,
+    T: RecordCsvCampionamentoHFBI + 'static
+{
+    let mut records = Vec::new();
+    let mut errors = Vec::new();
+
+    for result in rdr.deserialize() {
+        match result {
+            Ok(record) => records.push(record),
+            Err(e) => errors.push(e),
+        }
+    }
+
+    (records, errors)
+}
+
+pub(crate) fn check_campionamento_hfbi_reader<R: Read, T>(reader: R) -> Result<Vec<T>,Vec<csv::Error>>
+where
+    T: RecordCsvCampionamentoHFBI + 'static
+{
+    let normalizing_reader = NormalizerReader::new(reader);
+
+    let type_id = TypeId::of::<T>();  // Get the TypeId of T at runtime
+
+    // Match on the TypeId to determine the actual type of T
+    let delimiter = match type_id {
+        id if id == TypeId::of::<VeryItalianRecordCsvCampionamentoHFBI>() => { b';' },
+        _ => { b',' }
+    };
+
+    let rdr = csv::ReaderBuilder::new()
+        .delimiter(delimiter)
+        .from_reader(normalizing_reader);
+    let (records, errors) = parse_csv_campionamento_hfbi(rdr);
+
+    println!("Campionamento HFBI: Numero record csv validi: {}", records.len());
+    println!("Campionamento HFBI: Numero record csv non validi: {}", errors.len());
+
+    if !errors.is_empty() {
+        /*
+        for error in &errors {
+            eprintln!("  {}", error);
+        }
+        */
+        let processed_errors = process_csv_errors(&errors, TipoRecordCsv::CampionamentoHFBI);
+        eprintln!("Errori incontrati durante l'elaborazione csv del campionamento HFBI: {{");
+        for e in processed_errors {
+            eprintln!("{e}");
+        }
+        eprintln!("}}");
+        Err(errors)
+    } else {
+        //TODO: handle verbosity
+        //println!("Tutti i record csv del campionamento HFBI sono stati processati con successo!");
+        /*
+        for record in &records {
+            println!("  Record: {{{record}}}");
+        }
+        */
+        Ok(records)
+    }
+}
+
+pub(crate) fn check_campionamento_hfbi_path<T>(path: PathBuf) -> Result<Vec<T>,Vec<csv::Error>>
+where
+    T: RecordCsvCampionamentoHFBI + 'static
+{
+    if !check_path_is_file_ends_with_csv(&path) {
+        eprintln!("Il file {} non è un .csv", path.display());
+        let err = csv::Error::from(Error::new(ErrorKind::Other, "Errore campionamento HFBI: il file non è un .csv"));
+        let err_vec: Vec<csv::Error> = vec!(err);
+        return Err(err_vec);
+    }
+    let file = File::open(path).expect("Unable to open file");
+    check_campionamento_hfbi_reader(file)
+}
+
 fn parse_csv_pos(pos: &Option<csv::Position>) -> String {
     let res;
     match pos {
@@ -645,6 +768,13 @@ pub(crate) fn process_csv_errors(errors: &Vec<csv::Error>, tipo_csv: TipoRecordC
                             TipoRecordCsv::AnagraficaNISECI => {
                                 if field_idx < ANAGRAFICA_NISECI_HEADER_FIELDS.len() {
                                     field_str = format!("{} ({})", field_idx, ANAGRAFICA_NISECI_HEADER_FIELDS[field_idx]);
+                                } else {
+                                    field_str = "???".to_string();
+                                }
+                            }
+                            TipoRecordCsv::CampionamentoHFBI => {
+                                if field_idx < CAMPIONAMENTO_HFBI_HEADER_FIELDS.len() {
+                                    field_str = format!("{} ({})", field_idx, CAMPIONAMENTO_HFBI_HEADER_FIELDS[field_idx]);
                                 } else {
                                     field_str = "???".to_string();
                                 }

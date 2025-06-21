@@ -18,8 +18,9 @@
 use std::fmt;
 use chrono::NaiveDate;
 use chrono::format::ParseErrorKind;
-use super::{RecordCsvRiferimentoNISECI, RecordCsvCampionamentoNISECI, RecordCsvAnagraficaNISECI};
+use super::{RecordCsvRiferimentoNISECI, RecordCsvCampionamentoNISECI, RecordCsvAnagraficaNISECI, RecordCsvCampionamentoHFBI};
 use crate::domain::niseci::{SpecieNISECI, RecordNISECI, AnagraficaNISECI, AreaNISECI, TipoComunitaNISECI, ComunitaNISECI, IdroEcoRegioneNISECI};
+use crate::domain::hfbi::{RecordHFBI, RIFERIMENTO_HFBI};
 use crate::domain::location::Location;
 
 #[derive(Debug)]
@@ -524,6 +525,96 @@ pub(crate) fn check_records_anagrafica_niseci<T: RecordCsvAnagraficaNISECI>(reco
         }
     }
 }
+
+#[derive(Debug)]
+pub(crate) enum RecordCsvCampionamentoHFBIError {
+    ValoreInvalido { msg : String }, //TODO: add position?
+}
+
+impl fmt::Display for RecordCsvCampionamentoHFBIError {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    let string_representation = match self {
+      RecordCsvCampionamentoHFBIError::ValoreInvalido { msg } => format!("Errore record campionamento HFBI: {}", msg),
+    };
+    write!(f, "{}", string_representation)
+  }
+}
+
+pub(crate) fn parse_recordcsv_campionamento_hfbi<T: RecordCsvCampionamentoHFBI>(records: Vec<T>) -> (Vec<RecordHFBI>,Vec<RecordCsvCampionamentoHFBIError>) {
+    let mut campioni = Vec::new();
+    let mut errors = Vec::new();
+    let mut idx = 0;
+    for r in records {
+        idx += 1;
+        if r.codice_specie().is_empty() {
+            let err = RecordCsvCampionamentoHFBIError::ValoreInvalido { msg : format!("Record {idx}: codice_specie non valido (lunghezza < 1)") };
+            errors.push(err);
+            continue;
+        }
+        let codice_specie = r.codice_specie();
+        let mut opt_matched_specie = None;
+        for s in &RIFERIMENTO_HFBI { // FIXME: this is O(n^2).
+            if s.codice_specie == codice_specie {
+                opt_matched_specie = Some(s);
+                break; // TODO: mmmh
+            }
+        }
+
+        let matched_specie;
+        if let Some(specie) = opt_matched_specie {
+            matched_specie = specie;
+        } else {
+            let err = RecordCsvCampionamentoHFBIError::ValoreInvalido { msg : format!("Record {idx}: codice_specie non valido (non presente nel riferimento): {}", codice_specie) };
+            errors.push(err);
+            continue;
+        }
+
+
+        //TODO: update this abomination when records change to have an integer directly
+        if r.numero_individui() < 1 {
+            let err = RecordCsvCampionamentoHFBIError::ValoreInvalido { msg : format!("Record {idx}: numero_individui non valido (<1): {}", r.numero_individui()) };
+            errors.push(err);
+            continue;
+        }
+        let peso = r.peso();
+
+        let hfbi_rec = RecordHFBI {
+            specie: matched_specie.clone(),
+            numero_individui: r.numero_individui(),
+            peso: peso
+        };
+        campioni.push(hfbi_rec);
+    }
+    (campioni, errors)
+}
+
+pub(crate) fn check_records_campionamento_hfbi<T: RecordCsvCampionamentoHFBI>(records: Vec<T>) -> Result<Vec<RecordHFBI>,Vec<RecordCsvCampionamentoHFBIError>> {
+
+    let (records, errors) = parse_recordcsv_campionamento_hfbi(records);
+
+    println!("Campionamento HFBI: Numero record validi: {}", records.len());
+    println!("Campionamento HFBI: Numero record non validi: {}", errors.len());
+
+    if !errors.is_empty() {
+        eprintln!("Errori incontrati durante l'elaborazione dei record per campionamento HFBI: {{");
+        //TODO: add process_record_campionamentoNISECI_errors()
+        for error in &errors {
+            eprintln!("  {}", error);
+        }
+        eprintln!("}}");
+        Err(errors)
+    } else {
+        //TODO: handle verbosity
+        //println!("Tutti i record del campionamento HFBI sono stati processati con successo!");
+        /*
+        for record in &records {
+            println!("  Record: {{{record}}}");
+        }
+        */
+        Ok(records)
+    }
+}
+
 
 pub(crate) fn parse_date(date_str: &str) -> Result<NaiveDate, chrono::format::ParseError> {
     let normalized = date_str.replace("/", "-"); // Replace all / with -

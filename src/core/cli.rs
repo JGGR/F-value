@@ -17,15 +17,16 @@
 
 use std::path::PathBuf;
 use crate::engines::niseci::full::{calculate_niseci, calculate_rqe_niseci, calculate_stato_ecologico};
-use crate::domain::niseci::{CampionamentoNISECI, RiferimentoNISECI, AnagraficaNISECI, TipoComunitaNISECI, ComunitaNISECI, AreaNISECI, IdroEcoRegioneNISECI};
+use crate::domain::niseci::{CampionamentoNISECI, RiferimentoNISECI, AnagraficaNISECI, TipoComunitaNISECI, ComunitaNISECI, AreaNISECI, IdroEcoRegioneNISECI, RisultatoNISECI};
 use crate::domain::location::Location;
 use crate::core::{COPYRIGHT_INFO, PROJECT_NAME, SHORT_PROJECT_VERSION, PROJECT_VERSION_FULL};
-use crate::core::csv::deser::{check_path_is_file_ends_with_csv, check_riferimento_niseci_path, VeryItalianRecordCsvRiferimentoNISECI, check_campionamento_niseci_path, VeryItalianRecordCsvCampionamentoNISECI, check_anagrafica_niseci_path, VeryItalianRecordCsvAnagraficaNISECI, check_campionamento_hfbi_path};
+use crate::core::csv::deser::{check_path_is_file_ends_with_csv, check_riferimento_niseci_path, VeryItalianRecordCsvRiferimentoNISECI, check_campionamento_niseci_path, VeryItalianRecordCsvCampionamentoNISECI, check_anagrafica_niseci_path, VeryItalianRecordCsvAnagraficaNISECI, check_campionamento_hfbi_path, VeryItalianRecordCsvCampionamentoHFBI};
 use crate::core::csv::parser::{check_records_campionamento_niseci, check_records_riferimento_niseci, check_records_anagrafica_niseci};
+use crate::core::pdf::esporta_pdf_niseci;
 
 pub(crate) fn esox_usage() {
     println!("{PROJECT_NAME} v{SHORT_PROJECT_VERSION}");
-    println!("Usage: {PROJECT_NAME} [--headless] <campionamento.csv> <riferimento.csv> <anagrafica.csv>");
+    println!("Usage: {PROJECT_NAME} [--headless] <campionamento.csv> <riferimento.csv> <anagrafica.csv> [pdf_export_path]");
     println!("       {PROJECT_NAME} [--headless] --hfbi <campionamento.csv> <anagrafica.csv>");
     println!(
         "Flags:
@@ -57,6 +58,7 @@ pub(crate) fn run_headless(do_niseci: bool, args: &[String]) -> bool {
     let mut campionamento_path_str = "";
     let mut riferimento_path_str = "";
     let mut anagrafica_path_str = "";
+    let mut pdf_export_path_str = ".";
     for arg in &args[1..] {
         arg_i += 1;
         match arg_i {
@@ -74,6 +76,19 @@ pub(crate) fn run_headless(do_niseci: bool, args: &[String]) -> bool {
             3 => {
                 if do_niseci {
                     anagrafica_path_str = arg;
+                } else {
+                    eprintln!("Error: Unexpected arg: {arg}");
+                    esox_usage();
+                    return false;
+                }
+            }
+            4 => {
+                if do_niseci {
+                    pdf_export_path_str = arg;
+                } else {
+                    eprintln!("Error: Unexpected arg: {arg}");
+                    esox_usage();
+                    return false;
                 }
             }
             _ => {
@@ -87,6 +102,7 @@ pub(crate) fn run_headless(do_niseci: bool, args: &[String]) -> bool {
     let campionamento_path = PathBuf::from(campionamento_path_str);
     let riferimento_path = PathBuf::from(riferimento_path_str);
     let anagrafica_path = PathBuf::from(anagrafica_path_str);
+    let pdf_export_path = PathBuf::from(pdf_export_path_str);
 
     if !check_path_is_file_ends_with_csv(&campionamento_path) {
         eprintln!("Fallito controllo path campionamento");
@@ -345,6 +361,15 @@ pub(crate) fn run_headless(do_niseci: bool, args: &[String]) -> bool {
                             println!("STATO ECOLOGICO NISECI: NC");
                         }
                     }
+
+                    let risultato_niseci = RisultatoNISECI::new(
+                        niseci,
+                        rqe_niseci,
+                        intermediates
+                    );
+
+                    println!("Esportato pdf in {}", pdf_export_path.display());
+                    esporta_pdf_niseci(pdf_export_path, riferimento, anagrafica, risultato_niseci);
                 }
                 Err(_errors) => {
                     /* Assuming they were printed before this point
@@ -359,8 +384,8 @@ pub(crate) fn run_headless(do_niseci: bool, args: &[String]) -> bool {
         }
         !had_failures && !niseci_calc_failed
     } else {
-        let campionamento_check_res = check_campionamento_hfbi_path(campionamento_path);
-        println!("Result: {campionamento_check_res}");
-        true
+        let _campionamento_check_res = check_campionamento_hfbi_path::<VeryItalianRecordCsvCampionamentoHFBI>(campionamento_path);
+        todo!("Implement this");
+        //println!("Result: {campionamento_check_res}");
     }
 }
