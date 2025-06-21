@@ -1,3 +1,13 @@
+## [0.0.18] - 2025-06-21
+
+### Added
+
+- New `pdf` module with `esporta_pdf_niseci()`
+- New `hfbi` module in `domain`
+- New functions related to parsing `CampionamentoHFBI` from csv
+- All code paths up to HFBI calc request have been implemented
+- Added `templates/campionamento_hfbi.csv`
+
 ## [0.0.17] - 2025-06-17
 
 ## Changed

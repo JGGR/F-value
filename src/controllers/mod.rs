@@ -20,13 +20,14 @@ use raylib::RaylibHandle;
 use raylib::consts::KeyboardKey::*;
 use chrono::format::ParseErrorKind;
 use crate::core::csv::{TipoRecordCsv};
-use crate::core::csv::deser::{process_csv_errors, VeryItalianRecordCsvRiferimentoNISECI, VeryItalianRecordCsvCampionamentoNISECI, check_campionamento_niseci_path, check_riferimento_niseci_path};
-use crate::core::csv::parser::{check_records_riferimento_niseci, check_records_campionamento_niseci, parse_date};
+use crate::core::csv::deser::{process_csv_errors, VeryItalianRecordCsvRiferimentoNISECI, VeryItalianRecordCsvCampionamentoNISECI, VeryItalianRecordCsvCampionamentoHFBI, check_campionamento_niseci_path, check_riferimento_niseci_path, check_campionamento_hfbi_path};
+use crate::core::csv::parser::{check_records_riferimento_niseci, check_records_campionamento_niseci, check_records_campionamento_hfbi, parse_date};
 use crate::app::core::{CurrentView, MainState};
 use crate::app::model::{SubModel, HomeModel, SecondModel, IndiceModel, FileInputModel, InfoAggiuntiveModel, OutputModel, ConsoleModel};
-use crate::domain::{index::Indice, niseci::{RiferimentoNISECI, CampionamentoNISECI, AnagraficaNISECI, TipoComunitaNISECI, RisultatoNISECI, StatoEcologicoNISECI}};
+use crate::domain::{index::Indice, niseci::{RiferimentoNISECI, CampionamentoNISECI, AnagraficaNISECI, TipoComunitaNISECI, RisultatoNISECI, StatoEcologicoNISECI}, hfbi::{CampionamentoHFBI, AnagraficaHFBI, RisultatoHFBI}};
 use crate::state::GLOBAL_STATE;
 use crate::engines::niseci::full::{calculate_niseci, calculate_rqe_niseci, calculate_stato_ecologico};
+use crate::core::pdf::esporta_pdf_niseci;
 
 #[cfg(feature="logged")]
 use log::info;
@@ -318,7 +319,7 @@ impl Controller for FileInputController {
                         if campionamento_valid {
                             eprintln!("FileInputController:  HFBI - L'utente ha validato campionamento");
                             eprintln!("FileInputController:  Let's update current view and go to SelezioneInfoAggiuntive.");
-                            self.add_console_message("FileInputController:  HFBI - L'utente ha validato campionamento".to_string());
+                            //self.add_console_message("FileInputController:  HFBI - L'utente ha validato campionamento".to_string());
                             main_state.set_current_view(CurrentView::SelezioneInfoAggiuntive);
                         }
                     }
@@ -507,6 +508,65 @@ impl FileInputController {
             }
         }
     }
+    pub(crate) fn valida_campionamento_hfbi_path(&self) {
+        if let Some(path) = self.get_campionamento_path() {
+            // Using italian deser for now
+            let csv_check = check_campionamento_hfbi_path::<VeryItalianRecordCsvCampionamentoHFBI>(path);
+
+            match csv_check {
+                Ok(records) => {
+                    //NOTE: no double locking is not allowed! If state is
+                    // still in scope, its lock has not been dropped yet.
+                    //A scope is mandatory to ensure the lock is dropped before calling any
+                    //method on self which would try to acquire a lock itself.
+                    //This is a valid example:
+                    //
+                    //{
+                    //    let mut state = GLOBAL_STATE.lock().unwrap();
+                    //    opt_riferimento_niseci = state.data_model.get_riferimento_niseci();
+                    //}
+                    //But instead we tuck the lock acquisition inside the
+                    //self.get_data_riferimento_niseci() and we chill.
+                    let records_check = check_records_campionamento_hfbi(records);
+                    match records_check {
+                        Ok(campioni) => {
+                            self.add_console_message("FileInputController:  Validazione CampionamentoHFBI completata!".to_string());
+                            let campionamento = CampionamentoHFBI::new(campioni);
+                            self.set_data_campionamento_hfbi(campionamento);
+                        }
+                        Err(errors) => { // Value errors
+                            for e in errors {
+                                self.add_console_message(format!("FileInputController:  {e}"));
+                            }
+                            let mut state = GLOBAL_STATE.lock().unwrap();
+                            state.fileinput_model.set_errors_occurred(true);
+                        }
+                    }
+                }
+                Err(errors) => { // Csv errors
+                    /*
+                    for err in errors {
+                        eprintln!("FileInputController:  {err}");
+                    }
+                    */
+                    let processed_errors = process_csv_errors(&errors, TipoRecordCsv::CampionamentoNISECI);
+                    for e in processed_errors {
+                        self.add_console_message(format!("FileInputController:  {e}"));
+                    }
+                    let mut state = GLOBAL_STATE.lock().unwrap();
+                    state.fileinput_model.set_errors_occurred(true);
+                }
+            }
+        }
+    }
+
+    fn set_data_campionamento_hfbi(&self, campionamento: CampionamentoHFBI) {
+        self.set_console_env(("campionamento_hfbi".to_string(), format!("{campionamento}")));
+        let mut state = GLOBAL_STATE.lock().unwrap();
+        state.data_model.set_campionamento_hfbi(Some(campionamento));
+        state.fileinput_model.set_campionamento_path_valid(true);
+    }
+
     pub(crate) fn set_console_env(&self, (key, val): (String,String)) {
         let mut state = GLOBAL_STATE.lock().unwrap();
 
@@ -543,19 +603,17 @@ impl Controller for InfoAggiuntiveController {
         match main_state.current_view {
             CurrentView::SelezioneInfoAggiuntive => {
                 match current_indice {
-                    Indice::Niseci => {
+                    Indice::Niseci | Indice::Hfbi => {
                         if state.infoaggiuntive_model.is_done_editing() {
                             eprintln!("InfoAggiuntiveController:  Let's update current view and go to ValidaInfoAggiuntive");
                             main_state.set_current_view(CurrentView::ValidazioneInfoAggiuntive);
                         }
                     }
-                    Indice::Hfbi => {
-                    }
                 }
             }
             CurrentView::ValidazioneInfoAggiuntive => {
                 match current_indice {
-                    Indice::Niseci => {
+                    Indice::Niseci | Indice::Hfbi => {
                         if !state.infoaggiuntive_model.is_done_editing() {
                             eprintln!("InfoAggiuntiveController:  Let's update current view and go back to SelezionaInfoAggiuntive");
                             main_state.set_current_view(CurrentView::SelezioneInfoAggiuntive);
@@ -564,8 +622,6 @@ impl Controller for InfoAggiuntiveController {
                             eprintln!("InfoAggiuntiveController:  Let's update current view and go to ProduzioneOutput");
                             main_state.set_current_view(CurrentView::ProduzioneOutput);
                         }
-                    }
-                    Indice::Hfbi => {
                     }
                 }
             }
@@ -768,6 +824,119 @@ impl InfoAggiuntiveController {
         state.infoaggiuntive_model.set_valid(false);
     }
 
+    pub(crate) fn get_data_anagrafica_hfbi(&self) -> Option<AnagraficaHFBI> {
+        let state = GLOBAL_STATE.lock().unwrap();
+        state.data_model.get_anagrafica_hfbi()
+    }
+
+    pub(crate) fn submit_anagrafica_hfbi(&self, anagrafica: AnagraficaHFBI) {
+        self.set_console_env(("anagrafica_hfbi".to_string(), format!("{anagrafica}")));
+        self.add_console_message("InfoAggiuntiveController: L'utente ha completato l'inserimento info aggiuntive.".to_string());
+        let mut state = GLOBAL_STATE.lock().unwrap();
+        assert!(state.data_model.get_anagrafica_hfbi().is_none());
+        state.data_model.set_anagrafica_hfbi(Some(anagrafica));
+        state.infoaggiuntive_model.set_done_editing(true);
+        state.infoaggiuntive_model.set_valid(false);
+    }
+
+    pub(crate) fn valida_anagrafica_hfbi(&self) {
+
+        //We grab the state in a scope to ensure we don't get lock problems
+        {
+            let state = GLOBAL_STATE.lock().unwrap();
+            assert!(state.infoaggiuntive_model.is_done_editing());
+        }
+
+        if let Some(anagrafica) = self.get_data_anagrafica_hfbi() {
+            let mut errors: Vec<String> = Vec::new();
+
+            if anagrafica.codice_stazione.is_empty() {
+                errors.push("Codice stazione troppo corto".to_string());
+            }
+
+            if anagrafica.corpo_idrico.is_empty() {
+                errors.push("Nome fiume troppo corto".to_string());
+            }
+
+            if anagrafica.posizione.regione.is_empty() {
+                errors.push("Nome regione troppo corto".to_string());
+            }
+
+            if anagrafica.posizione.provincia.is_empty() {
+                errors.push("Nome provincia troppo corto".to_string());
+            }
+
+            match parse_date(&anagrafica.date_string) {
+                Ok(_) => {},
+                Err(e) => {
+                    match e.kind() {
+                        ParseErrorKind::OutOfRange => {
+                            errors.push("Data fornita non valida: fuori range".to_string());
+                        },
+                        ParseErrorKind::Impossible => {
+                            errors.push("Data fornita non valida: valori non possibili".to_string());
+                        },
+                        ParseErrorKind::NotEnough => {
+                            errors.push("Data fornita non valida: specifica insufficiente".to_string());
+                        },
+                        ParseErrorKind::Invalid => {
+                            errors.push("Data fornita non valida: presenza di caratteri non attesi".to_string());
+                        },
+                        ParseErrorKind::TooShort => {
+                            errors.push("Data fornita non valida: terminazione prematura dell'input".to_string());
+                        },
+                        ParseErrorKind::TooLong => {
+                            errors.push("Data fornita non valida: input in eccesso".to_string());
+                        },
+                        ParseErrorKind::BadFormat => {
+                            errors.push("Data fornita non valida: errore nella specifica di formattazione".to_string());
+                        },
+                        _ => {
+                            errors.push("Data fornita non valida: errore sconosciuto".to_string());
+                        }
+                    }
+                }
+            }
+
+            if (anagrafica.get_lunghezza_media() - 0.0) < 1e-6 {
+                errors.push(format!("Lunghezza media troppo bassa: {}", anagrafica.get_lunghezza_media()));
+            }
+
+            if (anagrafica.get_larghezza_media() - 0.0) < 1e-6 {
+                errors.push(format!("Larghezza media troppo bassa: {}", anagrafica.get_larghezza_media()));
+            }
+
+            for e in &errors {
+                self.add_console_message(format!("InfoAggiuntiveController:  {e}"));
+            }
+
+            let mut state = GLOBAL_STATE.lock().unwrap();
+
+            if errors.is_empty() {
+                state.infoaggiuntive_model.set_valid(true);
+            } else {
+                //TODO: handle validation errors
+                //Will probably switch to ConsoleView using an errors_occurred flag like ValidazioneFileInput
+                state.infoaggiuntive_model.set_valid(false);
+                state.infoaggiuntive_model.set_errors_occurred(true);
+            }
+        } else {
+            let err_msg = "InfoAggiuntiveController: valida_anagrafica_hfbi() ha ricevuto uno stato spurio.";
+            eprintln!("{}", err_msg);
+            self.add_console_message(format!("InfoAggiuntiveController:  {err_msg}"));
+        };
+    }
+
+    pub(crate) fn backout_anagrafica_hfbi(&self) {
+        self.unset_console_env("anagrafica_hfbi".to_string());
+        self.add_console_message("InfoAggiuntiveController: L'utente ha annullato l'inserimento info aggiuntive.".to_string());
+        let mut state = GLOBAL_STATE.lock().unwrap();
+        assert!(state.data_model.get_anagrafica_hfbi().is_some());
+        state.data_model.set_anagrafica_hfbi(None);
+        state.infoaggiuntive_model.set_done_editing(false);
+        state.infoaggiuntive_model.set_valid(false);
+    }
+
     pub(crate) fn set_console_env(&self, (key, val): (String,String)) {
         let mut state = GLOBAL_STATE.lock().unwrap();
 
@@ -935,6 +1104,16 @@ impl OutputController {
         }
     }
 
+    pub(crate) fn get_data_anagrafica_niseci(&self) -> Option<AnagraficaNISECI> {
+        let state = GLOBAL_STATE.lock().unwrap();
+        state.data_model.get_anagrafica_niseci()
+    }
+
+    pub(crate) fn get_data_riferimento_niseci(&self) -> Option<RiferimentoNISECI> {
+        let state = GLOBAL_STATE.lock().unwrap();
+        state.data_model.get_riferimento_niseci()
+    }
+
     pub(crate) fn calc_niseci(&self) {
         let riferimento;
         let campionamento;
@@ -1098,10 +1277,52 @@ impl OutputController {
         }
     }
 
+    pub(crate) fn esporta_pdf_niseci(&self, export_path: PathBuf) {
+
+        self.add_console_message(format!("Esportazione pdf in {}", export_path.display()));
+
+        let risultato_niseci = self.get_data_risultato_niseci().expect("Failed calculating NISECI before requesting export");
+
+        let anagrafica_niseci = self.get_data_anagrafica_niseci().expect("Failed getting AnagraficaNISECI before requesting export");
+
+        let riferimento_niseci = self.get_data_riferimento_niseci().expect("Failed getting RiferimentoNISECI before requesting export");
+
+        esporta_pdf_niseci(export_path, riferimento_niseci, anagrafica_niseci, risultato_niseci);
+    }
+
     pub(crate) fn user_confirm_calc(&self) {
         let mut state = GLOBAL_STATE.lock().unwrap();
 
         state.output_model.set_done_user_confirm(true);
+    }
+
+    pub(crate) fn get_hfbi_value(&self) -> Option<f32> {
+        if self.get_is_done_calc() {
+            let opt_res = self.get_data_risultato_hfbi();
+            match opt_res {
+                Some(r) => {
+                    r.get_valore()
+                }
+                None => {
+                    None
+                }
+            }
+        } else {
+            None
+        }
+    }
+
+    pub(crate) fn get_data_risultato_hfbi(&self) -> Option<RisultatoHFBI> {
+        if self.get_is_done_calc() {
+            let state = GLOBAL_STATE.lock().unwrap();
+            state.data_model.get_risultato_hfbi()
+        } else {
+            None
+        }
+    }
+
+    pub(crate) fn calc_hfbi(&self) {
+        todo!("Implement this");
     }
 
     pub(crate) fn set_console_env(&self, (key, val): (String,String)) {

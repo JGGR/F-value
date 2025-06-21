@@ -254,20 +254,20 @@ impl fmt::Display for ComunitaNISECI {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     let string_representation = match self.tipo {
         TipoComunitaNISECI::Redatta | TipoComunitaNISECI::Dm260_2010 => {
-            format!("ComunitaNISECI: {{ tipo: {{{}}}", self.tipo)
+            format!("ComunitaNISECI: {{ tipo: {{{}}} }}", self.tipo)
         }
         TipoComunitaNISECI::Recuperata => {
             if let Some(fonte) = &self.fonte { //TODO: is this good?
-                format!("ComunitaNISECI: {{ tipo: {{{}}}, fonte: {{{}}} ", self.tipo, fonte)
+                format!("ComunitaNISECI: {{ tipo: {{{}}}, fonte: {{{}}} }}", self.tipo, fonte)
             } else {
-                format!("ComunitaNISECI: {{ tipo: {{{}}}, fonte: MANCANTE", self.tipo)
+                format!("ComunitaNISECI: {{ tipo: {{{}}}, fonte: MANCANTE }}", self.tipo)
             }
         }
         TipoComunitaNISECI::AffinataDalMase => {
             if let Some(num_proto) = &self.numero_protocollo { //TODO: is this good?
-                format!("ComunitaNISECI: {{ tipo: {{{}}}, numero_protocollo: {{{}}} ", self.tipo, num_proto)
+                format!("ComunitaNISECI: {{ tipo: {{{}}}, numero_protocollo: {{{}}} }}", self.tipo, num_proto)
             } else {
-                format!("ComunitaNISECI: {{ tipo: {{{}}}, numero_protocollo: MANCANTE", self.tipo)
+                format!("ComunitaNISECI: {{ tipo: {{{}}}, numero_protocollo: MANCANTE }}", self.tipo)
             }
         }
     };
@@ -284,8 +284,8 @@ pub(crate) enum AreaNISECI {
 impl fmt::Display for AreaNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let string_representation = match *self {
-            AreaNISECI::Alpina => "AreaNISECI: { Alpina }".to_string(),
-            AreaNISECI::Mediterranea => "AreaNISECI: { Mediterranea }".to_string(),
+            AreaNISECI::Alpina => "AreaNISECI: Alpina".to_string(),
+            AreaNISECI::Mediterranea => "AreaNISECI: Mediterranea".to_string(),
         };
         write!(f, "{}", string_representation)
     }

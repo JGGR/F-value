@@ -19,6 +19,7 @@ use std::path::PathBuf;
 use std::collections::HashMap;
 use crate::domain::index::Indice;
 use crate::domain::niseci::{RiferimentoNISECI, CampionamentoNISECI, AnagraficaNISECI, RisultatoNISECI};
+use crate::domain::hfbi::{CampionamentoHFBI, AnagraficaHFBI, RisultatoHFBI};
 use crate::console::Console;
 use crate::core::SHORT_PROJECT_VERSION;
 
@@ -305,10 +306,19 @@ pub(crate) struct DataModelNISECI {
 }
 
 #[derive(Clone)]
+pub(crate) struct DataModelHFBI {
+    campionamento: Option<CampionamentoHFBI>,
+    anagrafica: Option<AnagraficaHFBI>,
+    risultato: Option<RisultatoHFBI>
+}
+
+
+#[derive(Clone)]
 pub(crate) struct DataModel {
     frame_counter: u32,
     pub(crate) errors_occurred: bool,
     pub(crate) niseci: DataModelNISECI,
+    pub(crate) hfbi: DataModelHFBI,
 }
 
 impl SubModel for DataModel {
@@ -321,11 +331,12 @@ impl SubModel for DataModel {
 }
 
 impl DataModel {
-    pub(crate) fn _new(niseci: DataModelNISECI) -> Self {
+    pub(crate) fn _new(niseci: DataModelNISECI, hfbi: DataModelHFBI) -> Self {
         Self {
             frame_counter: 0,
             errors_occurred: false,
             niseci,
+            hfbi
         }
     }
     pub(crate) fn get_riferimento_niseci(&self) -> Option<RiferimentoNISECI> {
@@ -351,6 +362,25 @@ impl DataModel {
     }
     pub(crate) fn set_risultato_niseci(&mut self, risultato: Option<RisultatoNISECI>) {
         self.niseci.risultato = risultato;
+    }
+
+    pub(crate) fn _get_campionamento_hfbi(&mut self) -> Option<CampionamentoHFBI> {
+        self.hfbi.campionamento.clone()
+    }
+    pub(crate) fn set_campionamento_hfbi(&mut self, campionamento: Option<CampionamentoHFBI>) {
+        self.hfbi.campionamento = campionamento;
+    }
+    pub(crate) fn get_anagrafica_hfbi(&self) -> Option<AnagraficaHFBI> {
+        self.hfbi.anagrafica.clone()
+    }
+    pub(crate) fn set_anagrafica_hfbi(&mut self, anagrafica: Option<AnagraficaHFBI>) {
+        self.hfbi.anagrafica = anagrafica;
+    }
+    pub(crate) fn get_risultato_hfbi(&self) -> Option<RisultatoHFBI> {
+        self.hfbi.risultato.clone()
+    }
+    pub(crate) fn set_risultato_hfbi(&mut self, risultato: Option<RisultatoHFBI>) {
+        self.hfbi.risultato = risultato;
     }
 
     pub(crate) fn get_errors_occurred(&self) -> bool {
@@ -436,6 +466,11 @@ impl Model {
                     anagrafica: None,
                     risultato: None,
                 },
+                hfbi: DataModelHFBI {
+                    campionamento: None,
+                    anagrafica: None,
+                    risultato: None
+                }
             }
         }
     }

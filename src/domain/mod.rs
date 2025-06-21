@@ -18,4 +18,5 @@
 pub(crate) mod index;
 pub(crate) mod location;
 pub(crate) mod niseci;
+pub(crate) mod hfbi;
 pub(crate) mod logger;

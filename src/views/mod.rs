@@ -21,7 +21,7 @@ use raylib::prelude::*;
 use raylib::consts::GuiState::{STATE_NORMAL, STATE_DISABLED};
 use raylib::consts::GuiIconName::{ICON_FILE_OPEN, ICON_BIN, ICON_OK_TICK, ICON_CROSS, ICON_PLAYER_NEXT};
 use rfd::FileDialog;
-use crate::domain::{index::Indice, location::Location, niseci::{TipoComunitaNISECI, ComunitaNISECI, AreaNISECI, IdroEcoRegioneNISECI, AnagraficaNISECI}};
+use crate::domain::{index::Indice, location::Location, niseci::{TipoComunitaNISECI, ComunitaNISECI, AreaNISECI, IdroEcoRegioneNISECI, AnagraficaNISECI}, hfbi::{TipoLagunaCostieraHFBI, StagioneHFBI, HabitatHFBI, AnagraficaHFBI}};
 use crate::controllers::{Controller, Controllers, HomeController, SecondController, IndiceController, FileInputController, InfoAggiuntiveController, OutputController, ConsoleController};
 use crate::app::core::{CurrentView, MainState, propwidth, propheight, CONSOLE_FONT_DATA};
 use crate::app::model::SubModel;
@@ -642,8 +642,7 @@ impl View for ValidazioneFileInputView {
                     controller.valida_campionamento_niseci_path();
                 }
                 Indice::Hfbi => {
-                    todo!("Implement controller.valida_campionamento_hfbi_path()");
-                    // controller.valida_campionamento_hfbi_path();
+                    controller.valida_campionamento_hfbi_path();
                 }
             }
         }
@@ -690,6 +689,10 @@ pub(crate) struct SelezioneInfoAggiuntiveView {
     combobox_area_niseci_value: i32,
     textbox_bacino_niseci_edit_mode: bool,
     textbox_bacino_niseci_buffer: String,
+    combobox_stagione_hfbi_value: i32,
+    combobox_habitat_vegetato_hfbi_value: i32,
+    dropdownbox_tipolaguna_hfbi_edit_mode: bool,
+    dropdownbox_tipolaguna_hfbi_value: i32,
 }
 
 impl View for SelezioneInfoAggiuntiveView {
@@ -699,8 +702,7 @@ impl View for SelezioneInfoAggiuntiveView {
 
         d.clear_background(main_state.default_bg_color);
 
-        let state = controller.get_state();
-        let frame_counter = state.get_frame_counter();
+        let _state = controller.get_state();
         let current_index = match controller.get_current_index() {
             Some(index) => index,
             None => {
@@ -795,54 +797,84 @@ impl View for SelezioneInfoAggiuntiveView {
 
             let corpo_idrico = String::from(&self.textbox_corpo_idrico_buffer);
 
-            let tipo_comunita = match <TipoComunitaNISECI as TryFrom<i32>>::try_from(self.dropdownbox_tipocomunit_niseci_value) {
-                Ok(v) => v,
-                _ => { panic!("Unexpected tipo_comunita in SelezioneInfoAggiuntiveView::draw()"); }
-            };
-            let mut opt_fonte: Option<String> = None;
-            let mut opt_num_protocollo: Option<String> = None;
-            match tipo_comunita {
-                TipoComunitaNISECI::Recuperata => {
-                    // Raylib has trouble handling the string downstream if we don't ensure to do this
-                    opt_fonte = Some(self.textbox_fontecomunit_niseci_buffer.clone());
+            match current_index {
+                Indice::Niseci => {
+                    let tipo_comunita = match <TipoComunitaNISECI as TryFrom<i32>>::try_from(self.dropdownbox_tipocomunit_niseci_value) {
+                        Ok(v) => v,
+                        _ => { panic!("Unexpected tipo_comunita in SelezioneInfoAggiuntiveView::draw()"); }
+                    };
+                    let mut opt_fonte: Option<String> = None;
+                    let mut opt_num_protocollo: Option<String> = None;
+                    match tipo_comunita {
+                        TipoComunitaNISECI::Recuperata => {
+                            // Raylib has trouble handling the string downstream if we don't ensure to do this
+                            opt_fonte = Some(self.textbox_fontecomunit_niseci_buffer.clone());
+                        }
+                        TipoComunitaNISECI::AffinataDalMase => {
+                            // Raylib has trouble handling the string downstream if we don't ensure to do this
+                            opt_num_protocollo = Some(self.textbox_protocollocomunit_niseci_buffer.clone());
+                        }
+                        _ => {}
+                    }
+                    let comunita = ComunitaNISECI {
+                        tipo: tipo_comunita,
+                        fonte: opt_fonte,
+                        numero_protocollo: opt_num_protocollo
+                    };
+                    let area = match <AreaNISECI as TryFrom<i32>>::try_from(self.combobox_area_niseci_value) {
+                        Ok(v) => v,
+                        _ => { panic!("Unexpected area_niseci in SelezioneInfoAggiuntiveView::draw()"); }
+                    };
+
+                    let bacino_niseci = String::from(&self.textbox_bacino_niseci_buffer);
+
+                    let idro_ecoregione_niseci = match <IdroEcoRegioneNISECI as TryFrom<i32>>::try_from(self.listview_idroecoregione_niseci_value) {
+                        Ok(v) => v,
+                        _ => { panic!("Unexpected idroecoregione_niseci in SelezioneInfoAggiuntiveView::draw()"); }
+                    };
+
+                    let anagrafica = AnagraficaNISECI {
+                        comunita,
+                        codice_stazione,
+                        date_string,
+                        area,
+                        corpo_idrico,
+                        bacino_appartenenza: bacino_niseci,
+                        idro_eco_regione: idro_ecoregione_niseci,
+                        posizione,
+                        lunghezza_media_stazione: lunghezza_stazione,
+                        larghezza_media_stazione: larghezza_stazione,
+                    };
+
+                    controller.submit_anagrafica_niseci(anagrafica);
                 }
-                TipoComunitaNISECI::AffinataDalMase => {
-                    // Raylib has trouble handling the string downstream if we don't ensure to do this
-                    opt_num_protocollo = Some(self.textbox_protocollocomunit_niseci_buffer.clone());
+                Indice::Hfbi => {
+                    let tipo_laguna_costiera = match <TipoLagunaCostieraHFBI as TryFrom<i32>>::try_from(self.dropdownbox_tipolaguna_hfbi_value) {
+                        Ok(v) => v,
+                        _ => { panic!("Unexpected tipo_laguna in SelezioneInfoAggiuntiveView::draw()"); }
+                    };
+                    let stagione = match <StagioneHFBI as TryFrom<i32>>::try_from(self.combobox_stagione_hfbi_value) {
+                        Ok(v) => v,
+                        _ => { panic!("Unexpected stagione in SelezioneInfoAggiuntiveView::draw()"); }
+                    };
+                    let habitat_vegetato = match <HabitatHFBI as TryFrom<i32>>::try_from(self.combobox_habitat_vegetato_hfbi_value) {
+                        Ok(v) => v,
+                        _ => { panic!("Unexpected habitat in SelezioneInfoAggiuntiveView::draw()"); }
+                    };
+                    let anagrafica = AnagraficaHFBI {
+                        codice_stazione,
+                        corpo_idrico,
+                        posizione,
+                        date_string,
+                        tipo_laguna: tipo_laguna_costiera,
+                        stagione,
+                        habitat_vegetato,
+                        lunghezza_media_transetto: lunghezza_stazione,
+                        larghezza_media_transetto: larghezza_stazione
+                    };
+                    controller.submit_anagrafica_hfbi(anagrafica);
                 }
-                _ => {}
             }
-            let comunita = ComunitaNISECI {
-                tipo: tipo_comunita,
-                fonte: opt_fonte,
-                numero_protocollo: opt_num_protocollo
-            };
-            let area = match <AreaNISECI as TryFrom<i32>>::try_from(self.combobox_area_niseci_value) {
-                Ok(v) => v,
-                _ => { panic!("Unexpected area_niseci in SelezioneInfoAggiuntiveView::draw()"); }
-            };
-
-            let bacino_niseci = String::from(&self.textbox_bacino_niseci_buffer);
-
-            let idro_ecoregione_niseci = match <IdroEcoRegioneNISECI as TryFrom<i32>>::try_from(self.listview_idroecoregione_niseci_value) {
-                Ok(v) => v,
-                _ => { panic!("Unexpected idroecoregione_niseci in SelezioneInfoAggiuntiveView::draw()"); }
-            };
-
-            let anagrafica = AnagraficaNISECI {
-                comunita,
-                codice_stazione,
-                date_string,
-                area,
-                corpo_idrico,
-                bacino_appartenenza: bacino_niseci,
-                idro_eco_regione: idro_ecoregione_niseci,
-                posizione,
-                lunghezza_media_stazione: lunghezza_stazione,
-                larghezza_media_stazione: larghezza_stazione,
-            };
-
-            controller.submit_anagrafica_niseci(anagrafica);
         }
 
         let x_padding = groupbox_width / 20;
@@ -925,6 +957,15 @@ impl View for SelezioneInfoAggiuntiveView {
             "Data"
         );
 
+        let label_for_station_length;
+        match current_index {
+            Indice::Niseci => {
+                label_for_station_length = "Lunghezza stazione";
+            }
+            Indice::Hfbi => {
+                label_for_station_length = "Lunghezza transetto";
+            }
+        }
         d.gui_label(
             rrect(
                 column_1_labels_x,
@@ -932,8 +973,18 @@ impl View for SelezioneInfoAggiuntiveView {
                 column_1_labels_width,
                 column_1_labels_height
             ),
-            "Lunghezza stazione"
+            label_for_station_length
         );
+
+        let label_for_station_width;
+        match current_index {
+            Indice::Niseci => {
+                label_for_station_width = "Larghezza stazione";
+            }
+            Indice::Hfbi => {
+                label_for_station_width = "Larghezza transetto";
+            }
+        }
 
         d.gui_label(
             rrect(
@@ -942,7 +993,7 @@ impl View for SelezioneInfoAggiuntiveView {
                 column_1_labels_width,
                 column_1_labels_height
             ),
-            "Larghezza stazione"
+            label_for_station_width
         );
 
         let column_1_boxes_width = column_1_labels_width;
@@ -1286,16 +1337,49 @@ impl View for SelezioneInfoAggiuntiveView {
                 }
             }
             Indice::Hfbi => {
-                let rainbow_speed = 0.03;
-                let todo_hfbi_font_scale = 2;
-                let todo_hfbi_font_height = main_state.current_font_height * todo_hfbi_font_scale;
+                let column_2_label_stagione_y = column_2_groupbox_comunit_y + column_2_groupbox_fields_y_spacing;
+                let column_2_label_habitat_vegetato_y = column_2_label_stagione_y + column_2_labels_height + column_2_groupbox_fields_y_spacing;
+                let column_2_label_tipo_laguna_y = column_2_label_habitat_vegetato_y + column_2_labels_height + column_2_groupbox_fields_y_spacing;
+                let column_2_groupbox_boxes_width = column_2_groupbox_labels_width;
+                let column_2_groupbox_boxes_height = column_2_labels_height;
+                let column_2_groupbox_boxes_x = column_2_groupbox_labels_x + column_2_groupbox_labels_width;
+                let mut _combo_box_stagione_pick = -1;
+                _combo_box_stagione_pick = d.gui_combo_box(
+                    rrect(
+                        column_2_groupbox_boxes_x,
+                        column_2_label_stagione_y,
+                        column_2_groupbox_boxes_width,
+                        column_2_groupbox_boxes_height
+                    ),
+                    "Primavera;Autunno",
+                    &mut self.combobox_stagione_hfbi_value,
+                );
 
-                let todo_hfbi_txt = "TODO: HFBI controls";
-                let todo_hfbi_txt_bounds = main_state.current_font.measure_text(todo_hfbi_txt, todo_hfbi_font_height as f32, main_state.default_txt_spacing as f32);
-                let todo_hfbi_txt_x = column_2_groupbox_hfbi_x + (column_2_groupbox_hfbi_width / 2) - (todo_hfbi_txt_bounds.x as i32 / 2);
-                let todo_hfbi_txt_y = column_2_groupbox_hfbi_y + (column_2_groupbox_hfbi_height / 2) - (todo_hfbi_txt_bounds.y as i32 / 2);
+                let mut _combo_box_habitat_vegetato_pick = -1;
+                _combo_box_habitat_vegetato_pick = d.gui_combo_box(
+                    rrect(
+                        column_2_groupbox_boxes_x,
+                        column_2_label_habitat_vegetato_y,
+                        column_2_groupbox_boxes_width,
+                        column_2_groupbox_boxes_height
+                    ),
+                    "Vegetato;Non vegetato",
+                    &mut self.combobox_habitat_vegetato_hfbi_value,
+                );
 
-                draw_rainbow_text(d, todo_hfbi_txt_x, todo_hfbi_txt_y, "TODO: HFBI controls", frame_counter, rainbow_speed, &main_state.current_font, main_state.default_txt_spacing, main_state.current_font_height, todo_hfbi_font_scale);
+                if d.gui_dropdown_box(
+                    rrect(
+                        column_2_groupbox_boxes_x,
+                        column_2_label_tipo_laguna_y,
+                        column_2_groupbox_boxes_width,
+                        column_2_groupbox_boxes_height,
+                    ),
+                    "M-AT-1;M-AT-2;M-AT-3",
+                    &mut self.dropdownbox_tipolaguna_hfbi_value,
+                    self.dropdownbox_tipolaguna_hfbi_edit_mode,
+                ) {
+                    self.dropdownbox_tipolaguna_hfbi_edit_mode = !self.dropdownbox_tipolaguna_hfbi_edit_mode;
+                }
             }
         }
 
@@ -1348,6 +1432,10 @@ impl SelezioneInfoAggiuntiveView {
             combobox_area_niseci_value: 0,
             textbox_bacino_niseci_edit_mode: false,
             textbox_bacino_niseci_buffer: bacino_buffer,
+            combobox_stagione_hfbi_value: 0,
+            combobox_habitat_vegetato_hfbi_value: 0,
+            dropdownbox_tipolaguna_hfbi_edit_mode: false,
+            dropdownbox_tipolaguna_hfbi_value: 0,
         }
     }
 }
@@ -1414,8 +1502,7 @@ impl View for ValidazioneInfoAggiuntiveView {
                     controller.valida_anagrafica_niseci();
                 }
                 Indice::Hfbi => {
-                    //TODO: implement this
-                    //controller.valida_anagrafica_hfbi()
+                    controller.valida_anagrafica_hfbi()
                 }
             }
         }
@@ -1436,8 +1523,7 @@ impl View for ValidazioneInfoAggiuntiveView {
                     controller.backout_anagrafica_niseci();
                 }
                 Indice::Hfbi => {
-                    //TODO: implement this
-                    //controller.backout_anagrafica_hfbi();
+                    controller.backout_anagrafica_hfbi();
                 }
             }
         }
@@ -1513,9 +1599,7 @@ impl View for ProduzioneOutputView {
                     controller.calc_niseci();
                 },
                 Indice::Hfbi => {
-                    //TODO: add this
-                    println!("TODO: add this.");
-                    //controller.calc_hfbi();
+                    controller.calc_hfbi();
                 }
             }
         }
@@ -1573,10 +1657,11 @@ impl View for ProduzioneOutputView {
             "Output"
         );
 
+        let y_spacing = main_state.current_font_height + propwidth(d, 5);
+        let output_start_y = panel_y + propwidth(d, 15);
+
         match current_index {
             Indice::Niseci => {
-                let y_spacing = main_state.current_font_height + propwidth(d, 5);
-                let output_start_y = panel_y + propwidth(d, 15);
                 let niseci_opt = controller.get_niseci_value();
                 let niseci_str = match niseci_opt {
                     Some(v) => {
@@ -1727,7 +1812,31 @@ impl View for ProduzioneOutputView {
                 );
             },
             Indice::Hfbi => {
-                todo!("Implement this!");
+                let hfbi_opt = controller.get_hfbi_value();
+                let hfbi_str = match hfbi_opt {
+                    Some(v) => {
+                        format!("{}", v)
+                    }
+                    None => {
+                        if controller.get_is_done_calc() { // Could use done_calc and avoid another
+                                                           // lock call
+                            "NC".to_string()
+                        } else {
+                            "Non calcolato".to_string()
+                        }
+                    }
+                };
+                let hfbi_line = format!("HFBI: {}", hfbi_str);
+                d.draw_text_ex(
+                    &main_state.current_font,
+                    &hfbi_line,
+                    // We use propwidth/height for the text starting position:
+                    // this is not the bound
+                    Vector2::new((panel_x + propwidth(d, 25)) as f32, (output_start_y + (y_spacing )) as f32),
+                    main_state.current_font_height as f32,
+                    main_state.default_txt_spacing as f32,
+                    main_state.default_txt_color
+                );
             }
         }
     }
@@ -1753,8 +1862,14 @@ impl View for ProduzionePDFView {
 
         d.clear_background(main_state.default_bg_color);
 
-        let state = controller.get_state();
-        let frame_counter = state.get_frame_counter();
+        let _state = controller.get_state();
+        let current_index = match controller.get_current_index() {
+            Some(index) => index,
+            None => {
+                eprintln!("ProduzionePDFView: Per qualche assurdo motivo l'indice corrente non è validato. Uso NISECI.");
+                Indice::Niseci
+            }
+        };
         let button_esporta_width = propwidth(d, 200);
         let button_esporta_x = d.get_screen_width() / 2 - button_esporta_width /2;
         let button_esporta_height = propwidth(d, 50);
@@ -1790,7 +1905,24 @@ impl View for ProduzionePDFView {
             "Esporta"
         ) {
             //TODO: esporta pdf
-            println!("TODO: call controller to update model.");
+            let file = FileDialog::new()
+                    .add_filter("pdf", &["pdf"])
+                    .set_directory("/")
+                    .save_file();
+
+            if let Some(filepath) = file {
+                match current_index {
+                    Indice::Niseci => {
+                        controller.esporta_pdf_niseci(filepath);
+                    }
+                    Indice::Hfbi => {
+                        todo!("Implement controller.esporta_pdf_hfbi()");
+                    }
+                }
+            } else {
+                eprintln!("Error: failed getting a file.");
+                controller.add_console_message("Failed getting a file for esportazione".to_string());
+            }
         }
 
         d.gui_panel(
@@ -1802,17 +1934,6 @@ impl View for ProduzionePDFView {
             ),
             "TODO: Output qui"
         );
-
-        let rainbow_speed = 0.03;
-        let todo_font_scale = 6;
-        let todo_font_height = main_state.current_font_height * todo_font_scale;
-
-        let todo_txt = "TODO: ESPORTAZIONE PDF";
-        let todo_txt_bounds = main_state.current_font.measure_text(todo_txt, todo_font_height as f32, main_state.default_txt_spacing as f32);
-        let todo_txt_x = (d.get_screen_width() / 2) - (todo_txt_bounds.x as i32 / 2);
-        let todo_txt_y = (d.get_screen_height() / 2) - (todo_txt_bounds.y as i32 / 2);
-
-        draw_rainbow_text(d, todo_txt_x, todo_txt_y, "TODO: ESPORTAZIONE PDF", frame_counter, rainbow_speed, &main_state.current_font, main_state.default_txt_spacing, main_state.current_font_height, todo_font_scale);
 
     }
 }
