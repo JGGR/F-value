@@ -1188,8 +1188,9 @@ impl OutputController {
 
                     #[cfg(feature="logged")]
                     {
-                        info!("NISECI, RQE NISECI, Stato ecologico, x1, x2, x3, x2_a, x2_b, x3_a, x3_b");
-                        info!("{}", format!("{}, {}, {}, {}, {}, {}, {}, {}, {}, {}",
+                        info!("Codice stazione, NISECI, RQE NISECI, Stato ecologico, x1, x2, x3, x2_a, x2_b, x3_a, x3_b");
+                        info!("{}", format!("{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}",
+                            anagrafica.codice_stazione,
                             niseci_str,
                             rqe_niseci_str,
                             stato_ecologico_str,
