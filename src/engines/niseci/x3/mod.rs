@@ -16,18 +16,52 @@
 */
 
 use std::collections::hash_map::Entry;
+use std::collections::HashMap;
 use crate::domain::niseci::{CampionamentoNISECI, ClassiEtaAlieniNISECI, ClassiEtaSpecieNISECI, InfoPopolazioniAlieneNISECI};
+
+#[derive(Clone)]
+pub(crate) struct SubmetricheX3 {
+    classi_eta: ClassiEtaSpecieNISECI,
+    rapporto_ad_juv: Option<f32>,
+    criterio_a: u8,
+    criterio_b: u8
+}
+
+impl SubmetricheX3 {
+    pub(crate) fn new(classi_eta: ClassiEtaSpecieNISECI, rapporto_ad_juv: Option<f32>, criterio_a: u8, criterio_b: u8) -> Self {
+        Self {
+            classi_eta,
+            rapporto_ad_juv,
+            criterio_a,
+            criterio_b
+        }
+    }
+    pub(crate) fn get_classi_eta(&self) -> ClassiEtaSpecieNISECI {
+        self.classi_eta.clone()
+    }
+    pub(crate) fn get_rapporto_ad_juv(&self) -> Option<f32> {
+        self.rapporto_ad_juv
+    }
+    pub(crate) fn get_criterio_a(&self) -> u8 {
+        self.criterio_a
+    }
+    pub(crate) fn get_criterio_b(&self) -> u8 {
+        self.criterio_b
+    }
+}
 
 pub(crate) struct MetricheX3 {
     criterio_a: f32,
-    criterio_b: f32
+    criterio_b: f32,
+    submetriche_map: HashMap<String, SubmetricheX3>
 }
 
 impl MetricheX3 {
-    pub(crate) fn new(criterio_a: f32, criterio_b: f32) -> Self {
+    pub(crate) fn new(criterio_a: f32, criterio_b: f32, submetriche_map: HashMap<String, SubmetricheX3>) -> Self {
         Self {
             criterio_a,
-            criterio_b
+            criterio_b,
+            submetriche_map
         }
     }
     pub(crate) fn get_criterio_a(&self) -> f32 {
@@ -35,6 +69,9 @@ impl MetricheX3 {
     }
     pub(crate) fn get_criterio_b(&self) -> f32 {
         self.criterio_b
+    }
+    pub(crate) fn get_submetriche_map(&self) -> HashMap<String, SubmetricheX3> {
+        self.submetriche_map.clone()
     }
 }
 
@@ -78,7 +115,86 @@ pub(crate) fn calculate_x3(c: &CampionamentoNISECI) -> Result<(f32, Option<Metri
 
   let x3 = 0.5 * (a + b);
 
-  Ok((x3, Some(MetricheX3::new(a, b))))
+  let mut errors = Vec::<String>::new();
+  let mut submetriche = HashMap::<String, SubmetricheX3>::new();
+
+  for (key, val) in info_pop_aliene.tipo_1.intermediates_map {
+    match submetriche.entry(key) {
+        Entry::Occupied(_) => {},
+        Entry::Vacant(vacant_entry) => {
+            vacant_entry.insert(
+                //We fill classi_eta later
+                //TODO: wrap submetrichex3 in a struct rather than using this ugly tuple access
+                SubmetricheX3::new(ClassiEtaSpecieNISECI::new(), val.2, val.0, val.1)
+            );
+        }
+    }
+  }
+  for (key, val) in classi_eta.map_tipo_1 {
+    match submetriche.entry(key.clone()) {
+        Entry::Occupied(mut entry) => {
+            let submetr = entry.get_mut();
+            *submetr = SubmetricheX3::new(val, submetr.get_rapporto_ad_juv(), submetr.get_criterio_a(), submetr.get_criterio_b());
+        },
+        Entry::Vacant(_) => {
+            errors.push(format!("Errore: specie {} ha classi eta ma manca degli altri valori intermedi", key));
+        }
+    }
+  }
+
+  for (key, val) in info_pop_aliene.tipo_2.intermediates_map {
+    match submetriche.entry(key) {
+        Entry::Occupied(_) => {},
+        Entry::Vacant(vacant_entry) => {
+            vacant_entry.insert(
+                //We fill classi_eta later
+                //TODO: wrap submetrichex3 in a struct rather than using this ugly tuple access
+                SubmetricheX3::new(ClassiEtaSpecieNISECI::new(), val.2, val.0, val.1)
+            );
+        }
+    }
+  }
+  for (key, val) in classi_eta.map_tipo_2 {
+    match submetriche.entry(key.clone()) {
+        Entry::Occupied(mut entry) => {
+            let submetr = entry.get_mut();
+            *submetr = SubmetricheX3::new(val, submetr.get_rapporto_ad_juv(), submetr.get_criterio_a(), submetr.get_criterio_b());
+        },
+        Entry::Vacant(_) => {
+            errors.push(format!("Errore: specie {} ha classi eta ma manca degli altri valori intermedi", key));
+        }
+    }
+  }
+
+  for (key, val) in info_pop_aliene.tipo_3.intermediates_map {
+    match submetriche.entry(key) {
+        Entry::Occupied(_) => {},
+        Entry::Vacant(vacant_entry) => {
+            vacant_entry.insert(
+                //We fill classi_eta later
+                //TODO: wrap submetrichex3 in a struct rather than using this ugly tuple access
+                SubmetricheX3::new(ClassiEtaSpecieNISECI::new(), val.2, val.0, val.1)
+            );
+        }
+    }
+  }
+  for (key, val) in classi_eta.map_tipo_3 {
+    match submetriche.entry(key.clone()) {
+        Entry::Occupied(mut entry) => {
+            let submetr = entry.get_mut();
+            *submetr = SubmetricheX3::new(val, submetr.get_rapporto_ad_juv(), submetr.get_criterio_a(), submetr.get_criterio_b());
+        },
+        Entry::Vacant(_) => {
+            errors.push(format!("Errore: specie {} ha classi eta ma manca degli altri valori intermedi", key));
+        }
+    }
+  }
+
+  if !errors.is_empty() { // In case the classi_eta loops had some problems
+    return Err(errors);
+  }
+
+  Ok((x3, Some(MetricheX3::new(a, b, submetriche))))
 }
 
 fn calculate_classi_eta_alieni(c: &CampionamentoNISECI) -> ClassiEtaAlieniNISECI {

@@ -733,6 +733,7 @@ pub(crate) struct InfoPopolazioniNISECI {
   pub(crate) species_mediamente_strutt: u32,
   pub(crate) species_destrutt: u32,
   pub(crate) tot_species: usize,
+  pub(crate) intermediates_map: HashMap<String, (u8, u8, Option<f32>)>,
   pub(crate) criterio_a: u8,
   pub(crate) criterio_b: u8,
   pub(crate) rapporto_ad_juv: Option<f32>,
@@ -749,6 +750,7 @@ impl InfoPopolazioniNISECI {
       criterio_a: 0,
       criterio_b: 0,
       rapporto_ad_juv: None,
+      intermediates_map: HashMap::new()
     }
   }
 
@@ -773,10 +775,11 @@ impl InfoPopolazioniNISECI {
           if popolazione.abs() < epsilon  {
             info_pop.species_destrutt += 1;
           }
+          let criterio_a = criteri_x2_a.get_criterio_a();
+          let criterio_b = criteri_x2_a.get_criterio_b();
+          let rapporto_ad_juv = criteri_x2_a.get_rapporto_ad_juv();
 
-          info_pop.criterio_a = criteri_x2_a.get_criterio_a();
-          info_pop.criterio_b = criteri_x2_a.get_criterio_b();
-          info_pop.rapporto_ad_juv = criteri_x2_a.get_rapporto_ad_juv();
+          info_pop.intermediates_map.insert(classe.specie.id.clone(), (criterio_a, criterio_b, rapporto_ad_juv));
         },
         Err(error) => errors.push(error),
       }

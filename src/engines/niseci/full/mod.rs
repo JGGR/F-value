@@ -81,6 +81,31 @@ pub(crate) fn calculate_niseci(campionamento: &CampionamentoNISECI, riferimento:
     }
     let (x3, criteri_x3) = x3.expect("calc_niseci() returned earlier on Err match");
 
+    if let Some(ref crit) = criteri_x3 {
+        let submetriche_map_x3 = crit.get_submetriche_map();
+        for (key, val) in submetriche_map_x3 {
+            let classi_eta = val.get_classi_eta();
+            let specie = key.clone();
+            let densita_stimata = -1.0; //TODO: check if this is correct
+            let subvalue_a = val.get_criterio_a();
+            let subvalue_b = val.get_criterio_b();
+            let val = ValoriIntermediSpecieNISECI {
+                classi_eta,
+                densita_stimata,
+                rapporto_ad_juv: val.get_rapporto_ad_juv(),
+                x2_a_a: subvalue_a,
+                x2_a_b: subvalue_b
+            };
+            match valori_intermedi_specie.entry(specie) {
+                Entry::Occupied(_) => {},
+                Entry::Vacant(vacant_entry) => {
+                    vacant_entry.insert(val);
+                }
+            }
+        }
+    }
+
+
     let mut x1_x2_errors = Vec::new();
     if x1 < 0.0 {
         x1_x2_errors.push(format!("Errore risultato x1: valore negativo: {}", x1));
