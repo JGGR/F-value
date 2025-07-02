@@ -124,8 +124,7 @@ pub(crate) fn calculate_x3(c: &CampionamentoNISECI) -> Result<(f32, Option<Metri
         Entry::Vacant(vacant_entry) => {
             vacant_entry.insert(
                 //We fill classi_eta later
-                //TODO: wrap submetrichex3 in a struct rather than using this ugly tuple access
-                SubmetricheX3::new(ClassiEtaSpecieNISECI::new(), val.2, val.0, val.1)
+                SubmetricheX3::new(ClassiEtaSpecieNISECI::new(), val.get_rapporto_ad_juv(), val.get_criterio_a(), val.get_criterio_b())
             );
         }
     }
@@ -148,8 +147,7 @@ pub(crate) fn calculate_x3(c: &CampionamentoNISECI) -> Result<(f32, Option<Metri
         Entry::Vacant(vacant_entry) => {
             vacant_entry.insert(
                 //We fill classi_eta later
-                //TODO: wrap submetrichex3 in a struct rather than using this ugly tuple access
-                SubmetricheX3::new(ClassiEtaSpecieNISECI::new(), val.2, val.0, val.1)
+                SubmetricheX3::new(ClassiEtaSpecieNISECI::new(), val.get_rapporto_ad_juv(), val.get_criterio_a(), val.get_criterio_b())
             );
         }
     }
@@ -172,8 +170,7 @@ pub(crate) fn calculate_x3(c: &CampionamentoNISECI) -> Result<(f32, Option<Metri
         Entry::Vacant(vacant_entry) => {
             vacant_entry.insert(
                 //We fill classi_eta later
-                //TODO: wrap submetrichex3 in a struct rather than using this ugly tuple access
-                SubmetricheX3::new(ClassiEtaSpecieNISECI::new(), val.2, val.0, val.1)
+                SubmetricheX3::new(ClassiEtaSpecieNISECI::new(), val.get_rapporto_ad_juv(), val.get_criterio_a(), val.get_criterio_b())
             );
         }
     }

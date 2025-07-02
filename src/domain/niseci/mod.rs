@@ -725,6 +725,26 @@ impl ClassiEta {
   }
 }
 
+pub(crate) struct InfoIntermediePopolazioniNISECI {
+    criterio_a: u8,
+    criterio_b: u8,
+    rapporto_ad_juv: Option<f32>
+}
+
+impl InfoIntermediePopolazioniNISECI {
+    pub(crate) fn new(criterio_a: u8, criterio_b: u8, rapporto_ad_juv: Option<f32>) -> InfoIntermediePopolazioniNISECI {
+        InfoIntermediePopolazioniNISECI { criterio_a, criterio_b, rapporto_ad_juv }
+    }
+    pub(crate) fn get_criterio_a(&self) -> u8 {
+        self.criterio_a
+    }
+    pub(crate) fn get_criterio_b(&self) -> u8 {
+        self.criterio_b
+    }
+    pub(crate) fn get_rapporto_ad_juv(&self) -> Option<f32> {
+        self.rapporto_ad_juv
+    }
+}
 
 /// struct che aiuta nel calcolo di x3
 pub(crate) struct InfoPopolazioniNISECI {
@@ -733,10 +753,7 @@ pub(crate) struct InfoPopolazioniNISECI {
   pub(crate) species_mediamente_strutt: u32,
   pub(crate) species_destrutt: u32,
   pub(crate) tot_species: usize,
-  pub(crate) intermediates_map: HashMap<String, (u8, u8, Option<f32>)>,
-  pub(crate) criterio_a: u8,
-  pub(crate) criterio_b: u8,
-  pub(crate) rapporto_ad_juv: Option<f32>,
+  pub(crate) intermediates_map: HashMap<String, InfoIntermediePopolazioniNISECI>,
 }
 
 impl InfoPopolazioniNISECI {
@@ -747,9 +764,6 @@ impl InfoPopolazioniNISECI {
       species_mediamente_strutt: 0,
       species_destrutt: 0,
       tot_species: 0,
-      criterio_a: 0,
-      criterio_b: 0,
-      rapporto_ad_juv: None,
       intermediates_map: HashMap::new()
     }
   }
@@ -779,7 +793,7 @@ impl InfoPopolazioniNISECI {
           let criterio_b = criteri_x2_a.get_criterio_b();
           let rapporto_ad_juv = criteri_x2_a.get_rapporto_ad_juv();
 
-          info_pop.intermediates_map.insert(classe.specie.id.clone(), (criterio_a, criterio_b, rapporto_ad_juv));
+          info_pop.intermediates_map.insert(classe.specie.id.clone(), InfoIntermediePopolazioniNISECI::new(criterio_a, criterio_b, rapporto_ad_juv));
         },
         Err(error) => errors.push(error),
       }
