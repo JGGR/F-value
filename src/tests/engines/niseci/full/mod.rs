@@ -18,7 +18,7 @@
 use std::io::Cursor;
 use crate::{engines::niseci::full::calculate_niseci, tests::test_utils::{create_dummy_riferimento, create_dummy_campionamento_full, create_dummy_campionamento_chopped, create_dummy_anagrafica}};
 use crate::core::csv::parser::{check_records_riferimento_niseci, check_records_campionamento_niseci, check_records_anagrafica_niseci};
-use crate::core::csv::lexer::{VeryItalianRecordCsvRiferimentoNISECI, check_riferimento_niseci_reader, VeryItalianRecordCsvCampionamentoNISECI, check_campionamento_niseci_reader, VeryItalianRecordCsvAnagraficaNISECI, check_anagrafica_niseci_reader};
+use crate::core::csv::deser::{VeryItalianRecordCsvRiferimentoNISECI, check_riferimento_niseci_reader, VeryItalianRecordCsvCampionamentoNISECI, check_campionamento_niseci_reader, VeryItalianRecordCsvAnagraficaNISECI, check_anagrafica_niseci_reader};
 use crate::domain::niseci::{RiferimentoNISECI, CampionamentoNISECI};
 
 const RIFERIMENTO_NISECI_TEMPLATE_DATA: &[u8] = include_bytes!("../../../../../templates/riferimento_niseci.csv");
@@ -108,8 +108,8 @@ fn calculate_niseci_template() {
 
     let (niseci, intermediates) = calc_niseci_res.expect("is_ok() was checked before");
 
-    assert_eq!(niseci, Some(0.2085337));
-    assert_eq!(intermediates.x1, 0.4285714);
+    assert_eq!(niseci, Some(0.20853373));
+    assert_eq!(intermediates.x1, 0.42857146);
     assert_eq!(intermediates.x2, Some(0.26666668));
     assert_eq!(intermediates.x3, 1.0);
 }

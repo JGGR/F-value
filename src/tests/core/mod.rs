@@ -17,7 +17,7 @@
 
 use std::io::Cursor;
 use crate::core::csv::parser::{check_records_campionamento_niseci, check_records_riferimento_niseci, check_records_anagrafica_niseci};
-use crate::core::csv::lexer::{check_campionamento_niseci_reader, check_riferimento_niseci_reader, check_anagrafica_niseci_reader, translate_error_message, VeryItalianRecordCsvRiferimentoNISECI, VeryItalianRecordCsvCampionamentoNISECI, VeryItalianRecordCsvAnagraficaNISECI};
+use crate::core::csv::deser::{check_campionamento_niseci_reader, check_riferimento_niseci_reader, check_anagrafica_niseci_reader, translate_error_message, VeryItalianRecordCsvRiferimentoNISECI, VeryItalianRecordCsvCampionamentoNISECI, VeryItalianRecordCsvAnagraficaNISECI};
 use crate::core::csv::{CAMPIONAMENTO_NISECI_HEADER, RIFERIMENTO_NISECI_HEADER, ANAGRAFICA_NISECI_HEADER};
 use crate::domain::niseci::SpecieNISECI;
 
