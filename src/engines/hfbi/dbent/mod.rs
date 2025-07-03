@@ -27,7 +27,6 @@ pub(crate) fn calc_dbent(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHF
             | GruppoEcoHFBI::ResidentiDiEstuario => {
                 sbent += specie.specie.gruppo_trofico.microbentivori;
                 sbent += specie.specie.gruppo_trofico.macrobentivori;
-                sbent += specie.specie.gruppo_trofico.iperbentivori;
             }
             _ => {}
         }

@@ -25,8 +25,7 @@ pub(crate) fn calc_bbent(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHF
             | GruppoEcoHFBI::MigratoriMarini
             | GruppoEcoHFBI::ResidentiDiEstuario => {
             biobent += specie.peso as f32 * (specie.specie.gruppo_trofico.microbentivori) +
-                specie.peso as f32 * (specie.specie.gruppo_trofico.macrobentivori) +
-                specie.peso as f32 * (specie.specie.gruppo_trofico.iperbentivori)
+                specie.peso as f32 * (specie.specie.gruppo_trofico.macrobentivori)
             }
             _ => {}
         }
