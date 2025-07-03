@@ -15,6 +15,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+use once_cell::sync::Lazy;
+
 use crate::domain::location::Location;
 
 #[derive(Debug, Clone)]
@@ -360,7 +362,12 @@ pub(crate) const RIFERIMENTO_HFBI: [SpecieHFBI; 31] = [
         onnivori: 0.0
     } },
 ];
-use std::fmt;
+
+
+
+
+
+use std::{collections::HashMap, fmt};
 
 #[derive(Debug, Clone)]
 pub(crate) struct RecordHFBI {
@@ -401,7 +408,7 @@ impl CampionamentoHFBI {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub(crate) enum TipoLagunaCostieraHFBI {
     MAt1,
     MAt2,
@@ -433,7 +440,7 @@ impl TryFrom<i32> for TipoLagunaCostieraHFBI {
 }
 
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub(crate) enum StagioneHFBI {
     Primavera,
     Autunno
@@ -462,7 +469,7 @@ impl TryFrom<i32> for StagioneHFBI {
 }
 
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Eq, Hash)]
 pub(crate) enum HabitatHFBI {
     Vegetato,
     NonVegetato
@@ -510,6 +517,14 @@ impl AnagraficaHFBI {
   pub(crate) fn get_larghezza_media(&self) -> f32 {
     self.larghezza_media_transetto
   }
+
+  pub(crate) fn get_cond_riferimento_key(&self) -> CondizioniRiferimentoKeyHFBI {
+    return CondizioniRiferimentoKeyHFBI {
+        tipo_laguna: self.tipo_laguna.clone(),
+        stagione: self.stagione.clone(),
+        habitat_vegetato: self.habitat_vegetato.clone()
+    }
+  }
 }
 
 impl fmt::Display for AnagraficaHFBI {
@@ -530,3 +545,235 @@ impl RisultatoHFBI {
         self.valore
     }
 }
+
+#[derive(Hash)]
+pub(crate) struct CondizioniRiferimentoKeyHFBI {
+    pub(crate) tipo_laguna: TipoLagunaCostieraHFBI,
+    pub(crate) stagione: StagioneHFBI,
+    pub(crate) habitat_vegetato: HabitatHFBI,
+}
+
+
+impl PartialEq for CondizioniRiferimentoKeyHFBI {
+    fn eq(&self, other: &Self) -> bool {
+        self.habitat_vegetato == other.habitat_vegetato &&
+        self.stagione == other.stagione &&
+        self.tipo_laguna == other.tipo_laguna
+    }
+}
+
+impl Eq for CondizioniRiferimentoKeyHFBI {}
+
+#[derive(Clone)]
+pub(crate) struct CondizioniRiferimentoHFBI {
+  pub(crate) bn: f32,
+  pub(crate) ddom: f32,
+  pub(crate) dmig: f32,
+  pub(crate) bbent: f32,
+  pub(crate) dbent: f32,
+  pub(crate) dhzp: f32,
+}
+
+impl CondizioniRiferimentoHFBI {
+    pub(crate) fn get_cond_riferimento(anagrafica: AnagraficaHFBI) -> Option<&'static CondizioniRiferimentoHFBI> {
+        let key = anagrafica.get_cond_riferimento_key();
+        return CONDIZIONI_RIFERIMENTO_HFBI_HASHMAP.get(&key);
+    }
+}
+
+
+static CONDIZIONI_RIFERIMENTO_HFBI_HASHMAP: Lazy<HashMap<CondizioniRiferimentoKeyHFBI, CondizioniRiferimentoHFBI>> = Lazy::new(|| {
+    let map = HashMap::from([
+        // M-AT-1 data
+        (
+            CondizioniRiferimentoKeyHFBI {
+                tipo_laguna: TipoLagunaCostieraHFBI::MAt1,
+                stagione: StagioneHFBI::Primavera,
+                habitat_vegetato: HabitatHFBI::NonVegetato,
+            },
+            CondizioniRiferimentoHFBI {
+                bn: 2.232,
+                ddom: 2.052,
+                dmig: 3.212,
+                bbent: 6.537,
+                dbent: 3.768,
+                dhzp: 2.856,
+            },
+        ),
+        (
+            CondizioniRiferimentoKeyHFBI {
+                tipo_laguna: TipoLagunaCostieraHFBI::MAt1,
+                stagione: StagioneHFBI::Autunno,
+                habitat_vegetato: HabitatHFBI::NonVegetato,
+            },
+            CondizioniRiferimentoHFBI {
+                bn: 1.932,
+                ddom: 2.268,
+                dmig: 2.014,
+                bbent: 6.867,
+                dbent: 2.944,
+                dhzp: 2.570,
+            },
+        ),
+        (
+            CondizioniRiferimentoKeyHFBI {
+                tipo_laguna: TipoLagunaCostieraHFBI::MAt1,
+                stagione: StagioneHFBI::Primavera,
+                habitat_vegetato: HabitatHFBI::Vegetato,
+            },
+            CondizioniRiferimentoHFBI {
+                bn: 2.232,
+                ddom: 1.784,
+                dmig: 3.212,
+                bbent: 7.242,
+                dbent: 3.153,
+                dhzp: 2.369,
+            },
+        ),
+        (
+            CondizioniRiferimentoKeyHFBI {
+                tipo_laguna: TipoLagunaCostieraHFBI::MAt1,
+                stagione: StagioneHFBI::Autunno,
+                habitat_vegetato: HabitatHFBI::Vegetato,
+            },
+            CondizioniRiferimentoHFBI {
+                bn: 1.932,
+                ddom: 2.001,
+                dmig: 2.014,
+                bbent: 7.572,
+                dbent: 2.329,
+                dhzp: 2.083,
+            },
+        ),
+    
+        // M-AT-2 data
+        (
+            CondizioniRiferimentoKeyHFBI {
+                tipo_laguna: TipoLagunaCostieraHFBI::MAt2,
+                stagione: StagioneHFBI::Primavera,
+                habitat_vegetato: HabitatHFBI::NonVegetato,
+            },
+            CondizioniRiferimentoHFBI {
+                bn: 2.539,
+                ddom: 2.052,
+                dmig: 3.212,
+                bbent: 5.221,
+                dbent: 3.768,
+                dhzp: 2.856,
+            },
+        ),
+        (
+            CondizioniRiferimentoKeyHFBI {
+                tipo_laguna: TipoLagunaCostieraHFBI::MAt2,
+                stagione: StagioneHFBI::Autunno,
+                habitat_vegetato: HabitatHFBI::NonVegetato,
+            },
+            CondizioniRiferimentoHFBI {
+                bn: 2.238,
+                ddom: 2.268,
+                dmig: 2.014,
+                bbent: 5.551,
+                dbent: 2.944,
+                dhzp: 2.570,
+            },
+        ),
+        (
+            CondizioniRiferimentoKeyHFBI {
+                tipo_laguna: TipoLagunaCostieraHFBI::MAt2,
+                stagione: StagioneHFBI::Primavera,
+                habitat_vegetato: HabitatHFBI::Vegetato,
+            },
+            CondizioniRiferimentoHFBI {
+                bn: 2.539,
+                ddom: 1.784,
+                dmig: 3.212,
+                bbent: 5.925,
+                dbent: 3.153,
+                dhzp: 2.369,
+            },
+        ),
+        (
+            CondizioniRiferimentoKeyHFBI {
+                tipo_laguna: TipoLagunaCostieraHFBI::MAt2,
+                stagione: StagioneHFBI::Autunno,
+                habitat_vegetato: HabitatHFBI::Vegetato,
+            },
+            CondizioniRiferimentoHFBI {
+                bn: 2.238,
+                ddom: 2.001,
+                dmig: 2.014,
+                bbent: 6.255,
+                dbent: 2.329,
+                dhzp: 2.083,
+            },
+        ),
+    
+        // M-AT-3 data
+        (
+            CondizioniRiferimentoKeyHFBI {
+                tipo_laguna: TipoLagunaCostieraHFBI::MAt3,
+                stagione: StagioneHFBI::Primavera,
+                habitat_vegetato: HabitatHFBI::NonVegetato,
+            },
+            CondizioniRiferimentoHFBI {
+                bn: 2.217,
+                ddom: 2.052,
+                dmig: 3.212,
+                bbent: 4.561,
+                dbent: 3.768,
+                dhzp: 2.856,
+            },
+        ),
+        (
+            CondizioniRiferimentoKeyHFBI {
+                tipo_laguna: TipoLagunaCostieraHFBI::MAt3,
+                stagione: StagioneHFBI::Autunno,
+                habitat_vegetato: HabitatHFBI::NonVegetato,
+            },
+            CondizioniRiferimentoHFBI {
+                bn: 1.917,
+                ddom: 2.268,
+                dmig: 2.014,
+                bbent: 4.891,
+                dbent: 2.944,
+                dhzp: 2.570,
+            },
+        ),
+        (
+            CondizioniRiferimentoKeyHFBI {
+                tipo_laguna: TipoLagunaCostieraHFBI::MAt3,
+                stagione: StagioneHFBI::Primavera,
+                habitat_vegetato: HabitatHFBI::Vegetato,
+            },
+            CondizioniRiferimentoHFBI {
+                bn: 2.217,
+                ddom: 1.784,
+                dmig: 3.212,
+                bbent: 5.265,
+                dbent: 3.153,
+                dhzp: 2.369,
+            },
+        ),
+        (
+            CondizioniRiferimentoKeyHFBI {
+                tipo_laguna: TipoLagunaCostieraHFBI::MAt3,
+                stagione: StagioneHFBI::Autunno,
+                habitat_vegetato: HabitatHFBI::Vegetato,
+            },
+            CondizioniRiferimentoHFBI {
+                bn: 1.917,
+                ddom: 2.001,
+                dmig: 2.014,
+                bbent: 5.595,
+                dbent: 2.329,
+                dhzp: 2.083,
+            },
+        )
+    ]);
+
+    map
+});
+
+
+
+
