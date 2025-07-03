@@ -17,22 +17,47 @@
 
 use crate::domain::hfbi::{CampionamentoHFBI, AnagraficaHFBI, GruppoEcoHFBI};
 
-pub(crate) fn calc_dhzp(campione: CampionamentoHFBI, anagrafica: AnagraficaHFBI) -> f32 {
+pub(crate) fn calc_dhzp(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
     let mut shzp = 0.0;
-    let mut bhzp = 0.0;
-    for specie in campione.campionamento {
+    let bhzp = calc_bhzp(&campione, &anagrafica);
+    for specie in &campione.campionamento {
         match specie.specie.gruppo_eco {
             GruppoEcoHFBI::Diadromi
             | GruppoEcoHFBI::MigratoriMarini
             | GruppoEcoHFBI::ResidentiDiEstuario => {
                 shzp += specie.specie.gruppo_trofico.iperbentivori;
-                let density_factor = (100 * specie.peso) as f32 /
-                (anagrafica.lunghezza_media_transetto * anagrafica.larghezza_media_transetto);
-                bhzp += specie.peso as f32 * density_factor;
             }
             _ => {}
         }
     }
 
-    ((shzp - 0.2) / bhzp.ln() + 1.0).ln()
+    let epsilon: f32 = 1e-6;
+    if shzp.abs() < epsilon {
+        return 0.0;
+    }
+
+    if (shzp - 0.2).abs() < epsilon {
+        return 0.01;
+    }
+
+    (((shzp - 0.2) / bhzp) + 1.0).ln()
+}
+
+
+fn calc_bhzp(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
+    let mut biohzp = 0.0;
+    for specie in &campione.campionamento {
+        match specie.specie.gruppo_eco {
+            GruppoEcoHFBI::Diadromi
+            | GruppoEcoHFBI::MigratoriMarini
+            | GruppoEcoHFBI::ResidentiDiEstuario => {
+            biohzp += specie.peso as f32 * (specie.specie.gruppo_trofico.iperbentivori)
+            }
+            _ => {}
+        }
+    }
+
+    let area = anagrafica.lunghezza_media_transetto * anagrafica.larghezza_media_transetto;
+
+    ((biohzp / area) * 100.0 + 1.0).ln()
 }

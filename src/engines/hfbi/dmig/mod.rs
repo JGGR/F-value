@@ -15,23 +15,51 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::domain::hfbi::{CampionamentoHFBI, AnagraficaHFBI, GruppoEcoHFBI};
+use std::collections::{hash_map::Entry, HashMap};
 
-pub(crate) fn calc_dmig(campione: CampionamentoHFBI, anagrafica: AnagraficaHFBI) -> f32 {
-    let mut smig = 0;
-    let mut bmig = 0.0;
-    for specie in campione.campionamento {
+use crate::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI, GruppoEcoHFBI, SpecieHFBI};
+
+pub(crate) fn calc_dmig(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
+    let bmig = calc_bmig(&campione, &anagrafica);
+
+    let mut specie_map: HashMap<String, SpecieHFBI> = HashMap::with_capacity(10);
+    // trovo il numero di specie trovate
+    for cattura in &campione.campionamento {
+        match cattura.specie.gruppo_eco {
+            GruppoEcoHFBI::Diadromi
+            | GruppoEcoHFBI::MigratoriMarini => {
+                specie_map.insert(cattura.specie.codice_specie.to_string(), cattura.specie.clone());
+            },
+            _ => {}
+        }
+    }
+
+    let smig = specie_map.len();
+
+    if smig == 0 {
+        return 0.0;
+    }
+
+    if smig == 1 {
+        return 0.01;
+    }
+
+    (((smig as f32 - 1.0) / bmig) + 1.0).ln()
+}
+
+fn calc_bmig(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
+    let mut biomig = 0.0;
+    for specie in &campione.campionamento {
         match specie.specie.gruppo_eco {
             GruppoEcoHFBI::Diadromi
             | GruppoEcoHFBI::MigratoriMarini => {
-                smig += 1;
-                let density_factor = (100 * specie.peso) as f32 /
-                (anagrafica.lunghezza_media_transetto * anagrafica.larghezza_media_transetto);
-                bmig += specie.peso as f32 * density_factor;
+                biomig += specie.peso as f32
             }
             _ => {}
         }
     }
 
-    ((smig - 1) as f32 / bmig.ln() + 1.0).ln()
+    let area = anagrafica.lunghezza_media_transetto * anagrafica.larghezza_media_transetto;
+
+    ((biomig / area) * 100.0 +1.0).ln()
 }
