@@ -1389,22 +1389,22 @@ impl View for SelezioneInfoAggiuntiveView {
 impl SelezioneInfoAggiuntiveView {
 
     pub(crate) fn new() -> Self {
-        let codice_stazione_buffer = String::from("");
-        let corpo_idrico_buffer = String::from("");
+        let codice_stazione_buffer = String::with_capacity(250);
+        let corpo_idrico_buffer = String::with_capacity(250);
 
-        let provincia_buffer = String::from("");
+        let provincia_buffer = String::with_capacity(250);
 
-        let data_buffer = String::from("");
+        let data_buffer = String::with_capacity(25);
 
-        let lunghezza_stazione_buffer = String::from("");
+        let lunghezza_stazione_buffer = String::with_capacity(250);
 
-        let larghezza_stazione_buffer = String::from("");
+        let larghezza_stazione_buffer = String::with_capacity(250);
 
-        let fonte_comunit_buffer = String::from("");
+        let fonte_comunit_buffer = String::with_capacity(250);
 
-        let protocollo_comunit_buffer = String::from("");
+        let protocollo_comunit_buffer = String::with_capacity(250);
 
-        let bacino_buffer = String::from("");
+        let bacino_buffer = String::with_capacity(250);
 
         Self {
             textbox_codice_stazione_edit_mode: false,
