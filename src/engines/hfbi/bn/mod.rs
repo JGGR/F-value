@@ -17,10 +17,10 @@
 
 use crate::domain::hfbi::{CampionamentoHFBI};
 
-pub(crate) fn calc_bn(campione: CampionamentoHFBI) -> f32 {
+pub(crate) fn calc_bn(campione: &CampionamentoHFBI) -> f32 {
     let mut b = 0.0;
     let mut n = 0.0;
-    for specie in campione.campionamento {
+    for specie in &campione.campionamento {
         b += specie.peso as f32;
         n += 1.0;
     }

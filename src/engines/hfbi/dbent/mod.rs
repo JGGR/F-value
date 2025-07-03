@@ -15,25 +15,32 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::domain::hfbi::{CampionamentoHFBI, AnagraficaHFBI, GruppoEcoHFBI};
+use crate::{domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI, GruppoEcoHFBI}, engines::hfbi::bbent::calc_bbent};
 
-pub(crate) fn calc_dbent(campione: CampionamentoHFBI, anagrafica: AnagraficaHFBI) -> f32 {
+pub(crate) fn calc_dbent(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
     let mut sbent = 0.0;
-    let mut bbent = 0.0;
-    for specie in campione.campionamento {
+    let bbent = calc_bbent(&campione, &anagrafica);
+    for specie in &campione.campionamento {
         match specie.specie.gruppo_eco {
             GruppoEcoHFBI::Diadromi
             | GruppoEcoHFBI::MigratoriMarini
             | GruppoEcoHFBI::ResidentiDiEstuario => {
                 sbent += specie.specie.gruppo_trofico.microbentivori;
                 sbent += specie.specie.gruppo_trofico.macrobentivori;
-                let density_factor = (100 * specie.peso) as f32 /
-                (anagrafica.lunghezza_media_transetto * anagrafica.larghezza_media_transetto);
-                bbent += specie.peso as f32 * density_factor;
+                sbent += specie.specie.gruppo_trofico.iperbentivori;
             }
             _ => {}
         }
     }
 
-    ((sbent - 1.0) / bbent.ln() + 1.0).ln()
+    let epsilon: f32 = 1e-6;
+    if sbent.abs() < epsilon {
+        return 0.0;
+    }
+
+    if (sbent - 0.2).abs() < epsilon {
+        return 0.01;
+    }
+
+    (((sbent - 0.2) / bbent) + 1.0).ln()
 }
