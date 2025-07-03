@@ -15,17 +15,14 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::domain::hfbi::{CampionamentoHFBI, AnagraficaHFBI, GruppoEcoHFBI};
+use crate::domain::hfbi::{CampionamentoHFBI};
 
-pub(crate) fn calc_bn(campione: CampionamentoHFBI, anagrafica: AnagraficaHFBI) -> f32 {
+pub(crate) fn calc_bn(campione: CampionamentoHFBI) -> f32 {
     let mut b = 0.0;
     let mut n = 0.0;
     for specie in campione.campionamento {
-        let density_factor = (100 * specie.peso) as f32 /
-        (anagrafica.lunghezza_media_transetto * anagrafica.larghezza_media_transetto);
-        b += specie.peso as f32 * density_factor;
-        n += 1.0 * density_factor;
+        b += specie.peso as f32;
+        n += 1.0;
     }
-
     ((b / n) +1.0).ln()
 }
