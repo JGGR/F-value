@@ -15,12 +15,12 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use std::collections::{hash_map::Entry, HashMap};
+use std::collections::{HashMap};
 
 use crate::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI, GruppoEcoHFBI, SpecieHFBI};
 
 pub(crate) fn calc_dmig(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
-    let bmig = calc_bmig(&campione, &anagrafica);
+    let bmig = calc_bmig(campione, anagrafica);
 
     let mut specie_map: HashMap<String, SpecieHFBI> = HashMap::with_capacity(10);
     // trovo il numero di specie trovate

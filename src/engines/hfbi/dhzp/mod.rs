@@ -19,7 +19,7 @@ use crate::domain::hfbi::{CampionamentoHFBI, AnagraficaHFBI, GruppoEcoHFBI};
 
 pub(crate) fn calc_dhzp(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
     let mut shzp = 0.0;
-    let bhzp = calc_bhzp(&campione, &anagrafica);
+    let bhzp = calc_bhzp(campione, anagrafica);
     for specie in &campione.campionamento {
         match specie.specie.gruppo_eco {
             GruppoEcoHFBI::Diadromi
