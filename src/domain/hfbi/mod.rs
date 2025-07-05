@@ -540,7 +540,23 @@ pub(crate) struct RisultatoHFBI {
   valore: Option<f32>,
 }
 
+impl fmt::Display for RisultatoHFBI {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    let valore_str = match self.valore {
+        Some(v) => format!("{v}"),
+        None => "NC".to_string()
+    };
+    let string_representation = format!("RisultatoHFBI: {{ valore HFBI: {{{}}} }}", valore_str);
+    write!(f, "{}", string_representation)
+  }
+}
+
 impl RisultatoHFBI {
+    pub(crate) fn new(valore: Option<f32>) -> Self {
+        Self {
+            valore,
+        }
+    }
     pub(crate) fn get_valore(&self) -> Option<f32> {
         self.valore
     }
@@ -645,7 +661,7 @@ static CONDIZIONI_RIFERIMENTO_HFBI_HASHMAP: Lazy<HashMap<CondizioniRiferimentoKe
                 dhzp: 2.083,
             },
         ),
-    
+
         // M-AT-2 data
         (
             CondizioniRiferimentoKeyHFBI {
@@ -707,7 +723,7 @@ static CONDIZIONI_RIFERIMENTO_HFBI_HASHMAP: Lazy<HashMap<CondizioniRiferimentoKe
                 dhzp: 2.083,
             },
         ),
-    
+
         // M-AT-3 data
         (
             CondizioniRiferimentoKeyHFBI {
