@@ -575,7 +575,7 @@ pub(crate) struct CondizioniRiferimentoHFBI {
 }
 
 impl CondizioniRiferimentoHFBI {
-    pub(crate) fn get_cond_riferimento(anagrafica: AnagraficaHFBI) -> Option<&'static CondizioniRiferimentoHFBI> {
+    pub(crate) fn get_cond_riferimento(anagrafica: &AnagraficaHFBI) -> Option<&'static CondizioniRiferimentoHFBI> {
         let key = anagrafica.get_cond_riferimento_key();
         return CONDIZIONI_RIFERIMENTO_HFBI_HASHMAP.get(&key);
     }
