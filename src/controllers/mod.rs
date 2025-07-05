@@ -529,8 +529,9 @@ impl FileInputController {
                     //self.get_data_riferimento_niseci() and we chill.
                     let records_check = check_records_campionamento_hfbi(records);
                     match records_check {
-                        Ok(campioni) => {
+                        Ok(mut campioni) => {
                             self.add_console_message("FileInputController:  Validazione CampionamentoHFBI completata!".to_string());
+                            campioni.sort_by(|a, b| b.peso.cmp(&a.peso));
                             let campionamento = CampionamentoHFBI::new(campioni);
                             self.set_data_campionamento_hfbi(campionamento);
                         }
