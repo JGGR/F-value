@@ -13,7 +13,7 @@ const W_DHZP: f32 = 0.84;
 
 // MAGIC CONST
 const HFBI_T: f32 = -0.167;
-const HFBI_S: f32 = -0.150;
+const HFBI_S: f32 = 0.150;
 
 
 
