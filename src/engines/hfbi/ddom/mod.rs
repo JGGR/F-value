@@ -15,10 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use std::collections::{hash_map::Entry, HashMap};
-
 use crate::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI};
-
 
 pub(crate) fn calc_ddom(campionamento: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
 

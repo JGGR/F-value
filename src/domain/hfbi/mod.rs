@@ -24,7 +24,9 @@ pub(crate) enum GruppoEcoHFBI {
     MigratoriMarini,
     Diadromi,
     ResidentiDiEstuario,
+    #[allow(dead_code)]
     OccasionaliMarini,
+    #[allow(dead_code)]
     OccasionaliDiAcqueDolci
 }
 
@@ -568,7 +570,7 @@ impl fmt::Display for RisultatoHFBI {
         Some(v) => format!("{v}"),
         None => "NC".to_string()
     };
-    let string_representation = format!("RisultatoHFBI: {{ valore HFBI: {{{}}} }}", valore_str);
+    let string_representation = format!("RisultatoHFBI: {{ valore HFBI: {{{}}}, intermediates: {{{}}} }}", valore_str, self.intermediates);
     write!(f, "{}", string_representation)
   }
 }
@@ -583,7 +585,7 @@ impl RisultatoHFBI {
     pub(crate) fn get_valore(&self) -> Option<f32> {
         self.valore
     }
-    pub(crate) fn get_intermediates(&self) -> ValoriIntermediHFBI {
+    pub(crate) fn _get_intermediates(&self) -> ValoriIntermediHFBI {
         self.intermediates.clone()
     }
 }
