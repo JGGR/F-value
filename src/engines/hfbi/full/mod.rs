@@ -1,4 +1,4 @@
-use crate::{domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI, CondizioniRiferimentoHFBI}, engines::hfbi::{bbent::calc_bbent, bn::calc_bn, dbent::calc_dbent, ddom::calc_ddom, dhzp::calc_dhzp, dmig::calc_dmig}};
+use crate::{domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI, CondizioniRiferimentoHFBI, ValoriIntermediHFBI}, engines::hfbi::{bbent::calc_bbent, bn::calc_bn, dbent::calc_dbent, ddom::calc_ddom, dhzp::calc_dhzp, dmig::calc_dmig}};
 
 
 
@@ -17,12 +17,12 @@ const HFBI_S: f32 = 0.150;
 
 
 
-pub(crate) fn calculate_mmi(campionamento: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> Result<f32, String> {
+pub(crate) fn calculate_mmi(campionamento: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> Result<(f32, ValoriIntermediHFBI), String> {
   let condizioni_riferimento = match CondizioniRiferimentoHFBI::get_cond_riferimento(anagrafica) {
     Some(cond) => cond,
     None => return Err(String::from("Errore condizioni di riferimento non trovate")),
   };
-  
+
   let bbent: f32 = calc_bbent(campionamento, anagrafica);
   let bn: f32 = calc_bn(campionamento);
   let dbent: f32 = calc_dbent(campionamento, anagrafica);
@@ -41,20 +41,28 @@ pub(crate) fn calculate_mmi(campionamento: &CampionamentoHFBI, anagrafica: &Anag
   let weighted_rqe_ddom = W_DDOM * rqe_ddom;
   let weighted_rqe_dhzp = W_DHZP * rqe_dhzp;
   let weighted_rqe_dmig = W_DMIG * rqe_dmig;
-  
-  
+
+
   let weighted_rqe_sum = weighted_rqe_ddom + weighted_rqe_bn + weighted_rqe_dmig + weighted_rqe_bbent + weighted_rqe_dbent + weighted_rqe_dhzp;
   let weight_sum = W_DDOM + W_BN + W_DMIG + W_BBENT + W_DBENT + W_DHZP;
 
   let mmi = weighted_rqe_sum / weight_sum;
 
-  Ok(mmi)
+  let intermediates = ValoriIntermediHFBI {
+    bbent,
+    bn,
+    dbent,
+    ddom,
+    dhzp,
+    dmig
+  };
+  Ok((mmi, intermediates))
 }
 
 
-pub(crate) fn calculate_hfbi(campionamento: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> Result<f32, String> {
+pub(crate) fn calculate_hfbi(campionamento: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> Result<(f32, ValoriIntermediHFBI), String> {
   match calculate_mmi(campionamento, anagrafica) {
-    Ok(mmi) => Ok((mmi + HFBI_T) / HFBI_S),
+    Ok((mmi, intermediates)) => Ok(((mmi + HFBI_T) / HFBI_S, intermediates)),
     Err(error) => Err(error)
   }
 }

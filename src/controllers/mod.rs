@@ -1320,10 +1320,12 @@ impl OutputController {
             let anagrafica = anagrafica.expect("calc_hfbi() checked is_none() before");
 
             match calculate_hfbi(&campionamento, &anagrafica) {
-                Ok(hfbi) => {
+                Ok((hfbi, intermediates)) => {
                     self.add_console_message(format!("HFBI: {hfbi}"));
+                    self.add_console_message(format!("intermediates: {intermediates}"));
                     let risultato_hfbi = RisultatoHFBI::new(
                         Some(hfbi),
+                        intermediates
                     );
 
                     self.set_data_risultato_hfbi(risultato_hfbi);

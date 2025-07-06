@@ -536,8 +536,30 @@ impl fmt::Display for AnagraficaHFBI {
 }
 
 #[derive(Clone)]
+pub(crate) struct ValoriIntermediHFBI {
+    pub(crate) bbent: f32,
+    pub(crate) bn: f32,
+    pub(crate) dbent: f32,
+    pub(crate) ddom: f32,
+    pub(crate) dhzp: f32,
+    pub(crate) dmig: f32,
+}
+
+impl fmt::Display for ValoriIntermediHFBI {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    let mut string_representation = format!("bbent: {}, bn: {}, dbent: {}, ddom: {}, dhzp: {}, dmig: {}",
+        self.bbent, self.bn, self.dbent,
+        self.ddom, self.dhzp, self.dmig);
+
+    string_representation = format!("{}\n", string_representation);
+    write!(f, "{}", string_representation)
+  }
+}
+
+#[derive(Clone)]
 pub(crate) struct RisultatoHFBI {
   valore: Option<f32>,
+  intermediates: ValoriIntermediHFBI
 }
 
 impl fmt::Display for RisultatoHFBI {
@@ -552,13 +574,17 @@ impl fmt::Display for RisultatoHFBI {
 }
 
 impl RisultatoHFBI {
-    pub(crate) fn new(valore: Option<f32>) -> Self {
+    pub(crate) fn new(valore: Option<f32>, intermediates: ValoriIntermediHFBI) -> Self {
         Self {
             valore,
+            intermediates
         }
     }
     pub(crate) fn get_valore(&self) -> Option<f32> {
         self.valore
+    }
+    pub(crate) fn get_intermediates(&self) -> ValoriIntermediHFBI {
+        self.intermediates.clone()
     }
 }
 
