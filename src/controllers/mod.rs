@@ -28,7 +28,7 @@ use crate::domain::{index::Indice, niseci::{RiferimentoNISECI, CampionamentoNISE
 use crate::state::GLOBAL_STATE;
 use crate::engines::niseci::full::{calculate_niseci, calculate_rqe_niseci, calculate_stato_ecologico};
 use crate::engines::hfbi::full::calculate_hfbi;
-use crate::core::pdf::esporta_pdf_niseci;
+use crate::core::pdf::{esporta_pdf_niseci, esporta_pdf_hfbi};
 
 #[cfg(feature="logged")]
 use log::info;
@@ -1346,6 +1346,17 @@ impl OutputController {
         }
     }
 
+    pub(crate) fn esporta_pdf_hfbi(&self, export_path: PathBuf) {
+
+        self.add_console_message(format!("Esportazione pdf in {}", export_path.display()));
+
+        let risultato_hfbi = self.get_data_risultato_hfbi().expect("Failed calculating HFBI before requesting export");
+
+        let anagrafica_hfbi = self.get_data_anagrafica_hfbi().expect("Failed getting AnagraficaHFBI before requesting export");
+
+        esporta_pdf_hfbi(export_path, anagrafica_hfbi, risultato_hfbi);
+    }
+
     pub(crate) fn user_confirm_calc(&self) {
         let mut state = GLOBAL_STATE.lock().unwrap();
 
@@ -1375,6 +1386,11 @@ impl OutputController {
         } else {
             None
         }
+    }
+
+    pub(crate) fn get_data_anagrafica_hfbi(&self) -> Option<AnagraficaHFBI> {
+        let state = GLOBAL_STATE.lock().unwrap();
+        state.data_model.get_anagrafica_hfbi()
     }
 
     fn set_data_risultato_hfbi(&self, risultato: RisultatoHFBI) {

@@ -1916,7 +1916,7 @@ impl View for ProduzionePDFView {
                         controller.esporta_pdf_niseci(filepath);
                     }
                     Indice::Hfbi => {
-                        todo!("Implement controller.esporta_pdf_hfbi()");
+                        controller.esporta_pdf_hfbi(filepath);
                     }
                 }
             } else {

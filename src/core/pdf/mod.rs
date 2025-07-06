@@ -19,6 +19,7 @@ use std::path::PathBuf;
 use crate::PROJECT_LOGO_DATA;
 use crate::domain::niseci::{RiferimentoNISECI, AnagraficaNISECI, RisultatoNISECI, SpecieNISECI};
 use crate::engines::niseci::full::calculate_stato_ecologico;
+use crate::domain::hfbi::{AnagraficaHFBI, RisultatoHFBI};
 use pdf_writer::{Content, Finish, Name, Pdf, Rect, Ref, Str, Filter, Chunk};
 use image::{ColorType, GenericImageView, ImageFormat};
 use miniz_oxide::deflate::{compress_to_vec_zlib, CompressionLevel};
@@ -377,4 +378,276 @@ pub(crate) fn esporta_pdf_niseci(export_path: PathBuf, riferimento_niseci: Rifer
             eprintln!("Failed writing pdf to {}: {}", export_path.display(), e);
         }
     }
+}
+
+pub(crate) fn esporta_pdf_hfbi(export_path: PathBuf, anagrafica_hfbi: AnagraficaHFBI, risultato_hfbi: RisultatoHFBI) {
+
+    let valore_hfbi = match risultato_hfbi.get_valore() {
+        Some(v) => { &format!("{}", v) }
+        None => { "NC" }
+    };
+    // Define an ID allocator. Every time we need a new object, we just call
+    // `alloc.bump()`, which increases `alloc` by one and returns its previous
+    // value.
+    let mut alloc = Ref::new(1);
+
+    // Start writing.
+    let mut pdf = Pdf::new();
+
+    // Create a secondary chunk for parallel writing. This will allows us to
+    // write stuff while we're also holding a mutable reference to the main
+    // writer.
+    let mut secondary = Chunk::new();
+
+    // Define some indirect reference ids we'll use.
+    let page_tree_id = alloc.bump();
+
+    let mut page_ids = vec![];
+
+    let image_id = alloc.bump();
+    let image_name = Name(b"I1");
+
+    let s_mask_id = alloc.bump();
+
+    // Decode the image.
+    let format = image::guess_format(&PROJECT_LOGO_DATA).unwrap();
+    let dynamic = image::load_from_memory(&PROJECT_LOGO_DATA).unwrap();
+
+    let (filter, encoded, mask) = match format {
+        // A JPEG is already valid DCT-encoded data.
+        ImageFormat::Jpeg => {
+            assert!(dynamic.color() == ColorType::Rgb8);
+            (Filter::DctDecode, PROJECT_LOGO_DATA.to_vec(), None)
+        }
+
+        // While PNGs uses deflate internally, we need to re-encode to get just
+        // the raw coded samples without metadata. Also, we need to encode the
+        // RGB and alpha data separately.
+        ImageFormat::Png => {
+            let level = CompressionLevel::DefaultLevel as u8;
+            let encoded = compress_to_vec_zlib(dynamic.to_rgb8().as_raw(), level);
+
+            // If there's an alpha channel, extract the pixel alpha values.
+            let mask = dynamic.color().has_alpha().then(|| {
+                let alphas: Vec<_> = dynamic.pixels().map(|p| (p.2).0[3]).collect();
+                compress_to_vec_zlib(&alphas, level)
+            });
+
+            (Filter::FlateDecode, encoded, mask)
+        }
+
+        // You could handle other image formats similarly or just recode them to
+        // JPEG or PNG, whatever best fits your use case.
+        _ => panic!("unsupported image format"),
+    };
+
+    // Write the stream for the image we want to embed.
+    {
+        let mut image = pdf.image_xobject(image_id, &encoded);
+        image.filter(filter);
+        image.width(dynamic.width() as i32);
+        image.height(dynamic.height() as i32);
+        image.color_space().device_rgb();
+        image.bits_per_component(8);
+        if mask.is_some() {
+            image.s_mask(s_mask_id);
+        }
+        image.finish();
+    }
+
+    {
+        // Add SMask if the image has transparency.
+        if let Some(encoded) = &mask {
+            let mut s_mask = pdf.image_xobject(s_mask_id, encoded);
+            s_mask.filter(filter);
+            s_mask.width(dynamic.width() as i32);
+            s_mask.height(dynamic.height() as i32);
+            s_mask.color_space().device_gray();
+            s_mask.bits_per_component(8);
+        }
+    }
+
+    let a4 = Rect::new(0.0, 0.0, 595.0, 842.0);
+
+    // Size the image at 1pt per pixel.
+    let w = (dynamic.width() / 6) as f32;
+    let h = (dynamic.height() / 6) as f32;
+
+    // Center the image on the page.
+    let x = (a4.x2 - w) / 2.0;
+    let y = (a4.y2 - h) / 2.0;
+
+
+    // Page 1
+    let page_id = alloc.bump();
+    page_ids.push(page_id);
+
+    let font_id = alloc.bump();
+    let font_name = Name(b"F1");
+
+    // Table geometry
+    let height = 842.0;
+    let cell_width = 240.0;
+    let cell_height = 30.0;
+    let cols = 2;
+    let rows = 1;
+    let x_start = 58.0;
+    let y_start = height - 88.0;
+
+
+    {
+        // Write a page.
+        let mut page = pdf.page(page_id);
+
+        // Set the size to A4 (measured in points) using `media_box` and set the
+        // text object we'll write later as the page's contents.
+        page.media_box(a4);
+        page.parent(page_tree_id);
+
+        //let annotation_id = Ref::new(6);
+
+
+        //page.annotations([annotation_id]);
+
+        // We also need to specify which resources the page needs, which in our case
+        // is only a font that we name "F1" (the specific name doesn't matter).
+        {
+            let mut resources = page.resources();
+            resources.fonts().pair(font_name, font_id);
+            resources.x_objects().pair(image_name, image_id);
+        }
+
+        // Write a line of text, with the font specified in the resource list
+        // before, at a font size of 14.0, starting at coordinates (58.0, 734.0)
+        // measured from the bottom left of the page.
+        //
+        // Because we haven't specified any encoding when writing the Type 1 font,
+        // the standard encoding is used which happens to work with most ASCII
+        // characters.
+        let mut content = Content::new();
+
+        content.save_state();
+        content.begin_text();
+        content.set_font(font_name, 14.0);
+        content.next_line(58.0, 734.0);
+        content.show(Str(&format!("Hfbi: {}", valore_hfbi).into_bytes()));
+        content.end_text();
+        content.restore_state();
+
+        content.set_line_width(1.0);
+
+        // Horizontal lines
+        for row in 0..=rows {
+            let y = y_start - (row as f32 * cell_height);
+            content.move_to(x_start, y);
+            content.line_to(x_start + (cols as f32 * cell_width), y);
+            content.stroke();
+        }
+
+        content.save_state();
+        content.transform([w, 0.0, 0.0, h, x, y]);
+        content.x_object(image_name);
+        content.restore_state();
+
+        //This can be used to debug the content before streaming it
+        //let content_bytes = content.finish();
+        //println!("{}", String::from_utf8_lossy(&content_bytes));
+        //pdf.stream(content_id, &content_bytes);
+
+        let content_id = alloc.bump();
+        secondary.stream(content_id, &content.finish());
+        page.contents(content_id);
+    }
+
+    // Page 2
+    let page2_id = alloc.bump();
+    page_ids.push(page2_id);
+
+    {
+        // Add page 2
+        let mut page2 = pdf.page(page2_id);
+        page2.media_box(a4);
+        page2.parent(page_tree_id);
+        {
+            let mut resources = page2.resources();
+            resources.fonts().pair(font_name, font_id);
+            resources.x_objects().pair(image_name, image_id);
+        }
+
+        // Content for page 2
+        let mut content2 = Content::new();
+
+        content2.begin_text();
+        content2.set_font(font_name, 14.0);
+        content2.set_leading(30.0);
+        content2.next_line(58.0, 764.0);
+        content2.show(Str(&format!("Tipo laguna: {}", anagrafica_hfbi.tipo_laguna).into_bytes()));
+        content2.next_line(0.0, -30.0);
+        content2.show(Str(&format!("Codice stazione: {}", anagrafica_hfbi.codice_stazione).into_bytes()));
+        content2.next_line(0.0, -30.0);
+        content2.show(Str(&format!("Data: {}", anagrafica_hfbi.date_string).into_bytes()));
+        content2.next_line(0.0, -30.0);
+        content2.show(Str(&format!("Stagione: {}", anagrafica_hfbi.stagione).into_bytes()));
+        content2.next_line(0.0, -30.0);
+        content2.show(Str(&format!("Corpo idrico: {}", anagrafica_hfbi.corpo_idrico).into_bytes()));
+        content2.next_line(0.0, -30.0);
+        content2.show(Str(&format!("Habitat vegetato: {}", anagrafica_hfbi.habitat_vegetato).into_bytes()));
+        content2.next_line(0.0, -30.0);
+        content2.show(Str(&format!("Regione: {}", anagrafica_hfbi.posizione.regione).into_bytes()));
+        content2.next_line(0.0, -30.0);
+        content2.show(Str(&format!("Provincia: {}", anagrafica_hfbi.posizione.provincia).into_bytes()));
+        content2.next_line(0.0, -30.0);
+        content2.show(Str(&format!("Lunghezza media stazione: {}", anagrafica_hfbi.lunghezza_media_transetto).into_bytes()));
+        content2.next_line(0.0, -30.0);
+        content2.show(Str(&format!("Larghezza media stazione: {}", anagrafica_hfbi.larghezza_media_transetto).into_bytes()));
+        content2.end_text();
+
+        let cols = 2;
+        let rows = 9;
+
+        // Horizontal lines
+        for row in 0..=rows {
+            let y = y_start - (row as f32 * cell_height);
+            content2.move_to(x_start, y);
+            content2.line_to(x_start + (cols as f32 * cell_width), y);
+            content2.stroke();
+        }
+
+
+        content2.save_state();
+        content2.transform([w, 0.0, 0.0, h, x, y]);
+        content2.x_object(image_name);
+        content2.restore_state();
+
+        let content2_id = alloc.bump();
+        secondary.stream(content2_id, &content2.finish());
+        page2.contents(content2_id);
+
+    }
+
+    // Specify the font we want to use. Because Helvetica is one of the 14 base
+    // fonts shipped with every PDF reader, we don't have to embed any font
+    // data.
+    pdf.type1_font(font_id).base_font(Name(b"Helvetica"));
+
+    pdf.extend(&secondary);
+
+    // Write the page tree with a single child page.
+    pdf.pages(page_tree_id).kids(page_ids.iter().copied()).count(page_ids.len() as i32);
+
+    // Write the document catalog with a reference to the page tree.
+    pdf.catalog(alloc.bump()).pages(page_tree_id);
+
+    // Finish writing (this automatically creates the cross-reference table and
+    // file trailer) and retrieve the resulting byte buffer.
+    let buf: Vec<u8> = pdf.finish();
+
+    // Write the thing to a file.
+    match std::fs::write(&export_path, buf) {
+        Ok(_) => {},
+        Err(e) => {
+            eprintln!("Failed writing pdf to {}: {}", export_path.display(), e);
+        }
+    }
+
 }
