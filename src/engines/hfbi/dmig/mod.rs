@@ -65,7 +65,7 @@ fn calc_bmig(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
 }
 
 #[cfg(test)]
-mod tests {
+mod dmig_private_tests {
     use super::*;
     use crate::domain::hfbi::{
         AnagraficaHFBI, CampionamentoHFBI, GruppoEcoHFBI, GruppoTrofHFBI, HabitatHFBI, RecordHFBI,

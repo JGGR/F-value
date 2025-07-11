@@ -53,7 +53,7 @@ fn calc_s90_b90(campionamento: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) 
 
 
 #[cfg(test)]
-mod tests {
+mod ddom_private_tests {
     use super::*;
     use crate::domain::hfbi::{
         AnagraficaHFBI, CampionamentoHFBI, GruppoEcoHFBI, GruppoTrofHFBI, HabitatHFBI, RecordHFBI,

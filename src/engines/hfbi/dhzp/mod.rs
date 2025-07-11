@@ -63,7 +63,7 @@ fn calc_bhzp(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
 }
 
 #[cfg(test)]
-mod tests {
+mod dhzp_private_tests {
     use super::*;
     use crate::domain::hfbi::{
         AnagraficaHFBI, CampionamentoHFBI, GruppoEcoHFBI, GruppoTrofHFBI, HabitatHFBI, RecordHFBI,
