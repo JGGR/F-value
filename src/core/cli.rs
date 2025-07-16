@@ -18,11 +18,13 @@
 use std::path::PathBuf;
 use crate::engines::niseci::full::{calculate_niseci, calculate_rqe_niseci, calculate_stato_ecologico};
 use crate::domain::niseci::{CampionamentoNISECI, RiferimentoNISECI, AnagraficaNISECI, TipoComunitaNISECI, ComunitaNISECI, AreaNISECI, IdroEcoRegioneNISECI, RisultatoNISECI};
+use crate::engines::hfbi::full::calculate_hfbi;
+use crate::domain::hfbi::{CampionamentoHFBI, AnagraficaHFBI, StagioneHFBI, HabitatHFBI, TipoLagunaCostieraHFBI, RisultatoHFBI};
 use crate::domain::location::Location;
 use crate::core::{COPYRIGHT_INFO, PROJECT_NAME, SHORT_PROJECT_VERSION, PROJECT_VERSION_FULL};
-use crate::core::csv::deser::{check_path_is_file_ends_with_csv, check_riferimento_niseci_path, VeryItalianRecordCsvRiferimentoNISECI, check_campionamento_niseci_path, VeryItalianRecordCsvCampionamentoNISECI, check_anagrafica_niseci_path, VeryItalianRecordCsvAnagraficaNISECI, check_campionamento_hfbi_path, VeryItalianRecordCsvCampionamentoHFBI};
-use crate::core::csv::parser::{check_records_campionamento_niseci, check_records_riferimento_niseci, check_records_anagrafica_niseci};
-use crate::core::pdf::esporta_pdf_niseci;
+use crate::core::csv::deser::{check_path_is_file_ends_with_csv, check_riferimento_niseci_path, VeryItalianRecordCsvRiferimentoNISECI, check_campionamento_niseci_path, VeryItalianRecordCsvCampionamentoNISECI, check_anagrafica_niseci_path, VeryItalianRecordCsvAnagraficaNISECI, check_campionamento_hfbi_path, VeryItalianRecordCsvCampionamentoHFBI, check_anagrafica_hfbi_path, VeryItalianRecordCsvAnagraficaHFBI};
+use crate::core::csv::parser::{check_records_campionamento_niseci, check_records_riferimento_niseci, check_records_anagrafica_niseci, check_records_campionamento_hfbi, check_records_anagrafica_hfbi};
+use crate::core::pdf::{esporta_pdf_niseci, esporta_pdf_hfbi};
 
 pub(crate) fn esox_usage() {
     println!("{PROJECT_NAME} v{SHORT_PROJECT_VERSION}");
@@ -77,9 +79,8 @@ pub(crate) fn run_headless(do_niseci: bool, args: &[String]) -> bool {
                 if do_niseci {
                     anagrafica_path_str = arg;
                 } else {
-                    eprintln!("Error: Unexpected arg: {arg}");
-                    esox_usage();
-                    return false;
+                    // Doing HFBI so we don't have a riferimento
+                    pdf_export_path_str = arg;
                 }
             }
             4 => {
@@ -105,14 +106,14 @@ pub(crate) fn run_headless(do_niseci: bool, args: &[String]) -> bool {
     let pdf_export_path = PathBuf::from(pdf_export_path_str);
 
     if !check_path_is_file_ends_with_csv(&campionamento_path) {
-        eprintln!("Fallito controllo path campionamento");
+        eprintln!("Fallito controllo path campionamento: {}", campionamento_path.display());
         return false;
     }
 
     if do_niseci {
 
         if !check_path_is_file_ends_with_csv(&riferimento_path) {
-            eprintln!("Fallito controllo path riferimento");
+            eprintln!("Fallito controllo path riferimento: {}", riferimento_path.display());
             return false;
         }
         let mut riferimento_csv_failed = false;
@@ -239,7 +240,6 @@ pub(crate) fn run_headless(do_niseci: bool, args: &[String]) -> bool {
             campionamento_csv_failed ) || (
             riferimento_valueparse_failed ||
             campionamento_valueparse_failed );
-
 
         let mut anagrafica_csv_failed = false;
         let mut anagrafica_valueparse_failed = false;
@@ -384,8 +384,159 @@ pub(crate) fn run_headless(do_niseci: bool, args: &[String]) -> bool {
         }
         !had_failures && !niseci_calc_failed
     } else {
-        let _campionamento_check_res = check_campionamento_hfbi_path::<VeryItalianRecordCsvCampionamentoHFBI>(campionamento_path);
-        todo!("Implement this");
-        //println!("Result: {campionamento_check_res}");
+        let mut campionamento_csv_failed = false;
+        let mut campionamento_valueparse_failed = false;
+        let campionamento_check_res = check_campionamento_hfbi_path::<VeryItalianRecordCsvCampionamentoHFBI>(campionamento_path);
+        let mut campionamento_specie = Vec::new(); // Holds parsed RecordHFBI
+        match campionamento_check_res {
+            Ok(csv_recs) => {
+                /* TODO: handle verbosity
+                println!("Campionamento result: {{");
+                for r in &csv_recs {
+                    println!("  {r}");
+                }
+                println!("}}");
+                */
+                let campionamento_records_check_res = check_records_campionamento_hfbi(csv_recs);
+                match campionamento_records_check_res {
+                    Ok(campioni) => {
+                        campionamento_specie = campioni;
+                    }
+                    Err(_value_errors) => {
+                        /* Assuming they were printed before this point
+                        eprintln!("Campionamento value errors in run_headless(): {{");
+                        for e in value_errors {
+                            let error_txt;
+                            match e {
+                                RecordCsvCampionamentoHFBIError::ValoreInvalido{ msg } => {
+                                    error_txt = msg;
+                                }
+                            }
+                            eprintln!("  {}", error_txt);
+                        }
+                        eprintln!("}}");
+                        */
+                        campionamento_valueparse_failed = true;
+                        //return; We keep running and return later
+                    }
+                }
+            }
+            Err(_errs) => {
+                /* Assuming they were printed before this point
+                eprintln!("Campionamento errors in run_headless(): {{");
+                for e in errs {
+                    eprintln!("  {e}");
+                }
+                eprintln!("}}");
+                */
+                campionamento_csv_failed = true;
+                //return; We keep running and return later
+            }
+        }
+
+        let had_failures = ( campionamento_csv_failed ) || ( campionamento_valueparse_failed );
+        eprintln!("Check CSV campionamento:  {}", if campionamento_csv_failed { "FAIL" } else { "SUCCESS" });
+
+        let mut anagrafica_csv_failed = false;
+        let mut anagrafica_valueparse_failed = false;
+        let mut anagrafica = AnagraficaHFBI {
+            codice_stazione: "foo".to_string(),
+            date_string: "foo".to_string(),
+            corpo_idrico: "foo".to_string(),
+            posizione: Location {
+                regione: "foo".to_string(),
+                provincia: "foo".to_string(),
+            },
+            lunghezza_media_transetto: 0.0,
+            larghezza_media_transetto: 0.0,
+            stagione: StagioneHFBI::Primavera,
+            habitat_vegetato: HabitatHFBI::Vegetato,
+            tipo_laguna: TipoLagunaCostieraHFBI::MAt1,
+        };
+        if !had_failures {
+            /* TODO: handle verbosity
+            for c in &campionamento_specie {
+                println!("Campione:  {:?}", c);
+            }
+            */
+            // Using italian deser for now
+            let anagrafica_csv_check_res = check_anagrafica_hfbi_path::<VeryItalianRecordCsvAnagraficaHFBI>(anagrafica_path);
+            match anagrafica_csv_check_res {
+                Ok(csv_recs) => {
+                    /* TODO: handle verbosity
+                    println!("Anagrafica result: {{");
+                    for r in &csv_recs {
+                        println!("  {r}");
+                    }
+                    println!("}}");
+                    */
+                    let anagrafica_records_check_res = check_records_anagrafica_hfbi(csv_recs);
+                    match anagrafica_records_check_res {
+                        Ok(a) => {
+                            anagrafica = a;
+                        }
+                        Err(_value_errs) => {
+                            /* Assuming they were printed before this point
+                            eprintln!("Anagrafica value errors in run_headless(): {{");
+                            for e in value_errors {
+                                let error_txt;
+                                match e {
+                                    RecordCsvAnagraficaHFBIError::ValoreInvalido{ msg } => {
+                                        error_txt = msg;
+                                    }
+                                }
+                                eprintln!("  {}", error_txt);
+                            }
+                            eprintln!("}}");
+                            */
+                            anagrafica_valueparse_failed = true;
+                            //return; We keep running and return later
+                    }
+                        }
+                    }
+                    Err(_errs) => {
+                        /* Assuming they were printed before this point
+                        eprintln!("Anagrafica errors in run_headless(): {{");
+                        for e in errs {
+                            eprintln!("  {e}");
+                        }
+                        eprintln!("}}");
+                        */
+                        anagrafica_csv_failed = true;
+                        //return; We keep running and return later
+                    }
+            }
+        }
+
+        let had_failures = had_failures ||
+            ( anagrafica_csv_failed || anagrafica_valueparse_failed );
+
+        let mut hfbi_calc_failed = false;
+        if !had_failures {
+            let campionamento = CampionamentoHFBI {
+                campionamento: campionamento_specie
+            };
+            match calculate_hfbi(&campionamento, &anagrafica) {
+                Ok((hfbi, intermediates)) => {
+                    let risultato_hfbi = RisultatoHFBI::new(
+                        Some(hfbi),
+                        intermediates
+                    );
+
+                    println!("Esportato pdf in {}", pdf_export_path.display());
+                    esporta_pdf_hfbi(pdf_export_path, anagrafica, risultato_hfbi);
+                }
+                Err(_errors) => {
+                    /* Assuming they were printed before this point
+                    for e in errs {
+                        eprintln!("  {e}");
+                    }
+                    */
+                    hfbi_calc_failed = true;
+                }
+            }
+
+        }
+        !had_failures && !hfbi_calc_failed
     }
 }

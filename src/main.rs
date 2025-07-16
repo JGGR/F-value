@@ -53,7 +53,6 @@ fn main() {
     let args: Vec<String> = env::args().collect(); // Using this panics on receiving invalid Unicode
 
     let mut mutargs = args.clone();
-    let mut arg_i = 0;
 
     let mut headless = false;
 
@@ -63,7 +62,6 @@ fn main() {
         1 => {},
         _ => {
             for arg in &args[1..] {
-                arg_i += 1;
                 match arg.as_str() {
                     "-v" | "--version" | "-version" => {
                         println!("{PROJECT_NAME} v{PROJECT_VERSION}-{COMMIT_HASH_PLUS} ({PROJECT_BUILD_TYPE})");
@@ -127,11 +125,11 @@ fn main() {
                             return;
                         }
                         headless = true;
-                        mutargs.remove(arg_i);
+                        mutargs.remove(1);
                     }
                     "--hfbi" => {
                         indice_niseci = false;
-                        mutargs.remove(arg_i);
+                        mutargs.remove(1);
                     }
                     "-W" | "--warranty" | "-warranty" => {
                         return print_warranty_info();
