@@ -18,9 +18,9 @@
 use std::fmt;
 use chrono::NaiveDate;
 use chrono::format::ParseErrorKind;
-use super::{RecordCsvRiferimentoNISECI, RecordCsvCampionamentoNISECI, RecordCsvAnagraficaNISECI, RecordCsvCampionamentoHFBI};
+use super::{RecordCsvRiferimentoNISECI, RecordCsvCampionamentoNISECI, RecordCsvAnagraficaNISECI, RecordCsvCampionamentoHFBI, RecordCsvAnagraficaHFBI};
 use crate::domain::niseci::{SpecieNISECI, RecordNISECI, AnagraficaNISECI, AreaNISECI, TipoComunitaNISECI, ComunitaNISECI, IdroEcoRegioneNISECI};
-use crate::domain::hfbi::{RecordHFBI, RIFERIMENTO_HFBI};
+use crate::domain::hfbi::{RecordHFBI, RIFERIMENTO_HFBI, AnagraficaHFBI, StagioneHFBI, HabitatHFBI, TipoLagunaCostieraHFBI};
 use crate::domain::location::Location;
 
 #[derive(Debug)]
@@ -588,6 +588,167 @@ pub(crate) fn parse_recordcsv_campionamento_hfbi<T: RecordCsvCampionamentoHFBI>(
     (campioni, errors)
 }
 
+#[derive(Debug)]
+pub(crate) enum RecordCsvAnagraficaHFBIError {
+    ValoreInvalido { msg : String }, //TODO: add position?
+}
+
+impl fmt::Display for RecordCsvAnagraficaHFBIError {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    let string_representation = match self {
+      RecordCsvAnagraficaHFBIError::ValoreInvalido { msg } => format!("Errore record anagrafica HFBI: {}", msg),
+    };
+    write!(f, "{}", string_representation)
+  }
+}
+
+pub(crate) fn parse_recordcsv_anagrafica_hfbi<T: RecordCsvAnagraficaHFBI>(records: Vec<T>) -> Result<AnagraficaHFBI, Vec<RecordCsvAnagraficaHFBIError>> {
+    let mut errors = Vec::new();
+    if records.len() > 1 {
+        let err = RecordCsvAnagraficaHFBIError::ValoreInvalido { msg : format!("Troppi record: {}, atteso 1", records.len()) };
+        errors.push(err);
+    }
+    if records.is_empty() {
+        let err = RecordCsvAnagraficaHFBIError::ValoreInvalido { msg : "Nessun record trovato: atteso 1".to_string() };
+        errors.push(err);
+        return Err(errors);
+    }
+
+    let r = records.first().unwrap();
+
+    if r.codice_stazione().is_empty() {
+        let err = RecordCsvAnagraficaHFBIError::ValoreInvalido { msg : format!("Codice stazione troppo corto: {}", r.codice_stazione()) };
+        errors.push(err);
+    }
+
+    if r.corpo_idrico().is_empty() {
+        let err = RecordCsvAnagraficaHFBIError::ValoreInvalido { msg : format!("Corpo idrico troppo corto: {}", r.corpo_idrico()) };
+        errors.push(err);
+    }
+
+    if r.regione().is_empty() {
+        let err = RecordCsvAnagraficaHFBIError::ValoreInvalido { msg : format!("Regione troppo corta: {}", r.regione()) };
+        errors.push(err);
+    }
+
+    if r.provincia().is_empty() {
+        let err = RecordCsvAnagraficaHFBIError::ValoreInvalido { msg : format!("Provincia troppo corta: {}", r.provincia()) };
+        errors.push(err);
+    }
+
+    match parse_date(&r.data()) {
+        Ok(_) => {},
+        Err(e) => {
+            match e.kind() {
+                ParseErrorKind::OutOfRange => {
+                    let err = RecordCsvAnagraficaHFBIError::ValoreInvalido { msg : "Data fornita non valida: fuori range".to_string() };
+                    errors.push(err);
+                },
+                ParseErrorKind::Impossible => {
+                    let err = RecordCsvAnagraficaHFBIError::ValoreInvalido { msg : "Data fornita non valida: valori non possibili".to_string() };
+                    errors.push(err);
+                },
+                ParseErrorKind::NotEnough => {
+                    let err = RecordCsvAnagraficaHFBIError::ValoreInvalido { msg : "Data fornita non valida: specifica insufficiente".to_string() };
+                    errors.push(err);
+                },
+                ParseErrorKind::Invalid => {
+                    let err = RecordCsvAnagraficaHFBIError::ValoreInvalido { msg : "Data fornita non valida: presenza di caratteri non attesi".to_string() };
+                    errors.push(err);
+                },
+                ParseErrorKind::TooShort => {
+                    let err = RecordCsvAnagraficaHFBIError::ValoreInvalido { msg : "Data fornita non valida: terminazione prematura dell'input".to_string() };
+                    errors.push(err);
+                },
+                ParseErrorKind::TooLong => {
+                    let err = RecordCsvAnagraficaHFBIError::ValoreInvalido { msg : "Data fornita non valida: input in eccesso".to_string() };
+                    errors.push(err);
+                },
+                ParseErrorKind::BadFormat => {
+                    let err = RecordCsvAnagraficaHFBIError::ValoreInvalido { msg : "Data fornita non valida: errore nella specifica di formattazione".to_string() };
+                    errors.push(err);
+                },
+                _ => {
+                    let err = RecordCsvAnagraficaHFBIError::ValoreInvalido { msg : "Data fornita non valida: errore sconosciuto".to_string() };
+                    errors.push(err);
+                }
+            }
+        }
+    }
+
+    if r.lunghezza_stazione() < 0.0 {
+        let err = RecordCsvAnagraficaHFBIError::ValoreInvalido { msg : format!("Lunghezza stazione troppo bassa: {}", r.lunghezza_stazione()) };
+        errors.push(err);
+    }
+
+    if r.larghezza_stazione() < 0.0 {
+        let err = RecordCsvAnagraficaHFBIError::ValoreInvalido { msg : format!("Larghezza stazione troppo bassa: {}", r.larghezza_stazione()) };
+        errors.push(err);
+    }
+
+    let mut stagione = StagioneHFBI::Primavera;
+    match r.stagione() {
+        0 => {
+            stagione = StagioneHFBI::Primavera;
+        },
+        1 => {
+            stagione = StagioneHFBI::Autunno;
+        },
+        _ => {
+            let err = RecordCsvAnagraficaHFBIError::ValoreInvalido { msg : format!("Stagione HFBI non valido: {}, atteso [0, 1]", r.stagione()) };
+            errors.push(err);
+        }
+    }
+
+    let habitat = match r.habitat() {
+        0 => HabitatHFBI::Vegetato,
+        1 => HabitatHFBI::NonVegetato,
+        _ => {
+            let err = RecordCsvAnagraficaHFBIError::ValoreInvalido { msg : format!("HabitatHFBI non valido: {}, atteso [0, 1]", r.habitat()) };
+            errors.push(err);
+            HabitatHFBI::Vegetato // To still assign something by default
+        }
+    };
+
+    let mut tipo_laguna = TipoLagunaCostieraHFBI::MAt1;
+    match r.tipo_laguna() {
+        1 => {
+            tipo_laguna = TipoLagunaCostieraHFBI::MAt1;
+        },
+        2 => {
+            tipo_laguna = TipoLagunaCostieraHFBI::MAt2;
+        }
+        3 => {
+            tipo_laguna = TipoLagunaCostieraHFBI::MAt3;
+        }
+        _ => {
+            let err = RecordCsvAnagraficaHFBIError::ValoreInvalido { msg : format!("TipoLagunaCostieraHFBI non valido: {}, atteso [1, 3]", r.tipo_laguna()) };
+            errors.push(err);
+        }
+    }
+
+    if !errors.is_empty() {
+        return Err(errors);
+    }
+
+    let res = AnagraficaHFBI {
+        codice_stazione: r.codice_stazione(),
+        date_string: r.data(), // Formato gg/mm/aaaa
+        corpo_idrico: r.corpo_idrico(),
+        posizione: Location {
+            regione: r.regione(),
+            provincia: r.provincia()
+        },
+        lunghezza_media_transetto: r.lunghezza_stazione(),
+        larghezza_media_transetto: r.larghezza_stazione(),
+        stagione: stagione,
+        habitat_vegetato: habitat,
+        tipo_laguna: tipo_laguna
+    };
+    Ok(res)
+
+}
+
 pub(crate) fn check_records_campionamento_hfbi<T: RecordCsvCampionamentoHFBI>(records: Vec<T>) -> Result<Vec<RecordHFBI>,Vec<RecordCsvCampionamentoHFBIError>> {
 
     let (records, errors) = parse_recordcsv_campionamento_hfbi(records);
@@ -615,6 +776,34 @@ pub(crate) fn check_records_campionamento_hfbi<T: RecordCsvCampionamentoHFBI>(re
     }
 }
 
+pub(crate) fn check_records_anagrafica_hfbi<T: RecordCsvAnagraficaHFBI>(records: Vec<T>) -> Result<AnagraficaHFBI,Vec<RecordCsvAnagraficaHFBIError>> {
+
+    let res = parse_recordcsv_anagrafica_hfbi(records);
+
+    match res {
+        Ok(anagrafica) => {
+            println!("Anagrafica HFBI: {}", anagrafica);
+            //TODO: handle verbosity
+            //println!("Tutti i record dell'anagrafica HFBI sono stati processati con successo!");
+            /*
+            for record in &records {
+                println!("  Record: {{{record}}}");
+            }
+            */
+            Ok(anagrafica)
+        }
+        Err(errors) => {
+            println!("Anagrafica HFBI: Numero record non validi: {}", errors.len());
+            eprintln!("Errori incontrati durante l'elaborazione dei record per anagrafica HFBI: {{");
+            //TODO: add process_record_anagraficaHFBI_errors()
+            for error in &errors {
+                eprintln!("  {}", error);
+            }
+            eprintln!("}}");
+            Err(errors)
+        }
+    }
+}
 
 pub(crate) fn parse_date(date_str: &str) -> Result<NaiveDate, chrono::format::ParseError> {
     let normalized = date_str.replace("/", "-"); // Replace all / with -
