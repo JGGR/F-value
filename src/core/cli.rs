@@ -529,6 +529,8 @@ pub(crate) fn run_headless(do_niseci: bool, args: &[String]) -> bool {
                         intermediates
                     );
 
+                    println!("HFBI: {hfbi}");
+
                     println!("Esportato pdf in {}", pdf_export_path.display());
                     esporta_pdf_hfbi(pdf_export_path, anagrafica, risultato_hfbi);
                 }
