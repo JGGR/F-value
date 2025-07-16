@@ -434,8 +434,14 @@ pub(crate) fn run_headless(do_niseci: bool, args: &[String]) -> bool {
             }
         }
 
-        let had_failures = ( campionamento_csv_failed ) || ( campionamento_valueparse_failed );
         eprintln!("Check CSV campionamento:  {}", if campionamento_csv_failed { "FAIL" } else { "SUCCESS" });
+        if !campionamento_csv_failed {
+            eprintln!("Check valori campionamento:  {}", if campionamento_valueparse_failed { "FAIL" } else { "SUCCESS" });
+        } else {
+            eprintln!("Check valori campionamento:  SKIPPED (CSV check failed)");
+        }
+
+        let had_failures = ( campionamento_csv_failed ) || ( campionamento_valueparse_failed );
 
         let mut anagrafica_csv_failed = false;
         let mut anagrafica_valueparse_failed = false;
