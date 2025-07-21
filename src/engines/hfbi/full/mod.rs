@@ -76,24 +76,6 @@ mod full_hfbi_private_tests {
 
     const EPSILON: f32 = 1e-6;
 
-    // ===================================================================
-    // ===== 1. Mocked Dependencies & Helpers
-    // ===================================================================
-
-    // By defining these inside the test module, we can control their behavior for our tests.
-    // This is a common pattern for testing code that has external dependencies.
-
-    // Mock all the `calc_*` functions to return predictable values.
-    // This lets us test the MMI math without worrying about the complex logic inside each calc function.
-    fn calc_bbent(_c: &CampionamentoHFBI, _a: &AnagraficaHFBI) -> f32 { 10.0 }
-    fn calc_bn(_c: &CampionamentoHFBI) -> f32 { 8.0 }
-    fn calc_dbent(_c: &CampionamentoHFBI, _a: &AnagraficaHFBI) -> f32 { 1.0 }
-    fn calc_ddom(_c: &CampionamentoHFBI, _a: &AnagraficaHFBI) -> f32 { 6.0 }
-    fn calc_dhzp(_c: &CampionamentoHFBI, _a: &AnagraficaHFBI) -> f32 { 1.6 }
-    fn calc_dmig(_c: &CampionamentoHFBI, _a: &AnagraficaHFBI) -> f32 { 0.2 }
-
-
-
     fn create_specie_record(
         codice_specie: &'static str,
         gruppo_eco: GruppoEcoHFBI,
