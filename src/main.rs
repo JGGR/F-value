@@ -37,7 +37,7 @@ use raylib::core::texture::Image;
 use raylib::color::Color;
 use crate::app::core::{SUPPORT_HEADLESS, PROJECT_LOGO_DATA, ESOX_SCREEN_WIDTH, ESOX_SCREEN_HEIGHT, MainState};
 use crate::core::{PROJECT_NAME, SHORT_PROJECT_VERSION, PROJECT_VERSION, COMMIT_HASH_PLUS, PROJECT_BUILD_TYPE, PROJECT_BRANCH};
-use crate::core::csv::{RIFERIMENTO_NISECI_HEADER, RIFERIMENTO_NISECI_HEADER_FIELDS, RIFERIMENTO_NISECI_HEADER_FIELD_TYPES, CAMPIONAMENTO_NISECI_HEADER, CAMPIONAMENTO_NISECI_HEADER_FIELDS, CAMPIONAMENTO_NISECI_HEADER_FIELD_TYPES, ANAGRAFICA_NISECI_HEADER, ANAGRAFICA_NISECI_HEADER_FIELDS, ANAGRAFICA_NISECI_HEADER_FIELD_TYPES, CAMPIONAMENTO_HFBI_HEADER, CAMPIONAMENTO_HFBI_HEADER_FIELDS, CAMPIONAMENTO_HFBI_HEADER_FIELD_TYPES};
+use crate::core::csv::{RIFERIMENTO_NISECI_HEADER, RIFERIMENTO_NISECI_HEADER_FIELDS, RIFERIMENTO_NISECI_HEADER_FIELD_TYPES, CAMPIONAMENTO_NISECI_HEADER, CAMPIONAMENTO_NISECI_HEADER_FIELDS, CAMPIONAMENTO_NISECI_HEADER_FIELD_TYPES, ANAGRAFICA_NISECI_HEADER, ANAGRAFICA_NISECI_HEADER_FIELDS, ANAGRAFICA_NISECI_HEADER_FIELD_TYPES, CAMPIONAMENTO_HFBI_HEADER, CAMPIONAMENTO_HFBI_HEADER_FIELDS, CAMPIONAMENTO_HFBI_HEADER_FIELD_TYPES, ANAGRAFICA_HFBI_HEADER, ANAGRAFICA_HFBI_HEADER_FIELDS, ANAGRAFICA_HFBI_HEADER_FIELD_TYPES};
 use crate::core::cli::{esox_usage, print_warranty_info, print_copyright_splash, run_headless};
 use crate::controllers::Controllers;
 use crate::views::Views;
@@ -53,7 +53,6 @@ fn main() {
     let args: Vec<String> = env::args().collect(); // Using this panics on receiving invalid Unicode
 
     let mut mutargs = args.clone();
-    let mut arg_i = 0;
 
     let mut headless = false;
 
@@ -63,7 +62,6 @@ fn main() {
         1 => {},
         _ => {
             for arg in &args[1..] {
-                arg_i += 1;
                 match arg.as_str() {
                     "-v" | "--version" | "-version" => {
                         println!("{PROJECT_NAME} v{PROJECT_VERSION}-{COMMIT_HASH_PLUS} ({PROJECT_BUILD_TYPE})");
@@ -103,9 +101,17 @@ fn main() {
                         println!("Header campionamento HFBI: {{");
                         println!("  {CAMPIONAMENTO_HFBI_HEADER}");
                         println!("}}");
+                        println!("Header anagrafica HFBI: {{");
+                        println!("  {ANAGRAFICA_HFBI_HEADER}");
+                        println!("}}");
                         println!("Tipi header campionamento HFBI: {{");
                         for (i, field) in CAMPIONAMENTO_HFBI_HEADER_FIELDS.iter().enumerate() {
                             println!("    {}: {};", field, CAMPIONAMENTO_HFBI_HEADER_FIELD_TYPES[i]);
+                        }
+                        println!("}}");
+                        println!("Tipi header anagrafica HFBI: {{");
+                        for (i, field) in ANAGRAFICA_HFBI_HEADER_FIELDS.iter().enumerate() {
+                            println!("    {}: {};", field, ANAGRAFICA_HFBI_HEADER_FIELD_TYPES[i]);
                         }
                         println!("}}");
                         return;
@@ -119,11 +125,11 @@ fn main() {
                             return;
                         }
                         headless = true;
-                        mutargs.remove(arg_i);
+                        mutargs.remove(1);
                     }
                     "--hfbi" => {
                         indice_niseci = false;
-                        mutargs.remove(arg_i);
+                        mutargs.remove(1);
                     }
                     "-W" | "--warranty" | "-warranty" => {
                         return print_warranty_info();

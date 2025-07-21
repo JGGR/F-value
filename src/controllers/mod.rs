@@ -27,7 +27,8 @@ use crate::app::model::{SubModel, HomeModel, SecondModel, IndiceModel, FileInput
 use crate::domain::{index::Indice, niseci::{RiferimentoNISECI, CampionamentoNISECI, AnagraficaNISECI, TipoComunitaNISECI, RisultatoNISECI, StatoEcologicoNISECI}, hfbi::{CampionamentoHFBI, AnagraficaHFBI, RisultatoHFBI}};
 use crate::state::GLOBAL_STATE;
 use crate::engines::niseci::full::{calculate_niseci, calculate_rqe_niseci, calculate_stato_ecologico};
-use crate::core::pdf::esporta_pdf_niseci;
+use crate::engines::hfbi::full::calculate_hfbi;
+use crate::core::pdf::{esporta_pdf_niseci, esporta_pdf_hfbi};
 
 #[cfg(feature="logged")]
 use log::info;
@@ -529,8 +530,9 @@ impl FileInputController {
                     //self.get_data_riferimento_niseci() and we chill.
                     let records_check = check_records_campionamento_hfbi(records);
                     match records_check {
-                        Ok(campioni) => {
+                        Ok(mut campioni) => {
                             self.add_console_message("FileInputController:  Validazione CampionamentoHFBI completata!".to_string());
+                            campioni.sort_by(|a, b| b.peso.cmp(&a.peso));
                             let campionamento = CampionamentoHFBI::new(campioni);
                             self.set_data_campionamento_hfbi(campionamento);
                         }
@@ -1291,6 +1293,70 @@ impl OutputController {
         esporta_pdf_niseci(export_path, riferimento_niseci, anagrafica_niseci, risultato_niseci);
     }
 
+    pub(crate) fn calc_hfbi(&self) {
+        let campionamento;
+        let anagrafica;
+        {
+            let mut state = GLOBAL_STATE.lock().unwrap();
+            campionamento = state.data_model.get_campionamento_hfbi();
+            anagrafica = state.data_model.get_anagrafica_hfbi();
+        }
+
+        let mut valid = true;
+
+        if campionamento.is_none() {
+            // Implementation error, this should never happen
+            valid = false;
+            self.add_console_message("IMPLEMENTATION ERROR: campionamento hfbi was None in calc_hfbi()".to_string());
+        }
+        if anagrafica.is_none() {
+            // Implementation error, this should never happen
+            valid = false;
+            self.add_console_message("IMPLEMENTATION ERROR: anagrafica hfbi was None in calc_hfbi()".to_string());
+        }
+
+        if valid {
+            let campionamento = campionamento.expect("calc_hfbi() checked is_none() before");
+            let anagrafica = anagrafica.expect("calc_hfbi() checked is_none() before");
+
+            match calculate_hfbi(&campionamento, &anagrafica) {
+                Ok((hfbi, intermediates)) => {
+                    self.add_console_message(format!("HFBI: {hfbi}"));
+                    self.add_console_message(format!("intermediates: {intermediates}"));
+                    let risultato_hfbi = RisultatoHFBI::new(
+                        Some(hfbi),
+                        intermediates
+                    );
+
+                    self.set_data_risultato_hfbi(risultato_hfbi);
+                    println!("OutputController: Finished HFBI calc");
+                }
+                Err(hfbi_errors) => {
+                    self.add_console_message(format!("Errore durante il calcolo HFBI: {}", hfbi_errors));
+                    let mut state = GLOBAL_STATE.lock().unwrap();
+                    state.data_model.set_errors_occurred(true);
+                    state.output_model.set_done_calc(false);
+                    state.data_model.set_risultato_hfbi(None);
+                }
+            }
+        } else {
+            self.add_console_message("IMPLEMENTATION ERROR: spurious state in calc_hfbi()".to_string());
+            let mut state = GLOBAL_STATE.lock().unwrap();
+            state.data_model.set_errors_occurred(true);
+        }
+    }
+
+    pub(crate) fn esporta_pdf_hfbi(&self, export_path: PathBuf) {
+
+        self.add_console_message(format!("Esportazione pdf in {}", export_path.display()));
+
+        let risultato_hfbi = self.get_data_risultato_hfbi().expect("Failed calculating HFBI before requesting export");
+
+        let anagrafica_hfbi = self.get_data_anagrafica_hfbi().expect("Failed getting AnagraficaHFBI before requesting export");
+
+        esporta_pdf_hfbi(export_path, anagrafica_hfbi, risultato_hfbi);
+    }
+
     pub(crate) fn user_confirm_calc(&self) {
         let mut state = GLOBAL_STATE.lock().unwrap();
 
@@ -1322,8 +1388,16 @@ impl OutputController {
         }
     }
 
-    pub(crate) fn calc_hfbi(&self) {
-        todo!("Implement this");
+    pub(crate) fn get_data_anagrafica_hfbi(&self) -> Option<AnagraficaHFBI> {
+        let state = GLOBAL_STATE.lock().unwrap();
+        state.data_model.get_anagrafica_hfbi()
+    }
+
+    fn set_data_risultato_hfbi(&self, risultato: RisultatoHFBI) {
+        self.set_console_env(("risultato_hfbi".to_string(), format!("{risultato}")));
+        let mut state = GLOBAL_STATE.lock().unwrap();
+        state.data_model.set_risultato_hfbi(Some(risultato));
+        state.output_model.set_done_calc(true);
     }
 
     pub(crate) fn set_console_env(&self, (key, val): (String,String)) {

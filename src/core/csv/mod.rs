@@ -47,6 +47,14 @@ pub(crate) const CAMPIONAMENTO_HFBI_HEADER_FIELD_TYPES: [&str; 3] = [ "String", 
 pub(crate) const CAMPIONAMENTO_HFBI_HEADER: &str = "\
 codiceSpecie;numeroIndividui;peso";
 
+// This must be kept aligned with RecordCsvAnagraficaHFBI definition.
+// TODO: get this stuff with some macro?
+pub(crate) const ANAGRAFICA_HFBI_HEADER_FIELDS: [&str; 10] = [
+"codiceStazione", "corpoIdrico", "regione", "provincia", "data", "lunghezzaStazione", "larghezzaStazione", "stagione", "habitat", "tipoLaguna" ];
+pub(crate) const ANAGRAFICA_HFBI_HEADER_FIELD_TYPES: [&str; 10] = [ "String", "String", "String", "String", "String", "f32", "f32", "u32", "u32", "u32"];
+pub(crate) const ANAGRAFICA_HFBI_HEADER: &str = "\
+codiceStazione;corpoIdrico;regione;provincia;data;lunghezzaStazione;larghezzaStazione;stagione;habitat;tipoLaguna";
+
 
 #[derive(Copy,Clone)]
 pub(crate) enum TipoRecordCsv {
@@ -54,6 +62,7 @@ pub(crate) enum TipoRecordCsv {
     CampionamentoNISECI,
     AnagraficaNISECI,
     CampionamentoHFBI,
+    AnagraficaHFBI,
 }
 
 pub(crate) trait RecordCsvRiferimentoNISECI: serde::de::DeserializeOwned {
@@ -110,3 +119,15 @@ pub(crate) trait RecordCsvCampionamentoHFBI: serde::de::DeserializeOwned {
     fn peso(&self) -> u32;
 }
 
+pub(crate) trait RecordCsvAnagraficaHFBI: serde::de::DeserializeOwned {
+    fn codice_stazione(&self) -> String;
+    fn corpo_idrico(&self) -> String;
+    fn regione(&self) -> String;
+    fn provincia(&self) -> String;
+    fn data(&self) -> String;
+    fn lunghezza_stazione(&self) -> f32;
+    fn larghezza_stazione(&self) -> f32;
+    fn stagione(&self) -> u32;
+    fn habitat(&self) -> u32;
+    fn tipo_laguna(&self) -> u32;
+}

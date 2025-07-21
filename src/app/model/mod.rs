@@ -364,7 +364,7 @@ impl DataModel {
         self.niseci.risultato = risultato;
     }
 
-    pub(crate) fn _get_campionamento_hfbi(&mut self) -> Option<CampionamentoHFBI> {
+    pub(crate) fn get_campionamento_hfbi(&mut self) -> Option<CampionamentoHFBI> {
         self.hfbi.campionamento.clone()
     }
     pub(crate) fn set_campionamento_hfbi(&mut self, campionamento: Option<CampionamentoHFBI>) {

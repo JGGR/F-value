@@ -1343,6 +1343,37 @@ impl View for SelezioneInfoAggiuntiveView {
                 let column_2_groupbox_boxes_width = column_2_groupbox_labels_width;
                 let column_2_groupbox_boxes_height = column_2_labels_height;
                 let column_2_groupbox_boxes_x = column_2_groupbox_labels_x + column_2_groupbox_labels_width;
+
+                d.gui_label(
+                    rrect(
+                        column_2_groupbox_labels_x,
+                        column_2_label_stagione_y,
+                        column_2_groupbox_labels_width,
+                        column_2_labels_height
+                    ),
+                    "Stagione"
+                );
+
+                d.gui_label(
+                    rrect(
+                        column_2_groupbox_labels_x,
+                        column_2_label_habitat_vegetato_y,
+                        column_2_groupbox_labels_width,
+                        column_2_labels_height
+                    ),
+                    "Habitat"
+                );
+
+                d.gui_label(
+                    rrect(
+                        column_2_groupbox_labels_x,
+                        column_2_label_tipo_laguna_y,
+                        column_2_groupbox_labels_width,
+                        column_2_labels_height
+                    ),
+                    "Tipo Laguna"
+                );
+
                 let mut _combo_box_stagione_pick = -1;
                 _combo_box_stagione_pick = d.gui_combo_box(
                     rrect(
@@ -1916,7 +1947,7 @@ impl View for ProduzionePDFView {
                         controller.esporta_pdf_niseci(filepath);
                     }
                     Indice::Hfbi => {
-                        todo!("Implement controller.esporta_pdf_hfbi()");
+                        controller.esporta_pdf_hfbi(filepath);
                     }
                 }
             } else {
