@@ -1,3 +1,21 @@
+## [0.0.19] - 2025-07-21
+
+### Added
+
+- Collect `SubmetricheX3`
+- Add condizioni riferimento HFBI
+- Add full hfbi calc
+- Add `esporta_pdf_hfbi()`
+- Add tests for hfbi modules
+
+### Changed
+
+- Log codice stazione
+- Use `String::with_capacity()` for textbox buffers
+- Fix: always drop index 1 for mutargs in `run_headless()`
+- Fix wrong include using old name for `csv::deser`
+- Fix 2 failing tests by adjusting expected values
+
 ## [0.0.18] - 2025-06-21
 
 ### Added
