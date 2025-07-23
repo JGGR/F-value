@@ -135,6 +135,8 @@ impl TryFrom<i32> for GuiTheme {
 
 pub(crate) struct MainState {
     pub(crate) frame_counter: u32,
+    pub(crate) showing_reset_win: bool,
+    pub(crate) should_reset: bool,
     pub(crate) showing_quit_win: bool,
     pub(crate) should_quit: bool,
     pub(crate) showing_info_box: bool,
@@ -157,6 +159,8 @@ impl MainState {
     pub(crate) fn new(default_font_height: i32, current_font_height: i32, default_txt_spacing: i32, current_font: WeakFont, default_txt_color: Color, default_bg_color: Color, logo_texture: Option<Texture2D>) -> Self {
         Self {
             frame_counter: 0,
+            showing_reset_win: false,
+            should_reset: false,
             showing_quit_win: false,
             should_quit: false,
             showing_info_box: false,
@@ -182,7 +186,7 @@ impl MainState {
     }
 
     pub(crate) fn get_gui_should_lock(&self) -> bool {
-        self.showing_quit_win || self.showing_info_box || self.showing_settings_box || self.showing_license_box
+        self.showing_reset_win || self.showing_quit_win || self.showing_info_box || self.showing_settings_box || self.showing_license_box
     }
 
     pub(crate) fn mainloop(&mut self, rl: &mut RaylibHandle, thread: &RaylibThread, controllers: &Controllers, views: &mut Views) {

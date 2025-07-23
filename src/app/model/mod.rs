@@ -26,6 +26,7 @@ use crate::core::SHORT_PROJECT_VERSION;
 pub(crate) trait SubModel {
     fn get_frame_counter(&self) -> u32;
     fn increment_frame_counter(&mut self);
+    fn reset(&mut self);
 }
 
 // State struct holding non-`Copy` types
@@ -41,6 +42,10 @@ impl SubModel for HomeModel {
     }
     fn increment_frame_counter(&mut self) {
         self.frame_counter += 1;
+    }
+    fn reset(&mut self) {
+        self.frame_counter = 0;
+        self.set_user_continued(false);
     }
 }
 
@@ -69,6 +74,12 @@ impl SubModel for SecondModel {
     }
     fn increment_frame_counter(&mut self) {
         self.frame_counter += 1;
+    }
+    fn reset(&mut self) {
+        self.frame_counter = 0;
+        self.set_user_continued(false);
+        self.set_value(0);
+        self.set_name("".to_string());
     }
 }
 
@@ -109,11 +120,15 @@ impl SubModel for IndiceModel {
     fn increment_frame_counter(&mut self) {
         self.frame_counter += 1;
     }
+    fn reset(&mut self) {
+        self.frame_counter = 0;
+        self.set_selected_index(None);
+    }
 }
 
 impl IndiceModel {
-    pub(crate) fn set_selected_index(&mut self, index: Indice) {
-        self.selected_index = Some(index);
+    pub(crate) fn set_selected_index(&mut self, index: Option<Indice>) {
+        self.selected_index = index;
     }
 
     pub(crate) fn get_selected_index(&self) -> Option<Indice> {
@@ -138,6 +153,14 @@ impl SubModel for FileInputModel {
     }
     fn increment_frame_counter(&mut self) {
         self.frame_counter += 1;
+    }
+    fn reset(&mut self) {
+        self.frame_counter = 0;
+        self.set_riferimento_path(None);
+        self.set_campionamento_path(None);
+        self.set_riferimento_path_valid(false);
+        self.set_campionamento_path_valid(false);
+        self.set_errors_occurred(false);
     }
 }
 
@@ -200,6 +223,12 @@ impl SubModel for InfoAggiuntiveModel {
     fn increment_frame_counter(&mut self) {
         self.frame_counter += 1;
     }
+    fn reset(&mut self) {
+        self.frame_counter = 0;
+        self.set_done_editing(false);
+        self.set_valid(false);
+        self.set_errors_occurred(false);
+    }
 }
 
 impl InfoAggiuntiveModel {
@@ -243,6 +272,11 @@ impl SubModel for OutputModel {
     fn increment_frame_counter(&mut self) {
         self.frame_counter += 1;
     }
+    fn reset(&mut self) {
+        self.frame_counter = 0;
+        self.set_done_calc(false);
+        self.set_done_user_confirm(false);
+    }
 }
 
 impl OutputModel {
@@ -277,6 +311,12 @@ impl SubModel for ConsoleModel {
     }
     fn increment_frame_counter(&mut self) {
         self.frame_counter += 1;
+    }
+    fn reset(&mut self) {
+        self.frame_counter = 0;
+        self.set_name("".to_string());
+        self.set_should_backout(false);
+        self.console.reset();
     }
 }
 
@@ -327,6 +367,17 @@ impl SubModel for DataModel {
     }
     fn increment_frame_counter(&mut self) {
         self.frame_counter += 1;
+    }
+    fn reset(&mut self) {
+        self.frame_counter = 0;
+        self.set_riferimento_niseci(None);
+        self.set_campionamento_niseci(None);
+        self.set_anagrafica_niseci(None);
+        self.set_risultato_niseci(None);
+        self.set_campionamento_hfbi(None);
+        self.set_anagrafica_hfbi(None);
+        self.set_risultato_hfbi(None);
+        self.set_errors_occurred(false);
     }
 }
 

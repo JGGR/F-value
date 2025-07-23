@@ -56,6 +56,14 @@ impl Console {
         self.env.remove(&key)
     }
 
+    pub(crate) fn reset(&mut self) {
+        self.messages.clear();
+        self.set_env(("riferimento_niseci".to_string(), "Vuoto".to_string()));
+        self.set_env(("campionamento_niseci".to_string(), "Vuoto".to_string()));
+        self.set_env(("anagrafica_niseci".to_string(), "Vuoto".to_string()));
+        self.set_env(("risultato_niseci".to_string(), "Vuoto".to_string()));
+    }
+
     pub(crate) fn _get_len(&self) -> usize {
         self.messages.len()
     }

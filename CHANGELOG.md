@@ -1,3 +1,9 @@
+## [0.0.20] - Unreleased
+
+### Added
+
+- Add reset button
+
 ## [0.0.19] - 2025-07-21
 
 ### Added

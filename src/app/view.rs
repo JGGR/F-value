@@ -22,6 +22,37 @@ use raylib::consts::GuiDefaultProperty::TEXT_SIZE;
 use super::core::{GuiTheme, CurrentView, MainState, propwidth, propheight, GUI_THEME_COMBOBOX_STR};
 use crate::core::{COPYRIGHT_INFO, SHORT_PROJECT_VERSION, AUTHOR_JGABAUT, AUTHOR_GIONINJO, AUTHOR_JGABAUT_LINK, AUTHOR_GIONINJO_LINK, rrect};
 
+pub(crate) fn draw_reset_win(d: &mut RaylibDrawHandle, showing_reset_win: &mut bool, should_reset: &mut bool) {
+    if *showing_reset_win {
+        d.draw_rectangle(
+            0,
+            0,
+            d.get_screen_width(),
+            d.get_screen_height(),
+            Color::RAYWHITE.alpha(0.8),
+        );
+        let itext = d.gui_icon_text(ICON_EXIT, "Reset");
+        let result = d.gui_message_box(
+            rrect(
+                d.get_screen_width() / 2 - propwidth(d, 125),
+                d.get_screen_height() / 2 - propheight(d, 50),
+                propwidth(d, 250),
+                propheight(d, 100)
+            ),
+            itext.as_str(),
+            "Vuoi davvero resettare?",
+            "Si;No",
+        );
+
+        if (result == 0) || (result == 2) {
+            *showing_reset_win = false;
+        } else if result == 1 {
+            *should_reset = true;
+            *showing_reset_win = false;
+        }
+    }
+}
+
 pub(crate) fn draw_quit_win(d: &mut RaylibDrawHandle, showing_quit_win: &mut bool, should_quit: &mut bool) {
     if *showing_quit_win {
         d.draw_rectangle(
@@ -453,7 +484,7 @@ pub(crate) fn draw_main(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
 
     let core_button_width = propwidth(d, 25);
     let core_button_heigth = core_button_width;
-    let core_buttons_count = 5;
+    let core_buttons_count = 6;
     let core_buttons_x_padding = propwidth(d, 5);
     let core_buttons_y_padding = core_buttons_x_padding;
     let core_buttons_panel_height = navbar_height;
@@ -486,10 +517,21 @@ pub(crate) fn draw_main(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
         main_state.showing_info_box = true;
     }
 
-    let changeview_button_width = info_button_width;
-    let changeview_button_x = info_button_x + info_button_width + core_buttons_x_padding;
-    let changeview_button_height = info_button_height;
-    let changeview_button_y = info_button_y;
+    let reset_button_width = core_button_width;
+    let reset_button_x = info_button_x + info_button_width + core_buttons_x_padding;
+    let reset_button_height = info_button_height;
+    let reset_button_y = info_button_y;
+
+    // Reset button
+    let itext = d.gui_icon_text(ICON_RESTART, "");
+    if d.gui_button(rrect(reset_button_x, reset_button_y, reset_button_width, reset_button_height), itext.as_str()) {
+        main_state.showing_reset_win = true;
+    }
+
+    let changeview_button_width = reset_button_width;
+    let changeview_button_x = reset_button_x + reset_button_width + core_buttons_x_padding;
+    let changeview_button_height = reset_button_height;
+    let changeview_button_y = reset_button_y;
 
     // "Change view" button
     let itext = d.gui_icon_text(ICON_PLAYER_NEXT, "");
@@ -595,6 +637,14 @@ pub(crate) fn draw_main(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
     }
     draw_quit_win(d, &mut main_state.showing_quit_win, &mut main_state.should_quit);
     if lock_gui && main_state.showing_quit_win {
+        d.gui_lock();
+    }
+
+    if lock_gui && main_state.showing_reset_win {
+        d.gui_unlock();
+    }
+    draw_reset_win(d, &mut main_state.showing_reset_win, &mut main_state.should_reset);
+    if lock_gui && main_state.showing_reset_win {
         d.gui_lock();
     }
 
