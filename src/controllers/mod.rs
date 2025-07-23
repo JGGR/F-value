@@ -161,7 +161,8 @@ impl Controller for SecondController {
             main_state.should_reset = false;
             state.home_model.reset();
             state.second_model.reset();
-            main_state.set_current_view(CurrentView::Home)
+            main_state.set_current_view(CurrentView::Home);
+            return;
         }
     }
 
@@ -212,7 +213,8 @@ impl Controller for IndiceController {
             state.home_model.reset();
             state.second_model.reset();
             state.indice_model.reset();
-            main_state.set_current_view(CurrentView::Home)
+            main_state.set_current_view(CurrentView::Home);
+            return;
         }
     }
     fn get_state(&self) -> Self::SubModel {
@@ -248,7 +250,8 @@ impl Controller for FileInputController {
             state.second_model.reset();
             state.indice_model.reset();
             state.fileinput_model.reset();
-            main_state.set_current_view(CurrentView::Home)
+            main_state.set_current_view(CurrentView::Home);
+            return;
         }
 
         if state.fileinput_model.get_errors_occurred() {
@@ -623,7 +626,8 @@ impl Controller for InfoAggiuntiveController {
             state.indice_model.reset();
             state.fileinput_model.reset();
             state.infoaggiuntive_model.reset();
-            main_state.set_current_view(CurrentView::Home)
+            main_state.set_current_view(CurrentView::Home);
+            return;
         }
 
         if state.infoaggiuntive_model.get_errors_occurred() {
@@ -1009,7 +1013,8 @@ impl Controller for OutputController {
             state.fileinput_model.reset();
             state.infoaggiuntive_model.reset();
             state.data_model.reset();
-            main_state.set_current_view(CurrentView::Home)
+            main_state.set_current_view(CurrentView::Home);
+            return;
         }
 
         if state.data_model.get_errors_occurred() {
@@ -1491,7 +1496,8 @@ impl Controller for ConsoleController {
             state.infoaggiuntive_model.reset();
             state.data_model.reset();
             state.console_model.reset();
-            main_state.set_current_view(CurrentView::Home)
+            main_state.set_current_view(CurrentView::Home);
+            return;
         }
 
         if state.console_model.should_backout() {
