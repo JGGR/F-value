@@ -138,7 +138,8 @@ pub(crate) fn calculate_niseci(campionamento: &CampionamentoNISECI, riferimento:
                 ( (0.1 * (1.0 - x3)) *
                   ((0.1 * x1.sqrt()) + (0.1 * x2_val.sqrt()) + (0.8 * (x1 * x2_val)))
                 );
-            Ok((Some(niseci), intermediates))
+            let rounded_niseci = (1000.0*niseci).round()/1000.0;
+            Ok((Some(rounded_niseci), intermediates))
         },
         None => {
             // Nel caso in cui nessuna specie attesa sia presente nel campionamento
@@ -148,7 +149,13 @@ pub(crate) fn calculate_niseci(campionamento: &CampionamentoNISECI, riferimento:
 }
 
 pub(crate) fn calculate_rqe_niseci(niseci: Option<f32>) -> Option<f32> {
-    niseci.map(|val| (val.log(10.0) +  RQE_NISECI_MAGIC_ADDEND ) / RQE_NISECI_MAGIC_QUOTIENT)
+    let rqe = niseci.map(|val| (val.log(10.0) +  RQE_NISECI_MAGIC_ADDEND ) / RQE_NISECI_MAGIC_QUOTIENT);
+    if let Some(r) = rqe {
+        let rounded_rqe = (1000.0*r).round()/1000.0;
+        Some(rounded_rqe)
+    } else {
+        rqe
+    }
 }
 
 pub(crate) fn calculate_stato_ecologico(niseci: Option<f32>, area: &AreaNISECI) -> Option<StatoEcologicoNISECI> {

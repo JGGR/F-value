@@ -119,6 +119,12 @@ impl Controller for HomeController {
             eprintln!("HomeController:  Let's update current view and go to SelezioneIndice.");
             main_state.set_current_view(CurrentView::SelezioneIndice)
         }
+        if main_state.should_reset {
+            eprintln!("HomeController: Resetting");
+            main_state.should_reset = false;
+            state.home_model.reset();
+            state.console_model.reset();
+        }
     }
 
     fn get_state(&self) -> Self::SubModel {
@@ -150,6 +156,15 @@ impl Controller for SecondController {
             eprintln!("SecondController:  L'utente ha premuto Continua");
             eprintln!("SecondController:  Let's update current view and go to SelezioneIndice.");
             main_state.set_current_view(CurrentView::SelezioneIndice)
+        }
+        if main_state.should_reset {
+            eprintln!("SecondController: Resetting");
+            main_state.should_reset = false;
+            state.home_model.reset();
+            state.second_model.reset();
+            state.console_model.reset();
+            main_state.set_current_view(CurrentView::Home);
+            return;
         }
     }
 
@@ -194,6 +209,16 @@ impl Controller for IndiceController {
             eprintln!("IndiceController:  Let's update current view and go to SelezioneFileInput.");
             main_state.set_current_view(CurrentView::SelezioneFileInput)
         }
+        if main_state.should_reset {
+            eprintln!("IndiceController: Resetting");
+            main_state.should_reset = false;
+            state.home_model.reset();
+            state.second_model.reset();
+            state.indice_model.reset();
+            state.console_model.reset();
+            main_state.set_current_view(CurrentView::Home);
+            return;
+        }
     }
     fn get_state(&self) -> Self::SubModel {
         let state = GLOBAL_STATE.lock().unwrap();
@@ -208,7 +233,7 @@ impl IndiceController {
 
     pub(crate) fn set_indice_corrente(&self, index: Indice) {
         let mut state = GLOBAL_STATE.lock().unwrap();
-        state.indice_model.set_selected_index(index);
+        state.indice_model.set_selected_index(Some(index));
     }
 }
 
@@ -220,6 +245,18 @@ impl Controller for FileInputController {
     fn update(&self, _rl: &mut RaylibHandle, main_state: &mut MainState) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.fileinput_model.increment_frame_counter();
+
+        if main_state.should_reset {
+            eprintln!("FileInputController: Resetting");
+            main_state.should_reset = false;
+            state.home_model.reset();
+            state.second_model.reset();
+            state.indice_model.reset();
+            state.fileinput_model.reset();
+            state.console_model.reset();
+            main_state.set_current_view(CurrentView::Home);
+            return;
+        }
 
         if state.fileinput_model.get_errors_occurred() {
             eprintln!("FileInputController:  Errors occurred");
@@ -584,6 +621,19 @@ impl Controller for InfoAggiuntiveController {
     fn update(&self, _rl: &mut RaylibHandle, main_state: &mut MainState) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.infoaggiuntive_model.increment_frame_counter();
+
+        if main_state.should_reset {
+            eprintln!("InfoAggiuntiveController: Resetting");
+            main_state.should_reset = false;
+            state.home_model.reset();
+            state.second_model.reset();
+            state.indice_model.reset();
+            state.fileinput_model.reset();
+            state.infoaggiuntive_model.reset();
+            state.console_model.reset();
+            main_state.set_current_view(CurrentView::Home);
+            return;
+        }
 
         if state.infoaggiuntive_model.get_errors_occurred() {
             eprintln!("InfoAggiuntiveController:  Errors occurred");
@@ -959,6 +1009,20 @@ impl Controller for OutputController {
     fn update(&self, _rl: &mut RaylibHandle, main_state: &mut MainState) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.output_model.increment_frame_counter();
+        if main_state.should_reset {
+            eprintln!("OutputController: Resetting");
+            main_state.should_reset = false;
+            state.home_model.reset();
+            state.second_model.reset();
+            state.indice_model.reset();
+            state.fileinput_model.reset();
+            state.infoaggiuntive_model.reset();
+            state.data_model.reset();
+            state.console_model.reset();
+            main_state.set_current_view(CurrentView::Home);
+            return;
+        }
+
         if state.data_model.get_errors_occurred() {
             eprintln!("OutputController:  Errors occurred");
             eprintln!("OutputController:  Let's update current view and go to CONSOLE.");
@@ -1190,8 +1254,8 @@ impl OutputController {
 
                     #[cfg(feature="logged")]
                     {
-                        info!("Codice stazione, NISECI, RQE NISECI, Stato ecologico, x1, x2, x3, x2_a, x2_b, x3_a, x3_b");
-                        info!("{}", format!("{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}",
+                        info!("Codice stazione, NISECI, RQE NISECI, Stato ecologico, x1, x2, x3, x2_a, x2_b, x3_a, x3_b\n{}",
+                            format!("{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}",
                             anagrafica.codice_stazione,
                             niseci_str,
                             rqe_niseci_str,
@@ -1238,7 +1302,7 @@ impl OutputController {
 
                         match file_result {
                             Ok(mut file) => {
-                                let mut string_representation = format!("specie, nome latino, tipo autoctono, tipo alloctono, specie attesa, cl1, cl2, cl3, cl4, cl5, densita stimata, rapporto ad/juv, x2a_a, x2a_b\n");
+                                let mut string_representation = format!("specie, nome latino, tipo autoctono, tipo alloctono, specie attesa, cl1, cl2, cl3, cl4, cl5, densita stimata, rapporto ad/juv, x2a_a, x2a_b");
                                 for (_k, v) in intermediates.specie_specifici.iter() {
                                     string_representation = format!("{}\n{}", string_representation, v);
                                 }
@@ -1427,6 +1491,20 @@ impl Controller for ConsoleController {
 
     fn update(&self, rl: &mut RaylibHandle, main_state: &mut MainState) {
         let mut state = GLOBAL_STATE.lock().unwrap();
+
+        if main_state.should_reset {
+            eprintln!("ConsoleController: Resetting");
+            main_state.should_reset = false;
+            state.home_model.reset();
+            state.second_model.reset();
+            state.indice_model.reset();
+            state.fileinput_model.reset();
+            state.infoaggiuntive_model.reset();
+            state.data_model.reset();
+            state.console_model.reset();
+            main_state.set_current_view(CurrentView::Home);
+            return;
+        }
 
         if state.console_model.should_backout() {
             state.console_model.set_should_backout(false);

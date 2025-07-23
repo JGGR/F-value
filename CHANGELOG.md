@@ -1,3 +1,15 @@
+## [0.0.20] - 2025-07-23
+
+### Added
+
+- Add reset button
+
+### Changed
+
+- Round Niseci, RQE Niseci, Hfbi to 3 decimal digits
+- Drop empty lines in log files
+- Invert page 1 and 2 for Niseci PDF
+
 ## [0.0.19] - 2025-07-21
 
 ### Added
