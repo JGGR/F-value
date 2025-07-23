@@ -4,6 +4,10 @@
 
 - Add reset button
 
+### Changed
+
+- Round Niseci, RQE Niseci, Hfbi to 3 decimal digits
+
 ## [0.0.19] - 2025-07-21
 
 ### Added

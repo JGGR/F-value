@@ -62,7 +62,11 @@ pub(crate) fn calculate_mmi(campionamento: &CampionamentoHFBI, anagrafica: &Anag
 
 pub(crate) fn calculate_hfbi(campionamento: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> Result<(f32, ValoriIntermediHFBI), String> {
   match calculate_mmi(campionamento, anagrafica) {
-    Ok((mmi, intermediates)) => Ok(((mmi + HFBI_T) / HFBI_S, intermediates)),
+    Ok((mmi, intermediates)) => {
+        let hfbi = (mmi + HFBI_T) / HFBI_S;
+        let rounded_hfbi = (1000.0*hfbi).round()/1000.0;
+        Ok((rounded_hfbi, intermediates))
+    },
     Err(error) => Err(error)
   }
 }
