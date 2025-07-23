@@ -1,3 +1,10 @@
+## [0.0.21] - Unreleased
+
+### Changed
+
+- Silence warnings
+
+
 ## [0.0.20] - 2025-07-23
 
 ### Added

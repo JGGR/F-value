@@ -76,7 +76,7 @@ pub(crate) fn calculate_hfbi(campionamento: &CampionamentoHFBI, anagrafica: &Ana
 mod full_hfbi_private_tests {
     // We use the structs from the domain, but NOT the functions from the parent module.
     // By defining our own mock functions with the same names, they will be used instead.
-    use crate::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI, GruppoEcoHFBI, GruppoTrofHFBI, HabitatHFBI, RecordHFBI, SpecieHFBI, StagioneHFBI, TipoLagunaCostieraHFBI, ValoriIntermediHFBI};
+    use crate::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI, GruppoEcoHFBI, GruppoTrofHFBI, HabitatHFBI, RecordHFBI, SpecieHFBI, StagioneHFBI, TipoLagunaCostieraHFBI};
 
     const EPSILON: f32 = 1e-6;
 
