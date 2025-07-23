@@ -153,21 +153,14 @@ pub(crate) fn esporta_pdf_niseci(export_path: PathBuf, riferimento_niseci: Rifer
     let x_start = 58.0;
     let y_start = height - 88.0;
 
-
+    // Write a page.
     {
-        // Write a page.
+        // Add page
         let mut page = pdf.page(page_id);
-
         // Set the size to A4 (measured in points) using `media_box` and set the
         // text object we'll write later as the page's contents.
         page.media_box(a4);
         page.parent(page_tree_id);
-
-        //let annotation_id = Ref::new(6);
-
-
-        //page.annotations([annotation_id]);
-
         // We also need to specify which resources the page needs, which in our case
         // is only a font that we name "F1" (the specific name doesn't matter).
         {
@@ -185,19 +178,35 @@ pub(crate) fn esporta_pdf_niseci(export_path: PathBuf, riferimento_niseci: Rifer
         // characters.
         let mut content = Content::new();
 
-        content.save_state();
         content.begin_text();
         content.set_font(font_name, 14.0);
-        content.next_line(58.0, 734.0);
-        content.show(Str(&format!("Niseci: {}", valore_niseci).into_bytes()));
+        content.set_leading(30.0);
+        content.next_line(58.0, 764.0);
+        content.show(Str(&format!("{}", anagrafica_niseci.comunita).into_bytes()));
         content.next_line(0.0, -30.0);
-        content.next_line_show(Str(&format!("RQE Niseci: {}", valore_rqe_niseci).into_bytes()));
+        content.show(Str(&format!("Codice stazione: {}", anagrafica_niseci.codice_stazione).into_bytes()));
         content.next_line(0.0, -30.0);
-        content.next_line_show(Str(&format!("Stato ecologico: {}", stato_eco_niseci).into_bytes()));
+        content.show(Str(&format!("Data: {}", anagrafica_niseci.date_string).into_bytes()));
+        content.next_line(0.0, -30.0);
+        content.show(Str(&format!("{}", anagrafica_niseci.area).into_bytes()));
+        content.next_line(0.0, -30.0);
+        content.show(Str(&format!("Corpo idrico: {}", anagrafica_niseci.corpo_idrico).into_bytes()));
+        content.next_line(0.0, -30.0);
+        content.show(Str(&format!("Bacino: {}", anagrafica_niseci.bacino_appartenenza).into_bytes()));
+        content.next_line(0.0, -30.0);
+        content.show(Str(&format!("Idroecoregione: {}", anagrafica_niseci.idro_eco_regione).into_bytes()));
+        content.next_line(0.0, -30.0);
+        content.show(Str(&format!("Regione: {}", anagrafica_niseci.posizione.regione).into_bytes()));
+        content.next_line(0.0, -30.0);
+        content.show(Str(&format!("Provincia: {}", anagrafica_niseci.posizione.provincia).into_bytes()));
+        content.next_line(0.0, -30.0);
+        content.show(Str(&format!("Lunghezza media stazione: {}", anagrafica_niseci.lunghezza_media_stazione).into_bytes()));
+        content.next_line(0.0, -30.0);
+        content.show(Str(&format!("Larghezza media stazione: {}", anagrafica_niseci.larghezza_media_stazione).into_bytes()));
         content.end_text();
-        content.restore_state();
 
-        content.set_line_width(1.0);
+        let cols = 2;
+        let rows = 10;
 
         // Horizontal lines
         for row in 0..=rows {
@@ -206,6 +215,7 @@ pub(crate) fn esporta_pdf_niseci(export_path: PathBuf, riferimento_niseci: Rifer
             content.line_to(x_start + (cols as f32 * cell_width), y);
             content.stroke();
         }
+
 
         content.save_state();
         content.transform([w, 0.0, 0.0, h, x, y]);
@@ -229,46 +239,36 @@ pub(crate) fn esporta_pdf_niseci(export_path: PathBuf, riferimento_niseci: Rifer
     {
         // Add page 2
         let mut page2 = pdf.page(page2_id);
+
         page2.media_box(a4);
         page2.parent(page_tree_id);
+
+        //let annotation_id = Ref::new(6);
+
+
+        //page.annotations([annotation_id]);
+
         {
             let mut resources = page2.resources();
             resources.fonts().pair(font_name, font_id);
             resources.x_objects().pair(image_name, image_id);
         }
 
-        // Content for page 2
         let mut content2 = Content::new();
 
+        content2.save_state();
         content2.begin_text();
         content2.set_font(font_name, 14.0);
-        content2.set_leading(30.0);
-        content2.next_line(58.0, 764.0);
-        content2.show(Str(&format!("{}", anagrafica_niseci.comunita).into_bytes()));
+        content2.next_line(58.0, 734.0);
+        content2.show(Str(&format!("Niseci: {}", valore_niseci).into_bytes()));
         content2.next_line(0.0, -30.0);
-        content2.show(Str(&format!("Codice stazione: {}", anagrafica_niseci.codice_stazione).into_bytes()));
+        content2.next_line_show(Str(&format!("RQE Niseci: {}", valore_rqe_niseci).into_bytes()));
         content2.next_line(0.0, -30.0);
-        content2.show(Str(&format!("Data: {}", anagrafica_niseci.date_string).into_bytes()));
-        content2.next_line(0.0, -30.0);
-        content2.show(Str(&format!("{}", anagrafica_niseci.area).into_bytes()));
-        content2.next_line(0.0, -30.0);
-        content2.show(Str(&format!("Corpo idrico: {}", anagrafica_niseci.corpo_idrico).into_bytes()));
-        content2.next_line(0.0, -30.0);
-        content2.show(Str(&format!("Bacino: {}", anagrafica_niseci.bacino_appartenenza).into_bytes()));
-        content2.next_line(0.0, -30.0);
-        content2.show(Str(&format!("Idroecoregione: {}", anagrafica_niseci.idro_eco_regione).into_bytes()));
-        content2.next_line(0.0, -30.0);
-        content2.show(Str(&format!("Regione: {}", anagrafica_niseci.posizione.regione).into_bytes()));
-        content2.next_line(0.0, -30.0);
-        content2.show(Str(&format!("Provincia: {}", anagrafica_niseci.posizione.provincia).into_bytes()));
-        content2.next_line(0.0, -30.0);
-        content2.show(Str(&format!("Lunghezza media stazione: {}", anagrafica_niseci.lunghezza_media_stazione).into_bytes()));
-        content2.next_line(0.0, -30.0);
-        content2.show(Str(&format!("Larghezza media stazione: {}", anagrafica_niseci.larghezza_media_stazione).into_bytes()));
+        content2.next_line_show(Str(&format!("Stato ecologico: {}", stato_eco_niseci).into_bytes()));
         content2.end_text();
+        content2.restore_state();
 
-        let cols = 2;
-        let rows = 11;
+        content2.set_line_width(1.0);
 
         // Horizontal lines
         for row in 0..=rows {
@@ -277,7 +277,6 @@ pub(crate) fn esporta_pdf_niseci(export_path: PathBuf, riferimento_niseci: Rifer
             content2.line_to(x_start + (cols as f32 * cell_width), y);
             content2.stroke();
         }
-
 
         content2.save_state();
         content2.transform([w, 0.0, 0.0, h, x, y]);
@@ -310,7 +309,7 @@ pub(crate) fn esporta_pdf_niseci(export_path: PathBuf, riferimento_niseci: Rifer
         contentx.set_font(font_name, 14.0);
         contentx.set_leading(30.0);
         contentx.next_line(58.0, 764.0);
-        contentx.show(Str(b"Nome, cl1, cl2, cl3, cl4, adj1, adj2, adj3, adj4, dsoglia1, dsoglia2"));
+        contentx.show(Str(b"Specie, cl1, cl2, cl3, cl4, adj1, adj2, adj3, adj4, dsoglia1, dsoglia2"));
         contentx.next_line(0.0, -30.0);
 
         for specie in chunk {
