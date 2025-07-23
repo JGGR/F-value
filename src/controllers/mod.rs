@@ -1254,8 +1254,8 @@ impl OutputController {
 
                     #[cfg(feature="logged")]
                     {
-                        info!("Codice stazione, NISECI, RQE NISECI, Stato ecologico, x1, x2, x3, x2_a, x2_b, x3_a, x3_b");
-                        info!("{}", format!("{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}",
+                        info!("Codice stazione, NISECI, RQE NISECI, Stato ecologico, x1, x2, x3, x2_a, x2_b, x3_a, x3_b\n{}",
+                            format!("{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}",
                             anagrafica.codice_stazione,
                             niseci_str,
                             rqe_niseci_str,
@@ -1302,7 +1302,7 @@ impl OutputController {
 
                         match file_result {
                             Ok(mut file) => {
-                                let mut string_representation = format!("specie, nome latino, tipo autoctono, tipo alloctono, specie attesa, cl1, cl2, cl3, cl4, cl5, densita stimata, rapporto ad/juv, x2a_a, x2a_b\n");
+                                let mut string_representation = format!("specie, nome latino, tipo autoctono, tipo alloctono, specie attesa, cl1, cl2, cl3, cl4, cl5, densita stimata, rapporto ad/juv, x2a_a, x2a_b");
                                 for (_k, v) in intermediates.specie_specifici.iter() {
                                     string_representation = format!("{}\n{}", string_representation, v);
                                 }

@@ -7,6 +7,7 @@
 ### Changed
 
 - Round Niseci, RQE Niseci, Hfbi to 3 decimal digits
+- Drop empty lines in log files
 
 ## [0.0.19] - 2025-07-21
 
