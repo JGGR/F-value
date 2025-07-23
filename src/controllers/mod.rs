@@ -123,6 +123,7 @@ impl Controller for HomeController {
             eprintln!("HomeController: Resetting");
             main_state.should_reset = false;
             state.home_model.reset();
+            state.console_model.reset();
         }
     }
 
@@ -161,6 +162,7 @@ impl Controller for SecondController {
             main_state.should_reset = false;
             state.home_model.reset();
             state.second_model.reset();
+            state.console_model.reset();
             main_state.set_current_view(CurrentView::Home);
             return;
         }
@@ -213,6 +215,7 @@ impl Controller for IndiceController {
             state.home_model.reset();
             state.second_model.reset();
             state.indice_model.reset();
+            state.console_model.reset();
             main_state.set_current_view(CurrentView::Home);
             return;
         }
@@ -250,6 +253,7 @@ impl Controller for FileInputController {
             state.second_model.reset();
             state.indice_model.reset();
             state.fileinput_model.reset();
+            state.console_model.reset();
             main_state.set_current_view(CurrentView::Home);
             return;
         }
@@ -626,6 +630,7 @@ impl Controller for InfoAggiuntiveController {
             state.indice_model.reset();
             state.fileinput_model.reset();
             state.infoaggiuntive_model.reset();
+            state.console_model.reset();
             main_state.set_current_view(CurrentView::Home);
             return;
         }
@@ -1013,6 +1018,7 @@ impl Controller for OutputController {
             state.fileinput_model.reset();
             state.infoaggiuntive_model.reset();
             state.data_model.reset();
+            state.console_model.reset();
             main_state.set_current_view(CurrentView::Home);
             return;
         }
