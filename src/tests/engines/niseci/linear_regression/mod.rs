@@ -15,16 +15,13 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::engines::niseci::linear_regression::{calculate_quantita_with_regression, gradient_descent_iterate, Point};
-
+use crate::engines::niseci::linear_regression::{
+    calculate_quantita_with_regression, gradient_descent_iterate, Point,
+};
 
 #[test]
 fn test_linear_regression() {
-    let records = [
-        Point::new(1, 100),
-        Point::new(2, 75),
-        Point::new(3, 50),
-    ];
+    let records = [Point::new(1, 100), Point::new(2, 75), Point::new(3, 50)];
 
     let result = gradient_descent_iterate(&records);
     assert!(result.is_ok());
@@ -36,11 +33,7 @@ fn test_linear_regression() {
 
 #[test]
 fn test_quantita_stimata() {
-    let passaggi = [
-        Point::new(1, 100),
-        Point::new(2, 75),
-        Point::new(3, 50),
-    ];
+    let passaggi = [Point::new(1, 100), Point::new(2, 75), Point::new(3, 50)];
 
     let quantita_stimata = calculate_quantita_with_regression(&passaggi);
 
@@ -65,11 +58,7 @@ fn test_quantita_stimata_2() {
 
 #[test]
 fn test_quantita_stimata_m_positive() {
-    let passaggi = [
-        Point::new(1, 50),
-        Point::new(2, 75),
-        Point::new(3, 100),
-    ];
+    let passaggi = [Point::new(1, 50), Point::new(2, 75), Point::new(3, 100)];
     let quantita_stimata = calculate_quantita_with_regression(&passaggi);
 
     assert!(quantita_stimata.is_ok());

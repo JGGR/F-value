@@ -18,39 +18,34 @@
 use crate::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI};
 
 pub(crate) fn calc_ddom(campionamento: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
+    let (s90, b90): (u32, f32) = calc_s90_b90(campionamento, anagrafica);
 
-  let (s90, b90): (u32, f32) = calc_s90_b90(campionamento, anagrafica);
-
-  (((s90 as f32 - 1.0) / b90) + 1.0).ln()
+    (((s90 as f32 - 1.0) / b90) + 1.0).ln()
 }
-
 
 fn calc_s90_b90(campionamento: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> (u32, f32) {
-
-  let mut biomassa_tot = 0;
-  for cattura in &campionamento.campionamento {
-    biomassa_tot += cattura.peso;
-  }
-
-  let biomassa_90 = (biomassa_tot as f32 * 0.9) as u32;
-
-  let mut n_specie_90: u32 = 0;
-  let mut biomassa_tmp: u32 = 0;
-  for cattura in  &campionamento.campionamento {
-    biomassa_tmp += cattura.peso;
-    n_specie_90 += 1;
-    if biomassa_tmp > biomassa_90 {
-      break;
+    let mut biomassa_tot = 0;
+    for cattura in &campionamento.campionamento {
+        biomassa_tot += cattura.peso;
     }
-  }
 
-  let area: f32 = anagrafica.lunghezza_media_transetto * anagrafica.larghezza_media_transetto;
-  let b90: f32 = ((biomassa_90 as f32 / area) * 100.0 +1.0).ln();
+    let biomassa_90 = (biomassa_tot as f32 * 0.9) as u32;
 
-  (n_specie_90, b90)
+    let mut n_specie_90: u32 = 0;
+    let mut biomassa_tmp: u32 = 0;
+    for cattura in &campionamento.campionamento {
+        biomassa_tmp += cattura.peso;
+        n_specie_90 += 1;
+        if biomassa_tmp > biomassa_90 {
+            break;
+        }
+    }
 
+    let area: f32 = anagrafica.lunghezza_media_transetto * anagrafica.larghezza_media_transetto;
+    let b90: f32 = ((biomassa_90 as f32 / area) * 100.0 + 1.0).ln();
+
+    (n_specie_90, b90)
 }
-
 
 #[cfg(test)]
 mod ddom_private_tests {
@@ -68,7 +63,10 @@ mod ddom_private_tests {
         AnagraficaHFBI {
             codice_stazione: "TestStazione".to_string(),
             corpo_idrico: "TestCorpoIdrico".to_string(),
-            posizione: Location { regione: "Test".to_string(), provincia: "Test".to_string() },
+            posizione: Location {
+                regione: "Test".to_string(),
+                provincia: "Test".to_string(),
+            },
             date_string: "01/01/2025".to_string(),
             tipo_laguna: TipoLagunaCostieraHFBI::MAt1,
             stagione: StagioneHFBI::Primavera,
@@ -106,7 +104,9 @@ mod ddom_private_tests {
     #[test]
     fn test_s90_b90_empty_input() {
         let anagrafica = create_test_anagrafica(100.0, 5.0);
-        let campione = CampionamentoHFBI { campionamento: vec![] };
+        let campione = CampionamentoHFBI {
+            campionamento: vec![],
+        };
         let (s90, b90) = calc_s90_b90(&campione, &anagrafica);
 
         assert_eq!(s90, 0);
@@ -117,7 +117,9 @@ mod ddom_private_tests {
     #[test]
     fn test_s90_b90_single_species() {
         let anagrafica = create_test_anagrafica(10.0, 10.0); // area = 100
-        let campione = CampionamentoHFBI { campionamento: vec![create_dummy_record(200)] };
+        let campione = CampionamentoHFBI {
+            campionamento: vec![create_dummy_record(200)],
+        };
         let (s90, b90) = calc_s90_b90(&campione, &anagrafica);
 
         // n_specie_90 is 1 because the loop runs once and breaks.
@@ -131,20 +133,24 @@ mod ddom_private_tests {
     #[test]
     fn test_s90_b90_zero_area() {
         let anagrafica = create_test_anagrafica(10.0, 0.0); // area = 0
-        let campione = CampionamentoHFBI { campionamento: vec![create_dummy_record(100)] };
+        let campione = CampionamentoHFBI {
+            campionamento: vec![create_dummy_record(100)],
+        };
         let (s90, b90) = calc_s90_b90(&campione, &anagrafica);
 
         assert_eq!(s90, 1);
         // Division by zero area results in infinity
         assert!(b90.is_infinite());
     }
-    
+
     // --- Tests for the public function: calc_ddom ---
 
     #[test]
     fn test_ddom_empty_input() {
         let anagrafica = create_test_anagrafica(100.0, 5.0);
-        let campione = CampionamentoHFBI { campionamento: vec![] };
+        let campione = CampionamentoHFBI {
+            campionamento: vec![],
+        };
         let result = calc_ddom(&campione, &anagrafica);
         // s90=0, b90=0. Formula is ln(((0-1)/0)+1) = ln(-inf) = NaN
         assert!(result.is_nan());
@@ -153,16 +159,20 @@ mod ddom_private_tests {
     #[test]
     fn test_ddom_single_species() {
         let anagrafica = create_test_anagrafica(100.0, 5.0);
-        let campione = CampionamentoHFBI { campionamento: vec![create_dummy_record(100)] };
+        let campione = CampionamentoHFBI {
+            campionamento: vec![create_dummy_record(100)],
+        };
         let result = calc_ddom(&campione, &anagrafica);
         // s90=1. Formula is ln(((1-1)/b90)+1) = ln(1) = 0
         assert!((result - 0.0).abs() < EPSILON);
     }
-    
+
     #[test]
     fn test_ddom_zero_area() {
         let anagrafica = create_test_anagrafica(10.0, 0.0); // area = 0
-        let campione = CampionamentoHFBI { campionamento: vec![create_dummy_record(100), create_dummy_record(50)] };
+        let campione = CampionamentoHFBI {
+            campionamento: vec![create_dummy_record(100), create_dummy_record(50)],
+        };
         let result = calc_ddom(&campione, &anagrafica);
         // b90 is infinity. Formula is ln(((s90-1)/inf)+1) = ln(0+1) = ln(1) = 0
         assert!((result - 0.0).abs() < EPSILON);
@@ -186,13 +196,10 @@ mod ddom_private_tests {
         // b90 = ln((180 / 100) * 100 + 1) = ln(181)
         let s90 = 4.0_f32;
         let b90 = 181.0_f32.ln();
-        
+
         let expected_result = (((s90 - 1.0) / b90) + 1.0).ln();
         let actual_result = calc_ddom(&campione, &anagrafica);
-        
+
         assert!((actual_result - expected_result).abs() < EPSILON);
     }
 }
-
-
-

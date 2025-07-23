@@ -16,6 +16,8 @@
 */
 
 #[cfg(test)]
+mod full;
+#[cfg(test)]
 mod linear_regression;
 #[cfg(test)]
 mod x1;
@@ -23,5 +25,3 @@ mod x1;
 mod x2;
 #[cfg(test)]
 mod x3;
-#[cfg(test)]
-mod full;

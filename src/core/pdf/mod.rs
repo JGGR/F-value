@@ -15,35 +15,40 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use std::path::PathBuf;
-use crate::PROJECT_LOGO_DATA;
-use crate::domain::niseci::{RiferimentoNISECI, AnagraficaNISECI, RisultatoNISECI, SpecieNISECI};
-use crate::engines::niseci::full::calculate_stato_ecologico;
 use crate::domain::hfbi::{AnagraficaHFBI, RisultatoHFBI};
-use pdf_writer::{Content, Finish, Name, Pdf, Rect, Ref, Str, Filter, Chunk};
+use crate::domain::niseci::{AnagraficaNISECI, RiferimentoNISECI, RisultatoNISECI, SpecieNISECI};
+use crate::engines::niseci::full::calculate_stato_ecologico;
+use crate::PROJECT_LOGO_DATA;
 use image::{ColorType, GenericImageView, ImageFormat};
 use miniz_oxide::deflate::{compress_to_vec_zlib, CompressionLevel};
+use pdf_writer::{Chunk, Content, Filter, Finish, Name, Pdf, Rect, Ref, Str};
+use std::path::PathBuf;
 
-pub(crate) fn esporta_pdf_niseci(export_path: PathBuf, riferimento_niseci: RiferimentoNISECI, anagrafica_niseci: AnagraficaNISECI, risultato_niseci: RisultatoNISECI) {
-
+pub(crate) fn esporta_pdf_niseci(
+    export_path: PathBuf,
+    riferimento_niseci: RiferimentoNISECI,
+    anagrafica_niseci: AnagraficaNISECI,
+    risultato_niseci: RisultatoNISECI,
+) {
     let valore_niseci = match risultato_niseci.get_valore() {
-        Some(v) => { &format!("{}", v) }
-        None => { "NC" }
+        Some(v) => &format!("{}", v),
+        None => "NC",
     };
     let valore_rqe_niseci = match risultato_niseci.get_rqe() {
-        Some(v) => { &format!("{}", v) }
-        None => { "NC" }
+        Some(v) => &format!("{}", v),
+        None => "NC",
     };
-    let stato_eco_niseci = match calculate_stato_ecologico(risultato_niseci.get_valore(), &anagrafica_niseci.area) {
-        Some(v) => { &format!("{}", v) }
-        None => { "NC" }
-    };
+    let stato_eco_niseci =
+        match calculate_stato_ecologico(risultato_niseci.get_valore(), &anagrafica_niseci.area) {
+            Some(v) => &format!("{}", v),
+            None => "NC",
+        };
 
-    let filtered_riferimento_niseci: Vec<SpecieNISECI> = riferimento_niseci.elenco_specie
+    let filtered_riferimento_niseci: Vec<SpecieNISECI> = riferimento_niseci
+        .elenco_specie
         .into_iter()
         .filter(|specie| specie.specie_attesa)
         .collect();
-
 
     // Define an ID allocator. Every time we need a new object, we just call
     // `alloc.bump()`, which increases `alloc` by one and returns its previous
@@ -135,7 +140,6 @@ pub(crate) fn esporta_pdf_niseci(export_path: PathBuf, riferimento_niseci: Rifer
     // Center the image on the page.
     let x = (a4.x2 - w) / 2.0;
     let y = (a4.y2 - h) / 2.0;
-
 
     // Page 1
     let page_id = alloc.bump();
@@ -184,25 +188,59 @@ pub(crate) fn esporta_pdf_niseci(export_path: PathBuf, riferimento_niseci: Rifer
         content.next_line(58.0, 764.0);
         content.show(Str(&format!("{}", anagrafica_niseci.comunita).into_bytes()));
         content.next_line(0.0, -30.0);
-        content.show(Str(&format!("Codice stazione: {}", anagrafica_niseci.codice_stazione).into_bytes()));
+        content.show(Str(&format!(
+            "Codice stazione: {}",
+            anagrafica_niseci.codice_stazione
+        )
+        .into_bytes()));
         content.next_line(0.0, -30.0);
-        content.show(Str(&format!("Data: {}", anagrafica_niseci.date_string).into_bytes()));
+        content.show(Str(
+            &format!("Data: {}", anagrafica_niseci.date_string).into_bytes()
+        ));
         content.next_line(0.0, -30.0);
         content.show(Str(&format!("{}", anagrafica_niseci.area).into_bytes()));
         content.next_line(0.0, -30.0);
-        content.show(Str(&format!("Corpo idrico: {}", anagrafica_niseci.corpo_idrico).into_bytes()));
+        content.show(Str(&format!(
+            "Corpo idrico: {}",
+            anagrafica_niseci.corpo_idrico
+        )
+        .into_bytes()));
         content.next_line(0.0, -30.0);
-        content.show(Str(&format!("Bacino: {}", anagrafica_niseci.bacino_appartenenza).into_bytes()));
+        content.show(Str(&format!(
+            "Bacino: {}",
+            anagrafica_niseci.bacino_appartenenza
+        )
+        .into_bytes()));
         content.next_line(0.0, -30.0);
-        content.show(Str(&format!("Idroecoregione: {}", anagrafica_niseci.idro_eco_regione).into_bytes()));
+        content.show(Str(&format!(
+            "Idroecoregione: {}",
+            anagrafica_niseci.idro_eco_regione
+        )
+        .into_bytes()));
         content.next_line(0.0, -30.0);
-        content.show(Str(&format!("Regione: {}", anagrafica_niseci.posizione.regione).into_bytes()));
+        content.show(Str(&format!(
+            "Regione: {}",
+            anagrafica_niseci.posizione.regione
+        )
+        .into_bytes()));
         content.next_line(0.0, -30.0);
-        content.show(Str(&format!("Provincia: {}", anagrafica_niseci.posizione.provincia).into_bytes()));
+        content.show(Str(&format!(
+            "Provincia: {}",
+            anagrafica_niseci.posizione.provincia
+        )
+        .into_bytes()));
         content.next_line(0.0, -30.0);
-        content.show(Str(&format!("Lunghezza media stazione: {}", anagrafica_niseci.lunghezza_media_stazione).into_bytes()));
+        content.show(Str(&format!(
+            "Lunghezza media stazione: {}",
+            anagrafica_niseci.lunghezza_media_stazione
+        )
+        .into_bytes()));
         content.next_line(0.0, -30.0);
-        content.show(Str(&format!("Larghezza media stazione: {}", anagrafica_niseci.larghezza_media_stazione).into_bytes()));
+        content.show(Str(&format!(
+            "Larghezza media stazione: {}",
+            anagrafica_niseci.larghezza_media_stazione
+        )
+        .into_bytes()));
         content.end_text();
 
         let cols = 2;
@@ -215,7 +253,6 @@ pub(crate) fn esporta_pdf_niseci(export_path: PathBuf, riferimento_niseci: Rifer
             content.line_to(x_start + (cols as f32 * cell_width), y);
             content.stroke();
         }
-
 
         content.save_state();
         content.transform([w, 0.0, 0.0, h, x, y]);
@@ -245,7 +282,6 @@ pub(crate) fn esporta_pdf_niseci(export_path: PathBuf, riferimento_niseci: Rifer
 
         //let annotation_id = Ref::new(6);
 
-
         //page.annotations([annotation_id]);
 
         {
@@ -262,9 +298,13 @@ pub(crate) fn esporta_pdf_niseci(export_path: PathBuf, riferimento_niseci: Rifer
         content2.next_line(58.0, 734.0);
         content2.show(Str(&format!("Niseci: {}", valore_niseci).into_bytes()));
         content2.next_line(0.0, -30.0);
-        content2.next_line_show(Str(&format!("RQE Niseci: {}", valore_rqe_niseci).into_bytes()));
+        content2.next_line_show(Str(
+            &format!("RQE Niseci: {}", valore_rqe_niseci).into_bytes()
+        ));
         content2.next_line(0.0, -30.0);
-        content2.next_line_show(Str(&format!("Stato ecologico: {}", stato_eco_niseci).into_bytes()));
+        content2.next_line_show(Str(
+            &format!("Stato ecologico: {}", stato_eco_niseci).into_bytes()
+        ));
         content2.end_text();
         content2.restore_state();
 
@@ -309,25 +349,27 @@ pub(crate) fn esporta_pdf_niseci(export_path: PathBuf, riferimento_niseci: Rifer
         contentx.set_font(font_name, 14.0);
         contentx.set_leading(30.0);
         contentx.next_line(58.0, 764.0);
-        contentx.show(Str(b"Specie, cl1, cl2, cl3, cl4, adj1, adj2, adj3, adj4, dsoglia1, dsoglia2"));
+        contentx.show(Str(
+            b"Specie, cl1, cl2, cl3, cl4, adj1, adj2, adj3, adj4, dsoglia1, dsoglia2",
+        ));
         contentx.next_line(0.0, -30.0);
 
         for specie in chunk {
             contentx.show(Str(&format!(
-                        "{}, {:.3}, {:.3}, {:.3}, {:.3}, {:.3}, {:.3}, {:.3}, {:.3}, {:.3}, {:.3}",
-                        specie.nome,
-                        specie.cl_soglia1,
-                        specie.cl_soglia2,
-                        specie.cl_soglia3,
-                        specie.cl_soglia4,
-                        specie.ad_juv_soglia1,
-                        specie.ad_juv_soglia2,
-                        specie.ad_juv_soglia3,
-                        specie.ad_juv_soglia4,
-                        specie.dens_soglia1,
-                        specie.dens_soglia2
-                    )
-                    .into_bytes()));
+                "{}, {:.3}, {:.3}, {:.3}, {:.3}, {:.3}, {:.3}, {:.3}, {:.3}, {:.3}, {:.3}",
+                specie.nome,
+                specie.cl_soglia1,
+                specie.cl_soglia2,
+                specie.cl_soglia3,
+                specie.cl_soglia4,
+                specie.ad_juv_soglia1,
+                specie.ad_juv_soglia2,
+                specie.ad_juv_soglia3,
+                specie.ad_juv_soglia4,
+                specie.dens_soglia1,
+                specie.dens_soglia2
+            )
+            .into_bytes()));
             contentx.next_line(0.0, -30.0);
         }
         contentx.end_text();
@@ -361,7 +403,9 @@ pub(crate) fn esporta_pdf_niseci(export_path: PathBuf, riferimento_niseci: Rifer
     pdf.extend(&secondary);
 
     // Write the page tree with a single child page.
-    pdf.pages(page_tree_id).kids(page_ids.iter().copied()).count(page_ids.len() as i32);
+    pdf.pages(page_tree_id)
+        .kids(page_ids.iter().copied())
+        .count(page_ids.len() as i32);
 
     // Write the document catalog with a reference to the page tree.
     pdf.catalog(alloc.bump()).pages(page_tree_id);
@@ -372,18 +416,21 @@ pub(crate) fn esporta_pdf_niseci(export_path: PathBuf, riferimento_niseci: Rifer
 
     // Write the thing to a file.
     match std::fs::write(&export_path, buf) {
-        Ok(_) => {},
+        Ok(_) => {}
         Err(e) => {
             eprintln!("Failed writing pdf to {}: {}", export_path.display(), e);
         }
     }
 }
 
-pub(crate) fn esporta_pdf_hfbi(export_path: PathBuf, anagrafica_hfbi: AnagraficaHFBI, risultato_hfbi: RisultatoHFBI) {
-
+pub(crate) fn esporta_pdf_hfbi(
+    export_path: PathBuf,
+    anagrafica_hfbi: AnagraficaHFBI,
+    risultato_hfbi: RisultatoHFBI,
+) {
     let valore_hfbi = match risultato_hfbi.get_valore() {
-        Some(v) => { &format!("{}", v) }
-        None => { "NC" }
+        Some(v) => &format!("{}", v),
+        None => "NC",
     };
     // Define an ID allocator. Every time we need a new object, we just call
     // `alloc.bump()`, which increases `alloc` by one and returns its previous
@@ -476,7 +523,6 @@ pub(crate) fn esporta_pdf_hfbi(export_path: PathBuf, anagrafica_hfbi: Anagrafica
     let x = (a4.x2 - w) / 2.0;
     let y = (a4.y2 - h) / 2.0;
 
-
     // Page 1
     let page_id = alloc.bump();
     page_ids.push(page_id);
@@ -493,7 +539,6 @@ pub(crate) fn esporta_pdf_hfbi(export_path: PathBuf, anagrafica_hfbi: Anagrafica
     let x_start = 58.0;
     let y_start = height - 88.0;
 
-
     {
         // Write a page.
         let mut page = pdf.page(page_id);
@@ -504,7 +549,6 @@ pub(crate) fn esporta_pdf_hfbi(export_path: PathBuf, anagrafica_hfbi: Anagrafica
         page.parent(page_tree_id);
 
         //let annotation_id = Ref::new(6);
-
 
         //page.annotations([annotation_id]);
 
@@ -580,25 +624,61 @@ pub(crate) fn esporta_pdf_hfbi(export_path: PathBuf, anagrafica_hfbi: Anagrafica
         content2.set_font(font_name, 14.0);
         content2.set_leading(30.0);
         content2.next_line(58.0, 764.0);
-        content2.show(Str(&format!("Tipo laguna: {}", anagrafica_hfbi.tipo_laguna).into_bytes()));
+        content2.show(Str(&format!(
+            "Tipo laguna: {}",
+            anagrafica_hfbi.tipo_laguna
+        )
+        .into_bytes()));
         content2.next_line(0.0, -30.0);
-        content2.show(Str(&format!("Codice stazione: {}", anagrafica_hfbi.codice_stazione).into_bytes()));
+        content2.show(Str(&format!(
+            "Codice stazione: {}",
+            anagrafica_hfbi.codice_stazione
+        )
+        .into_bytes()));
         content2.next_line(0.0, -30.0);
-        content2.show(Str(&format!("Data: {}", anagrafica_hfbi.date_string).into_bytes()));
+        content2.show(Str(
+            &format!("Data: {}", anagrafica_hfbi.date_string).into_bytes()
+        ));
         content2.next_line(0.0, -30.0);
-        content2.show(Str(&format!("Stagione: {}", anagrafica_hfbi.stagione).into_bytes()));
+        content2.show(Str(
+            &format!("Stagione: {}", anagrafica_hfbi.stagione).into_bytes()
+        ));
         content2.next_line(0.0, -30.0);
-        content2.show(Str(&format!("Corpo idrico: {}", anagrafica_hfbi.corpo_idrico).into_bytes()));
+        content2.show(Str(&format!(
+            "Corpo idrico: {}",
+            anagrafica_hfbi.corpo_idrico
+        )
+        .into_bytes()));
         content2.next_line(0.0, -30.0);
-        content2.show(Str(&format!("Habitat vegetato: {}", anagrafica_hfbi.habitat_vegetato).into_bytes()));
+        content2.show(Str(&format!(
+            "Habitat vegetato: {}",
+            anagrafica_hfbi.habitat_vegetato
+        )
+        .into_bytes()));
         content2.next_line(0.0, -30.0);
-        content2.show(Str(&format!("Regione: {}", anagrafica_hfbi.posizione.regione).into_bytes()));
+        content2.show(Str(&format!(
+            "Regione: {}",
+            anagrafica_hfbi.posizione.regione
+        )
+        .into_bytes()));
         content2.next_line(0.0, -30.0);
-        content2.show(Str(&format!("Provincia: {}", anagrafica_hfbi.posizione.provincia).into_bytes()));
+        content2.show(Str(&format!(
+            "Provincia: {}",
+            anagrafica_hfbi.posizione.provincia
+        )
+        .into_bytes()));
         content2.next_line(0.0, -30.0);
-        content2.show(Str(&format!("Lunghezza media stazione: {}", anagrafica_hfbi.lunghezza_media_transetto).into_bytes()));
+        content2.show(Str(&format!(
+            "Lunghezza media stazione: {}",
+            anagrafica_hfbi.lunghezza_media_transetto
+        )
+        .into_bytes()));
         content2.next_line(0.0, -30.0);
-        content2.show(Str(&format!("Larghezza media stazione: {}", anagrafica_hfbi.larghezza_media_transetto).into_bytes()));
+        content2.show(Str(&format!(
+            "Larghezza media stazione: {}",
+            anagrafica_hfbi.larghezza_media_transetto
+        )
+        .into_bytes()));
         content2.end_text();
 
         let cols = 2;
@@ -612,7 +692,6 @@ pub(crate) fn esporta_pdf_hfbi(export_path: PathBuf, anagrafica_hfbi: Anagrafica
             content2.stroke();
         }
 
-
         content2.save_state();
         content2.transform([w, 0.0, 0.0, h, x, y]);
         content2.x_object(image_name);
@@ -621,7 +700,6 @@ pub(crate) fn esporta_pdf_hfbi(export_path: PathBuf, anagrafica_hfbi: Anagrafica
         let content2_id = alloc.bump();
         secondary.stream(content2_id, &content2.finish());
         page2.contents(content2_id);
-
     }
 
     // Specify the font we want to use. Because Helvetica is one of the 14 base
@@ -632,7 +710,9 @@ pub(crate) fn esporta_pdf_hfbi(export_path: PathBuf, anagrafica_hfbi: Anagrafica
     pdf.extend(&secondary);
 
     // Write the page tree with a single child page.
-    pdf.pages(page_tree_id).kids(page_ids.iter().copied()).count(page_ids.len() as i32);
+    pdf.pages(page_tree_id)
+        .kids(page_ids.iter().copied())
+        .count(page_ids.len() as i32);
 
     // Write the document catalog with a reference to the page tree.
     pdf.catalog(alloc.bump()).pages(page_tree_id);
@@ -643,10 +723,9 @@ pub(crate) fn esporta_pdf_hfbi(export_path: PathBuf, anagrafica_hfbi: Anagrafica
 
     // Write the thing to a file.
     match std::fs::write(&export_path, buf) {
-        Ok(_) => {},
+        Ok(_) => {}
         Err(e) => {
             eprintln!("Failed writing pdf to {}: {}", export_path.display(), e);
         }
     }
-
 }

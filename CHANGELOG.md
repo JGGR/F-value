@@ -3,7 +3,7 @@
 ### Changed
 
 - Silence warnings
-
+- Ran cargo fmt
 
 ## [0.0.20] - 2025-07-23
 

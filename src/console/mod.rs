@@ -15,27 +15,32 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use std::collections::{VecDeque, HashMap};
-use raylib::prelude::*;
-use raylib::consts::GuiIconName::ICON_MONITOR;
-use crate::app::core::{propwidth, propheight};
+use crate::app::core::{propheight, propwidth};
 use crate::controllers::ConsoleController;
 use crate::core::rrect;
+use raylib::consts::GuiIconName::ICON_MONITOR;
+use raylib::prelude::*;
+use std::collections::{HashMap, VecDeque};
 
 #[derive(Clone)]
 pub(crate) struct Console {
-    columns: usize,             // How many chars are shown per line
-    messages: VecDeque<String>, // Stores all console messages
-    max_messages: usize,        // Limit on messages to keep in memory
-    view_offset: usize,         // Offset for the currently visible messages
-    max_lines_visible: usize,   // Number of lines that fit in the view
-    autoscroll: bool,           // Flag to track autoscroll state
-    prompt: String,             // User prompt
-    env: HashMap<String,String>,// Console environment
+    columns: usize,               // How many chars are shown per line
+    messages: VecDeque<String>,   // Stores all console messages
+    max_messages: usize,          // Limit on messages to keep in memory
+    view_offset: usize,           // Offset for the currently visible messages
+    max_lines_visible: usize,     // Number of lines that fit in the view
+    autoscroll: bool,             // Flag to track autoscroll state
+    prompt: String,               // User prompt
+    env: HashMap<String, String>, // Console environment
 }
 
 impl Console {
-    pub(crate) fn new(columns: usize, max_messages: usize, max_lines_visible: usize, env: HashMap<String,String>) -> Self {
+    pub(crate) fn new(
+        columns: usize,
+        max_messages: usize,
+        max_lines_visible: usize,
+        env: HashMap<String, String>,
+    ) -> Self {
         Console {
             columns,
             messages: VecDeque::with_capacity(max_messages),
@@ -44,11 +49,11 @@ impl Console {
             max_lines_visible,
             autoscroll: true, // Start with autoscroll enabled
             prompt: String::new(),
-            env
+            env,
         }
     }
 
-    pub(crate) fn set_env(&mut self, (key, val): (String,String)) {
+    pub(crate) fn set_env(&mut self, (key, val): (String, String)) {
         self.env.insert(key, val);
     }
 
@@ -80,7 +85,6 @@ impl Console {
         let lines = msg.lines();
 
         for line in lines {
-
             let chunk_size = self.columns;
 
             let chunks: Vec<String> = line
@@ -105,7 +109,13 @@ impl Console {
     }
 
     /// Handle character input (e.g., from `raylib` key events)
-    pub(crate) fn handle_input(&mut self, _rl: &RaylibHandle, input_char: Option<char>, is_enter_pressed: bool, is_backspace_pressed: bool) {
+    pub(crate) fn handle_input(
+        &mut self,
+        _rl: &RaylibHandle,
+        input_char: Option<char>,
+        is_enter_pressed: bool,
+        is_backspace_pressed: bool,
+    ) {
         if let Some(c) = input_char {
             self.prompt.push(c);
         }
@@ -148,12 +158,18 @@ impl Console {
             match command.as_str() {
                 "help" => {
                     if args_num < 1 {
-                        self.add_message("esox prompt, comandi disponibili:\n  echo\n  info\n  clear\n  help".to_string());
+                        self.add_message(
+                            "esox prompt, comandi disponibili:\n  echo\n  info\n  clear\n  help"
+                                .to_string(),
+                        );
                     } else {
                         let cmd = args_vec[0];
                         match cmd {
                             "info" => {
-                                self.add_message("comando info:\n  uso: info <name>\nNomi disponibili: {".to_string());
+                                self.add_message(
+                                    "comando info:\n  uso: info <name>\nNomi disponibili: {"
+                                        .to_string(),
+                                );
                                 let keys: Vec<_> = self.env.keys().cloned().collect();
                                 for k in keys {
                                     self.add_message(format!("  {k}"));
@@ -224,11 +240,21 @@ impl Console {
         }
     }
 
-    pub(crate) fn draw(&self, d: &mut RaylibDrawHandle, controller: &ConsoleController, txt_color: Color, font_size: i32, font_spacing: i32, font: &Font) {
+    pub(crate) fn draw(
+        &self,
+        d: &mut RaylibDrawHandle,
+        controller: &ConsoleController,
+        txt_color: Color,
+        font_size: i32,
+        font_spacing: i32,
+        font: &Font,
+    ) {
         let line_height = propheight(d, font_size + 4); // Adjust as needed
-        let console_height = (self.max_lines_visible +1) * line_height as usize; // +1 for user
-                                                                                 // prompt
-        let monospaced_width = font.measure_text("w", font_size as f32, font_spacing as f32).x;
+        let console_height = (self.max_lines_visible + 1) * line_height as usize; // +1 for user
+                                                                                  // prompt
+        let monospaced_width = font
+            .measure_text("w", font_size as f32, font_spacing as f32)
+            .x;
         let console_width = monospaced_width as i32 * self.columns as i32;
 
         let top_y_padding = propheight(d, 50);
@@ -237,7 +263,11 @@ impl Console {
 
         // Using txt_color
         d.draw_rectangle_lines(
-            txt_left_x_padding, console_start_y, console_width, console_height as i32, txt_color,
+            txt_left_x_padding,
+            console_start_y,
+            console_width,
+            console_height as i32,
+            txt_color,
         );
 
         let sidebox_x_padding = txt_left_x_padding;
@@ -248,7 +278,11 @@ impl Console {
 
         // Using txt_color
         d.draw_rectangle_lines(
-            sidebox_x, sidebox_y, sidebox_width, sidebox_height, txt_color,
+            sidebox_x,
+            sidebox_y,
+            sidebox_width,
+            sidebox_height,
+            txt_color,
         );
 
         let userinfo_y_padding = propheight(d, 75);
@@ -256,17 +290,12 @@ impl Console {
         let backout_itext = d.gui_icon_text(ICON_MONITOR, ": Indietro");
         let backout_x = sidebox_x + sidebox_x_padding;
         let backout_y = userinfo_y_padding;
-        let backout_width = sidebox_width - sidebox_x_padding*2;
+        let backout_width = sidebox_width - sidebox_x_padding * 2;
         let backout_height = propheight(d, 30);
 
         if d.gui_button(
-            rrect(
-                backout_x,
-                backout_y,
-                backout_width,
-                backout_height
-            ),
-            backout_itext.as_str()
+            rrect(backout_x, backout_y, backout_width, backout_height),
+            backout_itext.as_str(),
         ) {
             controller.backout();
         }
@@ -281,15 +310,18 @@ impl Console {
             d.draw_text_ex(
                 font,
                 line,
-                Vector2::new(txt_left_x_padding as f32, (console_start_y + (i as i32 * line_height)) as f32),
+                Vector2::new(
+                    txt_left_x_padding as f32,
+                    (console_start_y + (i as i32 * line_height)) as f32,
+                ),
                 font_size as f32,
                 0.0,
-                txt_color
+                txt_color,
             );
         }
 
         let prompt_y_padding = propheight(d, 10);
-        let prompt_y = console_start_y + console_height as i32 + prompt_y_padding - line_height/2;
+        let prompt_y = console_start_y + console_height as i32 + prompt_y_padding - line_height / 2;
         let prompt_color = txt_color;
 
         // Draw the prompt at the bottom of the console
@@ -299,7 +331,7 @@ impl Console {
             Vector2::new(txt_left_x_padding as f32, prompt_y as f32),
             font_size as f32,
             0.0,
-            prompt_color
+            prompt_color,
         );
     }
 }

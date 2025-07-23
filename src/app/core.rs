@@ -15,12 +15,12 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use std::fmt;
-use raylib::prelude::*;
-use crate::controllers::Controllers;
-use crate::views::Views;
 use super::controller::update_main;
 use super::view::draw_main;
+use crate::controllers::Controllers;
+use crate::views::Views;
+use raylib::prelude::*;
+use std::fmt;
 
 pub(crate) const EXIT_KEY: raylib::consts::KeyboardKey = raylib::consts::KeyboardKey::KEY_ESCAPE;
 pub(crate) const ESOX_SCREEN_WIDTH: i32 = 960;
@@ -31,8 +31,10 @@ pub(crate) const CANDY_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/s
 pub(crate) const CHERRY_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_cherry.rgs");
 pub(crate) const CYBER_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_cyber.rgs");
 pub(crate) const JUNGLE_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_jungle.rgs");
-pub(crate) const LAVANDA_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_lavanda.rgs");
-pub(crate) const TERMINAL_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_terminal.rgs");
+pub(crate) const LAVANDA_THEME_DATA: &[u8] =
+    include_bytes!("../../assets/styles/style_lavanda.rgs");
+pub(crate) const TERMINAL_THEME_DATA: &[u8] =
+    include_bytes!("../../assets/styles/style_terminal.rgs");
 pub(crate) const ASHES_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_ashes.rgs");
 pub(crate) const CONSOLE_FONT_DATA: &[u8] = include_bytes!("../../assets/FreeMono.ttf");
 pub(crate) const PROJECT_LOGO_DATA: &[u8] = include_bytes!("../../assets/logo.png");
@@ -57,31 +59,32 @@ pub(crate) enum CurrentView {
     ValidazioneInfoAggiuntive,
     ProduzioneOutput,
     ProduzionePDF,
-    Console
+    Console,
 }
 
 impl fmt::Display for CurrentView {
-  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    let string_representation = match *self {
-      CurrentView::Home => "Home",
-      CurrentView::Second => "Second",
-      CurrentView::SelezioneIndice => "Selezione Indice",
-      CurrentView::SelezioneFileInput => "Selezione File Input",
-      CurrentView::ValidazioneFileInput => "Validazione File Input",
-      CurrentView::SelezioneInfoAggiuntive => "Selezione Info Aggiuntive",
-      CurrentView::ValidazioneInfoAggiuntive => "Validazione Info Aggiuntive",
-      CurrentView::ProduzioneOutput => "Produzione Output",
-      CurrentView::ProduzionePDF => "Produzione PDF",
-      CurrentView::Console => "Console",
-    };
-    write!(f, "{}", string_representation)
-  }
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let string_representation = match *self {
+            CurrentView::Home => "Home",
+            CurrentView::Second => "Second",
+            CurrentView::SelezioneIndice => "Selezione Indice",
+            CurrentView::SelezioneFileInput => "Selezione File Input",
+            CurrentView::ValidazioneFileInput => "Validazione File Input",
+            CurrentView::SelezioneInfoAggiuntive => "Selezione Info Aggiuntive",
+            CurrentView::ValidazioneInfoAggiuntive => "Validazione Info Aggiuntive",
+            CurrentView::ProduzioneOutput => "Produzione Output",
+            CurrentView::ProduzionePDF => "Produzione PDF",
+            CurrentView::Console => "Console",
+        };
+        write!(f, "{}", string_representation)
+    }
 }
 
 //TODO: add test to check if this string respects the discriminant ordering in GuiTheme
-pub(crate) const GUI_THEME_COMBOBOX_STR: &str = "Light;Dark;Bluish;Candy;Cherry;Cyber;Jungle;Lavanda;Terminal;Ashes";
+pub(crate) const GUI_THEME_COMBOBOX_STR: &str =
+    "Light;Dark;Bluish;Candy;Cherry;Cyber;Jungle;Lavanda;Terminal;Ashes";
 
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub(crate) enum GuiTheme {
     Light,
     Dark,
@@ -92,7 +95,7 @@ pub(crate) enum GuiTheme {
     Jungle,
     Lavanda,
     Terminal,
-    Ashes
+    Ashes,
 }
 
 impl fmt::Display for GuiTheme {
@@ -156,7 +159,15 @@ pub(crate) struct MainState {
 }
 
 impl MainState {
-    pub(crate) fn new(default_font_height: i32, current_font_height: i32, default_txt_spacing: i32, current_font: WeakFont, default_txt_color: Color, default_bg_color: Color, logo_texture: Option<Texture2D>) -> Self {
+    pub(crate) fn new(
+        default_font_height: i32,
+        current_font_height: i32,
+        default_txt_spacing: i32,
+        current_font: WeakFont,
+        default_txt_color: Color,
+        default_bg_color: Color,
+        logo_texture: Option<Texture2D>,
+    ) -> Self {
         Self {
             frame_counter: 0,
             showing_reset_win: false,
@@ -176,7 +187,7 @@ impl MainState {
             default_txt_color,
             current_font,
             default_bg_color,
-            logo_texture
+            logo_texture,
         }
     }
 
@@ -186,12 +197,21 @@ impl MainState {
     }
 
     pub(crate) fn get_gui_should_lock(&self) -> bool {
-        self.showing_reset_win || self.showing_quit_win || self.showing_info_box || self.showing_settings_box || self.showing_license_box
+        self.showing_reset_win
+            || self.showing_quit_win
+            || self.showing_info_box
+            || self.showing_settings_box
+            || self.showing_license_box
     }
 
-    pub(crate) fn mainloop(&mut self, rl: &mut RaylibHandle, thread: &RaylibThread, controllers: &Controllers, views: &mut Views) {
+    pub(crate) fn mainloop(
+        &mut self,
+        rl: &mut RaylibHandle,
+        thread: &RaylibThread,
+        controllers: &Controllers,
+        views: &mut Views,
+    ) {
         while !self.should_quit {
-
             // Base update step
             update_main(rl, self);
 
@@ -220,8 +240,7 @@ impl MainState {
     }
 }
 
-pub(crate) fn propwidth(d: &RaylibDrawHandle<'_>, to_scale: i32) -> i32
-{
+pub(crate) fn propwidth(d: &RaylibDrawHandle<'_>, to_scale: i32) -> i32 {
     if !(0..=ESOX_SCREEN_WIDTH).contains(&to_scale) {
         panic!("propw():  invalid to_scale value received: {to_scale}");
     }
@@ -229,8 +248,7 @@ pub(crate) fn propwidth(d: &RaylibDrawHandle<'_>, to_scale: i32) -> i32
     current_screen_width * to_scale / ESOX_SCREEN_WIDTH
 }
 
-pub(crate) fn propheight(d: &RaylibDrawHandle<'_>, to_scale: i32) -> i32
-{
+pub(crate) fn propheight(d: &RaylibDrawHandle<'_>, to_scale: i32) -> i32 {
     if !(0..=ESOX_SCREEN_HEIGHT).contains(&to_scale) {
         panic!("proph():  invalid to_scale value received: {to_scale}");
     }

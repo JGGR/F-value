@@ -16,13 +16,13 @@
 */
 
 enum _LogLevel {
-  Debug,
-  Info,
-  Warning,
-  Error
+    Debug,
+    Info,
+    Warning,
+    Error,
 }
 
 pub struct _LogMessage {
-  level: _LogLevel,
-  message: String
+    level: _LogLevel,
+    message: String,
 }

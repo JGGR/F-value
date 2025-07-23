@@ -15,7 +15,10 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::{domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI, GruppoEcoHFBI}, engines::hfbi::bbent::calc_bbent};
+use crate::{
+    domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI, GruppoEcoHFBI},
+    engines::hfbi::bbent::calc_bbent,
+};
 
 pub(crate) fn calc_dbent(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
     let mut sbent = 0.0;
@@ -60,7 +63,10 @@ mod dbent_private_tests {
         AnagraficaHFBI {
             codice_stazione: "TestStazione".to_string(),
             corpo_idrico: "TestCorpoIdrico".to_string(),
-            posizione: Location { regione: "Test".to_string(), provincia: "Test".to_string() },
+            posizione: Location {
+                regione: "Test".to_string(),
+                provincia: "Test".to_string(),
+            },
             date_string: "01/01/2025".to_string(),
             tipo_laguna: TipoLagunaCostieraHFBI::MAt1,
             stagione: StagioneHFBI::Primavera,
@@ -102,21 +108,34 @@ mod dbent_private_tests {
     #[test]
     fn test_dbent_empty_input() {
         let anagrafica = create_test_anagrafica(100.0, 5.0);
-        let campione = CampionamentoHFBI { campionamento: vec![] };
+        let campione = CampionamentoHFBI {
+            campionamento: vec![],
+        };
         let result = calc_dbent(&campione, &anagrafica);
-        assert!((result - 0.0).abs() < EPSILON, "Expected 0.0 for empty input, got {}", result);
+        assert!(
+            (result - 0.0).abs() < EPSILON,
+            "Expected 0.0 for empty input, got {}",
+            result
+        );
     }
 
     #[test]
     fn test_dbent_sbent_is_near_zero() {
         let anagrafica = create_test_anagrafica(100.0, 5.0);
         let campione = CampionamentoHFBI {
-            campionamento: vec![
-                create_specie_record(GruppoEcoHFBI::ResidentiDiEstuario, 0.0, 0.0, 100)
-            ]
+            campionamento: vec![create_specie_record(
+                GruppoEcoHFBI::ResidentiDiEstuario,
+                0.0,
+                0.0,
+                100,
+            )],
         };
         let result = calc_dbent(&campione, &anagrafica);
-        assert!((result - 0.0).abs() < EPSILON, "Expected 0.0 for sbent near zero, got {}", result);
+        assert!(
+            (result - 0.0).abs() < EPSILON,
+            "Expected 0.0 for sbent near zero, got {}",
+            result
+        );
     }
 
     #[test]
@@ -126,10 +145,14 @@ mod dbent_private_tests {
             campionamento: vec![
                 create_specie_record(GruppoEcoHFBI::Diadromi, 0.15, 0.05, 100),
                 create_specie_record(GruppoEcoHFBI::MigratoriMarini, 0.0, 0.0, 50),
-            ]
+            ],
         };
         let result = calc_dbent(&campione, &anagrafica);
-        assert!((result - 0.01).abs() < EPSILON, "Expected 0.01 for sbent near 0.2, got {}", result);
+        assert!(
+            (result - 0.01).abs() < EPSILON,
+            "Expected 0.01 for sbent near 0.2, got {}",
+            result
+        );
     }
 
     #[test]
@@ -140,14 +163,19 @@ mod dbent_private_tests {
                 create_specie_record(GruppoEcoHFBI::MigratoriMarini, 0.8, 0.7, 200),
                 create_specie_record(GruppoEcoHFBI::ResidentiDiEstuario, 0.5, 0.0, 150),
                 create_specie_record(GruppoEcoHFBI::OccasionaliMarini, 1.0, 1.0, 50),
-            ]
+            ],
         };
-        
+
         let sbent = 2.0;
         let bbent = 76.0_f32.ln();
         let expected = (((sbent - 0.2) / bbent) + 1.0).ln();
         let result = calc_dbent(&campione, &anagrafica);
 
-        assert!((result - expected).abs() < EPSILON, "Standard calculation failed. Expected: {}, Got: {}", expected, result);
+        assert!(
+            (result - expected).abs() < EPSILON,
+            "Standard calculation failed. Expected: {}, Got: {}",
+            expected,
+            result
+        );
     }
 }

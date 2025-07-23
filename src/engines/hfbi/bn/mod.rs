@@ -15,7 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::domain::hfbi::{CampionamentoHFBI};
+use crate::domain::hfbi::CampionamentoHFBI;
 
 pub(crate) fn calc_bn(campione: &CampionamentoHFBI) -> f32 {
     let mut b = 0.0;
@@ -24,15 +24,15 @@ pub(crate) fn calc_bn(campione: &CampionamentoHFBI) -> f32 {
         b += specie.peso as f32;
         n += 1.0;
     }
-    ((b / n) +1.0).ln()
+    ((b / n) + 1.0).ln()
 }
-
-
 
 #[cfg(test)]
 mod bn_private_tests {
     use super::*;
-    use crate::domain::hfbi::{CampionamentoHFBI, GruppoEcoHFBI, GruppoTrofHFBI, RecordHFBI, SpecieHFBI};
+    use crate::domain::hfbi::{
+        CampionamentoHFBI, GruppoEcoHFBI, GruppoTrofHFBI, RecordHFBI, SpecieHFBI,
+    };
 
     // Epsilon for floating-point comparisons.
     const EPSILON: f32 = 1e-6;
@@ -45,7 +45,8 @@ mod bn_private_tests {
                 codice_specie: "DM",
                 autoctono: true,
                 gruppo_eco: GruppoEcoHFBI::ResidentiDiEstuario, // This field is not used by calc_bn
-                gruppo_trofico: GruppoTrofHFBI { // This field is not used by calc_bn
+                gruppo_trofico: GruppoTrofHFBI {
+                    // This field is not used by calc_bn
                     microbentivori: 0.0,
                     macrobentivori: 0.0,
                     iperbentivori: 0.0,
@@ -62,10 +63,16 @@ mod bn_private_tests {
 
     #[test]
     fn test_calc_bn_empty_campionamento() {
-        let campione = CampionamentoHFBI { campionamento: vec![] };
+        let campione = CampionamentoHFBI {
+            campionamento: vec![],
+        };
         let result = calc_bn(&campione);
         // For an empty input, b=0 and n=0. The division 0.0 / 0.0 results in NaN (Not a Number).
-        assert!(result.is_nan(), "Expected NaN for empty input, but got {}", result);
+        assert!(
+            result.is_nan(),
+            "Expected NaN for empty input, but got {}",
+            result
+        );
     }
 
     #[test]
@@ -80,7 +87,8 @@ mod bn_private_tests {
         assert!(
             (result - expected).abs() < EPSILON,
             "Failed single specie test. Expected: {}, Got: {}",
-            expected, result
+            expected,
+            result
         );
     }
 
@@ -98,10 +106,11 @@ mod bn_private_tests {
         // n = 3.0
         // expected = ((350.0 / 3.0) + 1.0).ln()
         let expected = (350.0_f32 / 3.0 + 1.0).ln();
-         assert!(
+        assert!(
             (result - expected).abs() < EPSILON,
             "Failed multiple species test. Expected: {}, Got: {}",
-            expected, result
+            expected,
+            result
         );
     }
 }

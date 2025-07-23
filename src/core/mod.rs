@@ -46,17 +46,17 @@ pub(crate) const PROJECT_BRANCH: &str = env!("BRANCH_NAME");
 pub(crate) const _COMMIT_HASH: &str = env!("COMMIT_HASH");
 pub(crate) const COMMIT_HASH_PLUS: &str = env!("COMMIT_HASH_PLUS");
 
-#[cfg(feature="logged")]
-use flexi_logger::{FileSpec, Logger, WriteMode};
-#[cfg(feature="logged")]
-use std::path::PathBuf;
-#[cfg(feature="logged")]
+#[cfg(feature = "logged")]
 use dirs::document_dir;
-#[cfg(feature="logged")]
+#[cfg(feature = "logged")]
+use flexi_logger::{FileSpec, Logger, WriteMode};
+#[cfg(feature = "logged")]
 use log::Record;
+#[cfg(feature = "logged")]
+use std::path::PathBuf;
 
-use raylib::misc::AsF32;
 use raylib::math::Rectangle;
+use raylib::misc::AsF32;
 
 /// A convenience function for making a new `Rectangle`.
 #[inline]
@@ -69,8 +69,8 @@ pub fn rrect<T1: AsF32, T2: AsF32, T3: AsF32, T4: AsF32>(
     Rectangle::new(x.as_f32(), y.as_f32(), width.as_f32(), height.as_f32())
 }
 
-#[cfg(feature="logged")]
-pub(crate) fn prep_logger() -> Result<(),String> {
+#[cfg(feature = "logged")]
+pub(crate) fn prep_logger() -> Result<(), String> {
     let log_file_path;
     if let Some(documents_dir) = document_dir() {
         log_file_path = documents_dir.join("esox").join("log.csv");
@@ -81,12 +81,11 @@ pub(crate) fn prep_logger() -> Result<(),String> {
     if let Ok(logger_filespec) = FileSpec::try_from(log_file_path) {
         if let Ok(logger) = Logger::try_with_str("info, core=trace") {
             if let Err(e) = logger
-            .log_to_file(logger_filespec)
-            .write_mode(WriteMode::BufferAndFlush)
-            .format(|_writer, _now, record: &Record| {
-                writeln!(_writer, "{}", record.args())
-            })
-            .start() {
+                .log_to_file(logger_filespec)
+                .write_mode(WriteMode::BufferAndFlush)
+                .format(|_writer, _now, record: &Record| writeln!(_writer, "{}", record.args()))
+                .start()
+            {
                 eprintln!("Failed starting logger.");
                 eprintln!("Error was: {e}");
                 return Err(format!("Failed starting logger: {e}"));

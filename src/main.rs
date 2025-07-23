@@ -17,37 +17,49 @@
 
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-mod domain;
-mod state;
-mod views;
-mod controllers;
-mod console;
-mod core;
-mod engines;
 mod app;
+mod console;
+mod controllers;
+mod core;
+mod domain;
+mod engines;
+mod state;
 #[cfg(test)]
 mod tests;
+mod views;
 
-use std::env;
-use raylib::consts::TraceLogLevel;
-use raylib::consts::GuiControl::DEFAULT;
-use raylib::consts::GuiDefaultProperty::{BACKGROUND_COLOR, TEXT_SIZE, TEXT_SPACING};
-use raylib::consts::GuiControlProperty::TEXT_COLOR_NORMAL;
-use raylib::core::texture::Image;
-use raylib::color::Color;
-use crate::app::core::{SUPPORT_HEADLESS, PROJECT_LOGO_DATA, ESOX_SCREEN_WIDTH, ESOX_SCREEN_HEIGHT, MainState};
-use crate::core::{PROJECT_NAME, SHORT_PROJECT_VERSION, PROJECT_VERSION, COMMIT_HASH_PLUS, PROJECT_BUILD_TYPE, PROJECT_BRANCH};
-use crate::core::csv::{RIFERIMENTO_NISECI_HEADER, RIFERIMENTO_NISECI_HEADER_FIELDS, RIFERIMENTO_NISECI_HEADER_FIELD_TYPES, CAMPIONAMENTO_NISECI_HEADER, CAMPIONAMENTO_NISECI_HEADER_FIELDS, CAMPIONAMENTO_NISECI_HEADER_FIELD_TYPES, ANAGRAFICA_NISECI_HEADER, ANAGRAFICA_NISECI_HEADER_FIELDS, ANAGRAFICA_NISECI_HEADER_FIELD_TYPES, CAMPIONAMENTO_HFBI_HEADER, CAMPIONAMENTO_HFBI_HEADER_FIELDS, CAMPIONAMENTO_HFBI_HEADER_FIELD_TYPES, ANAGRAFICA_HFBI_HEADER, ANAGRAFICA_HFBI_HEADER_FIELDS, ANAGRAFICA_HFBI_HEADER_FIELD_TYPES};
-use crate::core::cli::{esox_usage, print_warranty_info, print_copyright_splash, run_headless};
+use crate::app::core::{
+    MainState, ESOX_SCREEN_HEIGHT, ESOX_SCREEN_WIDTH, PROJECT_LOGO_DATA, SUPPORT_HEADLESS,
+};
 use crate::controllers::Controllers;
+use crate::core::cli::{esox_usage, print_copyright_splash, print_warranty_info, run_headless};
+use crate::core::csv::{
+    ANAGRAFICA_HFBI_HEADER, ANAGRAFICA_HFBI_HEADER_FIELDS, ANAGRAFICA_HFBI_HEADER_FIELD_TYPES,
+    ANAGRAFICA_NISECI_HEADER, ANAGRAFICA_NISECI_HEADER_FIELDS,
+    ANAGRAFICA_NISECI_HEADER_FIELD_TYPES, CAMPIONAMENTO_HFBI_HEADER,
+    CAMPIONAMENTO_HFBI_HEADER_FIELDS, CAMPIONAMENTO_HFBI_HEADER_FIELD_TYPES,
+    CAMPIONAMENTO_NISECI_HEADER, CAMPIONAMENTO_NISECI_HEADER_FIELDS,
+    CAMPIONAMENTO_NISECI_HEADER_FIELD_TYPES, RIFERIMENTO_NISECI_HEADER,
+    RIFERIMENTO_NISECI_HEADER_FIELDS, RIFERIMENTO_NISECI_HEADER_FIELD_TYPES,
+};
+use crate::core::{
+    COMMIT_HASH_PLUS, PROJECT_BRANCH, PROJECT_BUILD_TYPE, PROJECT_NAME, PROJECT_VERSION,
+    SHORT_PROJECT_VERSION,
+};
 use crate::views::Views;
+use raylib::color::Color;
+use raylib::consts::GuiControl::DEFAULT;
+use raylib::consts::GuiControlProperty::TEXT_COLOR_NORMAL;
+use raylib::consts::GuiDefaultProperty::{BACKGROUND_COLOR, TEXT_SIZE, TEXT_SPACING};
+use raylib::consts::TraceLogLevel;
+use raylib::core::texture::Image;
+use std::env;
 
-#[cfg(feature="logged")]
+#[cfg(feature = "logged")]
 use crate::core::prep_logger;
 
 fn main() {
-
-    #[cfg(feature="logged")]
+    #[cfg(feature = "logged")]
     let _ = prep_logger();
 
     let args: Vec<String> = env::args().collect(); // Using this panics on receiving invalid Unicode
@@ -59,7 +71,7 @@ fn main() {
     let mut indice_niseci = true;
 
     match args.len() {
-        1 => {},
+        1 => {}
         _ => {
             for arg in &args[1..] {
                 match arg.as_str() {
@@ -85,17 +97,26 @@ fn main() {
                         println!("}}");
                         println!("Tipi header riferimento NISECI: {{");
                         for (i, field) in RIFERIMENTO_NISECI_HEADER_FIELDS.iter().enumerate() {
-                            println!("    {}: {};", field, RIFERIMENTO_NISECI_HEADER_FIELD_TYPES[i]);
+                            println!(
+                                "    {}: {};",
+                                field, RIFERIMENTO_NISECI_HEADER_FIELD_TYPES[i]
+                            );
                         }
                         println!("}}");
                         println!("Tipi header campionamento NISECI: {{");
                         for (i, field) in CAMPIONAMENTO_NISECI_HEADER_FIELDS.iter().enumerate() {
-                            println!("    {}: {};", field, CAMPIONAMENTO_NISECI_HEADER_FIELD_TYPES[i]);
+                            println!(
+                                "    {}: {};",
+                                field, CAMPIONAMENTO_NISECI_HEADER_FIELD_TYPES[i]
+                            );
                         }
                         println!("}}");
                         println!("Tipi header anagrafica NISECI: {{");
                         for (i, field) in ANAGRAFICA_NISECI_HEADER_FIELDS.iter().enumerate() {
-                            println!("    {}: {};", field, ANAGRAFICA_NISECI_HEADER_FIELD_TYPES[i]);
+                            println!(
+                                "    {}: {};",
+                                field, ANAGRAFICA_NISECI_HEADER_FIELD_TYPES[i]
+                            );
                         }
                         println!("}}");
                         println!("Header campionamento HFBI: {{");
@@ -106,7 +127,10 @@ fn main() {
                         println!("}}");
                         println!("Tipi header campionamento HFBI: {{");
                         for (i, field) in CAMPIONAMENTO_HFBI_HEADER_FIELDS.iter().enumerate() {
-                            println!("    {}: {};", field, CAMPIONAMENTO_HFBI_HEADER_FIELD_TYPES[i]);
+                            println!(
+                                "    {}: {};",
+                                field, CAMPIONAMENTO_HFBI_HEADER_FIELD_TYPES[i]
+                            );
                         }
                         println!("}}");
                         println!("Tipi header anagrafica HFBI: {{");
@@ -120,7 +144,7 @@ fn main() {
                         return esox_usage();
                     }
                     "--headless" => {
-                        if ! SUPPORT_HEADLESS {
+                        if !SUPPORT_HEADLESS {
                             eprintln!("Headless run is not supported.");
                             return;
                         }
@@ -142,9 +166,8 @@ fn main() {
                     }
                 }
             }
-        },
+        }
     }
-
 
     print_copyright_splash();
 
@@ -188,13 +211,13 @@ fn main() {
     }
 
     // 10 is way too small for the default font height
-    let gui_default_font_height: i32 = rl.gui_get_style(DEFAULT, TEXT_SIZE) *2;
+    let gui_default_font_height: i32 = rl.gui_get_style(DEFAULT, TEXT_SIZE) * 2;
     rl.gui_set_style(DEFAULT, TEXT_SIZE, gui_default_font_height);
     let gui_current_font_height: i32 = gui_default_font_height;
 
     let txt_color_int = rl.gui_get_style(DEFAULT, TEXT_COLOR_NORMAL);
     let bg_color_int = rl.gui_get_style(DEFAULT, BACKGROUND_COLOR);
-    let txt_spacing = rl.gui_get_style(DEFAULT, TEXT_SPACING) *2;
+    let txt_spacing = rl.gui_get_style(DEFAULT, TEXT_SPACING) * 2;
     rl.gui_set_style(DEFAULT, TEXT_SPACING, txt_spacing);
     let current_font = rl.gui_get_font();
     let mut main_state = MainState::new(
@@ -204,7 +227,7 @@ fn main() {
         current_font,
         Color::get_color(txt_color_int as u32),
         Color::get_color(bg_color_int as u32),
-        logo_texture
+        logo_texture,
     );
 
     let controllers = Controllers::new();
@@ -212,5 +235,4 @@ fn main() {
     let mut views = Views::new(&mut rl, &thread, gui_current_font_height, txt_spacing);
 
     main_state.mainloop(&mut rl, &thread, &controllers, &mut views);
-
 }

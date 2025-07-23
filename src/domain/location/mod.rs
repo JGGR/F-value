@@ -19,14 +19,16 @@ use std::fmt;
 
 #[derive(Clone)]
 pub(crate) struct Location {
-  pub(crate) regione: String,
-  pub(crate) provincia: String
+    pub(crate) regione: String,
+    pub(crate) provincia: String,
 }
 
 impl fmt::Display for Location {
-  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    let string_representation = format!("{{ regione: {{{}}}, provincia: {{{}}} }}",
-        self.regione, self.provincia);
-    write!(f, "{}", string_representation)
-  }
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let string_representation = format!(
+            "{{ regione: {{{}}}, provincia: {{{}}} }}",
+            self.regione, self.provincia
+        );
+        write!(f, "{}", string_representation)
+    }
 }
