@@ -1579,19 +1579,6 @@ impl OutputController {
     }
 }
 
-pub(crate) struct _LogController;
-
-impl _LogController {
-    pub(crate) fn _new() -> Self {
-        Self
-    }
-
-    pub(crate) fn _update(&self, _rl: &RaylibHandle) {
-        //let mut state = GLOBAL_STATE.lock().unwrap();
-        //state.second_model.set_name("Updated".to_string());
-    }
-}
-
 pub(crate) struct ConsoleController;
 
 impl Controller for ConsoleController {
