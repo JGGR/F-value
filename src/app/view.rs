@@ -43,9 +43,9 @@ pub(crate) fn draw_reset_win(
         let itext = d.gui_icon_text(ICON_EXIT, "Reset");
         let result = d.gui_message_box(
             rrect(
-                d.get_screen_width() / 2 - propwidth(d, 125),
+                d.get_screen_width() / 2 - propwidth(d, 150),
                 d.get_screen_height() / 2 - propheight(d, 50),
-                propwidth(d, 250),
+                propwidth(d, 300),
                 propheight(d, 100),
             ),
             itext.as_str(),
