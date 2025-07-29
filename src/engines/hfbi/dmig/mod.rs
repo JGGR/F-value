@@ -98,7 +98,7 @@ mod dmig_private_tests {
     fn create_specie_record(
         codice_specie: &'static str,
         gruppo_eco: GruppoEcoHFBI,
-        peso: u32,
+        peso: f32,
     ) -> RecordHFBI {
         RecordHFBI {
             specie: SpecieHFBI {
@@ -137,7 +137,7 @@ mod dmig_private_tests {
     fn test_bmig_zero_area() {
         let anagrafica = create_test_anagrafica(10.0, 0.0); // area = 0
         let campione = CampionamentoHFBI {
-            campionamento: vec![create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 100)],
+            campionamento: vec![create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 100.0)],
         };
         // biomig > 0, area = 0 -> division by zero -> infinity
         assert!(calc_bmig(&campione, &anagrafica).is_infinite());
@@ -148,9 +148,9 @@ mod dmig_private_tests {
         let anagrafica = create_test_anagrafica(20.0, 5.0); // area = 100
         let campione = CampionamentoHFBI {
             campionamento: vec![
-                create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 150), // biomig += 150
-                create_specie_record("SP2", GruppoEcoHFBI::ResidentiDiEstuario, 100), // ignored
-                create_specie_record("SP3", GruppoEcoHFBI::MigratoriMarini, 50), // biomig += 50
+                create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 150.0), // biomig += 150
+                create_specie_record("SP2", GruppoEcoHFBI::ResidentiDiEstuario, 100.0), // ignored
+                create_specie_record("SP3", GruppoEcoHFBI::MigratoriMarini, 50.0), // biomig += 50
             ],
         };
         // biomig = 150 + 50 = 200
@@ -169,7 +169,7 @@ mod dmig_private_tests {
             campionamento: vec![create_specie_record(
                 "SP1",
                 GruppoEcoHFBI::ResidentiDiEstuario,
-                100,
+                100.0,
             )],
         };
         // No migratory species, so smig = 0. Should return 0.0
@@ -181,8 +181,8 @@ mod dmig_private_tests {
         let anagrafica = create_test_anagrafica(100.0, 5.0);
         let campione = CampionamentoHFBI {
             campionamento: vec![
-                create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 100),
-                create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 50), // Same species
+                create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 100.0),
+                create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 50.0), // Same species
             ],
         };
         // Only one unique migratory species, so smig = 1. Should return 0.01
@@ -194,8 +194,8 @@ mod dmig_private_tests {
         let anagrafica = create_test_anagrafica(10.0, 0.0); // area = 0
         let campione = CampionamentoHFBI {
             campionamento: vec![
-                create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 100),
-                create_specie_record("SP2", GruppoEcoHFBI::MigratoriMarini, 50),
+                create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 100.0),
+                create_specie_record("SP2", GruppoEcoHFBI::MigratoriMarini, 50.0),
             ],
         };
         // bmig is infinity. Formula is ln(((smig-1)/inf)+1) = ln(1) = 0
@@ -207,10 +207,10 @@ mod dmig_private_tests {
         let anagrafica = create_test_anagrafica(20.0, 5.0); // area = 100
         let campione = CampionamentoHFBI {
             campionamento: vec![
-                create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 150),
-                create_specie_record("SP2", GruppoEcoHFBI::MigratoriMarini, 250),
-                create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 50), // Duplicate species
-                create_specie_record("SP3", GruppoEcoHFBI::ResidentiDiEstuario, 300), // Ignored
+                create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 150.0),
+                create_specie_record("SP2", GruppoEcoHFBI::MigratoriMarini, 250.0),
+                create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 50.0), // Duplicate species
+                create_specie_record("SP3", GruppoEcoHFBI::ResidentiDiEstuario, 300.0), // Ignored
             ],
         };
 

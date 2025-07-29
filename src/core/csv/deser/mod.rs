@@ -797,7 +797,8 @@ where
 pub(crate) struct VeryItalianRecordCsvCampionamentoHFBI {
     pub(crate) codice_specie: String,
     pub(crate) numero_individui: u32,
-    pub(crate) peso: u32,
+    #[serde(deserialize_with = "deserialize_comma_f32")]
+    pub(crate) peso: f32,
 }
 
 impl RecordCsvCampionamentoHFBI for VeryItalianRecordCsvCampionamentoHFBI {
@@ -807,7 +808,7 @@ impl RecordCsvCampionamentoHFBI for VeryItalianRecordCsvCampionamentoHFBI {
     fn numero_individui(&self) -> u32 {
         self.numero_individui
     }
-    fn peso(&self) -> u32 {
+    fn peso(&self) -> f32 {
         self.peso
     }
 }
@@ -827,7 +828,7 @@ impl fmt::Display for VeryItalianRecordCsvCampionamentoHFBI {
 pub(crate) struct PlainRecordCsvCampionamentoHFBI {
     pub(crate) codice_specie: String,
     pub(crate) numero_individui: u32,
-    pub(crate) peso: u32,
+    pub(crate) peso: f32,
 }
 
 impl RecordCsvCampionamentoHFBI for PlainRecordCsvCampionamentoHFBI {
@@ -837,7 +838,7 @@ impl RecordCsvCampionamentoHFBI for PlainRecordCsvCampionamentoHFBI {
     fn numero_individui(&self) -> u32 {
         self.numero_individui
     }
-    fn peso(&self) -> u32 {
+    fn peso(&self) -> f32 {
         self.peso
     }
 }

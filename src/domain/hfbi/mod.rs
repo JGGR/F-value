@@ -571,7 +571,7 @@ use std::{collections::HashMap, fmt};
 pub(crate) struct RecordHFBI {
     pub(crate) specie: SpecieHFBI,
     pub(crate) numero_individui: u32, // in millimetri
-    pub(crate) peso: u32,             // in grammi
+    pub(crate) peso: f32,             // in grammi
 }
 
 impl fmt::Display for RecordHFBI {

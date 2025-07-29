@@ -38,7 +38,7 @@ mod bn_private_tests {
     const EPSILON: f32 = 1e-6;
 
     // Helper to create a species record. We only need the `peso` for these tests.
-    fn create_dummy_record(peso: u32) -> RecordHFBI {
+    fn create_dummy_record(peso: f32) -> RecordHFBI {
         RecordHFBI {
             specie: SpecieHFBI {
                 nome_comune: "Dummy",
@@ -78,7 +78,7 @@ mod bn_private_tests {
     #[test]
     fn test_calc_bn_single_specie() {
         let campione = CampionamentoHFBI {
-            campionamento: vec![create_dummy_record(150)],
+            campionamento: vec![create_dummy_record(150.0)],
         };
         let result = calc_bn(&campione);
         // b = 150.0, n = 1.0
@@ -96,9 +96,9 @@ mod bn_private_tests {
     fn test_calc_bn_multiple_species() {
         let campione = CampionamentoHFBI {
             campionamento: vec![
-                create_dummy_record(100),
-                create_dummy_record(200),
-                create_dummy_record(50),
+                create_dummy_record(100.0),
+                create_dummy_record(200.0),
+                create_dummy_record(50.0),
             ],
         };
         let result = calc_bn(&campione);

@@ -4,6 +4,7 @@
 
 - Silence warnings
 - Ran cargo fmt
+- Change peso in RecordCsbCampionamentoHFBI to be f32
 
 ## [0.0.20] - 2025-07-23
 

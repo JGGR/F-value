@@ -81,7 +81,7 @@ mod dbent_private_tests {
         gruppo_eco: GruppoEcoHFBI,
         microb: f32,
         macrob: f32,
-        peso: u32,
+        peso: f32,
     ) -> RecordHFBI {
         RecordHFBI {
             specie: SpecieHFBI {
@@ -127,7 +127,7 @@ mod dbent_private_tests {
                 GruppoEcoHFBI::ResidentiDiEstuario,
                 0.0,
                 0.0,
-                100,
+                100.0,
             )],
         };
         let result = calc_dbent(&campione, &anagrafica);
@@ -143,8 +143,8 @@ mod dbent_private_tests {
         let anagrafica = create_test_anagrafica(100.0, 5.0);
         let campione = CampionamentoHFBI {
             campionamento: vec![
-                create_specie_record(GruppoEcoHFBI::Diadromi, 0.15, 0.05, 100),
-                create_specie_record(GruppoEcoHFBI::MigratoriMarini, 0.0, 0.0, 50),
+                create_specie_record(GruppoEcoHFBI::Diadromi, 0.15, 0.05, 100.0),
+                create_specie_record(GruppoEcoHFBI::MigratoriMarini, 0.0, 0.0, 50.0),
             ],
         };
         let result = calc_dbent(&campione, &anagrafica);
@@ -160,9 +160,9 @@ mod dbent_private_tests {
         let anagrafica = create_test_anagrafica(100.0, 5.0);
         let campione = CampionamentoHFBI {
             campionamento: vec![
-                create_specie_record(GruppoEcoHFBI::MigratoriMarini, 0.8, 0.7, 200),
-                create_specie_record(GruppoEcoHFBI::ResidentiDiEstuario, 0.5, 0.0, 150),
-                create_specie_record(GruppoEcoHFBI::OccasionaliMarini, 1.0, 1.0, 50),
+                create_specie_record(GruppoEcoHFBI::MigratoriMarini, 0.8, 0.7, 200.0),
+                create_specie_record(GruppoEcoHFBI::ResidentiDiEstuario, 0.5, 0.0, 150.0),
+                create_specie_record(GruppoEcoHFBI::OccasionaliMarini, 1.0, 1.0, 50.0),
             ],
         };
 

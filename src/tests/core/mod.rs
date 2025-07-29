@@ -596,7 +596,7 @@ fn test_empty_csv_campionamento_hfbi() {
 fn test_valid_recordcsv_campionamento_hfbi() {
     let record_1 = VeryItalianRecordCsvCampionamentoHFBI {
         codice_specie: "AN".to_string(),
-        peso: 100,
+        peso: 100.0,
         numero_individui: 10,
     };
     let recordcsv_data = vec![record_1];

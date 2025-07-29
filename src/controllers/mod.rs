@@ -638,7 +638,11 @@ impl FileInputController {
                                 "FileInputController:  Validazione CampionamentoHFBI completata!"
                                     .to_string(),
                             );
-                            campioni.sort_by(|a, b| b.peso.cmp(&a.peso));
+                            campioni.sort_by(|a, b| {
+                                b.peso
+                                    .partial_cmp(&a.peso)
+                                    .unwrap_or(std::cmp::Ordering::Equal)
+                            });
                             let campionamento = CampionamentoHFBI::new(campioni);
                             self.set_data_campionamento_hfbi(campionamento);
                         }

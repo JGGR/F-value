@@ -93,7 +93,7 @@ mod dhzp_private_tests {
     // Helper to create a species record, specifying the hyperbentivore value
     fn create_specie_record(
         gruppo_eco: GruppoEcoHFBI,
-        peso: u32,
+        peso: f32,
         iperbentivori: f32,
     ) -> RecordHFBI {
         RecordHFBI {
@@ -135,7 +135,7 @@ mod dhzp_private_tests {
         let campione = CampionamentoHFBI {
             campionamento: vec![create_specie_record(
                 GruppoEcoHFBI::ResidentiDiEstuario,
-                100,
+                100.0,
                 1.0,
             )],
         };
@@ -148,9 +148,9 @@ mod dhzp_private_tests {
         let anagrafica = create_test_anagrafica(20.0, 5.0); // area = 100
         let campione = CampionamentoHFBI {
             campionamento: vec![
-                create_specie_record(GruppoEcoHFBI::ResidentiDiEstuario, 50, 0.5), // biohzp += 25
-                create_specie_record(GruppoEcoHFBI::OccasionaliMarini, 100, 1.0),  // ignored
-                create_specie_record(GruppoEcoHFBI::MigratoriMarini, 100, 0.75),   // biohzp += 75
+                create_specie_record(GruppoEcoHFBI::ResidentiDiEstuario, 50.0, 0.5), // biohzp += 25
+                create_specie_record(GruppoEcoHFBI::OccasionaliMarini, 100.0, 1.0),  // ignored
+                create_specie_record(GruppoEcoHFBI::MigratoriMarini, 100.0, 0.75),   // biohzp += 75
             ],
         };
         // biohzp = 25 + 75 = 100
@@ -169,7 +169,7 @@ mod dhzp_private_tests {
             // Relevant species, but iperbentivori is 0, so shzp is 0
             campionamento: vec![create_specie_record(
                 GruppoEcoHFBI::ResidentiDiEstuario,
-                100,
+                100.0,
                 0.0,
             )],
         };
@@ -182,8 +182,8 @@ mod dhzp_private_tests {
         let anagrafica = create_test_anagrafica(100.0, 5.0);
         let campione = CampionamentoHFBI {
             campionamento: vec![
-                create_specie_record(GruppoEcoHFBI::Diadromi, 100, 0.1),
-                create_specie_record(GruppoEcoHFBI::MigratoriMarini, 50, 0.1),
+                create_specie_record(GruppoEcoHFBI::Diadromi, 100.0, 0.1),
+                create_specie_record(GruppoEcoHFBI::MigratoriMarini, 50.0, 0.1),
             ],
         };
         // shzp = 0.1 + 0.1 = 0.2. The special case should trigger.
@@ -196,7 +196,7 @@ mod dhzp_private_tests {
         let campione = CampionamentoHFBI {
             campionamento: vec![create_specie_record(
                 GruppoEcoHFBI::ResidentiDiEstuario,
-                100,
+                100.0,
                 0.5,
             )],
         };
@@ -209,9 +209,9 @@ mod dhzp_private_tests {
         let anagrafica = create_test_anagrafica(10.0, 5.0); // area = 50
         let campione = CampionamentoHFBI {
             campionamento: vec![
-                create_specie_record(GruppoEcoHFBI::ResidentiDiEstuario, 100, 0.5),
-                create_specie_record(GruppoEcoHFBI::MigratoriMarini, 200, 1.0),
-                create_specie_record(GruppoEcoHFBI::OccasionaliMarini, 50, 0.8), // ignored
+                create_specie_record(GruppoEcoHFBI::ResidentiDiEstuario, 100.0, 0.5),
+                create_specie_record(GruppoEcoHFBI::MigratoriMarini, 200.0, 1.0),
+                create_specie_record(GruppoEcoHFBI::OccasionaliMarini, 50.0, 0.8), // ignored
             ],
         };
         // From calc_bhzp:

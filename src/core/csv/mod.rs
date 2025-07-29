@@ -89,7 +89,7 @@ codiceStazione;corpoIdrico;regione;provincia;data;lunghezzaStazione;larghezzaSta
 // TODO: get this stuff with some macro?
 pub(crate) const CAMPIONAMENTO_HFBI_HEADER_FIELDS: [&str; 3] =
     ["codiceSpecie", "numeroIndividui", "peso"];
-pub(crate) const CAMPIONAMENTO_HFBI_HEADER_FIELD_TYPES: [&str; 3] = ["String", "u32", "u32"];
+pub(crate) const CAMPIONAMENTO_HFBI_HEADER_FIELD_TYPES: [&str; 3] = ["String", "u32", "f32"];
 pub(crate) const CAMPIONAMENTO_HFBI_HEADER: &str = "\
 codiceSpecie;numeroIndividui;peso";
 
@@ -173,7 +173,7 @@ pub(crate) trait RecordCsvAnagraficaNISECI: serde::de::DeserializeOwned {
 pub(crate) trait RecordCsvCampionamentoHFBI: serde::de::DeserializeOwned {
     fn codice_specie(&self) -> String;
     fn numero_individui(&self) -> u32;
-    fn peso(&self) -> u32;
+    fn peso(&self) -> f32;
 }
 
 pub(crate) trait RecordCsvAnagraficaHFBI: serde::de::DeserializeOwned {

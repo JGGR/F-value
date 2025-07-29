@@ -97,7 +97,7 @@ mod full_hfbi_private_tests {
     fn create_specie_record(
         codice_specie: &'static str,
         gruppo_eco: GruppoEcoHFBI,
-        peso: u32,
+        peso: f32,
     ) -> RecordHFBI {
         RecordHFBI {
             specie: SpecieHFBI {
@@ -153,11 +153,11 @@ mod full_hfbi_private_tests {
         let campione = CampionamentoHFBI {
             campionamento: vec![
                 // Species 1: Migratory, dominant, contributes to all metrics
-                create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 500),
+                create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 500.0),
                 // Species 2: Migratory, contributes to most metrics
-                create_specie_record("SP2", GruppoEcoHFBI::MigratoriMarini, 200),
+                create_specie_record("SP2", GruppoEcoHFBI::MigratoriMarini, 200.0),
                 // Species 3: Resident, not dominant
-                create_specie_record("SP3", GruppoEcoHFBI::ResidentiDiEstuario, 100),
+                create_specie_record("SP3", GruppoEcoHFBI::ResidentiDiEstuario, 100.0),
             ],
         };
 
