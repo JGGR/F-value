@@ -15,8 +15,10 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::{engines::niseci::linear_regression::Point, domain::niseci::{CampionamentoNISECI, RecordNISECI, SpecieNISECI}};
-
+use crate::{
+    domain::niseci::{CampionamentoNISECI, RecordNISECI, SpecieNISECI},
+    engines::niseci::linear_regression::Point,
+};
 
 #[test]
 fn test_calcolo_pesci_per_passaggio() {
@@ -42,21 +44,21 @@ fn test_calcolo_pesci_per_passaggio() {
         specie: specie_1.clone(),
         passaggio_cattura: 1,
         lunghezza: 100, // in millimetri
-        peso: 100 // in grammi
+        peso: 100,      // in grammi
     };
 
     let record_2 = RecordNISECI {
         specie: specie_1.clone(),
         passaggio_cattura: 2,
         lunghezza: 100, // in millimetri
-        peso: 100 // in grammi
+        peso: 100,      // in grammi
     };
 
     let record_3 = RecordNISECI {
         specie: specie_1.clone(),
         passaggio_cattura: 3,
         lunghezza: 100, // in millimetri
-        peso: 100 // in grammi
+        peso: 100,      // in grammi
     };
 
     let mut c1 = vec![record_1; 20];
@@ -65,14 +67,11 @@ fn test_calcolo_pesci_per_passaggio() {
 
     c1.append(&mut c2);
     c1.append(&mut c3);
-    let campionamento = CampionamentoNISECI {
-        campionamento: c1
-    };
+    let campionamento = CampionamentoNISECI { campionamento: c1 };
 
     let pesci_per_passaggio = campionamento.fishes_for_every_passage();
 
     assert_eq!(pesci_per_passaggio[0], Point::new(20, 20));
     assert_eq!(pesci_per_passaggio[1], Point::new(35, 15));
     assert_eq!(pesci_per_passaggio[2], Point::new(45, 10));
-
 }

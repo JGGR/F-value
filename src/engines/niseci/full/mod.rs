@@ -15,8 +15,11 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+use crate::domain::niseci::{
+    AnagraficaNISECI, AreaNISECI, CampionamentoNISECI, RiferimentoNISECI, StatoEcologicoNISECI,
+    ValoriIntermediNISECI, ValoriIntermediSpecieNISECI,
+};
 use std::collections::{hash_map::Entry, HashMap};
-use crate::domain::niseci::{CampionamentoNISECI, RiferimentoNISECI, AnagraficaNISECI, AreaNISECI, StatoEcologicoNISECI, ValoriIntermediSpecieNISECI, ValoriIntermediNISECI};
 
 use super::x1::calculate_x1;
 use super::x2::calculate_x2;
@@ -30,13 +33,17 @@ const STATO_ECOLOGICO_NISECI_SOGLIA_BUONO_AREA_MEDITERRANEA: f32 = 0.6;
 const STATO_ECOLOGICO_NISECI_SOGLIA_MODERATO: f32 = 0.4;
 const STATO_ECOLOGICO_NISECI_SOGLIA_SCADENTE: f32 = 0.2;
 
-pub(crate) fn calculate_niseci(campionamento: &CampionamentoNISECI, riferimento: &RiferimentoNISECI, anagrafica: &AnagraficaNISECI) -> Result<(Option<f32>, ValoriIntermediNISECI), Vec<String>> {
+pub(crate) fn calculate_niseci(
+    campionamento: &CampionamentoNISECI,
+    riferimento: &RiferimentoNISECI,
+    anagrafica: &AnagraficaNISECI,
+) -> Result<(Option<f32>, ValoriIntermediNISECI), Vec<String>> {
     let mut errors = Vec::new();
     let x1 = calculate_x1(campionamento, riferimento);
 
     let x2 = calculate_x2(campionamento, anagrafica);
     match x2 {
-        Ok(_) => {},
+        Ok(_) => {}
         Err(x2_errors) => {
             for e in x2_errors {
                 errors.push(format!("Errore durante calcolo x2: {}", e));
@@ -62,7 +69,7 @@ pub(crate) fn calculate_niseci(campionamento: &CampionamentoNISECI, riferimento:
             rapporto_ad_juv: criteri_x2_a.get_rapporto_ad_juv(),
         };
         match valori_intermedi_specie.entry(specie) {
-            Entry::Occupied(_) => {},
+            Entry::Occupied(_) => {}
             Entry::Vacant(vacant_entry) => {
                 vacant_entry.insert(val);
             }
@@ -71,7 +78,7 @@ pub(crate) fn calculate_niseci(campionamento: &CampionamentoNISECI, riferimento:
 
     let x3 = calculate_x3(campionamento);
     match x3 {
-        Ok(_) => {},
+        Ok(_) => {}
         Err(x3_errors) => {
             for e in x3_errors {
                 errors.push(format!("Errore durante calcolo x3: {}", e));
@@ -94,17 +101,16 @@ pub(crate) fn calculate_niseci(campionamento: &CampionamentoNISECI, riferimento:
                 densita_stimata,
                 rapporto_ad_juv: val.get_rapporto_ad_juv(),
                 x2_a_a: subvalue_a,
-                x2_a_b: subvalue_b
+                x2_a_b: subvalue_b,
             };
             match valori_intermedi_specie.entry(specie) {
-                Entry::Occupied(_) => {},
+                Entry::Occupied(_) => {}
                 Entry::Vacant(vacant_entry) => {
                     vacant_entry.insert(val);
                 }
             }
         }
     }
-
 
     let mut x1_x2_errors = Vec::new();
     if x1 < 0.0 {
@@ -127,20 +133,17 @@ pub(crate) fn calculate_niseci(campionamento: &CampionamentoNISECI, riferimento:
         x2_a: criteri_x2.get_criterio_a(),
         x2_b: criteri_x2.get_criterio_b(),
         x3_a: criteri_x3.as_ref().map(|v| v.get_criterio_a()),
-        x3_b: criteri_x3.as_ref().map(|v| v.get_criterio_b())
+        x3_b: criteri_x3.as_ref().map(|v| v.get_criterio_b()),
     };
 
     match x2 {
         Some(x2_val) => {
-            let niseci = (0.1 * x1.sqrt()) +
-                (0.1 * x2_val.sqrt()) +
-                (0.8 * (x1 * x2_val)) -
-                ( (0.1 * (1.0 - x3)) *
-                  ((0.1 * x1.sqrt()) + (0.1 * x2_val.sqrt()) + (0.8 * (x1 * x2_val)))
-                );
-            let rounded_niseci = (1000.0*niseci).round()/1000.0;
+            let niseci = (0.1 * x1.sqrt()) + (0.1 * x2_val.sqrt()) + (0.8 * (x1 * x2_val))
+                - ((0.1 * (1.0 - x3))
+                    * ((0.1 * x1.sqrt()) + (0.1 * x2_val.sqrt()) + (0.8 * (x1 * x2_val))));
+            let rounded_niseci = (1000.0 * niseci).round() / 1000.0;
             Ok((Some(rounded_niseci), intermediates))
-        },
+        }
         None => {
             // Nel caso in cui nessuna specie attesa sia presente nel campionamento
             Ok((None, intermediates))
@@ -149,16 +152,20 @@ pub(crate) fn calculate_niseci(campionamento: &CampionamentoNISECI, riferimento:
 }
 
 pub(crate) fn calculate_rqe_niseci(niseci: Option<f32>) -> Option<f32> {
-    let rqe = niseci.map(|val| (val.log(10.0) +  RQE_NISECI_MAGIC_ADDEND ) / RQE_NISECI_MAGIC_QUOTIENT);
+    let rqe =
+        niseci.map(|val| (val.log(10.0) + RQE_NISECI_MAGIC_ADDEND) / RQE_NISECI_MAGIC_QUOTIENT);
     if let Some(r) = rqe {
-        let rounded_rqe = (1000.0*r).round()/1000.0;
+        let rounded_rqe = (1000.0 * r).round() / 1000.0;
         Some(rounded_rqe)
     } else {
         rqe
     }
 }
 
-pub(crate) fn calculate_stato_ecologico(niseci: Option<f32>, area: &AreaNISECI) -> Option<StatoEcologicoNISECI> {
+pub(crate) fn calculate_stato_ecologico(
+    niseci: Option<f32>,
+    area: &AreaNISECI,
+) -> Option<StatoEcologicoNISECI> {
     let rqe_niseci = calculate_rqe_niseci(niseci);
     match rqe_niseci {
         Some(val) => {
@@ -170,7 +177,7 @@ pub(crate) fn calculate_stato_ecologico(niseci: Option<f32>, area: &AreaNISECI) 
                     if val >= STATO_ECOLOGICO_NISECI_SOGLIA_BUONO_AREA_ALPINA {
                         return Some(StatoEcologicoNISECI::Buono);
                     }
-                },
+                }
                 AreaNISECI::Mediterranea => {
                     if val >= STATO_ECOLOGICO_NISECI_SOGLIA_BUONO_AREA_MEDITERRANEA {
                         return Some(StatoEcologicoNISECI::Buono);
@@ -185,8 +192,6 @@ pub(crate) fn calculate_stato_ecologico(niseci: Option<f32>, area: &AreaNISECI) 
             }
             Some(StatoEcologicoNISECI::Cattivo)
         }
-        None => {
-            None
-        }
+        None => None,
     }
 }

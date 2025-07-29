@@ -15,11 +15,10 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-
-pub(crate) mod dhzp;
-pub(crate) mod dbent;
-pub(crate) mod dmig;
 pub(crate) mod bbent;
 pub(crate) mod bn;
+pub(crate) mod dbent;
 pub(crate) mod ddom;
+pub(crate) mod dhzp;
+pub(crate) mod dmig;
 pub(crate) mod full;

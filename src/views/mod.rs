@@ -15,18 +15,30 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use std::process::exit;
-use std::cmp::max;
-use raylib::prelude::*;
-use raylib::consts::GuiState::{STATE_NORMAL, STATE_DISABLED};
-use raylib::consts::GuiIconName::{ICON_FILE_OPEN, ICON_BIN, ICON_OK_TICK, ICON_CROSS, ICON_PLAYER_NEXT};
-use rfd::FileDialog;
-use crate::domain::{index::Indice, location::Location, niseci::{TipoComunitaNISECI, ComunitaNISECI, AreaNISECI, IdroEcoRegioneNISECI, AnagraficaNISECI}, hfbi::{TipoLagunaCostieraHFBI, StagioneHFBI, HabitatHFBI, AnagraficaHFBI}};
-use crate::controllers::{Controller, Controllers, HomeController, SecondController, IndiceController, FileInputController, InfoAggiuntiveController, OutputController, ConsoleController};
-use crate::app::core::{CurrentView, MainState, propwidth, propheight, CONSOLE_FONT_DATA};
+use crate::app::core::{propheight, propwidth, CurrentView, MainState, CONSOLE_FONT_DATA};
 use crate::app::model::SubModel;
-use crate::core::SHORT_PROJECT_VERSION;
+use crate::controllers::{
+    ConsoleController, Controller, Controllers, FileInputController, HomeController,
+    IndiceController, InfoAggiuntiveController, OutputController, SecondController,
+};
 use crate::core::rrect;
+use crate::core::SHORT_PROJECT_VERSION;
+use crate::domain::{
+    hfbi::{AnagraficaHFBI, HabitatHFBI, StagioneHFBI, TipoLagunaCostieraHFBI},
+    index::Indice,
+    location::Location,
+    niseci::{
+        AnagraficaNISECI, AreaNISECI, ComunitaNISECI, IdroEcoRegioneNISECI, TipoComunitaNISECI,
+    },
+};
+use raylib::consts::GuiIconName::{
+    ICON_BIN, ICON_CROSS, ICON_FILE_OPEN, ICON_OK_TICK, ICON_PLAYER_NEXT,
+};
+use raylib::consts::GuiState::{STATE_DISABLED, STATE_NORMAL};
+use raylib::prelude::*;
+use rfd::FileDialog;
+use std::cmp::max;
+use std::process::exit;
 
 pub(crate) struct Views {
     home_view: HomeView,
@@ -42,7 +54,12 @@ pub(crate) struct Views {
 }
 
 impl Views {
-    pub(crate) fn new(rl: &mut RaylibHandle, thread: &RaylibThread, gui_current_font_height: i32, txt_spacing: i32) -> Self {
+    pub(crate) fn new(
+        rl: &mut RaylibHandle,
+        thread: &RaylibThread,
+        gui_current_font_height: i32,
+        txt_spacing: i32,
+    ) -> Self {
         Self {
             home_view: HomeView::new(),
             second_view: SecondView::new(),
@@ -56,37 +73,81 @@ impl Views {
             console_view: ConsoleView::new(rl, thread, gui_current_font_height, txt_spacing),
         }
     }
-    pub(crate) fn draw(&mut self, d: &mut RaylibDrawHandle, thread: &RaylibThread, controllers: &Controllers, main_state: &MainState) {
+    pub(crate) fn draw(
+        &mut self,
+        d: &mut RaylibDrawHandle,
+        thread: &RaylibThread,
+        controllers: &Controllers,
+        main_state: &MainState,
+    ) {
         match main_state.current_view {
             CurrentView::Home => {
-                self.home_view.draw(d, thread, &controllers.home_controller, main_state);
+                self.home_view
+                    .draw(d, thread, &controllers.home_controller, main_state);
             }
             CurrentView::Second => {
-                self.second_view.draw(d, thread, &controllers.second_controller, main_state);
+                self.second_view
+                    .draw(d, thread, &controllers.second_controller, main_state);
             }
             CurrentView::SelezioneIndice => {
-                self.selezione_indice_view.draw(d, thread, &controllers.indice_controller, main_state);
+                self.selezione_indice_view.draw(
+                    d,
+                    thread,
+                    &controllers.indice_controller,
+                    main_state,
+                );
             }
             CurrentView::SelezioneFileInput => {
-                self.selezione_fileinput_view.draw(d, thread, &controllers.fileinput_controller, main_state);
+                self.selezione_fileinput_view.draw(
+                    d,
+                    thread,
+                    &controllers.fileinput_controller,
+                    main_state,
+                );
             }
             CurrentView::ValidazioneFileInput => {
-                self.validazione_fileinput_view.draw(d, thread, &controllers.fileinput_controller, main_state);
+                self.validazione_fileinput_view.draw(
+                    d,
+                    thread,
+                    &controllers.fileinput_controller,
+                    main_state,
+                );
             }
             CurrentView::SelezioneInfoAggiuntive => {
-                self.selezione_infoaggiuntive_view.draw(d, thread, &controllers.infoaggiuntive_controller, main_state);
+                self.selezione_infoaggiuntive_view.draw(
+                    d,
+                    thread,
+                    &controllers.infoaggiuntive_controller,
+                    main_state,
+                );
             }
             CurrentView::ValidazioneInfoAggiuntive => {
-                self.validazione_infoaggiuntive_view.draw(d, thread, &controllers.infoaggiuntive_controller, main_state);
+                self.validazione_infoaggiuntive_view.draw(
+                    d,
+                    thread,
+                    &controllers.infoaggiuntive_controller,
+                    main_state,
+                );
             }
             CurrentView::ProduzioneOutput => {
-                self.produzione_output_view.draw(d, thread, &controllers.output_controller, main_state);
+                self.produzione_output_view.draw(
+                    d,
+                    thread,
+                    &controllers.output_controller,
+                    main_state,
+                );
             }
             CurrentView::ProduzionePDF => {
-                self.produzione_pdf_view.draw(d, thread, &controllers.output_controller, main_state);
+                self.produzione_pdf_view.draw(
+                    d,
+                    thread,
+                    &controllers.output_controller,
+                    main_state,
+                );
             }
             CurrentView::Console => {
-                self.console_view.draw(d, thread, &controllers.console_controller, main_state);
+                self.console_view
+                    .draw(d, thread, &controllers.console_controller, main_state);
             }
         }
     }
@@ -94,7 +155,13 @@ impl Views {
 
 pub(crate) trait View {
     type Controller: Controller;
-    fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &Self::Controller, main_state: &MainState);
+    fn draw(
+        &mut self,
+        d: &mut RaylibDrawHandle,
+        _thread: &RaylibThread,
+        controller: &Self::Controller,
+        main_state: &MainState,
+    );
 }
 
 // A view responsible for rendering the state
@@ -104,7 +171,13 @@ pub(crate) struct HomeView {}
 impl View for HomeView {
     type Controller = HomeController;
 
-    fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &Self::Controller, main_state: &MainState) {
+    fn draw(
+        &mut self,
+        d: &mut RaylibDrawHandle,
+        _thread: &RaylibThread,
+        controller: &Self::Controller,
+        main_state: &MainState,
+    ) {
         d.clear_background(main_state.default_bg_color);
 
         // Draw the state retrieved via the Controller
@@ -113,7 +186,7 @@ impl View for HomeView {
 
         let texture_target_width = propwidth(d, 205);
         let texture_target_height = propheight(d, 205);
-        let texture_target_x = d.get_screen_width()/2 - texture_target_width /2;
+        let texture_target_x = d.get_screen_width() / 2 - texture_target_width / 2;
         let texture_target_y = propheight(d, 50);
         if let Some(ref texture) = main_state.logo_texture {
             d.draw_texture_pro(
@@ -137,18 +210,31 @@ impl View for HomeView {
         }
 
         let label_version_txt = format!("Version:   {}", SHORT_PROJECT_VERSION);
-        let label_target_txt = format!("Target:    {}-{}", std::env::consts::ARCH, std::env::consts::OS);
-        let label_version_txt_bounds = main_state.current_font.measure_text(&label_version_txt, main_state.current_font_height as f32, main_state.default_txt_spacing as f32);
-        let label_target_txt_bounds = main_state.current_font.measure_text(&label_target_txt, main_state.current_font_height as f32, main_state.default_txt_spacing as f32);
-        let labels_width = propwidth(d, 25) + max(label_version_txt_bounds.x as i32, label_target_txt_bounds.x as i32);
-        let labels_x = d.get_screen_width()/2 - labels_width/2;
+        let label_target_txt = format!(
+            "Target:    {}-{}",
+            std::env::consts::ARCH,
+            std::env::consts::OS
+        );
+        let label_version_txt_bounds = main_state.current_font.measure_text(
+            &label_version_txt,
+            main_state.current_font_height as f32,
+            main_state.default_txt_spacing as f32,
+        );
+        let label_target_txt_bounds = main_state.current_font.measure_text(
+            &label_target_txt,
+            main_state.current_font_height as f32,
+            main_state.default_txt_spacing as f32,
+        );
+        let labels_width = propwidth(d, 25)
+            + max(
+                label_version_txt_bounds.x as i32,
+                label_target_txt_bounds.x as i32,
+            );
+        let labels_x = d.get_screen_width() / 2 - labels_width / 2;
         let labels_y = propheight(d, 300);
         let labels_height = propheight(d, 25);
 
-        let labels: Vec<String> = vec!(
-            label_version_txt,
-            label_target_txt
-        );
+        let labels: Vec<String> = vec![label_version_txt, label_target_txt];
 
         for (i, label) in labels.iter().enumerate() {
             d.gui_label(
@@ -156,14 +242,14 @@ impl View for HomeView {
                     labels_x,
                     labels_y + (i as i32 * labels_height),
                     labels_width,
-                    labels_height
+                    labels_height,
                 ),
-                label.as_str()
+                label.as_str(),
             );
         }
 
         let continue_width = propwidth(d, 150);
-        let continue_x = d.get_screen_width()/2 - continue_width/2;
+        let continue_x = d.get_screen_width() / 2 - continue_width / 2;
         let continue_height = propwidth(d, 50);
         let continue_y_padding = propwidth(d, 25);
         let continue_y = labels_y + (labels_height * labels.len() as i32) + continue_y_padding;
@@ -171,13 +257,8 @@ impl View for HomeView {
         let continue_itext = d.gui_icon_text(ICON_PLAYER_NEXT, ": Continua");
 
         if d.gui_button(
-            rrect(
-                continue_x,
-                continue_y,
-                continue_width,
-                continue_height
-            ),
-            continue_itext.as_str()
+            rrect(continue_x, continue_y, continue_width, continue_height),
+            continue_itext.as_str(),
         ) {
             controller.set_user_continued(true);
         }
@@ -187,12 +268,26 @@ impl View for HomeView {
         let todo_font_height = main_state.current_font_height * todo_font_scale;
 
         let todo_txt = "TODO: WELCOME";
-        let todo_txt_bounds = main_state.current_font.measure_text(todo_txt, todo_font_height as f32, main_state.default_txt_spacing as f32);
+        let todo_txt_bounds = main_state.current_font.measure_text(
+            todo_txt,
+            todo_font_height as f32,
+            main_state.default_txt_spacing as f32,
+        );
         let todo_txt_x = (d.get_screen_width() / 2) - (todo_txt_bounds.x as i32 / 2);
         let todo_txt_y = (d.get_screen_height() / 2) - (todo_txt_bounds.y as i32 / 2);
 
-        draw_rainbow_text(d, todo_txt_x, todo_txt_y, "TODO: WELCOME", frame_counter, rainbow_speed, &main_state.current_font, main_state.default_txt_spacing, main_state.current_font_height, todo_font_scale);
-
+        draw_rainbow_text(
+            d,
+            todo_txt_x,
+            todo_txt_y,
+            "TODO: WELCOME",
+            frame_counter,
+            rainbow_speed,
+            &main_state.current_font,
+            main_state.default_txt_spacing,
+            main_state.current_font_height,
+            todo_font_scale,
+        );
     }
 }
 
@@ -210,7 +305,13 @@ pub(crate) struct SecondView {
 impl View for SecondView {
     type Controller = SecondController;
 
-    fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &Self::Controller, main_state: &MainState) {
+    fn draw(
+        &mut self,
+        d: &mut RaylibDrawHandle,
+        _thread: &RaylibThread,
+        controller: &Self::Controller,
+        main_state: &MainState,
+    ) {
         d.clear_background(main_state.default_bg_color);
 
         // Draw the state retrieved via the Controller
@@ -226,12 +327,16 @@ impl View for SecondView {
             Vector2::new(propwidth(d, 100) as f32, propheight(d, 10) as f32),
             main_state.current_font_height as f32,
             main_state.default_txt_spacing as f32,
-            main_state.default_txt_color
+            main_state.default_txt_color,
         );
 
-
         let updated_spinner = d.gui_spinner(
-            rrect(propwidth(d, 100), propheight(d, 50), propwidth(d, 125), propheight(d, 30)),
+            rrect(
+                propwidth(d, 100),
+                propheight(d, 50),
+                propwidth(d, 125),
+                propheight(d, 30),
+            ),
             "",
             &mut self.spinner_value,
             0,
@@ -250,7 +355,7 @@ impl View for SecondView {
 
         let texture_target_width = propwidth(d, 205);
         let texture_target_height = propheight(d, 205);
-        let texture_target_x = d.get_screen_width()/2 - texture_target_width /2;
+        let texture_target_x = d.get_screen_width() / 2 - texture_target_width / 2;
         let texture_target_y = propheight(d, 50);
         if let Some(ref texture) = main_state.logo_texture {
             d.draw_texture_pro(
@@ -274,18 +379,31 @@ impl View for SecondView {
         }
 
         let label_version_txt = format!("Version:   {}", SHORT_PROJECT_VERSION);
-        let label_target_txt = format!("Target:    {}-{}", std::env::consts::ARCH, std::env::consts::OS);
-        let label_version_txt_bounds = main_state.current_font.measure_text(&label_version_txt, main_state.current_font_height as f32, main_state.default_txt_spacing as f32);
-        let label_target_txt_bounds = main_state.current_font.measure_text(&label_target_txt, main_state.current_font_height as f32, main_state.default_txt_spacing as f32);
-        let labels_width = propwidth(d, 25) + max(label_version_txt_bounds.x as i32, label_target_txt_bounds.x as i32);
-        let labels_x = d.get_screen_width()/2 - labels_width/2;
+        let label_target_txt = format!(
+            "Target:    {}-{}",
+            std::env::consts::ARCH,
+            std::env::consts::OS
+        );
+        let label_version_txt_bounds = main_state.current_font.measure_text(
+            &label_version_txt,
+            main_state.current_font_height as f32,
+            main_state.default_txt_spacing as f32,
+        );
+        let label_target_txt_bounds = main_state.current_font.measure_text(
+            &label_target_txt,
+            main_state.current_font_height as f32,
+            main_state.default_txt_spacing as f32,
+        );
+        let labels_width = propwidth(d, 25)
+            + max(
+                label_version_txt_bounds.x as i32,
+                label_target_txt_bounds.x as i32,
+            );
+        let labels_x = d.get_screen_width() / 2 - labels_width / 2;
         let labels_y = propheight(d, 300);
         let labels_height = propheight(d, 25);
 
-        let labels: Vec<String> = vec!(
-            label_version_txt,
-            label_target_txt
-        );
+        let labels: Vec<String> = vec![label_version_txt, label_target_txt];
 
         for (i, label) in labels.iter().enumerate() {
             d.gui_label(
@@ -293,14 +411,14 @@ impl View for SecondView {
                     labels_x,
                     labels_y + (i as i32 * labels_height),
                     labels_width,
-                    labels_height
+                    labels_height,
                 ),
-                label.as_str()
+                label.as_str(),
             );
         }
 
         let continue_width = propwidth(d, 150);
-        let continue_x = d.get_screen_width()/2 - continue_width/2;
+        let continue_x = d.get_screen_width() / 2 - continue_width / 2;
         let continue_height = propwidth(d, 50);
         let continue_y_padding = propwidth(d, 25);
         let continue_y = labels_y + (labels_height * labels.len() as i32) + continue_y_padding;
@@ -308,13 +426,8 @@ impl View for SecondView {
         let continue_itext = d.gui_icon_text(ICON_PLAYER_NEXT, ": Continua");
 
         if d.gui_button(
-            rrect(
-                continue_x,
-                continue_y,
-                continue_width,
-                continue_height
-            ),
-            continue_itext.as_str()
+            rrect(continue_x, continue_y, continue_width, continue_height),
+            continue_itext.as_str(),
         ) {
             controller.set_user_continued(true);
         }
@@ -324,12 +437,26 @@ impl View for SecondView {
         let todo_font_height = main_state.current_font_height * todo_font_scale;
 
         let todo_txt = "TODO: WELCOME";
-        let todo_txt_bounds = main_state.current_font.measure_text(todo_txt, todo_font_height as f32, main_state.default_txt_spacing as f32);
+        let todo_txt_bounds = main_state.current_font.measure_text(
+            todo_txt,
+            todo_font_height as f32,
+            main_state.default_txt_spacing as f32,
+        );
         let todo_txt_x = (d.get_screen_width() / 2) - (todo_txt_bounds.x as i32 / 2);
         let todo_txt_y = (d.get_screen_height() / 2) - (todo_txt_bounds.y as i32 / 2);
 
-        draw_rainbow_text(d, todo_txt_x, todo_txt_y, "TODO: WELCOME", frame_counter, rainbow_speed, &main_state.current_font, main_state.default_txt_spacing, main_state.current_font_height, todo_font_scale);
-
+        draw_rainbow_text(
+            d,
+            todo_txt_x,
+            todo_txt_y,
+            "TODO: WELCOME",
+            frame_counter,
+            rainbow_speed,
+            &main_state.current_font,
+            main_state.default_txt_spacing,
+            main_state.current_font_height,
+            todo_font_scale,
+        );
     }
 }
 
@@ -342,24 +469,28 @@ impl SecondView {
     }
 }
 
-pub(crate) struct SelezioneIndiceView {
-
-}
+pub(crate) struct SelezioneIndiceView {}
 
 impl View for SelezioneIndiceView {
     type Controller = IndiceController;
 
-    fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &Self::Controller, main_state: &MainState) {
-
+    fn draw(
+        &mut self,
+        d: &mut RaylibDrawHandle,
+        _thread: &RaylibThread,
+        controller: &Self::Controller,
+        main_state: &MainState,
+    ) {
         d.clear_background(main_state.default_bg_color);
 
         let button_niseci_width = propwidth(d, 200);
-        let button_niseci_x = d.get_screen_width() / 2 - button_niseci_width /2;
+        let button_niseci_x = d.get_screen_width() / 2 - button_niseci_width / 2;
         let button_niseci_height = propwidth(d, 50);
 
         let button_indice_y_spacing = button_niseci_height;
 
-        let button_niseci_y = d.get_screen_height() / 2 - button_indice_y_spacing / 2 - button_niseci_height;
+        let button_niseci_y =
+            d.get_screen_height() / 2 - button_indice_y_spacing / 2 - button_niseci_height;
 
         let button_hfbi_width = button_niseci_width;
         let button_hfbi_x = button_niseci_x;
@@ -368,17 +499,13 @@ impl View for SelezioneIndiceView {
 
         let groupbox_width = button_niseci_width + propwidth(d, 100);
         let groupbox_x = button_niseci_x - propwidth(d, 50);
-        let groupbox_height = button_niseci_height * 2 + button_indice_y_spacing + propheight(d, 100);
+        let groupbox_height =
+            button_niseci_height * 2 + button_indice_y_spacing + propheight(d, 100);
         let groupbox_y = button_niseci_y - propheight(d, 50);
 
         d.gui_group_box(
-            rrect(
-                groupbox_x,
-                groupbox_y,
-                groupbox_width,
-                groupbox_height
-            ),
-            "Seleziona Indice"
+            rrect(groupbox_x, groupbox_y, groupbox_width, groupbox_height),
+            "Seleziona Indice",
         );
 
         if d.gui_button(
@@ -386,9 +513,9 @@ impl View for SelezioneIndiceView {
                 button_niseci_x,
                 button_niseci_y,
                 button_niseci_width,
-                button_niseci_height
+                button_niseci_height,
             ),
-            "NISECI"
+            "NISECI",
         ) {
             controller.set_indice_corrente(Indice::Niseci);
         }
@@ -400,7 +527,7 @@ impl View for SelezioneIndiceView {
                 button_hfbi_width,
                 button_hfbi_height,
             ),
-            "HFBI"
+            "HFBI",
         ) {
             controller.set_indice_corrente(Indice::Hfbi);
         }
@@ -408,23 +535,23 @@ impl View for SelezioneIndiceView {
 }
 
 impl SelezioneIndiceView {
-
     pub(crate) fn new() -> Self {
-        Self {
-
-        }
+        Self {}
     }
 }
 
-pub(crate) struct SelezioneFileInputView {
-
-}
+pub(crate) struct SelezioneFileInputView {}
 
 impl View for SelezioneFileInputView {
     type Controller = FileInputController;
 
-    fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &Self::Controller, main_state: &MainState) {
-
+    fn draw(
+        &mut self,
+        d: &mut RaylibDrawHandle,
+        _thread: &RaylibThread,
+        controller: &Self::Controller,
+        main_state: &MainState,
+    ) {
         d.clear_background(main_state.default_bg_color);
 
         let _state = controller.get_state();
@@ -437,47 +564,47 @@ impl View for SelezioneFileInputView {
         };
 
         let button_riferimento_width = propwidth(d, 200);
-        let button_riferimento_x = d.get_screen_width() / 2 - button_riferimento_width /2;
+        let button_riferimento_x = d.get_screen_width() / 2 - button_riferimento_width / 2;
         let button_riferimento_height = propwidth(d, 50);
 
         let button_fileinput_y_spacing = button_riferimento_height;
 
-        let button_riferimento_y = d.get_screen_height() / 2 - button_fileinput_y_spacing / 2 - button_riferimento_height;
+        let button_riferimento_y =
+            d.get_screen_height() / 2 - button_fileinput_y_spacing / 2 - button_riferimento_height;
 
         let button_campionamento_width = button_riferimento_width;
         let button_campionamento_x = button_riferimento_x;
         let button_campionamento_height = button_riferimento_height;
         let button_campionamento_y = match current_index {
             Indice::Hfbi => button_riferimento_y + button_fileinput_y_spacing,
-            Indice::Niseci => button_riferimento_y + button_riferimento_height + button_fileinput_y_spacing,
+            Indice::Niseci => {
+                button_riferimento_y + button_riferimento_height + button_fileinput_y_spacing
+            }
         };
 
         let groupbox_width = button_riferimento_width + propwidth(d, 100);
         let groupbox_x = button_riferimento_x - propwidth(d, 50);
-        let groupbox_height = button_riferimento_height * 2 + button_fileinput_y_spacing + propheight(d, 100);
+        let groupbox_height =
+            button_riferimento_height * 2 + button_fileinput_y_spacing + propheight(d, 100);
         let groupbox_y = button_riferimento_y - propheight(d, 50);
 
         d.gui_group_box(
-            rrect(
-                groupbox_x,
-                groupbox_y,
-                groupbox_width,
-                groupbox_height
-            ),
-            "Seleziona file di input"
+            rrect(groupbox_x, groupbox_y, groupbox_width, groupbox_height),
+            "Seleziona file di input",
         );
 
         if current_index != Indice::Hfbi {
-            if let Some(_filepath) = controller.get_riferimento_path() { // A file is already set, display button to clear it
+            if let Some(_filepath) = controller.get_riferimento_path() {
+                // A file is already set, display button to clear it
                 let rif_itext = d.gui_icon_text(ICON_BIN, "Annulla Riferimento");
                 if d.gui_button(
                     rrect(
                         button_riferimento_x,
                         button_riferimento_y,
                         button_riferimento_width,
-                        button_riferimento_height
+                        button_riferimento_height,
                     ),
-                    rif_itext.as_str()
+                    rif_itext.as_str(),
                 ) {
                     controller.set_riferimento_path(None); // Should already also clear the path_valid
                                                            // state inside it
@@ -489,26 +616,29 @@ impl View for SelezioneFileInputView {
                         button_riferimento_x,
                         button_riferimento_y,
                         button_riferimento_width,
-                        button_riferimento_height
+                        button_riferimento_height,
                     ),
-                    rif_itext.as_str()
+                    rif_itext.as_str(),
                 ) {
                     let file = FileDialog::new()
-                            .add_filter("csv", &["csv"])
-                            .set_directory("/")
-                            .pick_file();
+                        .add_filter("csv", &["csv"])
+                        .set_directory("/")
+                        .pick_file();
 
                     if let Some(filepath) = file {
                         controller.set_riferimento_path(Some(filepath));
                     } else {
                         eprintln!("Error: failed getting a file.");
-                        controller.add_console_message("Failed getting a file for riferimento".to_string());
+                        controller.add_console_message(
+                            "Failed getting a file for riferimento".to_string(),
+                        );
                     }
                 }
             }
         }
 
-        if let Some(_filepath) = controller.get_campionamento_path() { // A file is already set, display button to clear it
+        if let Some(_filepath) = controller.get_campionamento_path() {
+            // A file is already set, display button to clear it
             let camp_itext = d.gui_icon_text(ICON_BIN, "Annulla Campionamento");
             if d.gui_button(
                 rrect(
@@ -517,10 +647,10 @@ impl View for SelezioneFileInputView {
                     button_campionamento_width,
                     button_campionamento_height,
                 ),
-                camp_itext.as_str()
+                camp_itext.as_str(),
             ) {
                 controller.set_campionamento_path(None); // Should already also clear the path_valid
-                                                       // state inside it
+                                                         // state inside it
             }
         } else {
             let camp_itext = d.gui_icon_text(ICON_FILE_OPEN, "Campionamento");
@@ -531,18 +661,19 @@ impl View for SelezioneFileInputView {
                     button_campionamento_width,
                     button_campionamento_height,
                 ),
-                camp_itext.as_str()
+                camp_itext.as_str(),
             ) {
                 let file = FileDialog::new()
-                        .add_filter("csv", &["csv"])
-                        .set_directory("/")
-                        .pick_file();
+                    .add_filter("csv", &["csv"])
+                    .set_directory("/")
+                    .pick_file();
 
                 if let Some(filepath) = file {
                     controller.set_campionamento_path(Some(filepath));
                 } else {
                     eprintln!("Error: failed getting a file.");
-                    controller.add_console_message("Failed getting a file for campionamento".to_string());
+                    controller
+                        .add_console_message("Failed getting a file for campionamento".to_string());
                 }
             }
         }
@@ -550,23 +681,23 @@ impl View for SelezioneFileInputView {
 }
 
 impl SelezioneFileInputView {
-
     pub(crate) fn new() -> Self {
-        Self {
-
-        }
+        Self {}
     }
 }
 
-pub(crate) struct ValidazioneFileInputView {
-
-}
+pub(crate) struct ValidazioneFileInputView {}
 
 impl View for ValidazioneFileInputView {
     type Controller = FileInputController;
 
-    fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &Self::Controller, main_state: &MainState) {
-
+    fn draw(
+        &mut self,
+        d: &mut RaylibDrawHandle,
+        _thread: &RaylibThread,
+        controller: &Self::Controller,
+        main_state: &MainState,
+    ) {
         d.clear_background(main_state.default_bg_color);
 
         let _state = controller.get_state();
@@ -579,46 +710,47 @@ impl View for ValidazioneFileInputView {
         };
 
         let button_riferimento_width = propwidth(d, 200);
-        let button_riferimento_x = d.get_screen_width() / 2 - button_riferimento_width /2;
+        let button_riferimento_x = d.get_screen_width() / 2 - button_riferimento_width / 2;
         let button_riferimento_height = propwidth(d, 50);
 
         let button_fileinput_y_spacing = button_riferimento_height;
 
-        let button_riferimento_y = d.get_screen_height() / 2 - button_fileinput_y_spacing / 2 - button_riferimento_height;
+        let button_riferimento_y =
+            d.get_screen_height() / 2 - button_fileinput_y_spacing / 2 - button_riferimento_height;
 
         let button_campionamento_width = button_riferimento_width;
         let button_campionamento_x = button_riferimento_x;
         let button_campionamento_height = button_riferimento_height;
         let button_campionamento_y = match current_index {
             Indice::Hfbi => button_riferimento_y + button_fileinput_y_spacing,
-            Indice::Niseci => button_riferimento_y + button_riferimento_height + button_fileinput_y_spacing,
+            Indice::Niseci => {
+                button_riferimento_y + button_riferimento_height + button_fileinput_y_spacing
+            }
         };
 
         let groupbox_width = button_riferimento_width + propwidth(d, 100);
         let groupbox_x = button_riferimento_x - propwidth(d, 50);
-        let groupbox_height = button_riferimento_height * 2 + button_fileinput_y_spacing + propheight(d, 100);
+        let groupbox_height =
+            button_riferimento_height * 2 + button_fileinput_y_spacing + propheight(d, 100);
         let groupbox_y = button_riferimento_y - propheight(d, 50);
 
         d.gui_group_box(
-            rrect(
-                groupbox_x,
-                groupbox_y,
-                groupbox_width,
-                groupbox_height
-            ),
-            "Valida file di input"
+            rrect(groupbox_x, groupbox_y, groupbox_width, groupbox_height),
+            "Valida file di input",
         );
 
-        if current_index != Indice::Hfbi && d.gui_button(
+        if current_index != Indice::Hfbi
+            && d.gui_button(
                 rrect(
                     button_riferimento_x,
                     button_riferimento_y,
                     button_riferimento_width,
-                    button_riferimento_height
+                    button_riferimento_height,
                 ),
-                "Valida Riferimento"
-        ) {
-                controller.valida_riferimento_niseci_path();
+                "Valida Riferimento",
+            )
+        {
+            controller.valida_riferimento_niseci_path();
         }
 
         let mut turn_off_button_campionamento = false;
@@ -635,7 +767,7 @@ impl View for ValidazioneFileInputView {
                 button_campionamento_width,
                 button_campionamento_height,
             ),
-            "Valida Campionamento"
+            "Valida Campionamento",
         ) {
             match current_index {
                 Indice::Niseci => {
@@ -655,11 +787,8 @@ impl View for ValidazioneFileInputView {
 }
 
 impl ValidazioneFileInputView {
-
     pub(crate) fn new() -> Self {
-        Self {
-
-        }
+        Self {}
     }
 }
 
@@ -698,8 +827,13 @@ pub(crate) struct SelezioneInfoAggiuntiveView {
 impl View for SelezioneInfoAggiuntiveView {
     type Controller = InfoAggiuntiveController;
 
-    fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &Self::Controller, main_state: &MainState) {
-
+    fn draw(
+        &mut self,
+        d: &mut RaylibDrawHandle,
+        _thread: &RaylibThread,
+        controller: &Self::Controller,
+        main_state: &MainState,
+    ) {
         d.clear_background(main_state.default_bg_color);
 
         let _state = controller.get_state();
@@ -712,29 +846,27 @@ impl View for SelezioneInfoAggiuntiveView {
         };
 
         let groupbox_width = propwidth(d, 750);
-        let groupbox_x = d.get_screen_width() /2 - groupbox_width /2;
+        let groupbox_x = d.get_screen_width() / 2 - groupbox_width / 2;
         let groupbox_height = propheight(d, 450);
-        let groupbox_y = d.get_screen_height() / 2 - groupbox_height /2;
+        let groupbox_y = d.get_screen_height() / 2 - groupbox_height / 2;
 
         d.gui_group_box(
-            rrect(
-                groupbox_x,
-                groupbox_y,
-                groupbox_width,
-                groupbox_height
-            ),
-            "Inserisci informazioni aggiuntive"
+            rrect(groupbox_x, groupbox_y, groupbox_width, groupbox_height),
+            "Inserisci informazioni aggiuntive",
         );
 
         let submit_width = propwidth(d, 100);
         let groupbox_x_end = groupbox_x + groupbox_width;
-        let submit_x = groupbox_x_end + (d.get_screen_width() - groupbox_x_end)/2 - submit_width/2;
+        let submit_x =
+            groupbox_x_end + (d.get_screen_width() - groupbox_x_end) / 2 - submit_width / 2;
         let submit_height = propheight(d, 50);
-        let submit_y = d.get_screen_height() /2 - submit_height /2;
+        let submit_y = d.get_screen_height() / 2 - submit_height / 2;
 
         let confirm_itext = d.gui_icon_text(ICON_OK_TICK, "Conferma");
-        if d.gui_button(rrect(submit_x, submit_y, submit_width, submit_height), confirm_itext.as_str()) {
-
+        if d.gui_button(
+            rrect(submit_x, submit_y, submit_width, submit_height),
+            confirm_itext.as_str(),
+        ) {
             //TODO: impl TryInto<u32> for a new custom RegioneItaliana or smth ?
             //But this was request as a free string originally...
             let regione_string = match self.listview_regione_value {
@@ -758,7 +890,9 @@ impl View for SelezioneInfoAggiuntiveView {
                 17 => "Umbria".to_string(),
                 18 => "Valle d'Aosta".to_string(),
                 19 => "Veneto".to_string(),
-                _ => { panic!("Unexpected regione_string in SelezioneInfoAggiuntiveView::draw()"); }
+                _ => {
+                    panic!("Unexpected regione_string in SelezioneInfoAggiuntiveView::draw()");
+                }
             };
 
             let provincia_string = String::from(&self.textbox_provincia_buffer);
@@ -767,41 +901,44 @@ impl View for SelezioneInfoAggiuntiveView {
                 provincia: provincia_string,
             };
 
-
             let larghezza_stazione_str = String::from(&self.textbox_larghezza_stazione_buffer);
 
-            let larghezza_stazione = match controller.check_larghezza_stazione_string(&larghezza_stazione_str) {
-                Ok(v) => {
-                    v
-                }
-                Err(_e) => {
-                    return; // This is not very appropriate but we expect the controller to change
-                            // the view for us in case of error so it's ok I guess
-                }
-            };
+            let larghezza_stazione =
+                match controller.check_larghezza_stazione_string(&larghezza_stazione_str) {
+                    Ok(v) => v,
+                    Err(_e) => {
+                        return; // This is not very appropriate but we expect the controller to change
+                                // the view for us in case of error so it's ok I guess
+                    }
+                };
 
             let lunghezza_stazione_str = String::from(&self.textbox_lunghezza_stazione_buffer);
 
-            let lunghezza_stazione = match controller.check_lunghezza_stazione_string(&lunghezza_stazione_str) {
-                Ok(v) => {
-                    v
-                }
-                Err(_e) => {
-                    return; // This is not very appropriate but we expect the controller to change
-                            // the view for us in case of error so it's ok I guess
-                }
-            };
+            let lunghezza_stazione =
+                match controller.check_lunghezza_stazione_string(&lunghezza_stazione_str) {
+                    Ok(v) => v,
+                    Err(_e) => {
+                        return; // This is not very appropriate but we expect the controller to change
+                                // the view for us in case of error so it's ok I guess
+                    }
+                };
 
             let codice_stazione = String::from(&self.textbox_codice_stazione_buffer);
-            let date_string =  String::from(&self.textbox_data_buffer);
+            let date_string = String::from(&self.textbox_data_buffer);
 
             let corpo_idrico = String::from(&self.textbox_corpo_idrico_buffer);
 
             match current_index {
                 Indice::Niseci => {
-                    let tipo_comunita = match <TipoComunitaNISECI as TryFrom<i32>>::try_from(self.dropdownbox_tipocomunit_niseci_value) {
+                    let tipo_comunita = match <TipoComunitaNISECI as TryFrom<i32>>::try_from(
+                        self.dropdownbox_tipocomunit_niseci_value,
+                    ) {
                         Ok(v) => v,
-                        _ => { panic!("Unexpected tipo_comunita in SelezioneInfoAggiuntiveView::draw()"); }
+                        _ => {
+                            panic!(
+                                "Unexpected tipo_comunita in SelezioneInfoAggiuntiveView::draw()"
+                            );
+                        }
                     };
                     let mut opt_fonte: Option<String> = None;
                     let mut opt_num_protocollo: Option<String> = None;
@@ -812,26 +949,36 @@ impl View for SelezioneInfoAggiuntiveView {
                         }
                         TipoComunitaNISECI::AffinataDalMase => {
                             // Raylib has trouble handling the string downstream if we don't ensure to do this
-                            opt_num_protocollo = Some(self.textbox_protocollocomunit_niseci_buffer.clone());
+                            opt_num_protocollo =
+                                Some(self.textbox_protocollocomunit_niseci_buffer.clone());
                         }
                         _ => {}
                     }
                     let comunita = ComunitaNISECI {
                         tipo: tipo_comunita,
                         fonte: opt_fonte,
-                        numero_protocollo: opt_num_protocollo
+                        numero_protocollo: opt_num_protocollo,
                     };
-                    let area = match <AreaNISECI as TryFrom<i32>>::try_from(self.combobox_area_niseci_value) {
+                    let area = match <AreaNISECI as TryFrom<i32>>::try_from(
+                        self.combobox_area_niseci_value,
+                    ) {
                         Ok(v) => v,
-                        _ => { panic!("Unexpected area_niseci in SelezioneInfoAggiuntiveView::draw()"); }
+                        _ => {
+                            panic!("Unexpected area_niseci in SelezioneInfoAggiuntiveView::draw()");
+                        }
                     };
 
                     let bacino_niseci = String::from(&self.textbox_bacino_niseci_buffer);
 
-                    let idro_ecoregione_niseci = match <IdroEcoRegioneNISECI as TryFrom<i32>>::try_from(self.listview_idroecoregione_niseci_value) {
-                        Ok(v) => v,
-                        _ => { panic!("Unexpected idroecoregione_niseci in SelezioneInfoAggiuntiveView::draw()"); }
-                    };
+                    let idro_ecoregione_niseci =
+                        match <IdroEcoRegioneNISECI as TryFrom<i32>>::try_from(
+                            self.listview_idroecoregione_niseci_value,
+                        ) {
+                            Ok(v) => v,
+                            _ => {
+                                panic!("Unexpected idroecoregione_niseci in SelezioneInfoAggiuntiveView::draw()");
+                            }
+                        };
 
                     let anagrafica = AnagraficaNISECI {
                         comunita,
@@ -849,17 +996,32 @@ impl View for SelezioneInfoAggiuntiveView {
                     controller.submit_anagrafica_niseci(anagrafica);
                 }
                 Indice::Hfbi => {
-                    let tipo_laguna_costiera = match <TipoLagunaCostieraHFBI as TryFrom<i32>>::try_from(self.dropdownbox_tipolaguna_hfbi_value) {
+                    let tipo_laguna_costiera =
+                        match <TipoLagunaCostieraHFBI as TryFrom<i32>>::try_from(
+                            self.dropdownbox_tipolaguna_hfbi_value,
+                        ) {
+                            Ok(v) => v,
+                            _ => {
+                                panic!(
+                                    "Unexpected tipo_laguna in SelezioneInfoAggiuntiveView::draw()"
+                                );
+                            }
+                        };
+                    let stagione = match <StagioneHFBI as TryFrom<i32>>::try_from(
+                        self.combobox_stagione_hfbi_value,
+                    ) {
                         Ok(v) => v,
-                        _ => { panic!("Unexpected tipo_laguna in SelezioneInfoAggiuntiveView::draw()"); }
+                        _ => {
+                            panic!("Unexpected stagione in SelezioneInfoAggiuntiveView::draw()");
+                        }
                     };
-                    let stagione = match <StagioneHFBI as TryFrom<i32>>::try_from(self.combobox_stagione_hfbi_value) {
+                    let habitat_vegetato = match <HabitatHFBI as TryFrom<i32>>::try_from(
+                        self.combobox_habitat_vegetato_hfbi_value,
+                    ) {
                         Ok(v) => v,
-                        _ => { panic!("Unexpected stagione in SelezioneInfoAggiuntiveView::draw()"); }
-                    };
-                    let habitat_vegetato = match <HabitatHFBI as TryFrom<i32>>::try_from(self.combobox_habitat_vegetato_hfbi_value) {
-                        Ok(v) => v,
-                        _ => { panic!("Unexpected habitat in SelezioneInfoAggiuntiveView::draw()"); }
+                        _ => {
+                            panic!("Unexpected habitat in SelezioneInfoAggiuntiveView::draw()");
+                        }
                     };
                     let anagrafica = AnagraficaHFBI {
                         codice_stazione,
@@ -870,7 +1032,7 @@ impl View for SelezioneInfoAggiuntiveView {
                         stagione,
                         habitat_vegetato,
                         lunghezza_media_transetto: lunghezza_stazione,
-                        larghezza_media_transetto: larghezza_stazione
+                        larghezza_media_transetto: larghezza_stazione,
                     };
                     controller.submit_anagrafica_hfbi(anagrafica);
                 }
@@ -881,13 +1043,13 @@ impl View for SelezioneInfoAggiuntiveView {
         let y_padding = groupbox_height / 15;
 
         // 2 columns: 2 paddings per side + 1 between the columns
-        let column_width = (groupbox_width - (x_padding * 3))/2;
+        let column_width = (groupbox_width - (x_padding * 3)) / 2;
         let column_1_x = groupbox_x + x_padding;
         let column_2_x = column_1_x + column_width + x_padding;
         let column_1_y = groupbox_y + y_padding;
         let column_2_y = column_1_y;
         // 1 padding on top, 2 below
-        let column_1_height = groupbox_height - y_padding*3;
+        let column_1_height = groupbox_height - y_padding * 3;
         // 1 padding on top, 0 below
         let column_2_height = groupbox_height - y_padding;
 
@@ -897,24 +1059,32 @@ impl View for SelezioneInfoAggiuntiveView {
         let column_1_fields_y_spacing = y_padding / 3;
         let column_1_labels_count = 7;
         let column_1_labels_x = column_1_x;
-        let column_1_labels_height = (column_1_height - (column_1_fields_y_spacing*13) ) / column_1_labels_count;
+        let column_1_labels_height =
+            (column_1_height - (column_1_fields_y_spacing * 13)) / column_1_labels_count;
 
         let column_1_label_stazione_y = column_1_y;
-        let column_1_label_corpo_idrico_y = column_1_label_stazione_y + column_1_labels_height + column_1_fields_y_spacing;
-        let column_1_label_regione_y = column_1_label_corpo_idrico_y + column_1_labels_height + column_1_fields_y_spacing;
-        let column_1_label_provincia_y = column_1_label_regione_y + column_1_labels_height + column_1_fields_y_spacing*8;
-        let column_1_label_data_y = column_1_label_provincia_y + column_1_labels_height + column_1_fields_y_spacing;
-        let column_1_label_lunghezza_stazione_y = column_1_label_data_y + column_1_labels_height + column_1_fields_y_spacing;
-        let column_1_label_larghezza_stazione_y = column_1_label_lunghezza_stazione_y + column_1_labels_height + column_1_fields_y_spacing;
+        let column_1_label_corpo_idrico_y =
+            column_1_label_stazione_y + column_1_labels_height + column_1_fields_y_spacing;
+        let column_1_label_regione_y =
+            column_1_label_corpo_idrico_y + column_1_labels_height + column_1_fields_y_spacing;
+        let column_1_label_provincia_y =
+            column_1_label_regione_y + column_1_labels_height + column_1_fields_y_spacing * 8;
+        let column_1_label_data_y =
+            column_1_label_provincia_y + column_1_labels_height + column_1_fields_y_spacing;
+        let column_1_label_lunghezza_stazione_y =
+            column_1_label_data_y + column_1_labels_height + column_1_fields_y_spacing;
+        let column_1_label_larghezza_stazione_y = column_1_label_lunghezza_stazione_y
+            + column_1_labels_height
+            + column_1_fields_y_spacing;
 
         d.gui_label(
             rrect(
                 column_1_labels_x,
                 column_1_label_stazione_y,
                 column_1_labels_width,
-                column_1_labels_height
+                column_1_labels_height,
             ),
-            "Codice stazione"
+            "Codice stazione",
         );
 
         d.gui_label(
@@ -922,9 +1092,9 @@ impl View for SelezioneInfoAggiuntiveView {
                 column_1_labels_x,
                 column_1_label_corpo_idrico_y,
                 column_1_labels_width,
-                column_1_labels_height
+                column_1_labels_height,
             ),
-            "Nome del corpo idrico"
+            "Nome del corpo idrico",
         );
 
         d.gui_label(
@@ -932,9 +1102,9 @@ impl View for SelezioneInfoAggiuntiveView {
                 column_1_labels_x,
                 column_1_label_regione_y,
                 column_1_labels_width,
-                column_1_labels_height
+                column_1_labels_height,
             ),
-            "Regione"
+            "Regione",
         );
 
         d.gui_label(
@@ -942,9 +1112,9 @@ impl View for SelezioneInfoAggiuntiveView {
                 column_1_labels_x,
                 column_1_label_provincia_y,
                 column_1_labels_width,
-                column_1_labels_height
+                column_1_labels_height,
             ),
-            "Provincia"
+            "Provincia",
         );
 
         d.gui_label(
@@ -952,9 +1122,9 @@ impl View for SelezioneInfoAggiuntiveView {
                 column_1_labels_x,
                 column_1_label_data_y,
                 column_1_labels_width,
-                column_1_labels_height
+                column_1_labels_height,
             ),
-            "Data"
+            "Data",
         );
 
         let label_for_station_length;
@@ -971,9 +1141,9 @@ impl View for SelezioneInfoAggiuntiveView {
                 column_1_labels_x,
                 column_1_label_lunghezza_stazione_y,
                 column_1_labels_width,
-                column_1_labels_height
+                column_1_labels_height,
             ),
-            label_for_station_length
+            label_for_station_length,
         );
 
         let label_for_station_width;
@@ -991,9 +1161,9 @@ impl View for SelezioneInfoAggiuntiveView {
                 column_1_labels_x,
                 column_1_label_larghezza_stazione_y,
                 column_1_labels_width,
-                column_1_labels_height
+                column_1_labels_height,
             ),
-            label_for_station_width
+            label_for_station_width,
         );
 
         let column_1_boxes_width = column_1_labels_width;
@@ -1005,10 +1175,10 @@ impl View for SelezioneInfoAggiuntiveView {
                 column_1_boxes_x,
                 column_1_label_stazione_y,
                 column_1_boxes_width,
-                column_1_boxes_height
+                column_1_boxes_height,
             ),
             &mut self.textbox_codice_stazione_buffer,
-            self.textbox_codice_stazione_edit_mode
+            self.textbox_codice_stazione_edit_mode,
         ) {
             self.textbox_codice_stazione_edit_mode = !self.textbox_codice_stazione_edit_mode;
         }
@@ -1017,10 +1187,10 @@ impl View for SelezioneInfoAggiuntiveView {
                 column_1_boxes_x,
                 column_1_label_corpo_idrico_y,
                 column_1_boxes_width,
-                column_1_boxes_height
+                column_1_boxes_height,
             ),
             &mut self.textbox_corpo_idrico_buffer,
-            self.textbox_corpo_idrico_edit_mode
+            self.textbox_corpo_idrico_edit_mode,
         ) {
             self.textbox_corpo_idrico_edit_mode = !self.textbox_corpo_idrico_edit_mode;
         }
@@ -1031,7 +1201,7 @@ impl View for SelezioneInfoAggiuntiveView {
                 column_1_boxes_x,
                 column_1_label_regione_y,
                 column_1_boxes_width,
-                column_1_boxes_height*3
+                column_1_boxes_height * 3,
             ),
             "Abruzzo;Basilicata;Calabria;Campania;Emilia-Romagna;\
             Friuli-Venezia-Giulia;Lazio;Liguria;Lombardia;Marche;\
@@ -1045,10 +1215,10 @@ impl View for SelezioneInfoAggiuntiveView {
                 column_1_boxes_x,
                 column_1_label_provincia_y,
                 column_1_boxes_width,
-                column_1_boxes_height
+                column_1_boxes_height,
             ),
             &mut self.textbox_provincia_buffer,
-            self.textbox_provincia_edit_mode
+            self.textbox_provincia_edit_mode,
         ) {
             self.textbox_provincia_edit_mode = !self.textbox_provincia_edit_mode;
         }
@@ -1057,10 +1227,10 @@ impl View for SelezioneInfoAggiuntiveView {
                 column_1_boxes_x,
                 column_1_label_data_y,
                 column_1_boxes_width,
-                column_1_boxes_height
+                column_1_boxes_height,
             ),
             &mut self.textbox_data_buffer,
-            self.textbox_data_edit_mode
+            self.textbox_data_edit_mode,
         ) {
             self.textbox_data_edit_mode = !self.textbox_data_edit_mode;
         }
@@ -1069,10 +1239,10 @@ impl View for SelezioneInfoAggiuntiveView {
                 column_1_boxes_x,
                 column_1_label_lunghezza_stazione_y,
                 column_1_boxes_width,
-                column_1_boxes_height
+                column_1_boxes_height,
             ),
             &mut self.textbox_lunghezza_stazione_buffer,
-            self.textbox_lunghezza_stazione_edit_mode
+            self.textbox_lunghezza_stazione_edit_mode,
         ) {
             self.textbox_lunghezza_stazione_edit_mode = !self.textbox_lunghezza_stazione_edit_mode;
         }
@@ -1081,34 +1251,37 @@ impl View for SelezioneInfoAggiuntiveView {
                 column_1_boxes_x,
                 column_1_label_larghezza_stazione_y,
                 column_1_boxes_width,
-                column_1_boxes_height
+                column_1_boxes_height,
             ),
             &mut self.textbox_larghezza_stazione_buffer,
-            self.textbox_larghezza_stazione_edit_mode
+            self.textbox_larghezza_stazione_edit_mode,
         ) {
             self.textbox_larghezza_stazione_edit_mode = !self.textbox_larghezza_stazione_edit_mode;
         }
         // Column 2
 
         // spacing between the two groupboxes
-        let column_2_groupbox_y_padding = y_padding/2;
+        let column_2_groupbox_y_padding = y_padding / 2;
         let column_2_groupbox_niseci_width = column_width;
         let column_2_groupbox_niseci_x = column_2_x;
         let column_2_groupbox_niseci_y = column_2_y;
-        let column_2_groupbox_niseci_height = column_2_height - column_2_groupbox_y_padding/2;// - y_padding;
+        let column_2_groupbox_niseci_height = column_2_height - column_2_groupbox_y_padding / 2; // - y_padding;
         let column_2_groupbox_hfbi_width = column_2_groupbox_niseci_width;
         let column_2_groupbox_hfbi_x = column_2_groupbox_niseci_x;
         //let column_2_groupbox_hfbi_y = column_2_groupbox_niseci_y + column_2_groupbox_niseci_height + column_2_groupbox_y_padding;
         //let column_2_groupbox_hfbi_height = column_2_height - column_2_groupbox_niseci_height;
         let column_2_groupbox_hfbi_y = column_2_groupbox_niseci_y;
-        let column_2_groupbox_hfbi_height = column_2_groupbox_niseci_height - column_2_groupbox_y_padding - y_padding;
+        let column_2_groupbox_hfbi_height =
+            column_2_groupbox_niseci_height - column_2_groupbox_y_padding - y_padding;
 
-        let column_2_comunit_x_padding = x_padding/4;
+        let column_2_comunit_x_padding = x_padding / 4;
         let column_2_comunit_y_padding = column_2_groupbox_y_padding;
         let column_2_groupbox_comunit_x = column_2_groupbox_niseci_x + column_2_comunit_x_padding;
         let column_2_groupbox_comunit_y = column_2_groupbox_niseci_y + column_2_comunit_y_padding;
-        let column_2_groupbox_comunit_width = column_2_groupbox_niseci_width - column_2_comunit_x_padding*2;
-        let column_2_groupbox_comunit_height = column_1_labels_height*3 + column_1_fields_y_spacing*4;
+        let column_2_groupbox_comunit_width =
+            column_2_groupbox_niseci_width - column_2_comunit_x_padding * 2;
+        let column_2_groupbox_comunit_height =
+            column_1_labels_height * 3 + column_1_fields_y_spacing * 4;
 
         match current_index {
             Indice::Niseci => {
@@ -1117,9 +1290,9 @@ impl View for SelezioneInfoAggiuntiveView {
                         column_2_groupbox_niseci_x,
                         column_2_groupbox_niseci_y,
                         column_2_groupbox_niseci_width,
-                        column_2_groupbox_niseci_height
+                        column_2_groupbox_niseci_height,
                     ),
-                    "NISECI"
+                    "NISECI",
                 );
 
                 d.gui_group_box(
@@ -1127,11 +1300,10 @@ impl View for SelezioneInfoAggiuntiveView {
                         column_2_groupbox_comunit_x,
                         column_2_groupbox_comunit_y,
                         column_2_groupbox_comunit_width,
-                        column_2_groupbox_comunit_height
+                        column_2_groupbox_comunit_height,
                     ),
-                    "Comunità NISECI"
+                    "Comunità NISECI",
                 );
-
             }
             Indice::Hfbi => {
                 d.gui_group_box(
@@ -1139,36 +1311,49 @@ impl View for SelezioneInfoAggiuntiveView {
                         column_2_groupbox_hfbi_x,
                         column_2_groupbox_hfbi_y,
                         column_2_groupbox_hfbi_width,
-                        column_2_groupbox_hfbi_height
+                        column_2_groupbox_hfbi_height,
                     ),
-                    "HFBI"
+                    "HFBI",
                 );
             }
         }
 
         let column_2_groupbox_labels_x_spacing = column_2_comunit_x_padding;
-        let column_2_groupbox_labels_width = (column_2_groupbox_comunit_width - column_2_groupbox_labels_x_spacing*2) / 2;
+        let column_2_groupbox_labels_width =
+            (column_2_groupbox_comunit_width - column_2_groupbox_labels_x_spacing * 2) / 2;
         let column_2_groupbox_fields_y_spacing = column_1_fields_y_spacing;
-        let column_2_groupbox_labels_x = column_2_groupbox_comunit_x + column_2_groupbox_labels_x_spacing;
+        let column_2_groupbox_labels_x =
+            column_2_groupbox_comunit_x + column_2_groupbox_labels_x_spacing;
         let column_2_labels_height = column_1_labels_height;
 
         match current_index {
             Indice::Niseci => {
-                let column_2_label_tipo_comunit_y = column_2_groupbox_comunit_y + column_2_groupbox_fields_y_spacing;
-                let column_2_label_fonte_comunit_y = column_2_label_tipo_comunit_y + column_2_labels_height + column_2_groupbox_fields_y_spacing;
-                let column_2_label_protocollo_comunit_y = column_2_label_fonte_comunit_y + column_2_labels_height + column_2_groupbox_fields_y_spacing;
-                let column_2_label_idroecoregione_y = column_2_groupbox_comunit_y + column_2_groupbox_comunit_height + column_2_groupbox_fields_y_spacing;
-                let column_2_label_area_niseci_y = column_2_label_idroecoregione_y + column_2_labels_height*4 + column_2_groupbox_fields_y_spacing;
-                let column_2_label_bacino_y = column_2_label_area_niseci_y + column_2_labels_height + column_2_groupbox_fields_y_spacing;
+                let column_2_label_tipo_comunit_y =
+                    column_2_groupbox_comunit_y + column_2_groupbox_fields_y_spacing;
+                let column_2_label_fonte_comunit_y = column_2_label_tipo_comunit_y
+                    + column_2_labels_height
+                    + column_2_groupbox_fields_y_spacing;
+                let column_2_label_protocollo_comunit_y = column_2_label_fonte_comunit_y
+                    + column_2_labels_height
+                    + column_2_groupbox_fields_y_spacing;
+                let column_2_label_idroecoregione_y = column_2_groupbox_comunit_y
+                    + column_2_groupbox_comunit_height
+                    + column_2_groupbox_fields_y_spacing;
+                let column_2_label_area_niseci_y = column_2_label_idroecoregione_y
+                    + column_2_labels_height * 4
+                    + column_2_groupbox_fields_y_spacing;
+                let column_2_label_bacino_y = column_2_label_area_niseci_y
+                    + column_2_labels_height
+                    + column_2_groupbox_fields_y_spacing;
 
                 d.gui_label(
                     rrect(
                         column_2_groupbox_labels_x,
                         column_2_label_tipo_comunit_y,
                         column_2_groupbox_labels_width,
-                        column_2_labels_height
+                        column_2_labels_height,
                     ),
-                    "Tipo"
+                    "Tipo",
                 );
 
                 d.gui_label(
@@ -1176,9 +1361,9 @@ impl View for SelezioneInfoAggiuntiveView {
                         column_2_groupbox_labels_x,
                         column_2_label_fonte_comunit_y,
                         column_2_groupbox_labels_width,
-                        column_2_labels_height
+                        column_2_labels_height,
                     ),
-                    "Fonte"
+                    "Fonte",
                 );
 
                 d.gui_label(
@@ -1186,9 +1371,9 @@ impl View for SelezioneInfoAggiuntiveView {
                         column_2_groupbox_labels_x,
                         column_2_label_protocollo_comunit_y,
                         column_2_groupbox_labels_width,
-                        column_2_labels_height
+                        column_2_labels_height,
                     ),
-                    "Protocollo"
+                    "Protocollo",
                 );
 
                 d.gui_label(
@@ -1196,9 +1381,9 @@ impl View for SelezioneInfoAggiuntiveView {
                         column_2_groupbox_labels_x,
                         column_2_label_idroecoregione_y,
                         column_2_groupbox_labels_width,
-                        column_2_labels_height
+                        column_2_labels_height,
                     ),
-                    "Idroecoregione"
+                    "Idroecoregione",
                 );
 
                 d.gui_label(
@@ -1206,29 +1391,30 @@ impl View for SelezioneInfoAggiuntiveView {
                         column_2_groupbox_labels_x,
                         column_2_label_area_niseci_y,
                         column_2_groupbox_labels_width,
-                        column_2_labels_height
+                        column_2_labels_height,
                     ),
-                    "Area"
+                    "Area",
                 );
-
 
                 d.gui_label(
                     rrect(
                         column_2_groupbox_labels_x,
                         column_2_label_bacino_y,
                         column_2_groupbox_labels_width,
-                        column_2_labels_height
+                        column_2_labels_height,
                     ),
-                    "Bacino"
+                    "Bacino",
                 );
 
                 let column_2_groupbox_boxes_width = column_2_groupbox_labels_width;
                 let column_2_groupbox_boxes_height = column_2_labels_height;
-                let column_2_groupbox_boxes_x = column_2_groupbox_labels_x + column_2_groupbox_labels_width;
+                let column_2_groupbox_boxes_x =
+                    column_2_groupbox_labels_x + column_2_groupbox_labels_width;
 
                 match self.dropdownbox_tipocomunit_niseci_value {
                     1 => { /* 1 == Fonte I guess */ }
-                    _ => { // Not fonte I guess
+                    _ => {
+                        // Not fonte I guess
                         d.gui_lock();
                         d.gui_set_state(STATE_DISABLED);
                     }
@@ -1238,16 +1424,18 @@ impl View for SelezioneInfoAggiuntiveView {
                         column_2_groupbox_boxes_x,
                         column_2_label_fonte_comunit_y,
                         column_2_groupbox_boxes_width,
-                        column_2_groupbox_boxes_height
+                        column_2_groupbox_boxes_height,
                     ),
                     &mut self.textbox_fontecomunit_niseci_buffer,
-                    self.textbox_fontecomunit_niseci_edit_mode
+                    self.textbox_fontecomunit_niseci_edit_mode,
                 ) {
-                    self.textbox_fontecomunit_niseci_edit_mode = !self.textbox_fontecomunit_niseci_edit_mode;
+                    self.textbox_fontecomunit_niseci_edit_mode =
+                        !self.textbox_fontecomunit_niseci_edit_mode;
                 }
                 match self.dropdownbox_tipocomunit_niseci_value {
                     1 => { /* 1 == Fonte I guess */ }
-                    _ => { // Not fonte I guess
+                    _ => {
+                        // Not fonte I guess
                         d.gui_set_state(STATE_NORMAL);
                         d.gui_unlock();
                     }
@@ -1255,7 +1443,8 @@ impl View for SelezioneInfoAggiuntiveView {
 
                 match self.dropdownbox_tipocomunit_niseci_value {
                     3 => { /* 3 == Mase I guess */ }
-                    _ => { // Not Mase I guess
+                    _ => {
+                        // Not Mase I guess
                         d.gui_lock();
                         d.gui_set_state(STATE_DISABLED);
                     }
@@ -1265,16 +1454,18 @@ impl View for SelezioneInfoAggiuntiveView {
                         column_2_groupbox_boxes_x,
                         column_2_label_protocollo_comunit_y,
                         column_2_groupbox_boxes_width,
-                        column_2_groupbox_boxes_height
+                        column_2_groupbox_boxes_height,
                     ),
                     &mut self.textbox_protocollocomunit_niseci_buffer,
-                    self.textbox_protocollocomunit_niseci_edit_mode
+                    self.textbox_protocollocomunit_niseci_edit_mode,
                 ) {
-                    self.textbox_protocollocomunit_niseci_edit_mode = !self.textbox_protocollocomunit_niseci_edit_mode;
+                    self.textbox_protocollocomunit_niseci_edit_mode =
+                        !self.textbox_protocollocomunit_niseci_edit_mode;
                 }
                 match self.dropdownbox_tipocomunit_niseci_value {
                     3 => { /* 3 == Mase I guess */ }
-                    _ => { // Not Mase I guess
+                    _ => {
+                        // Not Mase I guess
                         d.gui_set_state(STATE_NORMAL);
                         d.gui_unlock();
                     }
@@ -1286,7 +1477,7 @@ impl View for SelezioneInfoAggiuntiveView {
                         column_2_groupbox_boxes_x,
                         column_2_label_idroecoregione_y,
                         column_2_groupbox_boxes_width,
-                        column_2_groupbox_boxes_height*4
+                        column_2_groupbox_boxes_height * 4,
                     ),
                     "AlpiCentroOrientali;AlpiMediterranee;AlpiMeridionali;\
                     AlpiOccidentali;AppenninoCentrale;AppenninoMeridionale;\
@@ -1303,7 +1494,7 @@ impl View for SelezioneInfoAggiuntiveView {
                         column_2_groupbox_boxes_x,
                         column_2_label_area_niseci_y,
                         column_2_groupbox_boxes_width,
-                        column_2_groupbox_boxes_height
+                        column_2_groupbox_boxes_height,
                     ),
                     "Alpina;Mediterranea",
                     &mut self.combobox_area_niseci_value,
@@ -1314,10 +1505,10 @@ impl View for SelezioneInfoAggiuntiveView {
                         column_2_groupbox_boxes_x,
                         column_2_label_bacino_y,
                         column_2_groupbox_boxes_width,
-                        column_2_groupbox_boxes_height
+                        column_2_groupbox_boxes_height,
                     ),
                     &mut self.textbox_bacino_niseci_buffer,
-                    self.textbox_bacino_niseci_edit_mode
+                    self.textbox_bacino_niseci_edit_mode,
                 ) {
                     self.textbox_bacino_niseci_edit_mode = !self.textbox_bacino_niseci_edit_mode;
                 }
@@ -1333,25 +1524,32 @@ impl View for SelezioneInfoAggiuntiveView {
                     &mut self.dropdownbox_tipocomunit_niseci_value,
                     self.dropdownbox_tipocomunit_niseci_edit_mode,
                 ) {
-                    self.dropdownbox_tipocomunit_niseci_edit_mode = !self.dropdownbox_tipocomunit_niseci_edit_mode;
+                    self.dropdownbox_tipocomunit_niseci_edit_mode =
+                        !self.dropdownbox_tipocomunit_niseci_edit_mode;
                 }
             }
             Indice::Hfbi => {
-                let column_2_label_stagione_y = column_2_groupbox_comunit_y + column_2_groupbox_fields_y_spacing;
-                let column_2_label_habitat_vegetato_y = column_2_label_stagione_y + column_2_labels_height + column_2_groupbox_fields_y_spacing;
-                let column_2_label_tipo_laguna_y = column_2_label_habitat_vegetato_y + column_2_labels_height + column_2_groupbox_fields_y_spacing;
+                let column_2_label_stagione_y =
+                    column_2_groupbox_comunit_y + column_2_groupbox_fields_y_spacing;
+                let column_2_label_habitat_vegetato_y = column_2_label_stagione_y
+                    + column_2_labels_height
+                    + column_2_groupbox_fields_y_spacing;
+                let column_2_label_tipo_laguna_y = column_2_label_habitat_vegetato_y
+                    + column_2_labels_height
+                    + column_2_groupbox_fields_y_spacing;
                 let column_2_groupbox_boxes_width = column_2_groupbox_labels_width;
                 let column_2_groupbox_boxes_height = column_2_labels_height;
-                let column_2_groupbox_boxes_x = column_2_groupbox_labels_x + column_2_groupbox_labels_width;
+                let column_2_groupbox_boxes_x =
+                    column_2_groupbox_labels_x + column_2_groupbox_labels_width;
 
                 d.gui_label(
                     rrect(
                         column_2_groupbox_labels_x,
                         column_2_label_stagione_y,
                         column_2_groupbox_labels_width,
-                        column_2_labels_height
+                        column_2_labels_height,
                     ),
-                    "Stagione"
+                    "Stagione",
                 );
 
                 d.gui_label(
@@ -1359,9 +1557,9 @@ impl View for SelezioneInfoAggiuntiveView {
                         column_2_groupbox_labels_x,
                         column_2_label_habitat_vegetato_y,
                         column_2_groupbox_labels_width,
-                        column_2_labels_height
+                        column_2_labels_height,
                     ),
-                    "Habitat"
+                    "Habitat",
                 );
 
                 d.gui_label(
@@ -1369,9 +1567,9 @@ impl View for SelezioneInfoAggiuntiveView {
                         column_2_groupbox_labels_x,
                         column_2_label_tipo_laguna_y,
                         column_2_groupbox_labels_width,
-                        column_2_labels_height
+                        column_2_labels_height,
                     ),
-                    "Tipo Laguna"
+                    "Tipo Laguna",
                 );
 
                 let mut _combo_box_stagione_pick = -1;
@@ -1380,7 +1578,7 @@ impl View for SelezioneInfoAggiuntiveView {
                         column_2_groupbox_boxes_x,
                         column_2_label_stagione_y,
                         column_2_groupbox_boxes_width,
-                        column_2_groupbox_boxes_height
+                        column_2_groupbox_boxes_height,
                     ),
                     "Primavera;Autunno",
                     &mut self.combobox_stagione_hfbi_value,
@@ -1392,7 +1590,7 @@ impl View for SelezioneInfoAggiuntiveView {
                         column_2_groupbox_boxes_x,
                         column_2_label_habitat_vegetato_y,
                         column_2_groupbox_boxes_width,
-                        column_2_groupbox_boxes_height
+                        column_2_groupbox_boxes_height,
                     ),
                     "Vegetato;Non vegetato",
                     &mut self.combobox_habitat_vegetato_hfbi_value,
@@ -1409,16 +1607,15 @@ impl View for SelezioneInfoAggiuntiveView {
                     &mut self.dropdownbox_tipolaguna_hfbi_value,
                     self.dropdownbox_tipolaguna_hfbi_edit_mode,
                 ) {
-                    self.dropdownbox_tipolaguna_hfbi_edit_mode = !self.dropdownbox_tipolaguna_hfbi_edit_mode;
+                    self.dropdownbox_tipolaguna_hfbi_edit_mode =
+                        !self.dropdownbox_tipolaguna_hfbi_edit_mode;
                 }
             }
         }
-
     }
 }
 
 impl SelezioneInfoAggiuntiveView {
-
     pub(crate) fn new() -> Self {
         let codice_stazione_buffer = String::with_capacity(250);
         let corpo_idrico_buffer = String::with_capacity(250);
@@ -1471,15 +1668,18 @@ impl SelezioneInfoAggiuntiveView {
     }
 }
 
-pub(crate) struct ValidazioneInfoAggiuntiveView {
-
-}
+pub(crate) struct ValidazioneInfoAggiuntiveView {}
 
 impl View for ValidazioneInfoAggiuntiveView {
     type Controller = InfoAggiuntiveController;
 
-    fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &Self::Controller, main_state: &MainState) {
-
+    fn draw(
+        &mut self,
+        d: &mut RaylibDrawHandle,
+        _thread: &RaylibThread,
+        controller: &Self::Controller,
+        main_state: &MainState,
+    ) {
         d.clear_background(main_state.default_bg_color);
 
         let _state = controller.get_state();
@@ -1493,9 +1693,9 @@ impl View for ValidazioneInfoAggiuntiveView {
         };
 
         let button_valida_width = propwidth(d, 200);
-        let button_valida_x = d.get_screen_width() / 2 - button_valida_width /2;
+        let button_valida_x = d.get_screen_width() / 2 - button_valida_width / 2;
         let button_valida_height = propwidth(d, 50);
-        let button_valida_y = d.get_screen_height() / 2 - button_valida_height/2;
+        let button_valida_y = d.get_screen_height() / 2 - button_valida_height / 2;
 
         let y_spacing = button_valida_height;
         let button_backout_width = button_valida_width;
@@ -1509,13 +1709,8 @@ impl View for ValidazioneInfoAggiuntiveView {
         let groupbox_y = button_valida_y - propheight(d, 50);
 
         d.gui_group_box(
-            rrect(
-                groupbox_x,
-                groupbox_y,
-                groupbox_width,
-                groupbox_height
-            ),
-            "Valida informazioni aggiuntive"
+            rrect(groupbox_x, groupbox_y, groupbox_width, groupbox_height),
+            "Valida informazioni aggiuntive",
         );
 
         if d.gui_button(
@@ -1523,18 +1718,16 @@ impl View for ValidazioneInfoAggiuntiveView {
                 button_valida_x,
                 button_valida_y,
                 button_valida_width,
-                button_valida_height
+                button_valida_height,
             ),
-            "Valida info aggiuntive"
+            "Valida info aggiuntive",
         ) {
             //Ask controller to validate info aggiuntive indice
             match current_index {
                 Indice::Niseci => {
                     controller.valida_anagrafica_niseci();
                 }
-                Indice::Hfbi => {
-                    controller.valida_anagrafica_hfbi()
-                }
+                Indice::Hfbi => controller.valida_anagrafica_hfbi(),
             }
         }
 
@@ -1546,7 +1739,7 @@ impl View for ValidazioneInfoAggiuntiveView {
                 button_backout_width,
                 button_backout_height,
             ),
-            indietro_itext.as_str()
+            indietro_itext.as_str(),
         ) {
             //Ask controller to go back and edit further
             match current_index {
@@ -1562,23 +1755,23 @@ impl View for ValidazioneInfoAggiuntiveView {
 }
 
 impl ValidazioneInfoAggiuntiveView {
-
     pub(crate) fn new() -> Self {
-        Self {
-
-        }
+        Self {}
     }
 }
 
-pub(crate) struct ProduzioneOutputView {
-
-}
+pub(crate) struct ProduzioneOutputView {}
 
 impl View for ProduzioneOutputView {
     type Controller = OutputController;
 
-    fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &Self::Controller, main_state: &MainState) {
-
+    fn draw(
+        &mut self,
+        d: &mut RaylibDrawHandle,
+        _thread: &RaylibThread,
+        controller: &Self::Controller,
+        main_state: &MainState,
+    ) {
         d.clear_background(main_state.default_bg_color);
 
         let _state = controller.get_state();
@@ -1591,9 +1784,9 @@ impl View for ProduzioneOutputView {
         };
 
         let button_calcola_width = propwidth(d, 200);
-        let button_calcola_x = d.get_screen_width() / 2 - button_calcola_width /2;
+        let button_calcola_x = d.get_screen_width() / 2 - button_calcola_width / 2;
         let button_calcola_height = propwidth(d, 50);
-        let button_calcola_y = d.get_screen_height() / 4 - button_calcola_height/2;
+        let button_calcola_y = d.get_screen_height() / 4 - button_calcola_height / 2;
 
         let groupbox_width = button_calcola_width + propwidth(d, 100);
         let groupbox_x = button_calcola_x - propwidth(d, 50);
@@ -1601,18 +1794,13 @@ impl View for ProduzioneOutputView {
         let groupbox_y = button_calcola_y - propheight(d, 50);
 
         let panel_width = groupbox_width + propwidth(d, 175);
-        let panel_x = d.get_screen_width() / 2 - panel_width /2;
+        let panel_x = d.get_screen_width() / 2 - panel_width / 2;
         let panel_y = groupbox_y + groupbox_height + propwidth(d, 50);
         let panel_height = groupbox_height + propheight(d, 50);
 
         d.gui_group_box(
-            rrect(
-                groupbox_x,
-                groupbox_y,
-                groupbox_width,
-                groupbox_height
-            ),
-            "Produzione output"
+            rrect(groupbox_x, groupbox_y, groupbox_width, groupbox_height),
+            "Produzione output",
         );
 
         if d.gui_button(
@@ -1620,15 +1808,15 @@ impl View for ProduzioneOutputView {
                 button_calcola_x,
                 button_calcola_y,
                 button_calcola_width,
-                button_calcola_height
+                button_calcola_height,
             ),
-            "Calcola"
+            "Calcola",
         ) {
             //TODO: calcola indice
             match current_index {
                 Indice::Niseci => {
                     controller.calc_niseci();
-                },
+                }
                 Indice::Hfbi => {
                     controller.calc_hfbi();
                 }
@@ -1637,9 +1825,9 @@ impl View for ProduzioneOutputView {
 
         let submit_width = propwidth(d, 125);
         let panel_x_end = panel_x + panel_width;
-        let submit_x = panel_x_end + (d.get_screen_width() - panel_x_end)/2 - submit_width/2;
+        let submit_x = panel_x_end + (d.get_screen_width() - panel_x_end) / 2 - submit_width / 2;
         let submit_height = propheight(d, 50);
-        let submit_y = d.get_screen_height() /2 - submit_height /2;
+        let submit_y = d.get_screen_height() / 2 - submit_height / 2;
 
         let confirm_itext = d.gui_icon_text(ICON_OK_TICK, "Conferma");
 
@@ -1649,15 +1837,12 @@ impl View for ProduzioneOutputView {
             // This distinguishes the case where the calc finished but the resulting value is None.
             // It should only really happen when we try to get x2 with a divide-by-zero, as in:
             // our campionamento had no records matching a riferimentore record with specie_attesa == 1
-
-            Indice::Niseci => {
-                done_calc && controller.get_niseci_value().is_some()
-            }
+            Indice::Niseci => done_calc && controller.get_niseci_value().is_some(),
             Indice::Hfbi => {
                 false //TODO: Implement this
-                       //
-                       //Maybe the is_some won't be needed
-                //done_calc && controller.get_hfbi_value().is_some()
+                      //
+                      //Maybe the is_some won't be needed
+                      //done_calc && controller.get_hfbi_value().is_some()
             }
         };
 
@@ -1670,7 +1855,10 @@ impl View for ProduzioneOutputView {
             d.gui_lock();
             d.gui_set_state(STATE_DISABLED);
         }
-        if d.gui_button(rrect(submit_x, submit_y, submit_width, submit_height), confirm_itext.as_str()) {
+        if d.gui_button(
+            rrect(submit_x, submit_y, submit_width, submit_height),
+            confirm_itext.as_str(),
+        ) {
             controller.user_confirm_calc();
         }
         if lock_user_submit {
@@ -1678,15 +1866,7 @@ impl View for ProduzioneOutputView {
             d.gui_unlock();
         }
 
-        d.gui_panel(
-            rrect(
-                panel_x,
-                panel_y,
-                panel_width,
-                panel_height
-            ),
-            "Output"
-        );
+        d.gui_panel(rrect(panel_x, panel_y, panel_width, panel_height), "Output");
 
         let y_spacing = main_state.current_font_height + propwidth(d, 5);
         let output_start_y = panel_y + propwidth(d, 15);
@@ -1699,8 +1879,9 @@ impl View for ProduzioneOutputView {
                         format!("{}", v)
                     }
                     None => {
-                        if controller.get_is_done_calc() { // Could use done_calc and avoid another
-                                                           // lock call
+                        if controller.get_is_done_calc() {
+                            // Could use done_calc and avoid another
+                            // lock call
                             "NC".to_string()
                         } else {
                             "Non calcolato".to_string()
@@ -1713,10 +1894,13 @@ impl View for ProduzioneOutputView {
                     &niseci_line,
                     // We use propwidth/height for the text starting position:
                     // this is not the bound
-                    Vector2::new((panel_x + propwidth(d, 25)) as f32, (output_start_y + (y_spacing )) as f32),
+                    Vector2::new(
+                        (panel_x + propwidth(d, 25)) as f32,
+                        (output_start_y + (y_spacing)) as f32,
+                    ),
                     main_state.current_font_height as f32,
                     main_state.default_txt_spacing as f32,
-                    main_state.default_txt_color
+                    main_state.default_txt_color,
                 );
                 let rqe_niseci_opt = controller.get_rqe_niseci_value();
                 let rqe_niseci_str = match rqe_niseci_opt {
@@ -1737,10 +1921,13 @@ impl View for ProduzioneOutputView {
                     &rqe_line,
                     // We use propwidth/height for the text starting position:
                     // this is not the bound
-                    Vector2::new((panel_x + propwidth(d, 25)) as f32, (output_start_y + (y_spacing * 2)) as f32),
+                    Vector2::new(
+                        (panel_x + propwidth(d, 25)) as f32,
+                        (output_start_y + (y_spacing * 2)) as f32,
+                    ),
                     main_state.current_font_height as f32,
                     main_state.default_txt_spacing as f32,
-                    main_state.default_txt_color
+                    main_state.default_txt_color,
                 );
                 let stato_eco_niseci_opt = controller.get_stato_eco_niseci_value();
                 let stato_eco_niseci_str = match stato_eco_niseci_opt {
@@ -1761,10 +1948,13 @@ impl View for ProduzioneOutputView {
                     &stato_eco_line,
                     // We use propwidth/height for the text starting position:
                     // this is not the bound
-                    Vector2::new((panel_x + propwidth(d, 25)) as f32, (output_start_y + (y_spacing * 3)) as f32),
+                    Vector2::new(
+                        (panel_x + propwidth(d, 25)) as f32,
+                        (output_start_y + (y_spacing * 3)) as f32,
+                    ),
                     main_state.current_font_height as f32,
                     main_state.default_txt_spacing as f32,
-                    main_state.default_txt_color
+                    main_state.default_txt_color,
                 );
 
                 let x1_opt = controller.get_x1_value();
@@ -1786,10 +1976,13 @@ impl View for ProduzioneOutputView {
                     &x1_line,
                     // We use propwidth/height for the text starting position:
                     // this is not the bound
-                    Vector2::new((panel_x + propwidth(d, 25)) as f32, (output_start_y + (y_spacing * 4)) as f32),
+                    Vector2::new(
+                        (panel_x + propwidth(d, 25)) as f32,
+                        (output_start_y + (y_spacing * 4)) as f32,
+                    ),
                     main_state.current_font_height as f32,
                     main_state.default_txt_spacing as f32,
-                    main_state.default_txt_color
+                    main_state.default_txt_color,
                 );
 
                 let x2_opt = controller.get_x2_value();
@@ -1811,10 +2004,13 @@ impl View for ProduzioneOutputView {
                     &x2_line,
                     // We use propwidth/height for the text starting position:
                     // this is not the bound
-                    Vector2::new((panel_x + propwidth(d, 25)) as f32, (output_start_y + (y_spacing * 5)) as f32),
+                    Vector2::new(
+                        (panel_x + propwidth(d, 25)) as f32,
+                        (output_start_y + (y_spacing * 5)) as f32,
+                    ),
                     main_state.current_font_height as f32,
                     main_state.default_txt_spacing as f32,
-                    main_state.default_txt_color
+                    main_state.default_txt_color,
                 );
 
                 let x3_opt = controller.get_x3_value();
@@ -1836,12 +2032,15 @@ impl View for ProduzioneOutputView {
                     &x3_line,
                     // We use propwidth/height for the text starting position:
                     // this is not the bound
-                    Vector2::new((panel_x + propwidth(d, 25)) as f32, (output_start_y + (y_spacing * 6)) as f32),
+                    Vector2::new(
+                        (panel_x + propwidth(d, 25)) as f32,
+                        (output_start_y + (y_spacing * 6)) as f32,
+                    ),
                     main_state.current_font_height as f32,
                     main_state.default_txt_spacing as f32,
-                    main_state.default_txt_color
+                    main_state.default_txt_color,
                 );
-            },
+            }
             Indice::Hfbi => {
                 let hfbi_opt = controller.get_hfbi_value();
                 let hfbi_str = match hfbi_opt {
@@ -1849,8 +2048,9 @@ impl View for ProduzioneOutputView {
                         format!("{}", v)
                     }
                     None => {
-                        if controller.get_is_done_calc() { // Could use done_calc and avoid another
-                                                           // lock call
+                        if controller.get_is_done_calc() {
+                            // Could use done_calc and avoid another
+                            // lock call
                             "NC".to_string()
                         } else {
                             "Non calcolato".to_string()
@@ -1863,10 +2063,13 @@ impl View for ProduzioneOutputView {
                     &hfbi_line,
                     // We use propwidth/height for the text starting position:
                     // this is not the bound
-                    Vector2::new((panel_x + propwidth(d, 25)) as f32, (output_start_y + (y_spacing )) as f32),
+                    Vector2::new(
+                        (panel_x + propwidth(d, 25)) as f32,
+                        (output_start_y + (y_spacing)) as f32,
+                    ),
                     main_state.current_font_height as f32,
                     main_state.default_txt_spacing as f32,
-                    main_state.default_txt_color
+                    main_state.default_txt_color,
                 );
             }
         }
@@ -1874,23 +2077,23 @@ impl View for ProduzioneOutputView {
 }
 
 impl ProduzioneOutputView {
-
     pub(crate) fn new() -> Self {
-        Self {
-
-        }
+        Self {}
     }
 }
 
-pub(crate) struct ProduzionePDFView {
-
-}
+pub(crate) struct ProduzionePDFView {}
 
 impl View for ProduzionePDFView {
     type Controller = OutputController;
 
-    fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &Self::Controller, main_state: &MainState) {
-
+    fn draw(
+        &mut self,
+        d: &mut RaylibDrawHandle,
+        _thread: &RaylibThread,
+        controller: &Self::Controller,
+        main_state: &MainState,
+    ) {
         d.clear_background(main_state.default_bg_color);
 
         let _state = controller.get_state();
@@ -1902,9 +2105,9 @@ impl View for ProduzionePDFView {
             }
         };
         let button_esporta_width = propwidth(d, 200);
-        let button_esporta_x = d.get_screen_width() / 2 - button_esporta_width /2;
+        let button_esporta_x = d.get_screen_width() / 2 - button_esporta_width / 2;
         let button_esporta_height = propwidth(d, 50);
-        let button_esporta_y = d.get_screen_height() / 4 - button_esporta_height/2;
+        let button_esporta_y = d.get_screen_height() / 4 - button_esporta_height / 2;
 
         let groupbox_width = button_esporta_width + propwidth(d, 100);
         let groupbox_x = button_esporta_x - propwidth(d, 50);
@@ -1912,18 +2115,13 @@ impl View for ProduzionePDFView {
         let groupbox_y = button_esporta_y - propheight(d, 50);
 
         let panel_width = groupbox_width + propwidth(d, 100);
-        let panel_x = d.get_screen_width() / 2 - panel_width /2;
+        let panel_x = d.get_screen_width() / 2 - panel_width / 2;
         let panel_y = groupbox_y + groupbox_height + propwidth(d, 50);
         let panel_height = groupbox_height + propheight(d, 50);
 
         d.gui_group_box(
-            rrect(
-                groupbox_x,
-                groupbox_y,
-                groupbox_width,
-                groupbox_height
-            ),
-            "Produzione PDF"
+            rrect(groupbox_x, groupbox_y, groupbox_width, groupbox_height),
+            "Produzione PDF",
         );
 
         if d.gui_button(
@@ -1931,15 +2129,15 @@ impl View for ProduzionePDFView {
                 button_esporta_x,
                 button_esporta_y,
                 button_esporta_width,
-                button_esporta_height
+                button_esporta_height,
             ),
-            "Esporta"
+            "Esporta",
         ) {
             //TODO: esporta pdf
             let file = FileDialog::new()
-                    .add_filter("pdf", &["pdf"])
-                    .set_directory("/")
-                    .save_file();
+                .add_filter("pdf", &["pdf"])
+                .set_directory("/")
+                .save_file();
 
             if let Some(filepath) = file {
                 match current_index {
@@ -1952,29 +2150,21 @@ impl View for ProduzionePDFView {
                 }
             } else {
                 eprintln!("Error: failed getting a file.");
-                controller.add_console_message("Failed getting a file for esportazione".to_string());
+                controller
+                    .add_console_message("Failed getting a file for esportazione".to_string());
             }
         }
 
         d.gui_panel(
-            rrect(
-                panel_x,
-                panel_y,
-                panel_width,
-                panel_height
-            ),
-            "TODO: Output qui"
+            rrect(panel_x, panel_y, panel_width, panel_height),
+            "TODO: Output qui",
         );
-
     }
 }
 
 impl ProduzionePDFView {
-
     pub(crate) fn new() -> Self {
-        Self {
-
-        }
+        Self {}
     }
 }
 
@@ -1986,7 +2176,18 @@ fn rainbow_color_from_framecounter(frame_counter: u32, speed: f32) -> Color {
     Color::new(red, green, blue, 255)
 }
 
-fn draw_rainbow_text(d: &mut RaylibDrawHandle, x: i32, y: i32, text: &str, frame_counter: u32, rainbow_speed: f32, font: &WeakFont, text_spacing: i32, current_font_height: i32, font_height_scale: i32) {
+fn draw_rainbow_text(
+    d: &mut RaylibDrawHandle,
+    x: i32,
+    y: i32,
+    text: &str,
+    frame_counter: u32,
+    rainbow_speed: f32,
+    font: &WeakFont,
+    text_spacing: i32,
+    current_font_height: i32,
+    font_height_scale: i32,
+) {
     assert!(font_height_scale > 0);
     // Smaller speed = slower cycle
     let rainbow_color = rainbow_color_from_framecounter(frame_counter, rainbow_speed);
@@ -1995,39 +2196,68 @@ fn draw_rainbow_text(d: &mut RaylibDrawHandle, x: i32, y: i32, text: &str, frame
     //let text_bounds = font.measure_text(&text, text_font_height as f32, text_spacing as f32);
     let text_x = x; //- text_bounds.x as i32 / 2;
     let text_y = y; //- text_bounds.y as i32 / 2;
-    d.draw_text_ex(font, text, Vector2::new(text_x as f32, text_y as f32), text_font_height as f32, text_spacing as f32, rainbow_color);
+    d.draw_text_ex(
+        font,
+        text,
+        Vector2::new(text_x as f32, text_y as f32),
+        text_font_height as f32,
+        text_spacing as f32,
+        rainbow_color,
+    );
 }
 
 pub(crate) struct ConsoleView {
-    font : Font,
-    current_font_size : i32,
-    _default_font_size : i32,
-    font_spacing : i32,
+    font: Font,
+    current_font_size: i32,
+    _default_font_size: i32,
+    font_spacing: i32,
 }
 
 impl View for ConsoleView {
     type Controller = ConsoleController;
 
-    fn draw(&mut self, d: &mut RaylibDrawHandle, _thread: &RaylibThread, controller: &Self::Controller, main_state: &MainState) {
+    fn draw(
+        &mut self,
+        d: &mut RaylibDrawHandle,
+        _thread: &RaylibThread,
+        controller: &Self::Controller,
+        main_state: &MainState,
+    ) {
         d.clear_background(main_state.default_bg_color);
 
         let state = controller.get_state();
 
-        state.console.draw(d, controller, main_state.default_txt_color, self.current_font_size, self.font_spacing, &self.font);
+        state.console.draw(
+            d,
+            controller,
+            main_state.default_txt_color,
+            self.current_font_size,
+            self.font_spacing,
+            &self.font,
+        );
     }
 }
 
 impl ConsoleView {
-    pub(crate) fn new(rl: &mut RaylibHandle, thread : &RaylibThread, font_size : i32, font_spacing: i32) -> Self {
+    pub(crate) fn new(
+        rl: &mut RaylibHandle,
+        thread: &RaylibThread,
+        font_size: i32,
+        font_spacing: i32,
+    ) -> Self {
         Self {
-            font : rl.load_font_from_memory(thread,
-                ".ttf",
-                CONSOLE_FONT_DATA,
-                font_size,// *2,
-                None).expect("failed loading console font"),
+            font: rl
+                .load_font_from_memory(
+                    thread,
+                    ".ttf",
+                    CONSOLE_FONT_DATA,
+                    font_size, // *2,
+                    None,
+                )
+                .expect("failed loading console font"),
             _default_font_size: font_size,
             current_font_size: font_size,
-            font_spacing: font_spacing*2
+            font_spacing: font_spacing * 2,
         }
     }
 }

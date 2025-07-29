@@ -15,12 +15,11 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-
 #[cfg(test)]
 mod core;
 #[cfg(test)]
 mod engines;
 #[cfg(test)]
-pub mod test_utils;
-#[cfg(test)]
 mod model;
+#[cfg(test)]
+pub mod test_utils;

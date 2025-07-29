@@ -15,7 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::domain::hfbi::{CampionamentoHFBI, AnagraficaHFBI, GruppoEcoHFBI};
+use crate::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI, GruppoEcoHFBI};
 
 pub(crate) fn calc_dhzp(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
     let mut shzp = 0.0;
@@ -43,7 +43,6 @@ pub(crate) fn calc_dhzp(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFB
     (((shzp - 0.2) / bhzp) + 1.0).ln()
 }
 
-
 fn calc_bhzp(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
     let mut biohzp = 0.0;
     for specie in &campione.campionamento {
@@ -51,7 +50,7 @@ fn calc_bhzp(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
             GruppoEcoHFBI::Diadromi
             | GruppoEcoHFBI::MigratoriMarini
             | GruppoEcoHFBI::ResidentiDiEstuario => {
-            biohzp += specie.peso as f32 * (specie.specie.gruppo_trofico.iperbentivori)
+                biohzp += specie.peso as f32 * (specie.specie.gruppo_trofico.iperbentivori)
             }
             _ => {}
         }
@@ -78,7 +77,10 @@ mod dhzp_private_tests {
         AnagraficaHFBI {
             codice_stazione: "TestStazione".to_string(),
             corpo_idrico: "TestCorpoIdrico".to_string(),
-            posizione: Location { regione: "Test".to_string(), provincia: "Test".to_string() },
+            posizione: Location {
+                regione: "Test".to_string(),
+                provincia: "Test".to_string(),
+            },
             date_string: "01/01/2025".to_string(),
             tipo_laguna: TipoLagunaCostieraHFBI::MAt1,
             stagione: StagioneHFBI::Primavera,
@@ -91,7 +93,7 @@ mod dhzp_private_tests {
     // Helper to create a species record, specifying the hyperbentivore value
     fn create_specie_record(
         gruppo_eco: GruppoEcoHFBI,
-        peso: u32,
+        peso: f32,
         iperbentivori: f32,
     ) -> RecordHFBI {
         RecordHFBI {
@@ -120,7 +122,9 @@ mod dhzp_private_tests {
     #[test]
     fn test_bhzp_empty_input() {
         let anagrafica = create_test_anagrafica(100.0, 5.0);
-        let campione = CampionamentoHFBI { campionamento: vec![] };
+        let campione = CampionamentoHFBI {
+            campionamento: vec![],
+        };
         // biohzp = 0 -> ln(1) = 0
         assert!((calc_bhzp(&campione, &anagrafica) - 0.0).abs() < EPSILON);
     }
@@ -129,7 +133,11 @@ mod dhzp_private_tests {
     fn test_bhzp_zero_area() {
         let anagrafica = create_test_anagrafica(10.0, 0.0); // area = 0
         let campione = CampionamentoHFBI {
-            campionamento: vec![create_specie_record(GruppoEcoHFBI::ResidentiDiEstuario, 100, 1.0)],
+            campionamento: vec![create_specie_record(
+                GruppoEcoHFBI::ResidentiDiEstuario,
+                100.0,
+                1.0,
+            )],
         };
         // biohzp > 0, area = 0 -> division by zero -> infinity
         assert!(calc_bhzp(&campione, &anagrafica).is_infinite());
@@ -140,9 +148,9 @@ mod dhzp_private_tests {
         let anagrafica = create_test_anagrafica(20.0, 5.0); // area = 100
         let campione = CampionamentoHFBI {
             campionamento: vec![
-                create_specie_record(GruppoEcoHFBI::ResidentiDiEstuario, 50, 0.5), // biohzp += 25
-                create_specie_record(GruppoEcoHFBI::OccasionaliMarini, 100, 1.0), // ignored
-                create_specie_record(GruppoEcoHFBI::MigratoriMarini, 100, 0.75), // biohzp += 75
+                create_specie_record(GruppoEcoHFBI::ResidentiDiEstuario, 50.0, 0.5), // biohzp += 25
+                create_specie_record(GruppoEcoHFBI::OccasionaliMarini, 100.0, 1.0),  // ignored
+                create_specie_record(GruppoEcoHFBI::MigratoriMarini, 100.0, 0.75),   // biohzp += 75
             ],
         };
         // biohzp = 25 + 75 = 100
@@ -158,8 +166,12 @@ mod dhzp_private_tests {
     fn test_dhzp_shzp_is_zero() {
         let anagrafica = create_test_anagrafica(100.0, 5.0);
         let campione = CampionamentoHFBI {
-             // Relevant species, but iperbentivori is 0, so shzp is 0
-            campionamento: vec![create_specie_record(GruppoEcoHFBI::ResidentiDiEstuario, 100, 0.0)],
+            // Relevant species, but iperbentivori is 0, so shzp is 0
+            campionamento: vec![create_specie_record(
+                GruppoEcoHFBI::ResidentiDiEstuario,
+                100.0,
+                0.0,
+            )],
         };
         // The special case for shzp near zero should trigger
         assert!((calc_dhzp(&campione, &anagrafica) - 0.0).abs() < EPSILON);
@@ -170,8 +182,8 @@ mod dhzp_private_tests {
         let anagrafica = create_test_anagrafica(100.0, 5.0);
         let campione = CampionamentoHFBI {
             campionamento: vec![
-                create_specie_record(GruppoEcoHFBI::Diadromi, 100, 0.1),
-                create_specie_record(GruppoEcoHFBI::MigratoriMarini, 50, 0.1),
+                create_specie_record(GruppoEcoHFBI::Diadromi, 100.0, 0.1),
+                create_specie_record(GruppoEcoHFBI::MigratoriMarini, 50.0, 0.1),
             ],
         };
         // shzp = 0.1 + 0.1 = 0.2. The special case should trigger.
@@ -181,8 +193,12 @@ mod dhzp_private_tests {
     #[test]
     fn test_dhzp_bhzp_is_infinity() {
         let anagrafica = create_test_anagrafica(10.0, 0.0); // area = 0
-         let campione = CampionamentoHFBI {
-            campionamento: vec![create_specie_record(GruppoEcoHFBI::ResidentiDiEstuario, 100, 0.5)],
+        let campione = CampionamentoHFBI {
+            campionamento: vec![create_specie_record(
+                GruppoEcoHFBI::ResidentiDiEstuario,
+                100.0,
+                0.5,
+            )],
         };
         // bhzp is infinity. Formula is ln(((shzp-0.2)/inf)+1) = ln(1) = 0
         assert!((calc_dhzp(&campione, &anagrafica) - 0.0).abs() < EPSILON);
@@ -193,20 +209,20 @@ mod dhzp_private_tests {
         let anagrafica = create_test_anagrafica(10.0, 5.0); // area = 50
         let campione = CampionamentoHFBI {
             campionamento: vec![
-                create_specie_record(GruppoEcoHFBI::ResidentiDiEstuario, 100, 0.5),
-                create_specie_record(GruppoEcoHFBI::MigratoriMarini, 200, 1.0),
-                create_specie_record(GruppoEcoHFBI::OccasionaliMarini, 50, 0.8), // ignored
+                create_specie_record(GruppoEcoHFBI::ResidentiDiEstuario, 100.0, 0.5),
+                create_specie_record(GruppoEcoHFBI::MigratoriMarini, 200.0, 1.0),
+                create_specie_record(GruppoEcoHFBI::OccasionaliMarini, 50.0, 0.8), // ignored
             ],
         };
         // From calc_bhzp:
         // biohzp = (100 * 0.5) + (200 * 1.0) = 50 + 200 = 250
         // bhzp = ln((250 / 50) * 100 + 1) = ln(501)
         let bhzp = 501.0_f32.ln();
-        
+
         // From calc_dhzp:
         // shzp = 0.5 + 1.0 = 1.5
         let shzp = 1.5_f32;
-        
+
         let expected = (((shzp - 0.2) / bhzp) + 1.0).ln();
         let result = calc_dhzp(&campione, &anagrafica);
 

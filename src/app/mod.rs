@@ -15,7 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-pub(crate) mod view;
 pub(crate) mod controller;
 pub(crate) mod core;
 pub(crate) mod model;
+pub(crate) mod view;

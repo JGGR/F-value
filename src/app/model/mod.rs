@@ -15,13 +15,15 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use std::path::PathBuf;
-use std::collections::HashMap;
-use crate::domain::index::Indice;
-use crate::domain::niseci::{RiferimentoNISECI, CampionamentoNISECI, AnagraficaNISECI, RisultatoNISECI};
-use crate::domain::hfbi::{CampionamentoHFBI, AnagraficaHFBI, RisultatoHFBI};
 use crate::console::Console;
 use crate::core::SHORT_PROJECT_VERSION;
+use crate::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI, RisultatoHFBI};
+use crate::domain::index::Indice;
+use crate::domain::niseci::{
+    AnagraficaNISECI, CampionamentoNISECI, RiferimentoNISECI, RisultatoNISECI,
+};
+use std::collections::HashMap;
+use std::path::PathBuf;
 
 pub(crate) trait SubModel {
     fn get_frame_counter(&self) -> u32;
@@ -33,7 +35,7 @@ pub(crate) trait SubModel {
 #[derive(Clone)]
 pub(crate) struct HomeModel {
     frame_counter: u32,
-    user_continued: bool
+    user_continued: bool,
 }
 
 impl SubModel for HomeModel {
@@ -58,14 +60,13 @@ impl HomeModel {
     }
 }
 
-
 // State struct holding non-`Copy` types
 #[derive(Clone)]
 pub(crate) struct SecondModel {
     frame_counter: u32,
     value: i32,
     name: String,
-    user_continued: bool
+    user_continued: bool,
 }
 
 impl SubModel for SecondModel {
@@ -110,7 +111,7 @@ impl SecondModel {
 #[derive(Clone)]
 pub(crate) struct IndiceModel {
     frame_counter: u32,
-    selected_index: Option<Indice>
+    selected_index: Option<Indice>,
 }
 
 impl SubModel for IndiceModel {
@@ -349,9 +350,8 @@ pub(crate) struct DataModelNISECI {
 pub(crate) struct DataModelHFBI {
     campionamento: Option<CampionamentoHFBI>,
     anagrafica: Option<AnagraficaHFBI>,
-    risultato: Option<RisultatoHFBI>
+    risultato: Option<RisultatoHFBI>,
 }
-
 
 #[derive(Clone)]
 pub(crate) struct DataModel {
@@ -387,7 +387,7 @@ impl DataModel {
             frame_counter: 0,
             errors_occurred: false,
             niseci,
-            hfbi
+            hfbi,
         }
     }
     pub(crate) fn get_riferimento_niseci(&self) -> Option<RiferimentoNISECI> {
@@ -470,7 +470,7 @@ impl Model {
             },
             indice_model: IndiceModel {
                 frame_counter: 0,
-                selected_index: None
+                selected_index: None,
             },
             fileinput_model: FileInputModel {
                 frame_counter: 0,
@@ -494,10 +494,10 @@ impl Model {
             console_model: ConsoleModel {
                 frame_counter: 0,
                 console: Console::new(
-                    65, // Columns - chars per line
+                    65,   // Columns - chars per line
                     1000, // Max messages
-                    17, // Max messages shown at a time
-                    HashMap::<String,String>::from([
+                    17,   // Max messages shown at a time
+                    HashMap::<String, String>::from([
                         ("version".to_string(), SHORT_PROJECT_VERSION.to_string()),
                         ("riferimento_niseci".to_string(), "Vuoto".to_string()),
                         ("campionamento_niseci".to_string(), "Vuoto".to_string()),
@@ -520,9 +520,9 @@ impl Model {
                 hfbi: DataModelHFBI {
                     campionamento: None,
                     anagrafica: None,
-                    risultato: None
-                }
-            }
+                    risultato: None,
+                },
+            },
         }
     }
 }

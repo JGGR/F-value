@@ -15,17 +15,21 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use std::io::Write;
-use std::path::PathBuf;
-use std::fs::File;
-use raylib::RaylibHandle;
-use raylib::consts::GuiDefaultProperty::{BACKGROUND_COLOR, TEXT_SIZE, TEXT_SPACING};
-use raylib::consts::KeyboardKey::*;
+use super::core::{
+    GuiTheme, MainState, ASHES_THEME_DATA, BLUISH_THEME_DATA, CANDY_THEME_DATA, CHERRY_THEME_DATA,
+    CYBER_THEME_DATA, DARK_THEME_DATA, EXIT_KEY, JUNGLE_THEME_DATA, LAVANDA_THEME_DATA,
+    TERMINAL_THEME_DATA,
+};
+use raylib::color::Color;
 use raylib::consts::GuiControl::DEFAULT;
 use raylib::consts::GuiControlProperty::TEXT_COLOR_NORMAL;
-use raylib::color::Color;
+use raylib::consts::GuiDefaultProperty::{BACKGROUND_COLOR, TEXT_SIZE, TEXT_SPACING};
+use raylib::consts::KeyboardKey::*;
+use raylib::RaylibHandle;
+use std::fs::File;
+use std::io::Write;
+use std::path::PathBuf;
 use uuid::Uuid;
-use super::core::{GuiTheme, MainState, EXIT_KEY, DARK_THEME_DATA, BLUISH_THEME_DATA, CANDY_THEME_DATA, CHERRY_THEME_DATA, CYBER_THEME_DATA, JUNGLE_THEME_DATA, LAVANDA_THEME_DATA, TERMINAL_THEME_DATA, ASHES_THEME_DATA};
 
 pub(crate) fn update_main(rl: &mut RaylibHandle, main_state: &mut MainState) {
     main_state.should_quit = rl.window_should_close();
@@ -77,7 +81,8 @@ fn load_style_from_memory(rl: &mut RaylibHandle, data: &[u8]) {
     // di include_bytes!(). Non la migliore idea, ma sembra funzionare.
 
     // Write the data to a temporary file
-    let (temp_file_cstring, temp_file_path) = write_temp_style_file(data).expect("Failed to write temp style file");
+    let (temp_file_cstring, temp_file_path) =
+        write_temp_style_file(data).expect("Failed to write temp style file");
 
     // Load the style
     rl.gui_load_style(temp_file_cstring.as_str());
@@ -132,16 +137,17 @@ impl GuiTheme {
         }
         let font_height_scale = match self {
             GuiTheme::Light => 2, // 10 is way too small for the default font height
-            _ => 1
+            _ => 1,
         };
         let font_spacing_scale = match self {
             GuiTheme::Light => 2,
-            _ => 1
+            _ => 1,
         };
         main_state.default_font_height = rl.gui_get_style(DEFAULT, TEXT_SIZE) * font_height_scale;
         rl.gui_set_style(DEFAULT, TEXT_SIZE, main_state.default_font_height);
         main_state.current_font_height = main_state.default_font_height;
-        main_state.default_txt_spacing = rl.gui_get_style(DEFAULT, TEXT_SPACING) * font_spacing_scale;
+        main_state.default_txt_spacing =
+            rl.gui_get_style(DEFAULT, TEXT_SPACING) * font_spacing_scale;
         rl.gui_set_style(DEFAULT, TEXT_SPACING, main_state.default_txt_spacing);
         let txt_color_int = rl.gui_get_style(DEFAULT, TEXT_COLOR_NORMAL) as u32;
         let bg_color_int = rl.gui_get_style(DEFAULT, BACKGROUND_COLOR) as u32;

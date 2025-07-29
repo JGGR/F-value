@@ -15,30 +15,49 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use std::path::PathBuf;
-use raylib::RaylibHandle;
-use raylib::consts::KeyboardKey::*;
-use chrono::format::ParseErrorKind;
-use crate::core::csv::{TipoRecordCsv};
-use crate::core::csv::deser::{process_csv_errors, VeryItalianRecordCsvRiferimentoNISECI, VeryItalianRecordCsvCampionamentoNISECI, VeryItalianRecordCsvCampionamentoHFBI, check_campionamento_niseci_path, check_riferimento_niseci_path, check_campionamento_hfbi_path};
-use crate::core::csv::parser::{check_records_riferimento_niseci, check_records_campionamento_niseci, check_records_campionamento_hfbi, parse_date};
 use crate::app::core::{CurrentView, MainState};
-use crate::app::model::{SubModel, HomeModel, SecondModel, IndiceModel, FileInputModel, InfoAggiuntiveModel, OutputModel, ConsoleModel};
-use crate::domain::{index::Indice, niseci::{RiferimentoNISECI, CampionamentoNISECI, AnagraficaNISECI, TipoComunitaNISECI, RisultatoNISECI, StatoEcologicoNISECI}, hfbi::{CampionamentoHFBI, AnagraficaHFBI, RisultatoHFBI}};
-use crate::state::GLOBAL_STATE;
-use crate::engines::niseci::full::{calculate_niseci, calculate_rqe_niseci, calculate_stato_ecologico};
+use crate::app::model::{
+    ConsoleModel, FileInputModel, HomeModel, IndiceModel, InfoAggiuntiveModel, OutputModel,
+    SecondModel, SubModel,
+};
+use crate::core::csv::deser::{
+    check_campionamento_hfbi_path, check_campionamento_niseci_path, check_riferimento_niseci_path,
+    process_csv_errors, VeryItalianRecordCsvCampionamentoHFBI,
+    VeryItalianRecordCsvCampionamentoNISECI, VeryItalianRecordCsvRiferimentoNISECI,
+};
+use crate::core::csv::parser::{
+    check_records_campionamento_hfbi, check_records_campionamento_niseci,
+    check_records_riferimento_niseci, parse_date,
+};
+use crate::core::csv::TipoRecordCsv;
+use crate::core::pdf::{esporta_pdf_hfbi, esporta_pdf_niseci};
+use crate::domain::{
+    hfbi::{AnagraficaHFBI, CampionamentoHFBI, RisultatoHFBI},
+    index::Indice,
+    niseci::{
+        AnagraficaNISECI, CampionamentoNISECI, RiferimentoNISECI, RisultatoNISECI,
+        StatoEcologicoNISECI, TipoComunitaNISECI,
+    },
+};
 use crate::engines::hfbi::full::calculate_hfbi;
-use crate::core::pdf::{esporta_pdf_niseci, esporta_pdf_hfbi};
+use crate::engines::niseci::full::{
+    calculate_niseci, calculate_rqe_niseci, calculate_stato_ecologico,
+};
+use crate::state::GLOBAL_STATE;
+use chrono::format::ParseErrorKind;
+use raylib::consts::KeyboardKey::*;
+use raylib::RaylibHandle;
+use std::path::PathBuf;
 
-#[cfg(feature="logged")]
+#[cfg(feature = "logged")]
 use log::info;
 
-#[cfg(feature="logged")]
+#[cfg(feature = "logged")]
 use dirs::document_dir;
 
-#[cfg(feature="logged")]
+#[cfg(feature = "logged")]
 use std::fs::OpenOptions;
-#[cfg(feature="logged")]
+#[cfg(feature = "logged")]
 use std::io::Write;
 
 pub(crate) struct Controllers {
@@ -48,7 +67,7 @@ pub(crate) struct Controllers {
     pub(crate) fileinput_controller: FileInputController,
     pub(crate) infoaggiuntive_controller: InfoAggiuntiveController,
     pub(crate) output_controller: OutputController,
-    pub(crate) console_controller: ConsoleController
+    pub(crate) console_controller: ConsoleController,
 }
 
 impl Controllers {
@@ -60,7 +79,7 @@ impl Controllers {
             fileinput_controller: FileInputController::new(),
             infoaggiuntive_controller: InfoAggiuntiveController::new(),
             output_controller: OutputController::new(),
-            console_controller: ConsoleController::new()
+            console_controller: ConsoleController::new(),
         }
     }
     pub(crate) fn update(&self, rl: &mut RaylibHandle, main_state: &mut MainState) {
@@ -81,7 +100,7 @@ impl Controllers {
             CurrentView::SelezioneInfoAggiuntive | CurrentView::ValidazioneInfoAggiuntive => {
                 self.infoaggiuntive_controller.update(rl, main_state);
             }
-            CurrentView::ProduzioneOutput | CurrentView::ProduzionePDF=> {
+            CurrentView::ProduzioneOutput | CurrentView::ProduzionePDF => {
                 self.output_controller.update(rl, main_state);
             }
             CurrentView::Console => {
@@ -175,7 +194,6 @@ impl Controller for SecondController {
 }
 
 impl SecondController {
-
     pub(crate) fn new() -> Self {
         Self
     }
@@ -271,7 +289,9 @@ impl Controller for FileInputController {
             current_indice = idx;
         } else {
             eprintln!("FileInputController:  User did not select an index");
-            eprintln!("FileInputController:  Let's update current view and go back to SelezioneIndice.");
+            eprintln!(
+                "FileInputController:  Let's update current view and go back to SelezioneIndice."
+            );
             main_state.set_current_view(CurrentView::SelezioneIndice);
             return;
         }
@@ -285,7 +305,9 @@ impl Controller for FileInputController {
                             riferimento_ready = true;
                         }
                         let mut campionamento_ready = false;
-                        if let Some(_campionamento_path) = state.fileinput_model.get_campionamento_path() {
+                        if let Some(_campionamento_path) =
+                            state.fileinput_model.get_campionamento_path()
+                        {
                             // Assumes the path is ready to be used.
                             // The current selection used by the only forces .csv extension
                             campionamento_ready = true;
@@ -299,19 +321,23 @@ impl Controller for FileInputController {
                     }
                     Indice::Hfbi => {
                         let mut campionamento_ready = false;
-                        if let Some(_campionamento_path) = state.fileinput_model.get_campionamento_path() {
+                        if let Some(_campionamento_path) =
+                            state.fileinput_model.get_campionamento_path()
+                        {
                             // Assumes the path is ready to be used.
                             // The current selection used by the only forces .csv extension
                             campionamento_ready = true;
                         }
                         if campionamento_ready {
-                            eprintln!("FileInputController:  HFBI - L'utente ha fornito campionamento");
+                            eprintln!(
+                                "FileInputController:  HFBI - L'utente ha fornito campionamento"
+                            );
                             eprintln!("FileInputController:  Let's update current view and go to ValidazioneFileInput.");
                             main_state.set_current_view(CurrentView::ValidazioneFileInput);
                         }
                     }
                 }
-            },
+            }
             CurrentView::ValidazioneFileInput => {
                 match current_indice {
                     Indice::Niseci => {
@@ -324,7 +350,9 @@ impl Controller for FileInputController {
                             return;
                         }
 
-                        if let Some(_campionamento_path) = state.fileinput_model.get_campionamento_path() {
+                        if let Some(_campionamento_path) =
+                            state.fileinput_model.get_campionamento_path()
+                        {
                             //
                         } else {
                             eprintln!("FileInputController:  User did not select a campionamento niseci path");
@@ -334,7 +362,8 @@ impl Controller for FileInputController {
                         }
 
                         let riferimento_valid = state.fileinput_model.get_riferimento_path_valid();
-                        let campionamento_valid = state.fileinput_model.get_campionamento_path_valid();
+                        let campionamento_valid =
+                            state.fileinput_model.get_campionamento_path_valid();
 
                         if riferimento_valid && campionamento_valid {
                             eprintln!("FileInputController:  NISECI - L'utente ha validato riferimento e campionamento");
@@ -344,7 +373,9 @@ impl Controller for FileInputController {
                         }
                     }
                     Indice::Hfbi => {
-                        if let Some(_campionamento_path) = state.fileinput_model.get_campionamento_path() {
+                        if let Some(_campionamento_path) =
+                            state.fileinput_model.get_campionamento_path()
+                        {
                             //
                         } else {
                             eprintln!("FileInputController:  User did not select a campionamento hfbi path");
@@ -352,18 +383,21 @@ impl Controller for FileInputController {
                             main_state.set_current_view(CurrentView::SelezioneFileInput);
                             return;
                         }
-                        let campionamento_valid = state.fileinput_model.get_campionamento_path_valid();
+                        let campionamento_valid =
+                            state.fileinput_model.get_campionamento_path_valid();
 
                         if campionamento_valid {
-                            eprintln!("FileInputController:  HFBI - L'utente ha validato campionamento");
+                            eprintln!(
+                                "FileInputController:  HFBI - L'utente ha validato campionamento"
+                            );
                             eprintln!("FileInputController:  Let's update current view and go to SelezioneInfoAggiuntive.");
                             //self.add_console_message("FileInputController:  HFBI - L'utente ha validato campionamento".to_string());
                             main_state.set_current_view(CurrentView::SelezioneInfoAggiuntive);
                         }
                     }
                 }
-            },
-            _ => {},
+            }
+            _ => {}
         }
     }
 
@@ -371,7 +405,6 @@ impl Controller for FileInputController {
         let state = GLOBAL_STATE.lock().unwrap();
         state.fileinput_model.clone()
     }
-
 }
 
 impl FileInputController {
@@ -386,9 +419,14 @@ impl FileInputController {
 
     pub(crate) fn set_riferimento_path(&self, riferimento_path: Option<PathBuf>) {
         if let Some(ref rif_path) = riferimento_path {
-            self.add_console_message(format!("FileInputController:  Selezione percorso riferimento: {{{}}}", rif_path.display()));
+            self.add_console_message(format!(
+                "FileInputController:  Selezione percorso riferimento: {{{}}}",
+                rif_path.display()
+            ));
         } else {
-            self.add_console_message("FileInputController:  Deselezione percorso riferimento".to_string());
+            self.add_console_message(
+                "FileInputController:  Deselezione percorso riferimento".to_string(),
+            );
         }
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.fileinput_model.set_riferimento_path(riferimento_path);
@@ -415,7 +453,8 @@ impl FileInputController {
     pub(crate) fn valida_riferimento_niseci_path(&self) {
         if let Some(path) = self.get_riferimento_path() {
             // Using italian deser for now
-            let csv_check = check_riferimento_niseci_path::<VeryItalianRecordCsvRiferimentoNISECI>(path);
+            let csv_check =
+                check_riferimento_niseci_path::<VeryItalianRecordCsvRiferimentoNISECI>(path);
 
             match csv_check {
                 Ok(records) => {
@@ -423,11 +462,15 @@ impl FileInputController {
 
                     match records_check {
                         Ok(species) => {
-                            self.add_console_message("FileInputController:  Validazione RiferimentoNISECI completata!".to_string());
+                            self.add_console_message(
+                                "FileInputController:  Validazione RiferimentoNISECI completata!"
+                                    .to_string(),
+                            );
                             let riferimento = RiferimentoNISECI::new(species);
                             self.set_data_riferimento_niseci(riferimento);
                         }
-                        Err(errors) => { // Value errors
+                        Err(errors) => {
+                            // Value errors
                             for e in errors {
                                 self.add_console_message(format!("FileInputController:  {e}"));
                             }
@@ -436,13 +479,15 @@ impl FileInputController {
                         }
                     }
                 }
-                Err(errors) => { // Csv errors
+                Err(errors) => {
+                    // Csv errors
                     /*
                     for err in errors {
                         eprintln!("FileInputController:  {err}");
                     }
                     */
-                    let processed_errors = process_csv_errors(&errors, TipoRecordCsv::RiferimentoNISECI);
+                    let processed_errors =
+                        process_csv_errors(&errors, TipoRecordCsv::RiferimentoNISECI);
                     for e in processed_errors {
                         self.add_console_message(format!("FileInputController:  {e}"));
                     }
@@ -460,12 +505,19 @@ impl FileInputController {
 
     pub(crate) fn set_campionamento_path(&self, campionamento_path: Option<PathBuf>) {
         if let Some(ref camp_path) = campionamento_path {
-            self.add_console_message(format!("FileInputController:  Selezione percorso campionamento: {{{}}}", camp_path.display()));
+            self.add_console_message(format!(
+                "FileInputController:  Selezione percorso campionamento: {{{}}}",
+                camp_path.display()
+            ));
         } else {
-            self.add_console_message("FileInputController:  Deselezione percorso campionamento".to_string());
+            self.add_console_message(
+                "FileInputController:  Deselezione percorso campionamento".to_string(),
+            );
         }
         let mut state = GLOBAL_STATE.lock().unwrap();
-        state.fileinput_model.set_campionamento_path(campionamento_path);
+        state
+            .fileinput_model
+            .set_campionamento_path(campionamento_path);
         state.fileinput_model.set_campionamento_path_valid(false); // Refresh the validity
     }
 
@@ -475,9 +527,14 @@ impl FileInputController {
     }
 
     fn set_data_campionamento_niseci(&self, campionamento: CampionamentoNISECI) {
-        self.set_console_env(("campionamento_niseci".to_string(), format!("{campionamento}")));
+        self.set_console_env((
+            "campionamento_niseci".to_string(),
+            format!("{campionamento}"),
+        ));
         let mut state = GLOBAL_STATE.lock().unwrap();
-        state.data_model.set_campionamento_niseci(Some(campionamento));
+        state
+            .data_model
+            .set_campionamento_niseci(Some(campionamento));
         state.fileinput_model.set_campionamento_path_valid(true);
     }
 
@@ -489,7 +546,8 @@ impl FileInputController {
     pub(crate) fn valida_campionamento_niseci_path(&self) {
         if let Some(path) = self.get_campionamento_path() {
             // Using italian deser for now
-            let csv_check = check_campionamento_niseci_path::<VeryItalianRecordCsvCampionamentoNISECI>(path);
+            let csv_check =
+                check_campionamento_niseci_path::<VeryItalianRecordCsvCampionamentoNISECI>(path);
 
             match csv_check {
                 Ok(records) => {
@@ -507,14 +565,18 @@ impl FileInputController {
                     //But instead we tuck the lock acquisition inside the
                     //self.get_data_riferimento_niseci() and we chill.
                     if let Some(riferimento_niseci) = opt_riferimento_niseci {
-                        let records_check = check_records_campionamento_niseci(records, riferimento_niseci.elenco_specie);
+                        let records_check = check_records_campionamento_niseci(
+                            records,
+                            riferimento_niseci.elenco_specie,
+                        );
                         match records_check {
                             Ok(campioni) => {
                                 self.add_console_message("FileInputController:  Validazione CampionamentoNISECI completata!".to_string());
                                 let campionamento = CampionamentoNISECI::new(campioni);
                                 self.set_data_campionamento_niseci(campionamento);
                             }
-                            Err(errors) => { // Value errors
+                            Err(errors) => {
+                                // Value errors
                                 for e in errors {
                                     self.add_console_message(format!("FileInputController:  {e}"));
                                 }
@@ -523,20 +585,23 @@ impl FileInputController {
                             }
                         }
                     } else {
-                        let error_msg = "Impossibile validare campionamento_niseci senza avere riferimento";
+                        let error_msg =
+                            "Impossibile validare campionamento_niseci senza avere riferimento";
                         eprintln!("{error_msg}");
                         self.add_console_message(format!("FileInputController:  {error_msg}"));
                         let mut state = GLOBAL_STATE.lock().unwrap();
                         state.fileinput_model.set_errors_occurred(true);
                     }
                 }
-                Err(errors) => { // Csv errors
+                Err(errors) => {
+                    // Csv errors
                     /*
                     for err in errors {
                         eprintln!("FileInputController:  {err}");
                     }
                     */
-                    let processed_errors = process_csv_errors(&errors, TipoRecordCsv::CampionamentoNISECI);
+                    let processed_errors =
+                        process_csv_errors(&errors, TipoRecordCsv::CampionamentoNISECI);
                     for e in processed_errors {
                         self.add_console_message(format!("FileInputController:  {e}"));
                     }
@@ -549,7 +614,8 @@ impl FileInputController {
     pub(crate) fn valida_campionamento_hfbi_path(&self) {
         if let Some(path) = self.get_campionamento_path() {
             // Using italian deser for now
-            let csv_check = check_campionamento_hfbi_path::<VeryItalianRecordCsvCampionamentoHFBI>(path);
+            let csv_check =
+                check_campionamento_hfbi_path::<VeryItalianRecordCsvCampionamentoHFBI>(path);
 
             match csv_check {
                 Ok(records) => {
@@ -568,12 +634,20 @@ impl FileInputController {
                     let records_check = check_records_campionamento_hfbi(records);
                     match records_check {
                         Ok(mut campioni) => {
-                            self.add_console_message("FileInputController:  Validazione CampionamentoHFBI completata!".to_string());
-                            campioni.sort_by(|a, b| b.peso.cmp(&a.peso));
+                            self.add_console_message(
+                                "FileInputController:  Validazione CampionamentoHFBI completata!"
+                                    .to_string(),
+                            );
+                            campioni.sort_by(|a, b| {
+                                b.peso
+                                    .partial_cmp(&a.peso)
+                                    .unwrap_or(std::cmp::Ordering::Equal)
+                            });
                             let campionamento = CampionamentoHFBI::new(campioni);
                             self.set_data_campionamento_hfbi(campionamento);
                         }
-                        Err(errors) => { // Value errors
+                        Err(errors) => {
+                            // Value errors
                             for e in errors {
                                 self.add_console_message(format!("FileInputController:  {e}"));
                             }
@@ -582,13 +656,15 @@ impl FileInputController {
                         }
                     }
                 }
-                Err(errors) => { // Csv errors
+                Err(errors) => {
+                    // Csv errors
                     /*
                     for err in errors {
                         eprintln!("FileInputController:  {err}");
                     }
                     */
-                    let processed_errors = process_csv_errors(&errors, TipoRecordCsv::CampionamentoNISECI);
+                    let processed_errors =
+                        process_csv_errors(&errors, TipoRecordCsv::CampionamentoNISECI);
                     for e in processed_errors {
                         self.add_console_message(format!("FileInputController:  {e}"));
                     }
@@ -606,10 +682,10 @@ impl FileInputController {
         state.fileinput_model.set_campionamento_path_valid(true);
     }
 
-    pub(crate) fn set_console_env(&self, (key, val): (String,String)) {
+    pub(crate) fn set_console_env(&self, (key, val): (String, String)) {
         let mut state = GLOBAL_STATE.lock().unwrap();
 
-        state.console_model.console.set_env((key,val));
+        state.console_model.console.set_env((key, val));
     }
 }
 
@@ -653,33 +729,28 @@ impl Controller for InfoAggiuntiveController {
             return;
         }
         match main_state.current_view {
-            CurrentView::SelezioneInfoAggiuntive => {
-                match current_indice {
-                    Indice::Niseci | Indice::Hfbi => {
-                        if state.infoaggiuntive_model.is_done_editing() {
-                            eprintln!("InfoAggiuntiveController:  Let's update current view and go to ValidaInfoAggiuntive");
-                            main_state.set_current_view(CurrentView::ValidazioneInfoAggiuntive);
-                        }
+            CurrentView::SelezioneInfoAggiuntive => match current_indice {
+                Indice::Niseci | Indice::Hfbi => {
+                    if state.infoaggiuntive_model.is_done_editing() {
+                        eprintln!("InfoAggiuntiveController:  Let's update current view and go to ValidaInfoAggiuntive");
+                        main_state.set_current_view(CurrentView::ValidazioneInfoAggiuntive);
                     }
                 }
-            }
-            CurrentView::ValidazioneInfoAggiuntive => {
-                match current_indice {
-                    Indice::Niseci | Indice::Hfbi => {
-                        if !state.infoaggiuntive_model.is_done_editing() {
-                            eprintln!("InfoAggiuntiveController:  Let's update current view and go back to SelezionaInfoAggiuntive");
-                            main_state.set_current_view(CurrentView::SelezioneInfoAggiuntive);
-                        }
-                        if state.infoaggiuntive_model.is_valid() {
-                            eprintln!("InfoAggiuntiveController:  Let's update current view and go to ProduzioneOutput");
-                            main_state.set_current_view(CurrentView::ProduzioneOutput);
-                        }
+            },
+            CurrentView::ValidazioneInfoAggiuntive => match current_indice {
+                Indice::Niseci | Indice::Hfbi => {
+                    if !state.infoaggiuntive_model.is_done_editing() {
+                        eprintln!("InfoAggiuntiveController:  Let's update current view and go back to SelezionaInfoAggiuntive");
+                        main_state.set_current_view(CurrentView::SelezioneInfoAggiuntive);
+                    }
+                    if state.infoaggiuntive_model.is_valid() {
+                        eprintln!("InfoAggiuntiveController:  Let's update current view and go to ProduzioneOutput");
+                        main_state.set_current_view(CurrentView::ProduzioneOutput);
                     }
                 }
-            }
+            },
             _ => {}
         }
-
     }
 
     fn get_state(&self) -> Self::SubModel {
@@ -700,7 +771,10 @@ impl InfoAggiuntiveController {
 
     pub(crate) fn submit_anagrafica_niseci(&self, anagrafica: AnagraficaNISECI) {
         self.set_console_env(("anagrafica_niseci".to_string(), format!("{anagrafica}")));
-        self.add_console_message("InfoAggiuntiveController: L'utente ha completato l'inserimento info aggiuntive.".to_string());
+        self.add_console_message(
+            "InfoAggiuntiveController: L'utente ha completato l'inserimento info aggiuntive."
+                .to_string(),
+        );
         let mut state = GLOBAL_STATE.lock().unwrap();
         assert!(state.data_model.get_anagrafica_niseci().is_none());
         state.data_model.set_anagrafica_niseci(Some(anagrafica));
@@ -708,16 +782,15 @@ impl InfoAggiuntiveController {
         state.infoaggiuntive_model.set_valid(false);
     }
 
-    pub(crate) fn check_larghezza_stazione_string(&self, larghezza: &str) -> Result<f32,String> {
+    pub(crate) fn check_larghezza_stazione_string(&self, larghezza: &str) -> Result<f32, String> {
         let s = larghezza.replace(',', "."); // Replace comma with dot
         match s.parse::<f32>() {
-            Ok(value) => {
-                Ok(value)
-            }
+            Ok(value) => Ok(value),
             Err(e) => {
                 let mut err_msg = format!("Errore nella conversione larghezza stazione: {}", e);
                 if err_msg.contains("invalid float literal") {
-                    err_msg = err_msg.replace("invalid float literal", "tipo non valido: atteso decimale");
+                    err_msg = err_msg
+                        .replace("invalid float literal", "tipo non valido: atteso decimale");
                 }
                 self.add_console_message(format!("InfoAggiuntiveController:  {err_msg}"));
                 let mut state = GLOBAL_STATE.lock().unwrap();
@@ -730,16 +803,15 @@ impl InfoAggiuntiveController {
         }
     }
 
-    pub(crate) fn check_lunghezza_stazione_string(&self, lunghezza: &str) -> Result<f32,String> {
+    pub(crate) fn check_lunghezza_stazione_string(&self, lunghezza: &str) -> Result<f32, String> {
         let s = lunghezza.replace(',', "."); // Replace comma with dot
         match s.parse::<f32>() {
-            Ok(value) => {
-                Ok(value)
-            }
+            Ok(value) => Ok(value),
             Err(e) => {
                 let mut err_msg = format!("Errore nella conversione lunghezza stazione: {}", e);
                 if err_msg.contains("invalid float literal") {
-                    err_msg = err_msg.replace("invalid float literal", "tipo non valido: atteso decimale");
+                    err_msg = err_msg
+                        .replace("invalid float literal", "tipo non valido: atteso decimale");
                 }
                 self.add_console_message(format!("InfoAggiuntiveController:  {err_msg}"));
                 let mut state = GLOBAL_STATE.lock().unwrap();
@@ -753,7 +825,6 @@ impl InfoAggiuntiveController {
     }
 
     pub(crate) fn valida_anagrafica_niseci(&self) {
-
         //We grab the state in a scope to ensure we don't get lock problems
         {
             let state = GLOBAL_STATE.lock().unwrap();
@@ -780,43 +851,55 @@ impl InfoAggiuntiveController {
             }
 
             match parse_date(&anagrafica.date_string) {
-                Ok(_) => {},
-                Err(e) => {
-                    match e.kind() {
-                        ParseErrorKind::OutOfRange => {
-                            errors.push("Data fornita non valida: fuori range".to_string());
-                        },
-                        ParseErrorKind::Impossible => {
-                            errors.push("Data fornita non valida: valori non possibili".to_string());
-                        },
-                        ParseErrorKind::NotEnough => {
-                            errors.push("Data fornita non valida: specifica insufficiente".to_string());
-                        },
-                        ParseErrorKind::Invalid => {
-                            errors.push("Data fornita non valida: presenza di caratteri non attesi".to_string());
-                        },
-                        ParseErrorKind::TooShort => {
-                            errors.push("Data fornita non valida: terminazione prematura dell'input".to_string());
-                        },
-                        ParseErrorKind::TooLong => {
-                            errors.push("Data fornita non valida: input in eccesso".to_string());
-                        },
-                        ParseErrorKind::BadFormat => {
-                            errors.push("Data fornita non valida: errore nella specifica di formattazione".to_string());
-                        },
-                        _ => {
-                            errors.push("Data fornita non valida: errore sconosciuto".to_string());
-                        }
+                Ok(_) => {}
+                Err(e) => match e.kind() {
+                    ParseErrorKind::OutOfRange => {
+                        errors.push("Data fornita non valida: fuori range".to_string());
                     }
-                }
+                    ParseErrorKind::Impossible => {
+                        errors.push("Data fornita non valida: valori non possibili".to_string());
+                    }
+                    ParseErrorKind::NotEnough => {
+                        errors.push("Data fornita non valida: specifica insufficiente".to_string());
+                    }
+                    ParseErrorKind::Invalid => {
+                        errors.push(
+                            "Data fornita non valida: presenza di caratteri non attesi".to_string(),
+                        );
+                    }
+                    ParseErrorKind::TooShort => {
+                        errors.push(
+                            "Data fornita non valida: terminazione prematura dell'input"
+                                .to_string(),
+                        );
+                    }
+                    ParseErrorKind::TooLong => {
+                        errors.push("Data fornita non valida: input in eccesso".to_string());
+                    }
+                    ParseErrorKind::BadFormat => {
+                        errors.push(
+                            "Data fornita non valida: errore nella specifica di formattazione"
+                                .to_string(),
+                        );
+                    }
+                    _ => {
+                        errors.push("Data fornita non valida: errore sconosciuto".to_string());
+                    }
+                },
             }
 
             if (anagrafica.get_lunghezza_media() - 0.0) < 1e-6 {
-                errors.push(format!("Lunghezza media troppo bassa: {}", anagrafica.get_lunghezza_media()));
+                errors.push(format!(
+                    "Lunghezza media troppo bassa: {}",
+                    anagrafica.get_lunghezza_media()
+                ));
             }
 
             if (anagrafica.get_larghezza_media() - 0.0) < 1e-6 {
-                errors.push(format!("Larghezza media troppo bassa: {}", anagrafica.get_larghezza_media()));
+                errors.push(format!(
+                    "Larghezza media troppo bassa: {}",
+                    anagrafica.get_larghezza_media()
+                ));
             }
 
             match anagrafica.comunita.tipo {
@@ -868,7 +951,10 @@ impl InfoAggiuntiveController {
 
     pub(crate) fn backout_anagrafica_niseci(&self) {
         self.unset_console_env("anagrafica_niseci".to_string());
-        self.add_console_message("InfoAggiuntiveController: L'utente ha annullato l'inserimento info aggiuntive.".to_string());
+        self.add_console_message(
+            "InfoAggiuntiveController: L'utente ha annullato l'inserimento info aggiuntive."
+                .to_string(),
+        );
         let mut state = GLOBAL_STATE.lock().unwrap();
         assert!(state.data_model.get_anagrafica_niseci().is_some());
         state.data_model.set_anagrafica_niseci(None);
@@ -883,7 +969,10 @@ impl InfoAggiuntiveController {
 
     pub(crate) fn submit_anagrafica_hfbi(&self, anagrafica: AnagraficaHFBI) {
         self.set_console_env(("anagrafica_hfbi".to_string(), format!("{anagrafica}")));
-        self.add_console_message("InfoAggiuntiveController: L'utente ha completato l'inserimento info aggiuntive.".to_string());
+        self.add_console_message(
+            "InfoAggiuntiveController: L'utente ha completato l'inserimento info aggiuntive."
+                .to_string(),
+        );
         let mut state = GLOBAL_STATE.lock().unwrap();
         assert!(state.data_model.get_anagrafica_hfbi().is_none());
         state.data_model.set_anagrafica_hfbi(Some(anagrafica));
@@ -892,7 +981,6 @@ impl InfoAggiuntiveController {
     }
 
     pub(crate) fn valida_anagrafica_hfbi(&self) {
-
         //We grab the state in a scope to ensure we don't get lock problems
         {
             let state = GLOBAL_STATE.lock().unwrap();
@@ -919,43 +1007,55 @@ impl InfoAggiuntiveController {
             }
 
             match parse_date(&anagrafica.date_string) {
-                Ok(_) => {},
-                Err(e) => {
-                    match e.kind() {
-                        ParseErrorKind::OutOfRange => {
-                            errors.push("Data fornita non valida: fuori range".to_string());
-                        },
-                        ParseErrorKind::Impossible => {
-                            errors.push("Data fornita non valida: valori non possibili".to_string());
-                        },
-                        ParseErrorKind::NotEnough => {
-                            errors.push("Data fornita non valida: specifica insufficiente".to_string());
-                        },
-                        ParseErrorKind::Invalid => {
-                            errors.push("Data fornita non valida: presenza di caratteri non attesi".to_string());
-                        },
-                        ParseErrorKind::TooShort => {
-                            errors.push("Data fornita non valida: terminazione prematura dell'input".to_string());
-                        },
-                        ParseErrorKind::TooLong => {
-                            errors.push("Data fornita non valida: input in eccesso".to_string());
-                        },
-                        ParseErrorKind::BadFormat => {
-                            errors.push("Data fornita non valida: errore nella specifica di formattazione".to_string());
-                        },
-                        _ => {
-                            errors.push("Data fornita non valida: errore sconosciuto".to_string());
-                        }
+                Ok(_) => {}
+                Err(e) => match e.kind() {
+                    ParseErrorKind::OutOfRange => {
+                        errors.push("Data fornita non valida: fuori range".to_string());
                     }
-                }
+                    ParseErrorKind::Impossible => {
+                        errors.push("Data fornita non valida: valori non possibili".to_string());
+                    }
+                    ParseErrorKind::NotEnough => {
+                        errors.push("Data fornita non valida: specifica insufficiente".to_string());
+                    }
+                    ParseErrorKind::Invalid => {
+                        errors.push(
+                            "Data fornita non valida: presenza di caratteri non attesi".to_string(),
+                        );
+                    }
+                    ParseErrorKind::TooShort => {
+                        errors.push(
+                            "Data fornita non valida: terminazione prematura dell'input"
+                                .to_string(),
+                        );
+                    }
+                    ParseErrorKind::TooLong => {
+                        errors.push("Data fornita non valida: input in eccesso".to_string());
+                    }
+                    ParseErrorKind::BadFormat => {
+                        errors.push(
+                            "Data fornita non valida: errore nella specifica di formattazione"
+                                .to_string(),
+                        );
+                    }
+                    _ => {
+                        errors.push("Data fornita non valida: errore sconosciuto".to_string());
+                    }
+                },
             }
 
             if (anagrafica.get_lunghezza_media() - 0.0) < 1e-6 {
-                errors.push(format!("Lunghezza media troppo bassa: {}", anagrafica.get_lunghezza_media()));
+                errors.push(format!(
+                    "Lunghezza media troppo bassa: {}",
+                    anagrafica.get_lunghezza_media()
+                ));
             }
 
             if (anagrafica.get_larghezza_media() - 0.0) < 1e-6 {
-                errors.push(format!("Larghezza media troppo bassa: {}", anagrafica.get_larghezza_media()));
+                errors.push(format!(
+                    "Larghezza media troppo bassa: {}",
+                    anagrafica.get_larghezza_media()
+                ));
             }
 
             for e in &errors {
@@ -973,7 +1073,8 @@ impl InfoAggiuntiveController {
                 state.infoaggiuntive_model.set_errors_occurred(true);
             }
         } else {
-            let err_msg = "InfoAggiuntiveController: valida_anagrafica_hfbi() ha ricevuto uno stato spurio.";
+            let err_msg =
+                "InfoAggiuntiveController: valida_anagrafica_hfbi() ha ricevuto uno stato spurio.";
             eprintln!("{}", err_msg);
             self.add_console_message(format!("InfoAggiuntiveController:  {err_msg}"));
         };
@@ -981,7 +1082,10 @@ impl InfoAggiuntiveController {
 
     pub(crate) fn backout_anagrafica_hfbi(&self) {
         self.unset_console_env("anagrafica_hfbi".to_string());
-        self.add_console_message("InfoAggiuntiveController: L'utente ha annullato l'inserimento info aggiuntive.".to_string());
+        self.add_console_message(
+            "InfoAggiuntiveController: L'utente ha annullato l'inserimento info aggiuntive."
+                .to_string(),
+        );
         let mut state = GLOBAL_STATE.lock().unwrap();
         assert!(state.data_model.get_anagrafica_hfbi().is_some());
         state.data_model.set_anagrafica_hfbi(None);
@@ -989,10 +1093,10 @@ impl InfoAggiuntiveController {
         state.infoaggiuntive_model.set_valid(false);
     }
 
-    pub(crate) fn set_console_env(&self, (key, val): (String,String)) {
+    pub(crate) fn set_console_env(&self, (key, val): (String, String)) {
         let mut state = GLOBAL_STATE.lock().unwrap();
 
-        state.console_model.console.set_env((key,val));
+        state.console_model.console.set_env((key, val));
     }
 
     pub(crate) fn unset_console_env(&self, key: String) {
@@ -1034,13 +1138,13 @@ impl Controller for OutputController {
             CurrentView::ProduzioneOutput => {
                 if state.output_model.is_done_user_confirm() {
                     eprintln!("OutputController:  User confirmed");
-                    eprintln!("OutputController:  Let's update current view and go to ProduzionePDF.");
+                    eprintln!(
+                        "OutputController:  Let's update current view and go to ProduzionePDF."
+                    );
                     main_state.set_current_view(CurrentView::ProduzionePDF);
                 }
             }
-            CurrentView::ProduzionePDF => {
-
-            }
+            CurrentView::ProduzionePDF => {}
             _ => {}
         }
     }
@@ -1065,12 +1169,8 @@ impl OutputController {
         if self.get_is_done_calc() {
             let opt_res = self.get_data_risultato_niseci();
             match opt_res {
-                Some(r) => {
-                    r.get_valore()
-                }
-                None => {
-                    None
-                }
+                Some(r) => r.get_valore(),
+                None => None,
             }
         } else {
             None
@@ -1081,12 +1181,8 @@ impl OutputController {
         if self.get_is_done_calc() {
             let opt_res = self.get_data_risultato_niseci();
             match opt_res {
-                Some(r) => {
-                    r.get_rqe()
-                }
-                None => {
-                    None
-                }
+                Some(r) => r.get_rqe(),
+                None => None,
             }
         } else {
             None
@@ -1105,14 +1201,10 @@ impl OutputController {
                             let niseci_val = r.get_valore();
                             calculate_stato_ecologico(niseci_val, &anagr.area)
                         }
-                        None => {
-                            None
-                        }
+                        None => None,
                     }
                 }
-                None => {
-                    None
-                }
+                None => None,
             }
         } else {
             None
@@ -1132,12 +1224,8 @@ impl OutputController {
         if self.get_is_done_calc() {
             let opt_res = self.get_data_risultato_niseci();
             match opt_res {
-                Some(r) => {
-                    r.get_x2()
-                }
-                None => {
-                    None
-                }
+                Some(r) => r.get_x2(),
+                None => None,
             }
         } else {
             None
@@ -1152,7 +1240,6 @@ impl OutputController {
             None
         }
     }
-
 
     fn set_data_risultato_niseci(&self, risultato: RisultatoNISECI) {
         self.set_console_env(("risultato_niseci".to_string(), format!("{risultato}")));
@@ -1196,17 +1283,23 @@ impl OutputController {
         if riferimento.is_none() {
             // Implementation error, this should never happen
             valid = false;
-            self.add_console_message("IMPLEMENTATION ERROR: riferimento niseci was None in calc_niseci()".to_string());
+            self.add_console_message(
+                "IMPLEMENTATION ERROR: riferimento niseci was None in calc_niseci()".to_string(),
+            );
         }
         if campionamento.is_none() {
             // Implementation error, this should never happen
             valid = false;
-            self.add_console_message("IMPLEMENTATION ERROR: campionamento niseci was None in calc_niseci()".to_string());
+            self.add_console_message(
+                "IMPLEMENTATION ERROR: campionamento niseci was None in calc_niseci()".to_string(),
+            );
         }
         if anagrafica.is_none() {
             // Implementation error, this should never happen
             valid = false;
-            self.add_console_message("IMPLEMENTATION ERROR: anagrafica niseci was None in calc_niseci()".to_string());
+            self.add_console_message(
+                "IMPLEMENTATION ERROR: anagrafica niseci was None in calc_niseci()".to_string(),
+            );
         }
         if valid {
             let riferimento = riferimento.expect("calc_niseci() checked is_none() before");
@@ -1252,7 +1345,7 @@ impl OutputController {
                     }
                     self.add_console_message(format!("Stato ecologico: {stato_ecologico_str}"));
 
-                    #[cfg(feature="logged")]
+                    #[cfg(feature = "logged")]
                     {
                         info!("Codice stazione, NISECI, RQE NISECI, Stato ecologico, x1, x2, x3, x2_a, x2_b, x3_a, x3_b\n{}",
                             format!("{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}",
@@ -1285,11 +1378,12 @@ impl OutputController {
                     self.add_console_message(format!("{intermediates}"));
 
                     //TODO: format intermediates properly
-                    #[cfg(feature="logged")]
+                    #[cfg(feature = "logged")]
                     {
                         let log_file_path;
                         if let Some(documents_dir) = document_dir() {
-                            log_file_path = documents_dir.join("esox").join("log_intermediates.csv");
+                            log_file_path =
+                                documents_dir.join("esox").join("log_intermediates.csv");
                         } else {
                             log_file_path = PathBuf::from("./esox/log_intermediates.csv");
                         }
@@ -1304,9 +1398,11 @@ impl OutputController {
                             Ok(mut file) => {
                                 let mut string_representation = format!("specie, nome latino, tipo autoctono, tipo alloctono, specie attesa, cl1, cl2, cl3, cl4, cl5, densita stimata, rapporto ad/juv, x2a_a, x2a_b");
                                 for (_k, v) in intermediates.specie_specifici.iter() {
-                                    string_representation = format!("{}\n{}", string_representation, v);
+                                    string_representation =
+                                        format!("{}\n{}", string_representation, v);
                                 }
-                                let write_result = writeln!(file, "{}", format!("{string_representation}"));
+                                let write_result =
+                                    writeln!(file, "{}", format!("{string_representation}"));
                                 match write_result {
                                     Ok(_) => println!("Successfully wrote to file."),
                                     Err(e) => eprintln!("Failed to write to file: {}", e),
@@ -1318,18 +1414,17 @@ impl OutputController {
                         }
                     }
 
-                    let risultato_niseci = RisultatoNISECI::new(
-                        niseci,
-                        rqe_niseci,
-                        intermediates
-                    );
+                    let risultato_niseci = RisultatoNISECI::new(niseci, rqe_niseci, intermediates);
 
                     self.set_data_risultato_niseci(risultato_niseci);
                     println!("OutputController: Finished NISECI calc");
-                },
+                }
                 Err(niseci_errors) => {
                     for e in niseci_errors {
-                        self.add_console_message(format!("Errore durante il calcolo NISECI: {}", e));
+                        self.add_console_message(format!(
+                            "Errore durante il calcolo NISECI: {}",
+                            e
+                        ));
                     }
                     let mut state = GLOBAL_STATE.lock().unwrap();
                     state.data_model.set_errors_occurred(true);
@@ -1338,23 +1433,35 @@ impl OutputController {
                 }
             }
         } else {
-            self.add_console_message("IMPLEMENTATION ERROR: spurious state in calc_niseci()".to_string());
+            self.add_console_message(
+                "IMPLEMENTATION ERROR: spurious state in calc_niseci()".to_string(),
+            );
             let mut state = GLOBAL_STATE.lock().unwrap();
             state.data_model.set_errors_occurred(true);
         }
     }
 
     pub(crate) fn esporta_pdf_niseci(&self, export_path: PathBuf) {
-
         self.add_console_message(format!("Esportazione pdf in {}", export_path.display()));
 
-        let risultato_niseci = self.get_data_risultato_niseci().expect("Failed calculating NISECI before requesting export");
+        let risultato_niseci = self
+            .get_data_risultato_niseci()
+            .expect("Failed calculating NISECI before requesting export");
 
-        let anagrafica_niseci = self.get_data_anagrafica_niseci().expect("Failed getting AnagraficaNISECI before requesting export");
+        let anagrafica_niseci = self
+            .get_data_anagrafica_niseci()
+            .expect("Failed getting AnagraficaNISECI before requesting export");
 
-        let riferimento_niseci = self.get_data_riferimento_niseci().expect("Failed getting RiferimentoNISECI before requesting export");
+        let riferimento_niseci = self
+            .get_data_riferimento_niseci()
+            .expect("Failed getting RiferimentoNISECI before requesting export");
 
-        esporta_pdf_niseci(export_path, riferimento_niseci, anagrafica_niseci, risultato_niseci);
+        esporta_pdf_niseci(
+            export_path,
+            riferimento_niseci,
+            anagrafica_niseci,
+            risultato_niseci,
+        );
     }
 
     pub(crate) fn calc_hfbi(&self) {
@@ -1371,12 +1478,16 @@ impl OutputController {
         if campionamento.is_none() {
             // Implementation error, this should never happen
             valid = false;
-            self.add_console_message("IMPLEMENTATION ERROR: campionamento hfbi was None in calc_hfbi()".to_string());
+            self.add_console_message(
+                "IMPLEMENTATION ERROR: campionamento hfbi was None in calc_hfbi()".to_string(),
+            );
         }
         if anagrafica.is_none() {
             // Implementation error, this should never happen
             valid = false;
-            self.add_console_message("IMPLEMENTATION ERROR: anagrafica hfbi was None in calc_hfbi()".to_string());
+            self.add_console_message(
+                "IMPLEMENTATION ERROR: anagrafica hfbi was None in calc_hfbi()".to_string(),
+            );
         }
 
         if valid {
@@ -1387,16 +1498,16 @@ impl OutputController {
                 Ok((hfbi, intermediates)) => {
                     self.add_console_message(format!("HFBI: {hfbi}"));
                     self.add_console_message(format!("intermediates: {intermediates}"));
-                    let risultato_hfbi = RisultatoHFBI::new(
-                        Some(hfbi),
-                        intermediates
-                    );
+                    let risultato_hfbi = RisultatoHFBI::new(Some(hfbi), intermediates);
 
                     self.set_data_risultato_hfbi(risultato_hfbi);
                     println!("OutputController: Finished HFBI calc");
                 }
                 Err(hfbi_errors) => {
-                    self.add_console_message(format!("Errore durante il calcolo HFBI: {}", hfbi_errors));
+                    self.add_console_message(format!(
+                        "Errore durante il calcolo HFBI: {}",
+                        hfbi_errors
+                    ));
                     let mut state = GLOBAL_STATE.lock().unwrap();
                     state.data_model.set_errors_occurred(true);
                     state.output_model.set_done_calc(false);
@@ -1404,19 +1515,24 @@ impl OutputController {
                 }
             }
         } else {
-            self.add_console_message("IMPLEMENTATION ERROR: spurious state in calc_hfbi()".to_string());
+            self.add_console_message(
+                "IMPLEMENTATION ERROR: spurious state in calc_hfbi()".to_string(),
+            );
             let mut state = GLOBAL_STATE.lock().unwrap();
             state.data_model.set_errors_occurred(true);
         }
     }
 
     pub(crate) fn esporta_pdf_hfbi(&self, export_path: PathBuf) {
-
         self.add_console_message(format!("Esportazione pdf in {}", export_path.display()));
 
-        let risultato_hfbi = self.get_data_risultato_hfbi().expect("Failed calculating HFBI before requesting export");
+        let risultato_hfbi = self
+            .get_data_risultato_hfbi()
+            .expect("Failed calculating HFBI before requesting export");
 
-        let anagrafica_hfbi = self.get_data_anagrafica_hfbi().expect("Failed getting AnagraficaHFBI before requesting export");
+        let anagrafica_hfbi = self
+            .get_data_anagrafica_hfbi()
+            .expect("Failed getting AnagraficaHFBI before requesting export");
 
         esporta_pdf_hfbi(export_path, anagrafica_hfbi, risultato_hfbi);
     }
@@ -1431,12 +1547,8 @@ impl OutputController {
         if self.get_is_done_calc() {
             let opt_res = self.get_data_risultato_hfbi();
             match opt_res {
-                Some(r) => {
-                    r.get_valore()
-                }
-                None => {
-                    None
-                }
+                Some(r) => r.get_valore(),
+                None => None,
             }
         } else {
             None
@@ -1464,23 +1576,10 @@ impl OutputController {
         state.output_model.set_done_calc(true);
     }
 
-    pub(crate) fn set_console_env(&self, (key, val): (String,String)) {
+    pub(crate) fn set_console_env(&self, (key, val): (String, String)) {
         let mut state = GLOBAL_STATE.lock().unwrap();
 
-        state.console_model.console.set_env((key,val));
-    }
-}
-
-pub(crate) struct _LogController;
-
-impl _LogController {
-    pub(crate) fn _new() -> Self {
-        Self
-    }
-
-    pub(crate) fn _update(&self, _rl: &RaylibHandle) {
-        //let mut state = GLOBAL_STATE.lock().unwrap();
-        //state.second_model.set_name("Updated".to_string());
+        state.console_model.console.set_env((key, val));
     }
 }
 
@@ -1518,10 +1617,14 @@ impl Controller for ConsoleController {
         let mwheel_move = rl.get_mouse_wheel_move() as i32;
 
         if mwheel_move != 0 {
-            if mwheel_move > 0 { // Positive is to scroll up
+            if mwheel_move > 0 {
+                // Positive is to scroll up
                 state.console_model.console.scroll_up(mwheel_move as usize);
             } else {
-                state.console_model.console.scroll_down(-mwheel_move as usize);
+                state
+                    .console_model
+                    .console
+                    .scroll_down(-mwheel_move as usize);
             }
         }
 
@@ -1534,17 +1637,26 @@ impl Controller for ConsoleController {
 
         // Detect and pass keys to the console
         while let Some(c) = rl.get_char_pressed() {
-            state.console_model.console.handle_input(rl, Some(c), false, false);
+            state
+                .console_model
+                .console
+                .handle_input(rl, Some(c), false, false);
         }
 
         // Check for Enter key press
         if rl.is_key_pressed(KEY_ENTER) {
-            state.console_model.console.handle_input(rl, None, true, false);
+            state
+                .console_model
+                .console
+                .handle_input(rl, None, true, false);
         }
 
         // Check for Backspace key press
         if rl.is_key_pressed(KEY_BACKSPACE) {
-            state.console_model.console.handle_input(rl, None, false, true);
+            state
+                .console_model
+                .console
+                .handle_input(rl, None, false, true);
         }
         state.console_model.set_name("Updated".to_string());
     }
@@ -1556,7 +1668,6 @@ impl Controller for ConsoleController {
 }
 
 impl ConsoleController {
-
     pub(crate) fn new() -> Self {
         Self
     }
@@ -1566,9 +1677,9 @@ impl ConsoleController {
         state.console_model.set_should_backout(true);
     }
 
-    pub(crate) fn _set_console_env(&self, (key, val): (String,String)) {
+    pub(crate) fn _set_console_env(&self, (key, val): (String, String)) {
         let mut state = GLOBAL_STATE.lock().unwrap();
 
-        state.console_model.console.set_env((key,val));
+        state.console_model.console.set_env((key, val));
     }
 }

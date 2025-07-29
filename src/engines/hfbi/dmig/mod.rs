@@ -15,7 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use std::collections::{HashMap};
+use std::collections::HashMap;
 
 use crate::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI, GruppoEcoHFBI, SpecieHFBI};
 
@@ -26,10 +26,12 @@ pub(crate) fn calc_dmig(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFB
     // trovo il numero di specie trovate
     for cattura in &campione.campionamento {
         match cattura.specie.gruppo_eco {
-            GruppoEcoHFBI::Diadromi
-            | GruppoEcoHFBI::MigratoriMarini => {
-                specie_map.insert(cattura.specie.codice_specie.to_string(), cattura.specie.clone());
-            },
+            GruppoEcoHFBI::Diadromi | GruppoEcoHFBI::MigratoriMarini => {
+                specie_map.insert(
+                    cattura.specie.codice_specie.to_string(),
+                    cattura.specie.clone(),
+                );
+            }
             _ => {}
         }
     }
@@ -51,8 +53,7 @@ fn calc_bmig(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
     let mut biomig = 0.0;
     for specie in &campione.campionamento {
         match specie.specie.gruppo_eco {
-            GruppoEcoHFBI::Diadromi
-            | GruppoEcoHFBI::MigratoriMarini => {
+            GruppoEcoHFBI::Diadromi | GruppoEcoHFBI::MigratoriMarini => {
                 biomig += specie.peso as f32
             }
             _ => {}
@@ -61,7 +62,7 @@ fn calc_bmig(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
 
     let area = anagrafica.lunghezza_media_transetto * anagrafica.larghezza_media_transetto;
 
-    ((biomig / area) * 100.0 +1.0).ln()
+    ((biomig / area) * 100.0 + 1.0).ln()
 }
 
 #[cfg(test)]
@@ -80,7 +81,10 @@ mod dmig_private_tests {
         AnagraficaHFBI {
             codice_stazione: "TestStazione".to_string(),
             corpo_idrico: "TestCorpoIdrico".to_string(),
-            posizione: Location { regione: "Test".to_string(), provincia: "Test".to_string() },
+            posizione: Location {
+                regione: "Test".to_string(),
+                provincia: "Test".to_string(),
+            },
             date_string: "01/01/2025".to_string(),
             tipo_laguna: TipoLagunaCostieraHFBI::MAt1,
             stagione: StagioneHFBI::Primavera,
@@ -94,7 +98,7 @@ mod dmig_private_tests {
     fn create_specie_record(
         codice_specie: &'static str,
         gruppo_eco: GruppoEcoHFBI,
-        peso: u32,
+        peso: f32,
     ) -> RecordHFBI {
         RecordHFBI {
             specie: SpecieHFBI {
@@ -122,7 +126,9 @@ mod dmig_private_tests {
     #[test]
     fn test_bmig_empty_input() {
         let anagrafica = create_test_anagrafica(100.0, 5.0);
-        let campione = CampionamentoHFBI { campionamento: vec![] };
+        let campione = CampionamentoHFBI {
+            campionamento: vec![],
+        };
         // biomig = 0 -> ln(1) = 0
         assert!((calc_bmig(&campione, &anagrafica) - 0.0).abs() < EPSILON);
     }
@@ -131,7 +137,7 @@ mod dmig_private_tests {
     fn test_bmig_zero_area() {
         let anagrafica = create_test_anagrafica(10.0, 0.0); // area = 0
         let campione = CampionamentoHFBI {
-            campionamento: vec![create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 100)],
+            campionamento: vec![create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 100.0)],
         };
         // biomig > 0, area = 0 -> division by zero -> infinity
         assert!(calc_bmig(&campione, &anagrafica).is_infinite());
@@ -142,9 +148,9 @@ mod dmig_private_tests {
         let anagrafica = create_test_anagrafica(20.0, 5.0); // area = 100
         let campione = CampionamentoHFBI {
             campionamento: vec![
-                create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 150), // biomig += 150
-                create_specie_record("SP2", GruppoEcoHFBI::ResidentiDiEstuario, 100), // ignored
-                create_specie_record("SP3", GruppoEcoHFBI::MigratoriMarini, 50), // biomig += 50
+                create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 150.0), // biomig += 150
+                create_specie_record("SP2", GruppoEcoHFBI::ResidentiDiEstuario, 100.0), // ignored
+                create_specie_record("SP3", GruppoEcoHFBI::MigratoriMarini, 50.0), // biomig += 50
             ],
         };
         // biomig = 150 + 50 = 200
@@ -160,7 +166,11 @@ mod dmig_private_tests {
     fn test_dmig_smig_is_zero() {
         let anagrafica = create_test_anagrafica(100.0, 5.0);
         let campione = CampionamentoHFBI {
-            campionamento: vec![create_specie_record("SP1", GruppoEcoHFBI::ResidentiDiEstuario, 100)],
+            campionamento: vec![create_specie_record(
+                "SP1",
+                GruppoEcoHFBI::ResidentiDiEstuario,
+                100.0,
+            )],
         };
         // No migratory species, so smig = 0. Should return 0.0
         assert!((calc_dmig(&campione, &anagrafica) - 0.0).abs() < EPSILON);
@@ -171,8 +181,8 @@ mod dmig_private_tests {
         let anagrafica = create_test_anagrafica(100.0, 5.0);
         let campione = CampionamentoHFBI {
             campionamento: vec![
-                create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 100),
-                create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 50), // Same species
+                create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 100.0),
+                create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 50.0), // Same species
             ],
         };
         // Only one unique migratory species, so smig = 1. Should return 0.01
@@ -183,9 +193,9 @@ mod dmig_private_tests {
     fn test_dmig_bmig_is_infinity() {
         let anagrafica = create_test_anagrafica(10.0, 0.0); // area = 0
         let campione = CampionamentoHFBI {
-             campionamento: vec![
-                create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 100),
-                create_specie_record("SP2", GruppoEcoHFBI::MigratoriMarini, 50),
+            campionamento: vec![
+                create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 100.0),
+                create_specie_record("SP2", GruppoEcoHFBI::MigratoriMarini, 50.0),
             ],
         };
         // bmig is infinity. Formula is ln(((smig-1)/inf)+1) = ln(1) = 0
@@ -197,10 +207,10 @@ mod dmig_private_tests {
         let anagrafica = create_test_anagrafica(20.0, 5.0); // area = 100
         let campione = CampionamentoHFBI {
             campionamento: vec![
-                create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 150),
-                create_specie_record("SP2", GruppoEcoHFBI::MigratoriMarini, 250),
-                create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 50), // Duplicate species
-                create_specie_record("SP3", GruppoEcoHFBI::ResidentiDiEstuario, 300), // Ignored
+                create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 150.0),
+                create_specie_record("SP2", GruppoEcoHFBI::MigratoriMarini, 250.0),
+                create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 50.0), // Duplicate species
+                create_specie_record("SP3", GruppoEcoHFBI::ResidentiDiEstuario, 300.0), // Ignored
             ],
         };
 
@@ -208,15 +218,14 @@ mod dmig_private_tests {
         // biomig = 150 + 250 + 50 = 450
         // bmig = ln((450 / 100) * 100 + 1) = ln(451)
         let bmig = 451.0_f32.ln();
-        
+
         // smig calculation:
         // Unique species are "SP1" and "SP2", so smig = 2
         let smig = 2.0_f32;
-        
+
         let expected = (((smig - 1.0) / bmig) + 1.0).ln();
         let result = calc_dmig(&campione, &anagrafica);
 
         assert!((result - expected).abs() < EPSILON);
     }
 }
-

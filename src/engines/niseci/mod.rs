@@ -15,9 +15,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-
+pub(crate) mod full;
+pub(crate) mod linear_regression;
 pub(crate) mod x1;
 pub(crate) mod x2;
 pub(crate) mod x3;
-pub(crate) mod linear_regression;
-pub(crate) mod full;

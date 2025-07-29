@@ -15,8 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+pub(crate) mod hfbi;
 pub(crate) mod index;
 pub(crate) mod location;
 pub(crate) mod niseci;
-pub(crate) mod hfbi;
-pub(crate) mod logger;

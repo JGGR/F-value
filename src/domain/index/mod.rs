@@ -15,21 +15,21 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use std::{fmt};
+use std::fmt;
 
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
 pub(crate) enum Indice {
-  #[default]
-  Niseci,
-  Hfbi
+    #[default]
+    Niseci,
+    Hfbi,
 }
 
 impl fmt::Display for Indice {
-  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    let string_representation = match *self {
-      Indice::Niseci => "NISECI",
-      Indice::Hfbi => "HFBI"
-    };
-    write!(f, "{}", string_representation)
-  }
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let string_representation = match *self {
+            Indice::Niseci => "NISECI",
+            Indice::Hfbi => "HFBI",
+        };
+        write!(f, "{}", string_representation)
+    }
 }

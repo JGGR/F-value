@@ -15,7 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::domain::hfbi::{CampionamentoHFBI, AnagraficaHFBI, GruppoEcoHFBI};
+use crate::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI, GruppoEcoHFBI};
 
 pub(crate) fn calc_bbent(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
     let mut biobent = 0.0;
@@ -24,8 +24,8 @@ pub(crate) fn calc_bbent(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHF
             GruppoEcoHFBI::Diadromi
             | GruppoEcoHFBI::MigratoriMarini
             | GruppoEcoHFBI::ResidentiDiEstuario => {
-            biobent += specie.peso as f32 * (specie.specie.gruppo_trofico.microbentivori) +
-                specie.peso as f32 * (specie.specie.gruppo_trofico.macrobentivori)
+                biobent += specie.peso as f32 * (specie.specie.gruppo_trofico.microbentivori)
+                    + specie.peso as f32 * (specie.specie.gruppo_trofico.macrobentivori)
             }
             _ => {}
         }
@@ -38,7 +38,7 @@ pub(crate) fn calc_bbent(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHF
 
     let area = anagrafica.lunghezza_media_transetto * anagrafica.larghezza_media_transetto;
 
-    ((biobent / area) * 100.0 +1.0).ln()
+    ((biobent / area) * 100.0 + 1.0).ln()
 }
 
 #[cfg(test)]
@@ -77,7 +77,7 @@ mod bbent_private_tests {
         gruppo_eco: GruppoEcoHFBI,
         microb: f32,
         macrob: f32,
-        peso: u32,
+        peso: f32,
     ) -> RecordHFBI {
         RecordHFBI {
             specie: SpecieHFBI {
@@ -103,13 +103,16 @@ mod bbent_private_tests {
     #[test]
     fn test_calc_bbent_empty_campionamento() {
         let anagrafica = create_test_anagrafica(100.0, 5.0);
-        let campione = CampionamentoHFBI { campionamento: vec![] };
+        let campione = CampionamentoHFBI {
+            campionamento: vec![],
+        };
         let result = calc_bbent(&campione, &anagrafica);
         let expected = 0.0;
         assert!(
             (result - expected).abs() < EPSILON,
             "Failed empty campionamento test. Expected: {}, Got: {}",
-            expected, result
+            expected,
+            result
         );
     }
 
@@ -117,14 +120,20 @@ mod bbent_private_tests {
     fn test_calc_bbent_with_irrelevant_species() {
         let anagrafica = create_test_anagrafica(100.0, 5.0);
         let campione = CampionamentoHFBI {
-            campionamento: vec![create_specie_record(GruppoEcoHFBI::OccasionaliMarini, 0.5, 0.5, 100)],
+            campionamento: vec![create_specie_record(
+                GruppoEcoHFBI::OccasionaliMarini,
+                0.5,
+                0.5,
+                100.0,
+            )],
         };
         let result = calc_bbent(&campione, &anagrafica);
         let expected = 0.0;
         assert!(
             (result - expected).abs() < EPSILON,
             "Failed irrelevant species test. Expected: {}, Got: {}",
-            expected, result
+            expected,
+            result
         );
     }
 
@@ -132,14 +141,20 @@ mod bbent_private_tests {
     fn test_calc_bbent_with_single_relevant_specie() {
         let anagrafica = create_test_anagrafica(100.0, 5.0);
         let campione = CampionamentoHFBI {
-            campionamento: vec![create_specie_record(GruppoEcoHFBI::ResidentiDiEstuario, 0.4, 0.6, 200)],
+            campionamento: vec![create_specie_record(
+                GruppoEcoHFBI::ResidentiDiEstuario,
+                0.4,
+                0.6,
+                200.0,
+            )],
         };
         let result = calc_bbent(&campione, &anagrafica);
         let expected = 41.0_f32.ln();
         assert!(
             (result - expected).abs() < EPSILON,
             "Failed single relevant specie test. Expected: {}, Got: {}",
-            expected, result
+            expected,
+            result
         );
     }
 
@@ -148,10 +163,10 @@ mod bbent_private_tests {
         let anagrafica = create_test_anagrafica(80.0, 5.0);
         let campione = CampionamentoHFBI {
             campionamento: vec![
-                create_specie_record(GruppoEcoHFBI::ResidentiDiEstuario, 0.5, 0.5, 150),
-                create_specie_record(GruppoEcoHFBI::MigratoriMarini, 0.2, 0.3, 100),
-                create_specie_record(GruppoEcoHFBI::OccasionaliDiAcqueDolci, 1.0, 0.0, 500),
-                create_specie_record(GruppoEcoHFBI::Diadromi, 0.8, 0.2, 200),
+                create_specie_record(GruppoEcoHFBI::ResidentiDiEstuario, 0.5, 0.5, 150.0),
+                create_specie_record(GruppoEcoHFBI::MigratoriMarini, 0.2, 0.3, 100.0),
+                create_specie_record(GruppoEcoHFBI::OccasionaliDiAcqueDolci, 1.0, 0.0, 500.0),
+                create_specie_record(GruppoEcoHFBI::Diadromi, 0.8, 0.2, 200.0),
             ],
         };
         let result = calc_bbent(&campione, &anagrafica);
@@ -159,7 +174,8 @@ mod bbent_private_tests {
         assert!(
             (result - expected).abs() < EPSILON,
             "Failed mixed species test. Expected: {}, Got: {}",
-            expected, result
+            expected,
+            result
         );
     }
 
@@ -167,7 +183,12 @@ mod bbent_private_tests {
     fn test_calc_bbent_division_by_zero_area() {
         let anagrafica = create_test_anagrafica(100.0, 0.0);
         let campione = CampionamentoHFBI {
-            campionamento: vec![create_specie_record(GruppoEcoHFBI::ResidentiDiEstuario, 1.0, 0.0, 100)],
+            campionamento: vec![create_specie_record(
+                GruppoEcoHFBI::ResidentiDiEstuario,
+                1.0,
+                0.0,
+                100.0,
+            )],
         };
         let result = calc_bbent(&campione, &anagrafica);
         assert!(
@@ -179,13 +200,16 @@ mod bbent_private_tests {
     #[test]
     fn test_calc_bbent_division_by_zero_area_and_zero_biobent() {
         let anagrafica = create_test_anagrafica(0.0, 10.0);
-        let campione = CampionamentoHFBI { campionamento: vec![] };
+        let campione = CampionamentoHFBI {
+            campionamento: vec![],
+        };
         let result = calc_bbent(&campione, &anagrafica);
         let expected = 0.0;
         assert!(
             (result - expected).abs() < EPSILON,
             "Failed zero area and zero biobent test. Expected: {}, Got: {}",
-            expected, result
+            expected,
+            result
         );
     }
 }

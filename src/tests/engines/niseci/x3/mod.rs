@@ -15,131 +15,141 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::{engines::niseci::x3::calculate_x3, domain::niseci::RecordNISECI, tests::test_utils::{create_massive_campionamento_ciacci_2, create_massive_campionamento_ciacci_con_bronzi_strutt, create_massive_campionamento_ciacci_con_tappi_destrutt, create_massive_campionamento_ciacci_con_tappi_mediam_strutt, create_massive_campionamento_ciacci_con_tappi_strutt, create_massive_campionamento_ciacci_con_trocchi_strutt, create_massive_campionamento_ciacci_solo_autoctoni_1, get_ciaccio}};
-
+use crate::{
+    domain::niseci::RecordNISECI,
+    engines::niseci::x3::calculate_x3,
+    tests::test_utils::{
+        create_massive_campionamento_ciacci_2,
+        create_massive_campionamento_ciacci_con_bronzi_strutt,
+        create_massive_campionamento_ciacci_con_tappi_destrutt,
+        create_massive_campionamento_ciacci_con_tappi_mediam_strutt,
+        create_massive_campionamento_ciacci_con_tappi_strutt,
+        create_massive_campionamento_ciacci_con_trocchi_strutt,
+        create_massive_campionamento_ciacci_solo_autoctoni_1, get_ciaccio,
+    },
+};
 
 #[test]
 fn calculate_x3_assenza_specie_aliene() {
-  let c = create_massive_campionamento_ciacci_solo_autoctoni_1();
-  let x3 = calculate_x3(&c);
+    let c = create_massive_campionamento_ciacci_solo_autoctoni_1();
+    let x3 = calculate_x3(&c);
 
-  assert!(x3.is_ok());
-  let (x3, _criteri_x3) = x3.unwrap();
-  assert_eq!(x3, 1.0);
+    assert!(x3.is_ok());
+    let (x3, _criteri_x3) = x3.unwrap();
+    assert_eq!(x3, 1.0);
 }
 
 #[test]
 fn calculate_x3_un_trocchio() {
-  let c = create_massive_campionamento_ciacci_2();
-  let x3 = calculate_x3(&c);
+    let c = create_massive_campionamento_ciacci_2();
+    let x3 = calculate_x3(&c);
 
-  assert!(x3.is_ok());
-  let (x3, _criteri_x3) = x3.unwrap();
-  assert_eq!(x3, 0.75);
+    assert!(x3.is_ok());
+    let (x3, _criteri_x3) = x3.unwrap();
+    assert_eq!(x3, 0.75);
 }
 
 #[test]
 fn calculate_x3_alieni_magg_uguale_autoctoni() {
-  let c = create_massive_campionamento_ciacci_con_trocchi_strutt();
-  let x3 = calculate_x3(&c);
+    let c = create_massive_campionamento_ciacci_con_trocchi_strutt();
+    let x3 = calculate_x3(&c);
 
-  assert!(x3.is_ok());
-  let (x3, _criteri_x3) = x3.unwrap();
-  assert_eq!(x3, 0.0);
+    assert!(x3.is_ok());
+    let (x3, _criteri_x3) = x3.unwrap();
+    assert_eq!(x3, 0.0);
 }
 
 #[test]
 fn calculate_x3_alieni_tipo_1_strutt() {
-  let mut c = create_massive_campionamento_ciacci_con_trocchi_strutt();
+    let mut c = create_massive_campionamento_ciacci_con_trocchi_strutt();
 
     let ciaccio = RecordNISECI {
-      specie: get_ciaccio(),
-      passaggio_cattura: 2,
-      lunghezza: 2,
-      peso: 2
+        specie: get_ciaccio(),
+        passaggio_cattura: 2,
+        lunghezza: 2,
+        peso: 2,
     };
     c.campionamento.push(ciaccio);
 
-  let x3 = calculate_x3(&c);
+    let x3 = calculate_x3(&c);
 
-  assert!(x3.is_ok());
-  let (x3, _criteri_x3) = x3.unwrap();
-  assert_eq!(x3, 0.0);
+    assert!(x3.is_ok());
+    let (x3, _criteri_x3) = x3.unwrap();
+    assert_eq!(x3, 0.0);
 }
 
 #[test]
 fn calculate_x3_alieni_tipo_2_strutt() {
-  let mut c = create_massive_campionamento_ciacci_con_bronzi_strutt();
+    let mut c = create_massive_campionamento_ciacci_con_bronzi_strutt();
 
     let ciaccio = RecordNISECI {
-      specie: get_ciaccio(),
-      passaggio_cattura: 2,
-      lunghezza: 2,
-      peso: 2
+        specie: get_ciaccio(),
+        passaggio_cattura: 2,
+        lunghezza: 2,
+        peso: 2,
     };
     c.campionamento.push(ciaccio);
 
-  let x3 = calculate_x3(&c);
+    let x3 = calculate_x3(&c);
 
-  assert!(x3.is_ok());
-  let (x3, _criteri_x3) = x3.unwrap();
-  assert_eq!(x3, 0.25);
+    assert!(x3.is_ok());
+    let (x3, _criteri_x3) = x3.unwrap();
+    assert_eq!(x3, 0.25);
 }
-
 
 #[test]
 fn calculate_x3_alieni_tipo_3_strutt() {
-  let mut c = create_massive_campionamento_ciacci_con_tappi_strutt();
+    let mut c = create_massive_campionamento_ciacci_con_tappi_strutt();
 
-  let ciaccio = RecordNISECI {
-    specie: get_ciaccio(),
-    passaggio_cattura: 2,
-    lunghezza: 2,
-    peso: 2
-  };
-  c.campionamento.push(ciaccio);
+    let ciaccio = RecordNISECI {
+        specie: get_ciaccio(),
+        passaggio_cattura: 2,
+        lunghezza: 2,
+        peso: 2,
+    };
+    c.campionamento.push(ciaccio);
 
-  let x3 = calculate_x3(&c);
+    let x3 = calculate_x3(&c);
 
-  assert!(x3.is_ok());
-  let (x3, _criteri_x3) = x3.unwrap();
-  assert_eq!(x3, 0.375);
+    assert!(x3.is_ok());
+    let (x3, _criteri_x3) = x3.unwrap();
+    assert_eq!(x3, 0.375);
 }
 
 #[test]
 fn calculate_x3_alieni_tipo_3_destrutt() {
-  let mut c = create_massive_campionamento_ciacci_con_tappi_destrutt();
+    let mut c = create_massive_campionamento_ciacci_con_tappi_destrutt();
 
-  let ciaccio = RecordNISECI {
-    specie: get_ciaccio(),
-    passaggio_cattura: 2,
-    lunghezza: 2,
-    peso: 2
-  };
-  c.campionamento.push(ciaccio);
+    let ciaccio = RecordNISECI {
+        specie: get_ciaccio(),
+        passaggio_cattura: 2,
+        lunghezza: 2,
+        peso: 2,
+    };
+    c.campionamento.push(ciaccio);
 
-  let x3 = calculate_x3(&c);
+    let x3 = calculate_x3(&c);
 
-  assert!(x3.is_ok());
-  let (x3, _criteri_x3) = x3.unwrap();
-  assert_eq!(x3, 0.875);
+    assert!(x3.is_ok());
+    let (x3, _criteri_x3) = x3.unwrap();
+    assert_eq!(x3, 0.875);
 }
 
 #[test]
 fn calculate_x3_alieni_tipo_3_mediam_strutt() {
-  let mut c = create_massive_campionamento_ciacci_con_tappi_mediam_strutt();
+    let mut c = create_massive_campionamento_ciacci_con_tappi_mediam_strutt();
 
-  let ciaccio = RecordNISECI {
-    specie: get_ciaccio(),
-    passaggio_cattura: 2,
-    lunghezza: 2,
-    peso: 2
-  };
-  c.campionamento.push(ciaccio);
+    let ciaccio = RecordNISECI {
+        specie: get_ciaccio(),
+        passaggio_cattura: 2,
+        lunghezza: 2,
+        peso: 2,
+    };
+    c.campionamento.push(ciaccio);
 
-  let x3 = calculate_x3(&c);
+    let x3 = calculate_x3(&c);
 
-  assert!(x3.is_ok());
-  let (x3, _criteri_x3) = x3.unwrap();
-  assert_eq!(x3, 0.625);
+    assert!(x3.is_ok());
+    let (x3, _criteri_x3) = x3.unwrap();
+    assert_eq!(x3, 0.625);
 }
