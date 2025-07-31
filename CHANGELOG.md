@@ -1,3 +1,9 @@
+## [0.2.22] - 2025-07-31
+
+### Changed
+
+- `OutputController` now logs intermediates in `calc_hfbi()`
+
 ## [0.0.21] - 2025-07-29
 
 ### Changed

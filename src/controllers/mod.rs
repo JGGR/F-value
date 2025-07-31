@@ -1498,6 +1498,39 @@ impl OutputController {
                 Ok((hfbi, intermediates)) => {
                     self.add_console_message(format!("HFBI: {hfbi}"));
                     self.add_console_message(format!("intermediates: {intermediates}"));
+
+                    //TODO: format intermediates properly
+                    #[cfg(feature = "logged")]
+                    {
+                        let log_file_path;
+                        if let Some(documents_dir) = document_dir() {
+                            log_file_path =
+                                documents_dir.join("esox").join("log_intermediates.csv");
+                        } else {
+                            log_file_path = PathBuf::from("./esox/log_intermediates.csv");
+                        }
+
+                        let file_result = OpenOptions::new()
+                            .write(true)
+                            .truncate(true)
+                            .create(true)
+                            .open(log_file_path);
+
+                        match file_result {
+                            Ok(mut file) => {
+                                let string_representation = format!("bbent, bn, dbent, ddom, dhzp, dmig\n{}, {}, {}, {}, {}, {}", intermediates.bbent, intermediates.bn, intermediates.dbent, intermediates.ddom, intermediates.dhzp, intermediates.dmig);
+                                let write_result =
+                                    writeln!(file, "{}", format!("{string_representation}"));
+                                match write_result {
+                                    Ok(_) => println!("Successfully wrote to file."),
+                                    Err(e) => eprintln!("Failed to write to file: {}", e),
+                                }
+                            }
+                            Err(e) => {
+                                eprintln!("Failed to open file: {}", e);
+                            }
+                        }
+                    }
                     let risultato_hfbi = RisultatoHFBI::new(Some(hfbi), intermediates);
 
                     self.set_data_risultato_hfbi(risultato_hfbi);
