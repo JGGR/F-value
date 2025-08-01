@@ -1,3 +1,9 @@
+## [0.2.23] - Unreleased
+
+### Changed
+
+- Fixed `engine::hfbi::bn::calc_bn()`
+
 ## [0.2.22] - 2025-07-31
 
 ### Changed

@@ -22,7 +22,7 @@ pub(crate) fn calc_bn(campione: &CampionamentoHFBI) -> f32 {
     let mut n = 0.0;
     for specie in &campione.campionamento {
         b += specie.peso as f32;
-        n += 1.0;
+        n += specie.numero_individui as f32;
     }
     ((b / n) + 1.0).ln()
 }
