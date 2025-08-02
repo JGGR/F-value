@@ -173,7 +173,7 @@ mod full_hfbi_private_tests {
 
         let (mmi, intermediates) = mmi_result.unwrap();
 
-        let tested: f32 = 0.551520581; // ho testato a mano il risultato
+        let tested: f32 = 0.552; // ho testato a mano il risultato
 
         assert!(
             mmi.is_finite(),

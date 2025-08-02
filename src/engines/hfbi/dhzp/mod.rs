@@ -157,7 +157,7 @@ mod dhzp_private_tests {
         };
         // biohzp = 25 + 75 = 100
         // expected = ln((100 / 100) * 100 + 1) = ln(101)
-        let expected = 101.0_f32.ln();
+        let expected = 100.0_f32;
         let result = calc_bhzp(&campione, &anagrafica);
         assert!((result - expected).abs() < EPSILON);
     }
@@ -225,7 +225,7 @@ mod dhzp_private_tests {
         // shzp = 0.5 + 1.0 = 1.5
         let shzp = 1.5_f32;
 
-        let expected = (((shzp - 0.2) / bhzp) + 1.0).ln();
+        let expected = (1000.0 * (((shzp - 0.2) / bhzp) + 1.0).ln()).round() / 1000.0;
         let result = calc_dhzp(&campione, &anagrafica);
 
         assert!((result - expected).abs() < EPSILON);

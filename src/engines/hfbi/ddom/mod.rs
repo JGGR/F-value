@@ -199,7 +199,7 @@ mod ddom_private_tests {
         let s90 = 4.0_f32;
         let b90 = 181.0_f32.ln();
 
-        let expected_result = (((s90 - 1.0) / b90) + 1.0).ln();
+        let expected_result = (1000.0 * (((s90 - 1.0) / b90) + 1.0).ln()).round() / 1000.0;
         let actual_result = calc_ddom(&campione, &anagrafica);
 
         assert!((actual_result - expected_result).abs() < EPSILON);

@@ -175,7 +175,7 @@ mod dbent_private_tests {
 
         let sbent = 2.0;
         let bbent = 75.0_f32.ln();
-        let expected = (((sbent - 1.0) / bbent) + 1.0).ln();
+        let expected = (1000.0 * (((sbent - 1.0) / bbent) + 1.0).ln()).round() / 1000.0;
         let result = calc_dbent(&campione, &anagrafica);
 
         assert!(

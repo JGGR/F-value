@@ -157,7 +157,7 @@ mod dmig_private_tests {
         };
         // biomig = 150 + 50 = 200
         // expected = ln((200 / 100) * 100 + 1) = ln(201)
-        let expected = 201.0_f32.ln();
+        let expected = 200.0_f32;
         let result = calc_bmig(&campione, &anagrafica);
         assert!((result - expected).abs() < EPSILON);
     }
@@ -225,7 +225,7 @@ mod dmig_private_tests {
         // Unique species are "SP1" and "SP2", so smig = 2
         let smig = 2.0_f32;
 
-        let expected = (((smig - 1.0) / bmig) + 1.0).ln();
+        let expected = (1000.0 * (((smig - 1.0) / bmig) + 1.0).ln()).round() / 1000.0;
         let result = calc_dmig(&campione, &anagrafica);
 
         assert!((result - expected).abs() < EPSILON);

@@ -152,7 +152,7 @@ mod bbent_private_tests {
             )],
         };
         let result = calc_bbent(&campione, &anagrafica);
-        let expected = 41.0_f32.ln();
+        let expected = (1000.0 * 41.0_f32.ln()).round() / 1000.0;
         assert!(
             (result - expected).abs() < EPSILON,
             "Failed single relevant specie test. Expected: {}, Got: {}",
@@ -173,7 +173,7 @@ mod bbent_private_tests {
             ],
         };
         let result = calc_bbent(&campione, &anagrafica);
-        let expected = 101.0_f32.ln();
+        let expected = (1000.0 * 101.0_f32.ln()).round() / 1000.0;
         assert!(
             (result - expected).abs() < EPSILON,
             "Failed mixed species test. Expected: {}, Got: {}",

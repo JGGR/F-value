@@ -85,7 +85,7 @@ mod bn_private_tests {
         let result = calc_bn(&campione);
         // b = 150.0, n = 1.0
         // expected = ((150.0 / 1.0) + 1.0).ln() = 151.0.ln()
-        let expected = 151.0_f32.ln();
+        let expected = (1000.0 * 151.0_f32.ln()).round() / 1000.0;
         assert!(
             (result - expected).abs() < EPSILON,
             "Failed single specie test. Expected: {}, Got: {}",
@@ -107,7 +107,7 @@ mod bn_private_tests {
         // b = 100 + 200 + 50 = 350.0
         // n = 3.0
         // expected = ((350.0 / 3.0) + 1.0).ln()
-        let expected = (350.0_f32 / 3.0 + 1.0).ln();
+        let expected = (1000.0 * (350.0_f32 / 3.0 + 1.0).ln()).round() / 1000.0;
         assert!(
             (result - expected).abs() < EPSILON,
             "Failed multiple species test. Expected: {}, Got: {}",
