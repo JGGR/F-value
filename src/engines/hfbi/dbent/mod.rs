@@ -17,19 +17,24 @@
 
 use crate::{
     domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI, GruppoEcoHFBI},
-    engines::hfbi::bbent::calc_bbent,
 };
 
 pub(crate) fn calc_dbent(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
     let mut sbent = 0.0;
-    let bbent = calc_bbent(&campione, &anagrafica);
+    let mut densita_biomassa;
+    let mut specie_sbent;
+    let mut bbent = 0.0;
+    let area = anagrafica.larghezza_media_transetto * anagrafica.lunghezza_media_transetto;
     for specie in &campione.campionamento {
         match specie.specie.gruppo_eco {
             GruppoEcoHFBI::Diadromi
             | GruppoEcoHFBI::MigratoriMarini
             | GruppoEcoHFBI::ResidentiDiEstuario => {
-                sbent += specie.specie.gruppo_trofico.microbentivori;
-                sbent += specie.specie.gruppo_trofico.macrobentivori;
+                specie_sbent = specie.specie.gruppo_trofico.microbentivori;
+                specie_sbent += specie.specie.gruppo_trofico.macrobentivori;
+                densita_biomassa = (specie.peso / area) * 100.0;
+                bbent += densita_biomassa * specie_sbent;
+                sbent += specie_sbent;
             }
             _ => {}
         }
@@ -44,7 +49,7 @@ pub(crate) fn calc_dbent(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHF
         return 0.01;
     }
 
-    (((sbent - 0.2) / bbent) + 1.0).ln()
+    (((sbent - 1.0) / bbent.ln()) + 1.0).ln()
 }
 
 #[cfg(test)]
@@ -167,8 +172,8 @@ mod dbent_private_tests {
         };
 
         let sbent = 2.0;
-        let bbent = 76.0_f32.ln();
-        let expected = (((sbent - 0.2) / bbent) + 1.0).ln();
+        let bbent = 75.0_f32.ln();
+        let expected = (((sbent - 1.0) / bbent) + 1.0).ln();
         let result = calc_dbent(&campione, &anagrafica);
 
         assert!(
