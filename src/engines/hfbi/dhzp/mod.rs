@@ -40,7 +40,9 @@ pub(crate) fn calc_dhzp(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFB
         return 0.01;
     }
 
-    (((shzp - 0.2) / bhzp.ln()) + 1.0).ln()
+    let dhzp = (((shzp - 0.2) / bhzp.ln()) + 1.0).ln();
+    let rounded_dhzp = (1000.0 * dhzp).round() / 1000.0;
+    rounded_dhzp
 }
 
 fn calc_bhzp(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {

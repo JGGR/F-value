@@ -20,7 +20,9 @@ use crate::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI};
 pub(crate) fn calc_ddom(campionamento: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
     let (s90, b90): (u32, f32) = calc_s90_b90(campionamento, anagrafica);
 
-    (((s90 as f32 - 1.0) / b90) + 1.0).ln()
+    let ddom = (((s90 as f32 - 1.0) / b90) + 1.0).ln();
+    let rounded_ddom = (1000.0 * ddom).round() / 1000.0;
+    rounded_ddom
 }
 
 fn calc_s90_b90(campionamento: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> (u32, f32) {

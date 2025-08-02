@@ -46,10 +46,9 @@ pub(crate) fn calc_dmig(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFB
         return 0.01;
     }
 
-    println!("smig: {smig}");
-    println!("bmig: {bmig}");
-
-    (((smig as f32 - 1.0) / bmig.ln()) + 1.0).ln()
+    let dmig = (((smig as f32 - 1.0) / bmig.ln()) + 1.0).ln();
+    let rounded_dmig = (1000.0 * dmig).round() / 1000.0;
+    rounded_dmig
 }
 
 fn calc_bmig(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {

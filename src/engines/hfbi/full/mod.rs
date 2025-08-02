@@ -57,6 +57,7 @@ pub(crate) fn calculate_mmi(
     let weight_sum = W_DDOM + W_BN + W_DMIG + W_BBENT + W_DBENT + W_DHZP;
 
     let mmi = weighted_rqe_sum / weight_sum;
+    let rounded_mmi = (1000.0 * mmi).round() / 1000.0;
 
     let intermediates = ValoriIntermediHFBI {
         bbent,
@@ -66,7 +67,7 @@ pub(crate) fn calculate_mmi(
         dhzp,
         dmig,
     };
-    Ok((mmi, intermediates))
+    Ok((rounded_mmi, intermediates))
 }
 
 pub(crate) fn calculate_hfbi(
@@ -75,6 +76,7 @@ pub(crate) fn calculate_hfbi(
 ) -> Result<(f32, ValoriIntermediHFBI), String> {
     match calculate_mmi(campionamento, anagrafica) {
         Ok((mmi, intermediates)) => {
+            println!("mmi: {mmi}");
             let hfbi = (mmi + HFBI_T) / HFBI_S;
             let rounded_hfbi = (1000.0 * hfbi).round() / 1000.0;
             Ok((rounded_hfbi, intermediates))

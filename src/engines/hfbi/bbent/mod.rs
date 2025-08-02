@@ -38,7 +38,10 @@ pub(crate) fn calc_bbent(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHF
 
     let area = anagrafica.lunghezza_media_transetto * anagrafica.larghezza_media_transetto;
 
-    ((biobent / area) * 100.0 + 1.0).ln()
+    let bbent = ((biobent / area) * 100.0 + 1.0).ln();
+
+    let rounded_bbent = (1000.0 * bbent).round() / 1000.0;
+    rounded_bbent
 }
 
 #[cfg(test)]

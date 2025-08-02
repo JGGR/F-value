@@ -49,7 +49,9 @@ pub(crate) fn calc_dbent(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHF
         return 0.01;
     }
 
-    (((sbent - 1.0) / bbent.ln()) + 1.0).ln()
+    let dbent = (((sbent - 1.0) / bbent.ln()) + 1.0).ln();
+    let rounded_dbent = (1000.0 * dbent).round() / 1000.0;
+    rounded_dbent
 }
 
 #[cfg(test)]

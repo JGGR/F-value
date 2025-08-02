@@ -24,7 +24,9 @@ pub(crate) fn calc_bn(campione: &CampionamentoHFBI) -> f32 {
         b += specie.peso as f32;
         n += specie.numero_individui as f32;
     }
-    ((b / n) + 1.0).ln()
+    let bn = ((b / n) + 1.0).ln();
+    let rounded_bn = (1000.0 * bn).round() / 1000.0;
+    rounded_bn
 }
 
 #[cfg(test)]
