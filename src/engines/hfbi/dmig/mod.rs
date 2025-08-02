@@ -46,7 +46,10 @@ pub(crate) fn calc_dmig(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFB
         return 0.01;
     }
 
-    (((smig as f32 - 1.0) / bmig) + 1.0).ln()
+    println!("smig: {smig}");
+    println!("bmig: {bmig}");
+
+    (((smig as f32 - 1.0) / bmig.ln()) + 1.0).ln()
 }
 
 fn calc_bmig(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
@@ -62,7 +65,7 @@ fn calc_bmig(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
 
     let area = anagrafica.lunghezza_media_transetto * anagrafica.larghezza_media_transetto;
 
-    ((biomig / area) * 100.0 + 1.0).ln()
+    (biomig / area) * 100.0
 }
 
 #[cfg(test)]
