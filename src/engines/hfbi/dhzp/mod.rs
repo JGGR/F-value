@@ -40,7 +40,7 @@ pub(crate) fn calc_dhzp(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFB
         return 0.01;
     }
 
-    (((shzp - 0.2) / bhzp) + 1.0).ln()
+    (((shzp - 0.2) / bhzp.ln()) + 1.0).ln()
 }
 
 fn calc_bhzp(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
@@ -58,7 +58,7 @@ fn calc_bhzp(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
 
     let area = anagrafica.lunghezza_media_transetto * anagrafica.larghezza_media_transetto;
 
-    ((biohzp / area) * 100.0 + 1.0).ln()
+    (biohzp / area) * 100.0
 }
 
 #[cfg(test)]
