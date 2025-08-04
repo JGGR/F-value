@@ -46,7 +46,9 @@ pub(crate) fn calc_dmig(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFB
         return 0.01;
     }
 
-    (((smig as f32 - 1.0) / bmig) + 1.0).ln()
+    let dmig = (((smig as f32 - 1.0) / bmig.ln()) + 1.0).ln();
+    let rounded_dmig = (1000.0 * dmig).round() / 1000.0;
+    rounded_dmig
 }
 
 fn calc_bmig(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
@@ -62,7 +64,7 @@ fn calc_bmig(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
 
     let area = anagrafica.lunghezza_media_transetto * anagrafica.larghezza_media_transetto;
 
-    ((biomig / area) * 100.0 + 1.0).ln()
+    (biomig / area) * 100.0
 }
 
 #[cfg(test)]
@@ -155,7 +157,7 @@ mod dmig_private_tests {
         };
         // biomig = 150 + 50 = 200
         // expected = ln((200 / 100) * 100 + 1) = ln(201)
-        let expected = 201.0_f32.ln();
+        let expected = 200.0_f32;
         let result = calc_bmig(&campione, &anagrafica);
         assert!((result - expected).abs() < EPSILON);
     }
@@ -223,7 +225,7 @@ mod dmig_private_tests {
         // Unique species are "SP1" and "SP2", so smig = 2
         let smig = 2.0_f32;
 
-        let expected = (((smig - 1.0) / bmig) + 1.0).ln();
+        let expected = (1000.0 * (((smig - 1.0) / bmig) + 1.0).ln()).round() / 1000.0;
         let result = calc_dmig(&campione, &anagrafica);
 
         assert!((result - expected).abs() < EPSILON);

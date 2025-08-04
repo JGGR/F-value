@@ -40,7 +40,9 @@ pub(crate) fn calc_dhzp(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFB
         return 0.01;
     }
 
-    (((shzp - 0.2) / bhzp) + 1.0).ln()
+    let dhzp = (((shzp - 0.2) / bhzp.ln()) + 1.0).ln();
+    let rounded_dhzp = (1000.0 * dhzp).round() / 1000.0;
+    rounded_dhzp
 }
 
 fn calc_bhzp(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
@@ -58,7 +60,7 @@ fn calc_bhzp(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
 
     let area = anagrafica.lunghezza_media_transetto * anagrafica.larghezza_media_transetto;
 
-    ((biohzp / area) * 100.0 + 1.0).ln()
+    (biohzp / area) * 100.0
 }
 
 #[cfg(test)]
@@ -155,7 +157,7 @@ mod dhzp_private_tests {
         };
         // biohzp = 25 + 75 = 100
         // expected = ln((100 / 100) * 100 + 1) = ln(101)
-        let expected = 101.0_f32.ln();
+        let expected = 100.0_f32;
         let result = calc_bhzp(&campione, &anagrafica);
         assert!((result - expected).abs() < EPSILON);
     }
@@ -223,7 +225,7 @@ mod dhzp_private_tests {
         // shzp = 0.5 + 1.0 = 1.5
         let shzp = 1.5_f32;
 
-        let expected = (((shzp - 0.2) / bhzp) + 1.0).ln();
+        let expected = (1000.0 * (((shzp - 0.2) / bhzp) + 1.0).ln()).round() / 1000.0;
         let result = calc_dhzp(&campione, &anagrafica);
 
         assert!((result - expected).abs() < EPSILON);

@@ -38,7 +38,10 @@ pub(crate) fn calc_bbent(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHF
 
     let area = anagrafica.lunghezza_media_transetto * anagrafica.larghezza_media_transetto;
 
-    ((biobent / area) * 100.0 + 1.0).ln()
+    let bbent = ((biobent / area) * 100.0 + 1.0).ln();
+
+    let rounded_bbent = (1000.0 * bbent).round() / 1000.0;
+    rounded_bbent
 }
 
 #[cfg(test)]
@@ -149,7 +152,7 @@ mod bbent_private_tests {
             )],
         };
         let result = calc_bbent(&campione, &anagrafica);
-        let expected = 41.0_f32.ln();
+        let expected = (1000.0 * 41.0_f32.ln()).round() / 1000.0;
         assert!(
             (result - expected).abs() < EPSILON,
             "Failed single relevant specie test. Expected: {}, Got: {}",
@@ -170,7 +173,7 @@ mod bbent_private_tests {
             ],
         };
         let result = calc_bbent(&campione, &anagrafica);
-        let expected = 101.0_f32.ln();
+        let expected = (1000.0 * 101.0_f32.ln()).round() / 1000.0;
         assert!(
             (result - expected).abs() < EPSILON,
             "Failed mixed species test. Expected: {}, Got: {}",

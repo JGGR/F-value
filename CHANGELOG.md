@@ -1,3 +1,14 @@
+## [0.2.23] - 2025-08-04
+
+### Changed
+
+- Fixed `engine::hfbi::bn::calc_bn()`
+- Fixed `engines::hfbi::dbent::calc_dbent()`
+- Fixed `engines::hfbi::dhzp::calc_dhzp()`
+- Fixed `engines::hfbi::dmig::calc_dmig()`
+- Round hbfi submetrics to 3 decimal digits
+- Update tests for fixed metrics
+
 ## [0.2.22] - 2025-07-31
 
 ### Changed
