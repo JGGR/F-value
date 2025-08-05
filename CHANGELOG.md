@@ -1,4 +1,14 @@
-## [0.2.23] - 2025-08-04
+## [0.0.24] - Unreleased
+
+### Added
+
+- Log final values for `HFBI`
+
+### Changed
+
+- Move `mmi` into `ValoriIntermediHFBI`
+
+## [0.0.23] - 2025-08-04
 
 ### Changed
 
@@ -9,7 +19,7 @@
 - Round hbfi submetrics to 3 decimal digits
 - Update tests for fixed metrics
 
-## [0.2.22] - 2025-07-31
+## [0.0.22] - 2025-07-31
 
 ### Changed
 

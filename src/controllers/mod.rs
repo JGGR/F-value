@@ -1499,6 +1499,19 @@ impl OutputController {
                     self.add_console_message(format!("HFBI: {hfbi}"));
                     self.add_console_message(format!("intermediates: {intermediates}"));
 
+                    #[cfg(feature = "logged")]
+                    {
+                        info!("Codice stazione, stagione, habitat vegetato, tipo laguna, MMI, HFBI\n{}",
+                            format!("{}, {}, {}, {}, {}, {}",
+                            anagrafica.codice_stazione,
+                            anagrafica.stagione,
+                            anagrafica.habitat_vegetato,
+                            anagrafica.tipo_laguna,
+                            intermediates.mmi,
+                            hfbi
+                        ));
+                    }
+
                     //TODO: format intermediates properly
                     #[cfg(feature = "logged")]
                     {
