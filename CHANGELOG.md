@@ -1,4 +1,17 @@
-## [0.2.23] - 2025-08-04
+## [0.0.24] - 2025-08-06
+
+### Added
+
+- Log final values for `HFBI`
+- Proper hint for `HFBI` console envs
+- Print hfbi intermediates to stdout when needed
+
+### Changed
+
+- Move `mmi` into `ValoriIntermediHFBI`
+- Avoid pdf export in cli usage when not given an export path
+
+## [0.0.23] - 2025-08-04
 
 ### Changed
 
@@ -9,7 +22,7 @@
 - Round hbfi submetrics to 3 decimal digits
 - Update tests for fixed metrics
 
-## [0.2.22] - 2025-07-31
+## [0.0.22] - 2025-07-31
 
 ### Changed
 

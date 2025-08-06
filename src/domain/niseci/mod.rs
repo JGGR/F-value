@@ -527,7 +527,7 @@ impl fmt::Display for ValoriIntermediNISECI {
         for (_k, v) in self.specie_specifici.iter() {
             string_representation = format!("{}\n{}", string_representation, v);
         }
-        string_representation = format!("{}\n", string_representation);
+        string_representation = format!("{}", string_representation);
         write!(f, "{}", string_representation)
     }
 }

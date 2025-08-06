@@ -67,6 +67,9 @@ impl Console {
         self.set_env(("campionamento_niseci".to_string(), "Vuoto".to_string()));
         self.set_env(("anagrafica_niseci".to_string(), "Vuoto".to_string()));
         self.set_env(("risultato_niseci".to_string(), "Vuoto".to_string()));
+        self.set_env(("campionamento_hfbi".to_string(), "Vuoto".to_string()));
+        self.set_env(("anagrafica_hfbi".to_string(), "Vuoto".to_string()));
+        self.set_env(("risultato_hfbi".to_string(), "Vuoto".to_string()));
     }
 
     pub(crate) fn _get_len(&self) -> usize {

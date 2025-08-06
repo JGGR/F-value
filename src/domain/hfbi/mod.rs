@@ -739,19 +739,29 @@ pub(crate) struct ValoriIntermediHFBI {
     pub(crate) ddom: f32,
     pub(crate) dhzp: f32,
     pub(crate) dmig: f32,
+    pub(crate) mmi: f32,
 }
 
 impl fmt::Display for ValoriIntermediHFBI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut string_representation = format!(
-            "bbent: {}, bn: {}, dbent: {}, ddom: {}, dhzp: {}, dmig: {}",
-            self.bbent, self.bn, self.dbent, self.ddom, self.dhzp, self.dmig
+            "bbent: {}, bn: {}, dbent: {}, ddom: {}, dhzp: {}, dmig: {}, mmi: {}",
+            self.bbent, self.bn, self.dbent, self.ddom, self.dhzp, self.dmig, self.mmi
         );
 
-        string_representation = format!("{}\n", string_representation);
+        string_representation = format!("{}", string_representation);
         write!(f, "{}", string_representation)
     }
 }
+
+impl ValoriIntermediHFBI {
+    pub(crate) fn log(&self) {
+        //TODO: a proper format? we count on the embedded newlines to leverage the
+        //chopping on newlines from add_console_message()
+        println!("Valori intermedi: {{{self}}}");
+    }
+}
+
 
 #[derive(Clone)]
 pub(crate) struct RisultatoHFBI {

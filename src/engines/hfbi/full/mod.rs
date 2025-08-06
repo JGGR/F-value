@@ -23,7 +23,7 @@ const HFBI_S: f32 = 0.150;
 pub(crate) fn calculate_mmi(
     campionamento: &CampionamentoHFBI,
     anagrafica: &AnagraficaHFBI,
-) -> Result<(f32, ValoriIntermediHFBI), String> {
+) -> Result<ValoriIntermediHFBI, String> {
     let condizioni_riferimento = match CondizioniRiferimentoHFBI::get_cond_riferimento(anagrafica) {
         Some(cond) => cond,
         None => return Err(String::from("Errore condizioni di riferimento non trovate")),
@@ -66,8 +66,9 @@ pub(crate) fn calculate_mmi(
         ddom,
         dhzp,
         dmig,
+        mmi: rounded_mmi
     };
-    Ok((rounded_mmi, intermediates))
+    Ok(intermediates)
 }
 
 pub(crate) fn calculate_hfbi(
@@ -75,9 +76,8 @@ pub(crate) fn calculate_hfbi(
     anagrafica: &AnagraficaHFBI,
 ) -> Result<(f32, ValoriIntermediHFBI), String> {
     match calculate_mmi(campionamento, anagrafica) {
-        Ok((mmi, intermediates)) => {
-            println!("mmi: {mmi}");
-            let hfbi = (mmi + HFBI_T) / HFBI_S;
+        Ok(intermediates) => {
+            let hfbi = (intermediates.mmi + HFBI_T) / HFBI_S;
             let rounded_hfbi = (1000.0 * hfbi).round() / 1000.0;
             Ok((rounded_hfbi, intermediates))
         }
@@ -171,19 +171,19 @@ mod full_hfbi_private_tests {
             "calculate_mmi should succeed with non-empty data"
         );
 
-        let (mmi, intermediates) = mmi_result.unwrap();
+        let intermediates = mmi_result.unwrap();
 
         let tested: f32 = 0.552; // ho testato a mano il risultato
 
         assert!(
-            mmi.is_finite(),
+            intermediates.mmi.is_finite(),
             "MMI should be a finite number, but was {}",
-            mmi
+            intermediates.mmi
         );
         assert!(intermediates.bbent.is_finite(), "bbent should be finite");
         assert!(intermediates.bn.is_finite(), "bn should be finite");
         assert!(intermediates.ddom.is_finite(), "ddom should be finite");
-        assert!((mmi - tested).abs() < EPSILON);
+        assert!((intermediates.mmi - tested).abs() < EPSILON);
 
         // Now, we test the final step with the calculated MMI
         let hfbi_result = calculate_hfbi(&campione, &anagrafica);

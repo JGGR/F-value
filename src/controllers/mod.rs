@@ -1497,7 +1497,25 @@ impl OutputController {
             match calculate_hfbi(&campionamento, &anagrafica) {
                 Ok((hfbi, intermediates)) => {
                     self.add_console_message(format!("HFBI: {hfbi}"));
-                    self.add_console_message(format!("intermediates: {intermediates}"));
+
+                    #[cfg(feature = "logged")]
+                    {
+                        info!("Codice stazione, stagione, habitat vegetato, tipo laguna, MMI, HFBI\n{}",
+                            format!("{}, {}, {}, {}, {}, {}",
+                            anagrafica.codice_stazione,
+                            anagrafica.stagione,
+                            anagrafica.habitat_vegetato,
+                            anagrafica.tipo_laguna,
+                            intermediates.mmi,
+                            hfbi
+                        ));
+                    }
+
+                    //This logs to stdout
+                    intermediates.log();
+                    println!("HFBI: {hfbi}");
+
+                    self.add_console_message(format!("{intermediates}"));
 
                     //TODO: format intermediates properly
                     #[cfg(feature = "logged")]
