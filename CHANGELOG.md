@@ -1,12 +1,15 @@
-## [0.0.24] - Unreleased
+## [0.0.24] - 2025-08-06
 
 ### Added
 
 - Log final values for `HFBI`
+- Proper hint for `HFBI` console envs
+- Print hfbi intermediates to stdout when needed
 
 ### Changed
 
 - Move `mmi` into `ValoriIntermediHFBI`
+- Avoid pdf export in cli usage when not given an export path
 
 ## [0.0.23] - 2025-08-04
 

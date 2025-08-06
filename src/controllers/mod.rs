@@ -1497,7 +1497,6 @@ impl OutputController {
             match calculate_hfbi(&campionamento, &anagrafica) {
                 Ok((hfbi, intermediates)) => {
                     self.add_console_message(format!("HFBI: {hfbi}"));
-                    self.add_console_message(format!("intermediates: {intermediates}"));
 
                     #[cfg(feature = "logged")]
                     {
@@ -1511,6 +1510,12 @@ impl OutputController {
                             hfbi
                         ));
                     }
+
+                    //This logs to stdout
+                    intermediates.log();
+                    println!("HFBI: {hfbi}");
+
+                    self.add_console_message(format!("{intermediates}"));
 
                     //TODO: format intermediates properly
                     #[cfg(feature = "logged")]

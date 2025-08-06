@@ -82,6 +82,7 @@ pub(crate) fn run_headless(do_niseci: bool, args: &[String]) -> bool {
     let mut riferimento_path_str = "";
     let mut anagrafica_path_str = "";
     let mut pdf_export_path_str = ".";
+    let mut passed_pdf_export_path = false;
     for arg in &args[1..] {
         arg_i += 1;
         match arg_i {
@@ -102,11 +103,13 @@ pub(crate) fn run_headless(do_niseci: bool, args: &[String]) -> bool {
                 } else {
                     // Doing HFBI so we don't have a riferimento
                     pdf_export_path_str = arg;
+                    passed_pdf_export_path = true;
                 }
             }
             4 => {
                 if do_niseci {
                     pdf_export_path_str = arg;
+                    passed_pdf_export_path = true;
                 } else {
                     eprintln!("Error: Unexpected arg: {arg}");
                     esox_usage();
@@ -422,8 +425,10 @@ pub(crate) fn run_headless(do_niseci: bool, args: &[String]) -> bool {
 
                     let risultato_niseci = RisultatoNISECI::new(niseci, rqe_niseci, intermediates);
 
-                    println!("Esportato pdf in {}", pdf_export_path.display());
-                    esporta_pdf_niseci(pdf_export_path, riferimento, anagrafica, risultato_niseci);
+                    if passed_pdf_export_path {
+                        println!("Esportato pdf in {}", pdf_export_path.display());
+                        esporta_pdf_niseci(pdf_export_path, riferimento, anagrafica, risultato_niseci);
+                    }
                 }
                 Err(_errors) => {
                     /* Assuming they were printed before this point
@@ -593,12 +598,15 @@ pub(crate) fn run_headless(do_niseci: bool, args: &[String]) -> bool {
             };
             match calculate_hfbi(&campionamento, &anagrafica) {
                 Ok((hfbi, intermediates)) => {
+                    intermediates.log();
                     let risultato_hfbi = RisultatoHFBI::new(Some(hfbi), intermediates);
 
                     println!("HFBI: {hfbi}");
 
-                    println!("Esportato pdf in {}", pdf_export_path.display());
-                    esporta_pdf_hfbi(pdf_export_path, anagrafica, risultato_hfbi);
+                    if passed_pdf_export_path {
+                        println!("Esportato pdf in {}", pdf_export_path.display());
+                        esporta_pdf_hfbi(pdf_export_path, anagrafica, risultato_hfbi);
+                    }
                 }
                 Err(_errors) => {
                     /* Assuming they were printed before this point
