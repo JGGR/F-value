@@ -18,9 +18,15 @@
 use crate::app::core::{propheight, propwidth, CurrentView, MainState, CONSOLE_FONT_DATA};
 use crate::app::model::SubModel;
 use crate::controllers::{
-    ConsoleController, Controller, Controllers, FileInputController, HomeController,
-    IndiceController, InfoAggiuntiveController, OutputController, SecondController,
+    Controller, Controllers,
+    SecondController,
 };
+use crate::controllers::home::HomeController;
+use crate::controllers::indice::IndiceController;
+use crate::controllers::file_input::FileInputController;
+use crate::controllers::info_aggiuntive::InfoAggiuntiveController;
+use crate::controllers::output::OutputController;
+use crate::controllers::console::ConsoleController;
 use crate::core::rrect;
 use crate::core::SHORT_PROJECT_VERSION;
 use crate::domain::{
