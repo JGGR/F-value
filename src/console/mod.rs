@@ -16,7 +16,7 @@
 */
 
 use crate::app::core::{propheight, propwidth};
-use crate::controllers::ConsoleController;
+use crate::controllers::console::ConsoleController;
 use crate::core::rrect;
 use raylib::consts::GuiIconName::ICON_MONITOR;
 use raylib::prelude::*;

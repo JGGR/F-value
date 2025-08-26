@@ -762,7 +762,6 @@ impl ValoriIntermediHFBI {
     }
 }
 
-
 #[derive(Clone)]
 pub(crate) struct RisultatoHFBI {
     valore: Option<f32>,

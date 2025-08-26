@@ -427,7 +427,12 @@ pub(crate) fn run_headless(do_niseci: bool, args: &[String]) -> bool {
 
                     if passed_pdf_export_path {
                         println!("Esportato pdf in {}", pdf_export_path.display());
-                        esporta_pdf_niseci(pdf_export_path, riferimento, anagrafica, risultato_niseci);
+                        esporta_pdf_niseci(
+                            pdf_export_path,
+                            riferimento,
+                            anagrafica,
+                            risultato_niseci,
+                        );
                     }
                 }
                 Err(_errors) => {

@@ -1,3 +1,13 @@
+## [0.0.25] - 2025-08-26
+
+### Added
+
+- Test for HFBI template
+
+### Changed
+
+- Split controllers in modules
+- Split views in modules
 ## [0.0.24] - 2025-08-06
 
 ### Added

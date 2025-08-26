@@ -15,9 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::{
-    domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI, GruppoEcoHFBI},
-};
+use crate::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI, GruppoEcoHFBI};
 
 pub(crate) fn calc_dbent(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
     let mut sbent = 0.0;

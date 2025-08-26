@@ -16,6 +16,4 @@
 */
 
 #[cfg(test)]
-mod hfbi;
-#[cfg(test)]
-mod niseci;
+mod full;
