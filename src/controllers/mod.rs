@@ -20,9 +20,7 @@ use crate::app::model::{
     ConsoleModel, FileInputModel, HomeModel, IndiceModel, InfoAggiuntiveModel, OutputModel,
     SecondModel, SubModel,
 };
-use crate::domain::{
-    index::Indice,
-};
+use crate::domain::index::Indice;
 use crate::state::GLOBAL_STATE;
 use raylib::RaylibHandle;
 

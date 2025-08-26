@@ -14,15 +14,15 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-use crate::views::{View, propwidth, propheight, rrect};
-use crate::controllers::{Controller, output::OutputController};
-use crate::MainState;
+use crate::controllers::{output::OutputController, Controller};
 use crate::domain::index::Indice;
-use raylib::drawing::RaylibDrawHandle;
+use crate::views::{propheight, propwidth, rrect, View};
+use crate::MainState;
 use raylib::consts::GuiIconName::ICON_OK_TICK;
-use raylib::RaylibThread;
-use raylib::prelude::*;
 use raylib::consts::GuiState::{STATE_DISABLED, STATE_NORMAL};
+use raylib::drawing::RaylibDrawHandle;
+use raylib::prelude::*;
+use raylib::RaylibThread;
 pub(crate) struct ProduzioneOutputView {}
 
 impl View for ProduzioneOutputView {

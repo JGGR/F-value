@@ -14,13 +14,13 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-use crate::views::{View, propwidth, propheight, rrect};
-use crate::controllers::{Controller, output::OutputController};
-use crate::MainState;
+use crate::controllers::{output::OutputController, Controller};
 use crate::domain::index::Indice;
+use crate::views::{propheight, propwidth, rrect, View};
+use crate::MainState;
 use raylib::drawing::RaylibDrawHandle;
-use raylib::RaylibThread;
 use raylib::prelude::*;
+use raylib::RaylibThread;
 use rfd::FileDialog;
 pub(crate) struct ProduzionePDFView {}
 

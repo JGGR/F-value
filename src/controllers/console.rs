@@ -15,12 +15,12 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 pub(crate) struct ConsoleController;
-use crate::controllers::{Controller, ConsoleModel, CurrentView};
-use raylib::RaylibHandle;
-use crate::MainState;
-use crate::state::GLOBAL_STATE;
 use crate::app::model::SubModel;
+use crate::controllers::{ConsoleModel, Controller, CurrentView};
+use crate::state::GLOBAL_STATE;
+use crate::MainState;
 use raylib::consts::KeyboardKey::*;
+use raylib::RaylibHandle;
 
 impl Controller for ConsoleController {
     type SubModel = ConsoleModel;

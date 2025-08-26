@@ -14,15 +14,15 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-use std::process::exit;
-use crate::views::{View, propwidth, propheight, rrect};
-use crate::controllers::{Controller, file_input::FileInputController};
-use crate::MainState;
+use crate::controllers::{file_input::FileInputController, Controller};
 use crate::domain::index::Indice;
-use raylib::drawing::RaylibDrawHandle;
-use raylib::RaylibThread;
-use raylib::prelude::*;
+use crate::views::{propheight, propwidth, rrect, View};
+use crate::MainState;
 use raylib::consts::GuiState::{STATE_DISABLED, STATE_NORMAL};
+use raylib::drawing::RaylibDrawHandle;
+use raylib::prelude::*;
+use raylib::RaylibThread;
+use std::process::exit;
 pub(crate) struct ValidazioneFileInputView {}
 
 impl View for ValidazioneFileInputView {

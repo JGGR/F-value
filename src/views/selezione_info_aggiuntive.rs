@@ -14,9 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-use crate::views::{View, propwidth, propheight, rrect};
-use crate::controllers::{Controller, info_aggiuntive::InfoAggiuntiveController};
-use crate::MainState;
+use crate::controllers::{info_aggiuntive::InfoAggiuntiveController, Controller};
 use crate::domain::{
     hfbi::{AnagraficaHFBI, HabitatHFBI, StagioneHFBI, TipoLagunaCostieraHFBI},
     index::Indice,
@@ -25,11 +23,13 @@ use crate::domain::{
         AnagraficaNISECI, AreaNISECI, ComunitaNISECI, IdroEcoRegioneNISECI, TipoComunitaNISECI,
     },
 };
-use raylib::drawing::RaylibDrawHandle;
+use crate::views::{propheight, propwidth, rrect, View};
+use crate::MainState;
 use raylib::consts::GuiIconName::ICON_OK_TICK;
-use raylib::RaylibThread;
-use raylib::prelude::*;
 use raylib::consts::GuiState::{STATE_DISABLED, STATE_NORMAL};
+use raylib::drawing::RaylibDrawHandle;
+use raylib::prelude::*;
+use raylib::RaylibThread;
 pub(crate) struct SelezioneInfoAggiuntiveView {
     textbox_codice_stazione_edit_mode: bool,
     textbox_codice_stazione_buffer: String,

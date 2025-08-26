@@ -14,11 +14,14 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-use std::io::Cursor;
-use crate::core::csv::deser::{check_campionamento_hfbi_reader, VeryItalianRecordCsvCampionamentoHFBI, check_anagrafica_hfbi_reader, VeryItalianRecordCsvAnagraficaHFBI};
-use crate::core::csv::parser::{check_records_campionamento_hfbi, check_records_anagrafica_hfbi};
+use crate::core::csv::deser::{
+    check_anagrafica_hfbi_reader, check_campionamento_hfbi_reader,
+    VeryItalianRecordCsvAnagraficaHFBI, VeryItalianRecordCsvCampionamentoHFBI,
+};
+use crate::core::csv::parser::{check_records_anagrafica_hfbi, check_records_campionamento_hfbi};
 use crate::domain::hfbi::CampionamentoHFBI;
 use crate::engines::hfbi::full::calculate_hfbi;
+use std::io::Cursor;
 
 const CAMPIONAMENTO_HFBI_TEMPLATE_DATA: &[u8] =
     include_bytes!("../../../../../templates/campionamento_hfbi.csv");
@@ -38,8 +41,7 @@ fn calculate_hfbi_template() {
 
     let campionamento_csv_records = campionamento_csv_check.expect("is_ok() was checked before");
 
-    let campionamento_value_check =
-        check_records_campionamento_hfbi(campionamento_csv_records);
+    let campionamento_value_check = check_records_campionamento_hfbi(campionamento_csv_records);
 
     assert!(campionamento_value_check.is_ok());
 
@@ -47,10 +49,8 @@ fn calculate_hfbi_template() {
 
     let anagrafica_reader = Cursor::new(ANAGRAFICA_HFBI_TEMPLATE_DATA);
 
-    let anagrafica_csv_check = check_anagrafica_hfbi_reader::<
-        _,
-        VeryItalianRecordCsvAnagraficaHFBI,
-    >(anagrafica_reader);
+    let anagrafica_csv_check =
+        check_anagrafica_hfbi_reader::<_, VeryItalianRecordCsvAnagraficaHFBI>(anagrafica_reader);
 
     assert!(anagrafica_csv_check.is_ok());
 

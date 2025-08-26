@@ -15,16 +15,16 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 pub(crate) struct InfoAggiuntiveController;
-use crate::controllers::{Controller, InfoAggiuntiveModel, CurrentView};
-use raylib::RaylibHandle;
-use crate::MainState;
-use crate::state::GLOBAL_STATE;
+use crate::app::model::SubModel;
+use crate::controllers::{Controller, CurrentView, InfoAggiuntiveModel};
+use crate::core::csv::parser::parse_date;
+use crate::domain::hfbi::AnagraficaHFBI;
 use crate::domain::index::Indice;
 use crate::domain::niseci::{AnagraficaNISECI, TipoComunitaNISECI};
-use crate::domain::hfbi::AnagraficaHFBI;
-use crate::app::model::SubModel;
-use crate::core::csv::parser::parse_date;
+use crate::state::GLOBAL_STATE;
+use crate::MainState;
 use chrono::format::ParseErrorKind;
+use raylib::RaylibHandle;
 
 impl Controller for InfoAggiuntiveController {
     type SubModel = InfoAggiuntiveModel;

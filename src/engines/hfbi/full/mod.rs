@@ -66,7 +66,7 @@ pub(crate) fn calculate_mmi(
         ddom,
         dhzp,
         dmig,
-        mmi: rounded_mmi
+        mmi: rounded_mmi,
     };
     Ok(intermediates)
 }

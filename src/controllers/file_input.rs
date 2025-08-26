@@ -15,23 +15,25 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 pub(crate) struct FileInputController;
-use crate::controllers::{Controller, FileInputModel, CurrentView};
-use raylib::RaylibHandle;
-use crate::MainState;
-use crate::state::GLOBAL_STATE;
-use crate::domain::index::Indice;
 use crate::app::model::SubModel;
-use std::path::PathBuf;
+use crate::controllers::{Controller, CurrentView, FileInputModel};
 use crate::core::csv::deser::{
     check_campionamento_hfbi_path, check_campionamento_niseci_path, check_riferimento_niseci_path,
     process_csv_errors, VeryItalianRecordCsvCampionamentoHFBI,
     VeryItalianRecordCsvCampionamentoNISECI, VeryItalianRecordCsvRiferimentoNISECI,
 };
-use crate::core::csv::parser::{check_records_riferimento_niseci, check_records_campionamento_niseci, check_records_campionamento_hfbi};
-use crate::domain::niseci::{RiferimentoNISECI, CampionamentoNISECI};
-use crate::domain::hfbi::CampionamentoHFBI;
+use crate::core::csv::parser::{
+    check_records_campionamento_hfbi, check_records_campionamento_niseci,
+    check_records_riferimento_niseci,
+};
 use crate::core::csv::TipoRecordCsv;
-
+use crate::domain::hfbi::CampionamentoHFBI;
+use crate::domain::index::Indice;
+use crate::domain::niseci::{CampionamentoNISECI, RiferimentoNISECI};
+use crate::state::GLOBAL_STATE;
+use crate::MainState;
+use raylib::RaylibHandle;
+use std::path::PathBuf;
 
 impl Controller for FileInputController {
     type SubModel = FileInputModel;

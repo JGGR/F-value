@@ -14,13 +14,13 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-use crate::views::{View, propwidth, propheight, rrect};
 use crate::controllers::indice::IndiceController;
-use crate::MainState;
 use crate::domain::index::Indice;
+use crate::views::{propheight, propwidth, rrect, View};
+use crate::MainState;
 use raylib::drawing::RaylibDrawHandle;
-use raylib::RaylibThread;
 use raylib::prelude::*;
+use raylib::RaylibThread;
 pub(crate) struct SelezioneIndiceView {}
 
 impl View for SelezioneIndiceView {

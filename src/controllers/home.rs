@@ -17,11 +17,11 @@
 // Controller to update and access the state
 pub(crate) struct HomeController;
 
-use super::{Controller, HomeModel, CurrentView};
-use raylib::RaylibHandle;
-use crate::MainState;
-use crate::state::GLOBAL_STATE;
+use super::{Controller, CurrentView, HomeModel};
 use crate::app::model::SubModel;
+use crate::state::GLOBAL_STATE;
+use crate::MainState;
+use raylib::RaylibHandle;
 
 impl Controller for HomeController {
     type SubModel = HomeModel;

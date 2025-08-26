@@ -14,18 +14,18 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-use std::cmp::max;
-use crate::views::{View, propwidth, propheight, rrect, draw_rainbow_text};
-use crate::controllers::{Controller, home::HomeController};
 use crate::app::model::SubModel;
+use crate::controllers::{home::HomeController, Controller};
+use crate::views::{draw_rainbow_text, propheight, propwidth, rrect, View};
 use crate::MainState;
 use crate::SHORT_PROJECT_VERSION;
-use raylib::math::{Rectangle, Vector2};
 use raylib::color::Color;
-use raylib::drawing::RaylibDrawHandle;
-use raylib::RaylibThread;
 use raylib::consts::GuiIconName::ICON_PLAYER_NEXT;
+use raylib::drawing::RaylibDrawHandle;
+use raylib::math::{Rectangle, Vector2};
 use raylib::prelude::*;
+use raylib::RaylibThread;
+use std::cmp::max;
 pub(crate) struct HomeView {}
 
 impl View for HomeView {

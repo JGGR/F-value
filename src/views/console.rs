@@ -15,12 +15,12 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 use crate::app::core::CONSOLE_FONT_DATA;
+use crate::controllers::{console::ConsoleController, Controller};
 use crate::views::View;
-use crate::controllers::{Controller, console::ConsoleController};
 use crate::MainState;
 use raylib::drawing::RaylibDrawHandle;
-use raylib::RaylibThread;
 use raylib::prelude::*;
+use raylib::RaylibThread;
 pub(crate) struct ConsoleView {
     font: Font,
     current_font_size: i32,

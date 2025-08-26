@@ -14,14 +14,14 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-use crate::views::{View, propwidth, propheight, rrect};
-use crate::controllers::{Controller, file_input::FileInputController};
-use crate::MainState;
+use crate::controllers::{file_input::FileInputController, Controller};
 use crate::domain::index::Indice;
-use raylib::drawing::RaylibDrawHandle;
+use crate::views::{propheight, propwidth, rrect, View};
+use crate::MainState;
 use raylib::consts::GuiIconName::{ICON_BIN, ICON_FILE_OPEN};
-use raylib::RaylibThread;
+use raylib::drawing::RaylibDrawHandle;
 use raylib::prelude::*;
+use raylib::RaylibThread;
 use rfd::FileDialog;
 pub(crate) struct SelezioneFileInputView {}
 

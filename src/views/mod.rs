@@ -17,15 +17,10 @@
 
 use crate::app::core::{propheight, propwidth, CurrentView, MainState};
 use crate::app::model::SubModel;
-use crate::controllers::{
-    Controller, Controllers,
-    SecondController,
-};
+use crate::controllers::{Controller, Controllers, SecondController};
 use crate::core::rrect;
 use crate::core::SHORT_PROJECT_VERSION;
-use raylib::consts::GuiIconName::{
-    ICON_PLAYER_NEXT,
-};
+use raylib::consts::GuiIconName::ICON_PLAYER_NEXT;
 use raylib::prelude::*;
 use std::cmp::max;
 

@@ -15,19 +15,23 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 pub(crate) struct OutputController;
-use crate::controllers::{Controller, OutputModel, CurrentView};
-use raylib::RaylibHandle;
-use crate::MainState;
-use crate::state::GLOBAL_STATE;
 use crate::app::model::SubModel;
-use crate::domain::niseci::{StatoEcologicoNISECI, RisultatoNISECI, AnagraficaNISECI, RiferimentoNISECI};
- use crate::domain::hfbi::{RisultatoHFBI, AnagraficaHFBI};
-use crate::engines::niseci::full::{calculate_stato_ecologico, calculate_niseci, calculate_rqe_niseci};
-use crate::core::pdf::{esporta_pdf_niseci, esporta_pdf_hfbi};
+use crate::controllers::{Controller, CurrentView, OutputModel};
+use crate::core::pdf::{esporta_pdf_hfbi, esporta_pdf_niseci};
+use crate::domain::hfbi::{AnagraficaHFBI, RisultatoHFBI};
+use crate::domain::niseci::{
+    AnagraficaNISECI, RiferimentoNISECI, RisultatoNISECI, StatoEcologicoNISECI,
+};
 use crate::engines::hfbi::full::calculate_hfbi;
-use std::path::PathBuf;
+use crate::engines::niseci::full::{
+    calculate_niseci, calculate_rqe_niseci, calculate_stato_ecologico,
+};
+use crate::state::GLOBAL_STATE;
+use crate::MainState;
 #[cfg(feature = "logged")]
 use log::info;
+use raylib::RaylibHandle;
+use std::path::PathBuf;
 
 #[cfg(feature = "logged")]
 use dirs::document_dir;
@@ -466,7 +470,15 @@ impl OutputController {
 
                         match file_result {
                             Ok(mut file) => {
-                                let string_representation = format!("bbent, bn, dbent, ddom, dhzp, dmig\n{}, {}, {}, {}, {}, {}", intermediates.bbent, intermediates.bn, intermediates.dbent, intermediates.ddom, intermediates.dhzp, intermediates.dmig);
+                                let string_representation = format!(
+                                    "bbent, bn, dbent, ddom, dhzp, dmig\n{}, {}, {}, {}, {}, {}",
+                                    intermediates.bbent,
+                                    intermediates.bn,
+                                    intermediates.dbent,
+                                    intermediates.ddom,
+                                    intermediates.dhzp,
+                                    intermediates.dmig
+                                );
                                 let write_result =
                                     writeln!(file, "{}", format!("{string_representation}"));
                                 match write_result {

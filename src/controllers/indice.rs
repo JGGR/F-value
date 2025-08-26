@@ -16,12 +16,12 @@
 */
 
 pub(crate) struct IndiceController;
-use crate::controllers::{Controller, IndiceModel, CurrentView};
-use raylib::RaylibHandle;
-use crate::MainState;
-use crate::state::GLOBAL_STATE;
-use crate::domain::index::Indice;
 use crate::app::model::SubModel;
+use crate::controllers::{Controller, CurrentView, IndiceModel};
+use crate::domain::index::Indice;
+use crate::state::GLOBAL_STATE;
+use crate::MainState;
+use raylib::RaylibHandle;
 
 impl Controller for IndiceController {
     type SubModel = IndiceModel;
