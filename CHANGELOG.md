@@ -1,3 +1,10 @@
+## [0.0.26] - 2025-09-16
+
+### Changed
+
+- Rename `esox` visible mentions to `F-value`
+  - Includes the directory used for log output
+
 ## [0.0.25] - 2025-08-26
 
 ### Added

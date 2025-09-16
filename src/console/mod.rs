@@ -162,7 +162,7 @@ impl Console {
                 "help" => {
                     if args_num < 1 {
                         self.add_message(
-                            "esox prompt, comandi disponibili:\n  echo\n  info\n  clear\n  help"
+                            "F-value prompt, comandi disponibili:\n  echo\n  info\n  clear\n  help"
                                 .to_string(),
                         );
                     } else {

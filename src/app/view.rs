@@ -170,7 +170,7 @@ pub(crate) fn draw_info_box(
 
         let itext = d.gui_icon_text(ICON_INFO, "Program Info");
 
-        let proj_info_str = format!("esox {SHORT_PROJECT_VERSION}");
+        let proj_info_str = format!("F-value {SHORT_PROJECT_VERSION}");
         let proj_info_txt_bounds = font.measure_text(
             &proj_info_str,
             current_font_height as f32,
@@ -274,7 +274,7 @@ pub(crate) fn draw_info_box(
             raylib::core::misc::open_url(copyright_actual_link);
         }
 
-        let display_link = "Example: esox-website.it";
+        let display_link = "Example: F-value-website.it";
         let actual_link = "https://duckduckgo.com/?t=h_&q=esox+lucius";
         let link_str = display_link;
         let link_x = proj_name_str2_x;

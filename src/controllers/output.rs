@@ -317,9 +317,9 @@ impl OutputController {
                         let log_file_path;
                         if let Some(documents_dir) = document_dir() {
                             log_file_path =
-                                documents_dir.join("esox").join("log_intermediates.csv");
+                                documents_dir.join("f_value").join("log_intermediates.csv");
                         } else {
-                            log_file_path = PathBuf::from("./esox/log_intermediates.csv");
+                            log_file_path = PathBuf::from("./f_value/log_intermediates.csv");
                         }
 
                         let file_result = OpenOptions::new()
@@ -457,9 +457,9 @@ impl OutputController {
                         let log_file_path;
                         if let Some(documents_dir) = document_dir() {
                             log_file_path =
-                                documents_dir.join("esox").join("log_intermediates.csv");
+                                documents_dir.join("f_value").join("log_intermediates.csv");
                         } else {
-                            log_file_path = PathBuf::from("./esox/log_intermediates.csv");
+                            log_file_path = PathBuf::from("./f_value/log_intermediates.csv");
                         }
 
                         let file_result = OpenOptions::new()
