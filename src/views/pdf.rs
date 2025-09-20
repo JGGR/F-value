@@ -47,17 +47,12 @@ impl View for ProduzionePDFView {
         let button_esporta_width = propwidth(d, 200);
         let button_esporta_x = d.get_screen_width() / 2 - button_esporta_width / 2;
         let button_esporta_height = propwidth(d, 50);
-        let button_esporta_y = d.get_screen_height() / 4 - button_esporta_height / 2;
+        let button_esporta_y = d.get_screen_height() / 2 - button_esporta_height / 2;
 
         let groupbox_width = button_esporta_width + propwidth(d, 100);
         let groupbox_x = button_esporta_x - propwidth(d, 50);
         let groupbox_height = button_esporta_height + propheight(d, 100);
         let groupbox_y = button_esporta_y - propheight(d, 50);
-
-        let panel_width = groupbox_width + propwidth(d, 100);
-        let panel_x = d.get_screen_width() / 2 - panel_width / 2;
-        let panel_y = groupbox_y + groupbox_height + propwidth(d, 50);
-        let panel_height = groupbox_height + propheight(d, 50);
 
         d.gui_group_box(
             rrect(groupbox_x, groupbox_y, groupbox_width, groupbox_height),
@@ -73,7 +68,6 @@ impl View for ProduzionePDFView {
             ),
             "Esporta",
         ) {
-            //TODO: esporta pdf
             let file = FileDialog::new()
                 .add_filter("pdf", &["pdf"])
                 .set_directory("/")
@@ -95,10 +89,6 @@ impl View for ProduzionePDFView {
             }
         }
 
-        d.gui_panel(
-            rrect(panel_x, panel_y, panel_width, panel_height),
-            "TODO: Output qui",
-        );
     }
 }
 

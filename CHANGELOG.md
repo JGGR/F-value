@@ -1,3 +1,9 @@
+## [0.0.27] - Unreleased
+
+### Changed
+
+- Drop panel for output in PDF view
+
 ## [0.0.26] - 2025-09-16
 
 ### Changed
