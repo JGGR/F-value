@@ -15,7 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::core::csv::deser::{
+use crate::core::csv::deser::niseci::{
     check_anagrafica_niseci_reader, check_campionamento_niseci_reader,
     check_riferimento_niseci_reader, VeryItalianRecordCsvAnagraficaNISECI,
     VeryItalianRecordCsvCampionamentoNISECI, VeryItalianRecordCsvRiferimentoNISECI,

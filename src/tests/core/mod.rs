@@ -15,12 +15,12 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::core::csv::deser::{
-    check_anagrafica_hfbi_reader, check_anagrafica_niseci_reader, check_campionamento_hfbi_reader,
-    check_campionamento_niseci_reader, check_riferimento_niseci_reader, translate_error_message,
-    VeryItalianRecordCsvAnagraficaHFBI, VeryItalianRecordCsvAnagraficaNISECI,
-    VeryItalianRecordCsvCampionamentoHFBI, VeryItalianRecordCsvCampionamentoNISECI,
-    VeryItalianRecordCsvRiferimentoNISECI,
+use crate::core::csv::deser::{translate_error_message, niseci::{check_anagrafica_niseci_reader,check_campionamento_niseci_reader, check_riferimento_niseci_reader, VeryItalianRecordCsvRiferimentoNISECI,VeryItalianRecordCsvCampionamentoNISECI, VeryItalianRecordCsvAnagraficaNISECI,},
+    hfbi::{
+    check_anagrafica_hfbi_reader, check_campionamento_hfbi_reader,
+    VeryItalianRecordCsvCampionamentoHFBI,
+    VeryItalianRecordCsvAnagraficaHFBI,
+    }
 };
 use crate::core::csv::parser::{
     check_records_anagrafica_hfbi, check_records_anagrafica_niseci,

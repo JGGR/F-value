@@ -1,0 +1,407 @@
+// SPDX-License-Identifier: GPL-3.0-only
+/*
+    Copyright (C) 2024-2025 jgabaut, gioninjo
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, version 3 of the License.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
+use crate::core::csv::deser::{process_csv_errors, deserialize_comma_f32, NormalizerReader, check_path_is_file_ends_with_csv};
+use crate::core::csv::{TipoRecordCsv, RecordCsvCampionamentoHFBI, RecordCsvAnagraficaHFBI};
+use std::any::TypeId;
+use std::fmt;
+use std::path::PathBuf;
+use std::io::{Error, ErrorKind, Read};
+use std::fs::File;
+
+#[derive(Debug, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct VeryItalianRecordCsvCampionamentoHFBI {
+    pub(crate) codice_specie: String,
+    pub(crate) numero_individui: u32,
+    #[serde(deserialize_with = "deserialize_comma_f32")]
+    pub(crate) peso: f32,
+}
+
+impl RecordCsvCampionamentoHFBI for VeryItalianRecordCsvCampionamentoHFBI {
+    fn codice_specie(&self) -> String {
+        self.codice_specie.clone()
+    }
+    fn numero_individui(&self) -> u32 {
+        self.numero_individui
+    }
+    fn peso(&self) -> f32 {
+        self.peso
+    }
+}
+
+impl fmt::Display for VeryItalianRecordCsvCampionamentoHFBI {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let string_representation = format!(
+            "RecordCsvCampionamentoHFBI: {{ codice_specie: [{}], numero_individui: [{}], peso: [{}] }}",
+              self.codice_specie, self.numero_individui, self.peso
+        );
+        write!(f, "{}", string_representation)
+    }
+}
+
+#[derive(Debug, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct PlainRecordCsvCampionamentoHFBI {
+    pub(crate) codice_specie: String,
+    pub(crate) numero_individui: u32,
+    pub(crate) peso: f32,
+}
+
+impl RecordCsvCampionamentoHFBI for PlainRecordCsvCampionamentoHFBI {
+    fn codice_specie(&self) -> String {
+        self.codice_specie.clone()
+    }
+    fn numero_individui(&self) -> u32 {
+        self.numero_individui
+    }
+    fn peso(&self) -> f32 {
+        self.peso
+    }
+}
+
+impl fmt::Display for PlainRecordCsvCampionamentoHFBI {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let string_representation = format!(
+            "RecordCsvCampionamentoHFBI: {{ codice_specie: [{}], numero_individui: [{}], peso: [{}] }}",
+              self.codice_specie, self.numero_individui, self.peso
+        );
+        write!(f, "{}", string_representation)
+    }
+}
+
+pub(crate) fn parse_csv_campionamento_hfbi<R, T>(
+    mut rdr: csv::Reader<R>,
+) -> (Vec<T>, Vec<csv::Error>)
+where
+    R: std::io::Read,
+    T: RecordCsvCampionamentoHFBI + 'static,
+{
+    let mut records = Vec::new();
+    let mut errors = Vec::new();
+
+    for result in rdr.deserialize() {
+        match result {
+            Ok(record) => records.push(record),
+            Err(e) => errors.push(e),
+        }
+    }
+
+    (records, errors)
+}
+
+pub(crate) fn check_campionamento_hfbi_reader<R: Read, T>(
+    reader: R,
+) -> Result<Vec<T>, Vec<csv::Error>>
+where
+    T: RecordCsvCampionamentoHFBI + 'static,
+{
+    let normalizing_reader = NormalizerReader::new(reader);
+
+    let type_id = TypeId::of::<T>(); // Get the TypeId of T at runtime
+
+    // Match on the TypeId to determine the actual type of T
+    let delimiter = match type_id {
+        id if id == TypeId::of::<VeryItalianRecordCsvCampionamentoHFBI>() => b';',
+        _ => b',',
+    };
+
+    let rdr = csv::ReaderBuilder::new()
+        .delimiter(delimiter)
+        .from_reader(normalizing_reader);
+    let (records, errors) = parse_csv_campionamento_hfbi(rdr);
+
+    println!(
+        "Campionamento HFBI: Numero record csv validi: {}",
+        records.len()
+    );
+    println!(
+        "Campionamento HFBI: Numero record csv non validi: {}",
+        errors.len()
+    );
+
+    if !errors.is_empty() {
+        /*
+        for error in &errors {
+            eprintln!("  {}", error);
+        }
+        */
+        let processed_errors = process_csv_errors(&errors, TipoRecordCsv::CampionamentoHFBI);
+        eprintln!("Errori incontrati durante l'elaborazione csv del campionamento HFBI: {{");
+        for e in processed_errors {
+            eprintln!("{e}");
+        }
+        eprintln!("}}");
+        Err(errors)
+    } else {
+        //TODO: handle verbosity
+        //println!("Tutti i record csv del campionamento HFBI sono stati processati con successo!");
+        /*
+        for record in &records {
+            println!("  Record: {{{record}}}");
+        }
+        */
+        Ok(records)
+    }
+}
+
+pub(crate) fn check_campionamento_hfbi_path<T>(path: PathBuf) -> Result<Vec<T>, Vec<csv::Error>>
+where
+    T: RecordCsvCampionamentoHFBI + 'static,
+{
+    if !check_path_is_file_ends_with_csv(&path) {
+        eprintln!("Il file {} non è un .csv", path.display());
+        let err = csv::Error::from(Error::new(
+            ErrorKind::Other,
+            "Errore campionamento HFBI: il file non è un .csv",
+        ));
+        let err_vec: Vec<csv::Error> = vec![err];
+        return Err(err_vec);
+    }
+    let file = File::open(path).expect("Unable to open file");
+    check_campionamento_hfbi_reader(file)
+}
+
+#[derive(Debug, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct VeryItalianRecordCsvAnagraficaHFBI {
+    pub(crate) codice_stazione: String,
+    pub(crate) corpo_idrico: String,
+    pub(crate) regione: String,
+    pub(crate) provincia: String,
+    pub(crate) data: String,
+    #[serde(deserialize_with = "deserialize_comma_f32")]
+    pub(crate) lunghezza_stazione: f32,
+    #[serde(deserialize_with = "deserialize_comma_f32")]
+    pub(crate) larghezza_stazione: f32,
+    pub(crate) stagione: u32,
+    pub(crate) habitat: u32,
+    pub(crate) tipo_laguna: u32,
+}
+
+impl RecordCsvAnagraficaHFBI for VeryItalianRecordCsvAnagraficaHFBI {
+    fn codice_stazione(&self) -> String {
+        self.codice_stazione.clone()
+    }
+    fn corpo_idrico(&self) -> String {
+        self.corpo_idrico.clone()
+    }
+    fn regione(&self) -> String {
+        self.regione.clone()
+    }
+    fn provincia(&self) -> String {
+        self.provincia.clone()
+    }
+    fn data(&self) -> String {
+        self.data.clone()
+    }
+    fn lunghezza_stazione(&self) -> f32 {
+        self.lunghezza_stazione
+    }
+    fn larghezza_stazione(&self) -> f32 {
+        self.larghezza_stazione
+    }
+    fn stagione(&self) -> u32 {
+        self.stagione
+    }
+    fn habitat(&self) -> u32 {
+        self.habitat
+    }
+    fn tipo_laguna(&self) -> u32 {
+        self.tipo_laguna
+    }
+}
+
+impl fmt::Display for VeryItalianRecordCsvAnagraficaHFBI {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let string_representation = format!(
+            "RecordAnagraficaHFBI: {{ codice_stazione: [{}], corpo_idrico: [{}],\
+            regione: [{}], provincia: [{}], data: [{}], lunghezza_stazione: [{}],\
+            larghezza_stazione: [{}], stagione [{}], habitat [{}],\
+            tipo_laguna: [{}]}}",
+            self.codice_stazione,
+            self.corpo_idrico,
+            self.regione,
+            self.provincia,
+            self.data,
+            self.lunghezza_stazione,
+            self.larghezza_stazione,
+            self.stagione,
+            self.habitat,
+            self.tipo_laguna
+        );
+        write!(f, "{}", string_representation)
+    }
+}
+
+#[derive(Debug, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct PlainRecordCsvAnagraficaHFBI {
+    pub(crate) codice_stazione: String,
+    pub(crate) corpo_idrico: String,
+    pub(crate) regione: String,
+    pub(crate) provincia: String,
+    pub(crate) data: String,
+    pub(crate) lunghezza_stazione: f32,
+    pub(crate) larghezza_stazione: f32,
+    pub(crate) stagione: u32,
+    pub(crate) habitat: u32,
+    pub(crate) tipo_laguna: u32,
+}
+
+impl RecordCsvAnagraficaHFBI for PlainRecordCsvAnagraficaHFBI {
+    fn codice_stazione(&self) -> String {
+        self.codice_stazione.clone()
+    }
+    fn corpo_idrico(&self) -> String {
+        self.corpo_idrico.clone()
+    }
+    fn regione(&self) -> String {
+        self.regione.clone()
+    }
+    fn provincia(&self) -> String {
+        self.provincia.clone()
+    }
+    fn data(&self) -> String {
+        self.data.clone()
+    }
+    fn lunghezza_stazione(&self) -> f32 {
+        self.lunghezza_stazione
+    }
+    fn larghezza_stazione(&self) -> f32 {
+        self.larghezza_stazione
+    }
+    fn stagione(&self) -> u32 {
+        self.stagione
+    }
+    fn habitat(&self) -> u32 {
+        self.habitat
+    }
+    fn tipo_laguna(&self) -> u32 {
+        self.tipo_laguna
+    }
+}
+
+impl fmt::Display for PlainRecordCsvAnagraficaHFBI {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let string_representation = format!(
+            "RecordAnagraficaHFBI: {{ codice_stazione: [{}], corpo_idrico: [{}],\
+            regione: [{}], provincia: [{}], data: [{}], lunghezza_stazione: [{}],\
+            larghezza_stazione: [{}], stagione [{}], habitat [{}],\
+            tipo_laguna: [{}]}}",
+            self.codice_stazione,
+            self.corpo_idrico,
+            self.regione,
+            self.provincia,
+            self.data,
+            self.lunghezza_stazione,
+            self.larghezza_stazione,
+            self.stagione,
+            self.habitat,
+            self.tipo_laguna
+        );
+        write!(f, "{}", string_representation)
+    }
+}
+
+pub(crate) fn parse_csv_anagrafica_hfbi<R, T>(mut rdr: csv::Reader<R>) -> (Vec<T>, Vec<csv::Error>)
+where
+    R: std::io::Read,
+    T: RecordCsvAnagraficaHFBI,
+{
+    let mut records = Vec::new();
+    let mut errors = Vec::new();
+
+    for result in rdr.deserialize() {
+        match result {
+            Ok(record) => records.push(record),
+            Err(e) => errors.push(e),
+        }
+    }
+
+    (records, errors)
+}
+
+pub(crate) fn check_anagrafica_hfbi_reader<R: Read, T>(reader: R) -> Result<Vec<T>, Vec<csv::Error>>
+where
+    T: RecordCsvAnagraficaHFBI + 'static,
+{
+    let normalizing_reader = NormalizerReader::new(reader);
+
+    let type_id = TypeId::of::<T>(); // Get the TypeId of T at runtime
+
+    // Match on the TypeId to determine the actual type of T
+    let delimiter = match type_id {
+        id if id == TypeId::of::<VeryItalianRecordCsvAnagraficaHFBI>() => b';',
+        _ => b',',
+    };
+
+    let rdr = csv::ReaderBuilder::new()
+        .delimiter(delimiter)
+        .from_reader(normalizing_reader);
+    let (records, errors) = parse_csv_anagrafica_hfbi(rdr);
+
+    println!(
+        "Anagrafica HFBI: Numero record csv validi: {}",
+        records.len()
+    );
+    println!(
+        "Anagrafica HFBI: Numero record csv non validi: {}",
+        errors.len()
+    );
+
+    if !errors.is_empty() {
+        /*
+        for error in &errors {
+            eprintln!("  {}", error);
+        }
+        */
+        let processed_errors = process_csv_errors(&errors, TipoRecordCsv::AnagraficaHFBI);
+        eprintln!("Errori incontrati durante l'elaborazione csv dell' anagrafica HFBI: {{");
+        for e in processed_errors {
+            eprintln!("{e}");
+        }
+        eprintln!("}}");
+        Err(errors)
+    } else {
+        //TODO: handle verbosity
+        //println!("Tutti i record csv dell'anagrafica HFBI sono stati processati con successo!");
+        /*
+        for record in &records {
+            println!("  Record: {{{record}}}");
+        }
+        */
+        Ok(records)
+    }
+}
+
+pub(crate) fn check_anagrafica_hfbi_path<T>(path: PathBuf) -> Result<Vec<T>, Vec<csv::Error>>
+where
+    T: RecordCsvAnagraficaHFBI + 'static,
+{
+    if !check_path_is_file_ends_with_csv(&path) {
+        eprintln!("Il file {} non è un .csv", path.display());
+        let err = csv::Error::from(Error::new(
+            ErrorKind::Other,
+            "Errore anagrafica HFBI: il file non è un .csv",
+        ));
+        let err_vec: Vec<csv::Error> = vec![err];
+        return Err(err_vec);
+    }
+    let file = File::open(path).expect("Unable to open file");
+    check_anagrafica_hfbi_reader(file)
+}

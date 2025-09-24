@@ -16,11 +16,16 @@
 */
 
 use crate::core::csv::deser::{
-    check_anagrafica_hfbi_path, check_anagrafica_niseci_path, check_campionamento_hfbi_path,
-    check_campionamento_niseci_path, check_path_is_file_ends_with_csv,
-    check_riferimento_niseci_path, VeryItalianRecordCsvAnagraficaHFBI,
-    VeryItalianRecordCsvAnagraficaNISECI, VeryItalianRecordCsvCampionamentoHFBI,
-    VeryItalianRecordCsvCampionamentoNISECI, VeryItalianRecordCsvRiferimentoNISECI,
+    check_path_is_file_ends_with_csv,
+    hfbi::{
+        check_anagrafica_hfbi_path, check_campionamento_hfbi_path,
+        VeryItalianRecordCsvAnagraficaHFBI, VeryItalianRecordCsvCampionamentoHFBI,
+    },
+    niseci::{
+        check_anagrafica_niseci_path, check_campionamento_niseci_path,
+        check_riferimento_niseci_path, VeryItalianRecordCsvAnagraficaNISECI,
+        VeryItalianRecordCsvCampionamentoNISECI, VeryItalianRecordCsvRiferimentoNISECI,
+    },
 };
 use crate::core::csv::parser::{
     check_records_anagrafica_hfbi, check_records_anagrafica_niseci,

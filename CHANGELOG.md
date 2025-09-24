@@ -4,6 +4,7 @@
 
 - Drop panel for output in PDF view
 - Drop "change view" button
+- Split `core::csv::deser` into niseci and hfbi
 
 ## [0.0.26] - 2025-09-16
 
