@@ -47,6 +47,12 @@ impl Controller for OutputController {
     fn update(&self, _rl: &mut RaylibHandle, main_state: &mut MainState) {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.output_model.increment_frame_counter();
+
+        if state.output_model.get_should_reset() {
+            main_state.showing_reset_win = true;
+            state.output_model.set_should_reset(false);
+            return;
+        }
         if main_state.should_reset {
             eprintln!("OutputController: Resetting");
             main_state.should_reset = false;
@@ -97,6 +103,11 @@ impl OutputController {
     pub(crate) fn get_is_done_calc(&self) -> bool {
         let state = GLOBAL_STATE.lock().unwrap();
         state.output_model.is_done_calc()
+    }
+
+    pub(crate) fn get_is_done_export(&self) -> bool {
+        let state = GLOBAL_STATE.lock().unwrap();
+        state.output_model.is_done_export()
     }
 
     pub(crate) fn get_niseci_value(&self) -> Option<f32> {
@@ -396,6 +407,7 @@ impl OutputController {
             anagrafica_niseci,
             risultato_niseci,
         );
+        self.set_done_export(true);
     }
 
     pub(crate) fn calc_hfbi(&self) {
@@ -528,12 +540,19 @@ impl OutputController {
             .expect("Failed getting AnagraficaHFBI before requesting export");
 
         esporta_pdf_hfbi(export_path, anagrafica_hfbi, risultato_hfbi);
+        self.set_done_export(true);
     }
 
     pub(crate) fn user_confirm_calc(&self) {
         let mut state = GLOBAL_STATE.lock().unwrap();
 
         state.output_model.set_done_user_confirm(true);
+    }
+
+    pub(crate) fn set_done_export(&self, val: bool) {
+        let mut state = GLOBAL_STATE.lock().unwrap();
+
+        state.output_model.set_done_export(val);
     }
 
     pub(crate) fn get_hfbi_value(&self) -> Option<f32> {
@@ -567,6 +586,11 @@ impl OutputController {
         let mut state = GLOBAL_STATE.lock().unwrap();
         state.data_model.set_risultato_hfbi(Some(risultato));
         state.output_model.set_done_calc(true);
+    }
+
+    pub(crate) fn prompt_reset(&self) {
+        let mut state = GLOBAL_STATE.lock().unwrap();
+        state.output_model.set_should_reset(true);
     }
 
     pub(crate) fn set_console_env(&self, (key, val): (String, String)) {

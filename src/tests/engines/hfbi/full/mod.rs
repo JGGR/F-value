@@ -18,7 +18,9 @@ use crate::core::csv::deser::hfbi::{
     check_anagrafica_hfbi_reader, check_campionamento_hfbi_reader,
     VeryItalianRecordCsvAnagraficaHFBI, VeryItalianRecordCsvCampionamentoHFBI,
 };
-use crate::core::csv::parser::hfbi::{check_records_anagrafica_hfbi, check_records_campionamento_hfbi};
+use crate::core::csv::parser::hfbi::{
+    check_records_anagrafica_hfbi, check_records_campionamento_hfbi,
+};
 use crate::domain::hfbi::CampionamentoHFBI;
 use crate::engines::hfbi::full::calculate_hfbi;
 use std::io::Cursor;

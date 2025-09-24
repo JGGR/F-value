@@ -264,6 +264,8 @@ pub(crate) struct OutputModel {
     frame_counter: u32,
     done_calc: bool,
     done_user_confirm: bool,
+    done_export: bool,
+    should_reset: bool,
 }
 
 impl SubModel for OutputModel {
@@ -277,6 +279,7 @@ impl SubModel for OutputModel {
         self.frame_counter = 0;
         self.set_done_calc(false);
         self.set_done_user_confirm(false);
+        self.set_done_export(false);
     }
 }
 
@@ -295,6 +298,22 @@ impl OutputModel {
 
     pub(crate) fn set_done_user_confirm(&mut self, val: bool) {
         self.done_user_confirm = val;
+    }
+
+    pub(crate) fn is_done_export(&self) -> bool {
+        self.done_export
+    }
+
+    pub(crate) fn set_done_export(&mut self, val: bool) {
+        self.done_export = val;
+    }
+
+    pub(crate) fn get_should_reset(&self) -> bool {
+        self.should_reset
+    }
+
+    pub(crate) fn set_should_reset(&mut self, val: bool) {
+        self.should_reset = val;
     }
 }
 
@@ -490,6 +509,8 @@ impl Model {
                 frame_counter: 0,
                 done_calc: false,
                 done_user_confirm: false,
+                done_export: false,
+                should_reset: false,
             },
             console_model: ConsoleModel {
                 frame_counter: 0,

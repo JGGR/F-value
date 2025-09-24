@@ -1,5 +1,9 @@
 ## [0.0.27] - Unreleased
 
+### Added
+
+- Add reset button in pdf output view
+
 ### Changed
 
 - Drop panel for output in PDF view
