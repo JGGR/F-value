@@ -88,7 +88,6 @@ impl View for ProduzionePDFView {
                     .add_console_message("Failed getting a file for esportazione".to_string());
             }
         }
-
     }
 }
 
