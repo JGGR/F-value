@@ -26,8 +26,8 @@ use crate::core::csv::deser::{
     process_csv_errors,
 };
 use crate::core::csv::parser::{
-    check_records_campionamento_hfbi, check_records_campionamento_niseci,
-    check_records_riferimento_niseci,
+    hfbi::check_records_campionamento_hfbi,
+    niseci::{check_records_campionamento_niseci, check_records_riferimento_niseci},
 };
 use crate::core::csv::TipoRecordCsv;
 use crate::domain::hfbi::CampionamentoHFBI;

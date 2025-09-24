@@ -22,7 +22,7 @@ use super::{
 };
 use crate::core::csv::TipoRecordCsv;
 use serde::{de, Deserialize, Deserializer};
-use std::io::{self,Read};
+use std::io::{self, Read};
 use std::path::Path;
 
 struct NormalizerReader<R: Read> {

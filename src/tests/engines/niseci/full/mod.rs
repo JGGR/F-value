@@ -20,7 +20,7 @@ use crate::core::csv::deser::niseci::{
     check_riferimento_niseci_reader, VeryItalianRecordCsvAnagraficaNISECI,
     VeryItalianRecordCsvCampionamentoNISECI, VeryItalianRecordCsvRiferimentoNISECI,
 };
-use crate::core::csv::parser::{
+use crate::core::csv::parser::niseci::{
     check_records_anagrafica_niseci, check_records_campionamento_niseci,
     check_records_riferimento_niseci,
 };

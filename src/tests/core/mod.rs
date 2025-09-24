@@ -15,17 +15,24 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::core::csv::deser::{translate_error_message, niseci::{check_anagrafica_niseci_reader,check_campionamento_niseci_reader, check_riferimento_niseci_reader, VeryItalianRecordCsvRiferimentoNISECI,VeryItalianRecordCsvCampionamentoNISECI, VeryItalianRecordCsvAnagraficaNISECI,},
+use crate::core::csv::deser::{
     hfbi::{
-    check_anagrafica_hfbi_reader, check_campionamento_hfbi_reader,
-    VeryItalianRecordCsvCampionamentoHFBI,
-    VeryItalianRecordCsvAnagraficaHFBI,
-    }
+        check_anagrafica_hfbi_reader, check_campionamento_hfbi_reader,
+        VeryItalianRecordCsvAnagraficaHFBI, VeryItalianRecordCsvCampionamentoHFBI,
+    },
+    niseci::{
+        check_anagrafica_niseci_reader, check_campionamento_niseci_reader,
+        check_riferimento_niseci_reader, VeryItalianRecordCsvAnagraficaNISECI,
+        VeryItalianRecordCsvCampionamentoNISECI, VeryItalianRecordCsvRiferimentoNISECI,
+    },
+    translate_error_message,
 };
 use crate::core::csv::parser::{
-    check_records_anagrafica_hfbi, check_records_anagrafica_niseci,
-    check_records_campionamento_hfbi, check_records_campionamento_niseci,
-    check_records_riferimento_niseci,
+    hfbi::{check_records_anagrafica_hfbi, check_records_campionamento_hfbi},
+    niseci::{
+        check_records_anagrafica_niseci, check_records_campionamento_niseci,
+        check_records_riferimento_niseci,
+    },
 };
 use crate::core::csv::{
     ANAGRAFICA_HFBI_HEADER, ANAGRAFICA_NISECI_HEADER, CAMPIONAMENTO_HFBI_HEADER,

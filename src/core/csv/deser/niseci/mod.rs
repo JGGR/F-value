@@ -15,13 +15,18 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::core::csv::deser::{process_csv_errors, deserialize_comma_f32, NormalizerReader, check_path_is_file_ends_with_csv};
-use crate::core::csv::{TipoRecordCsv, RecordCsvRiferimentoNISECI, RecordCsvCampionamentoNISECI, RecordCsvAnagraficaNISECI};
+use crate::core::csv::deser::{
+    check_path_is_file_ends_with_csv, deserialize_comma_f32, process_csv_errors, NormalizerReader,
+};
+use crate::core::csv::{
+    RecordCsvAnagraficaNISECI, RecordCsvCampionamentoNISECI, RecordCsvRiferimentoNISECI,
+    TipoRecordCsv,
+};
 use std::any::TypeId;
 use std::fmt;
-use std::path::PathBuf;
-use std::io::{Error, ErrorKind, Read};
 use std::fs::File;
+use std::io::{Error, ErrorKind, Read};
+use std::path::PathBuf;
 
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
