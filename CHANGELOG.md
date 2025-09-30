@@ -9,6 +9,8 @@
 - Drop panel for output in PDF view
 - Drop "change view" button
 - Split `core::csv::{deser, parser}` into niseci and hfbi
+- Round x1, x2, x3 to 3 decimal digits
+- Round RQE Niseci to 2 decimal digits
 
 ## [0.0.26] - 2025-09-16
 

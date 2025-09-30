@@ -178,7 +178,9 @@ pub(crate) fn calculate_x2(
 
     let result = (0.6 * x2_a + 0.4 * x2_b) / tot_specie_attese_trovate as f32;
 
-    Ok((Some(result), metriche_x2))
+    let rounded_result = (1000.0 * result).round() / 1000.0;
+
+    Ok((Some(rounded_result), metriche_x2))
 }
 
 struct RecordSubmetricheX2A {

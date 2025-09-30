@@ -134,7 +134,7 @@ fn calculate_niseci_template() {
     let (niseci, intermediates) = calc_niseci_res.expect("is_ok() was checked before");
 
     assert_eq!(niseci, Some(0.209));
-    assert_eq!(intermediates.x1, 0.42857146);
-    assert_eq!(intermediates.x2, Some(0.26666668));
+    assert_eq!(intermediates.x1, 0.429);
+    assert_eq!(intermediates.x2, Some(0.267));
     assert_eq!(intermediates.x3, 1.0);
 }

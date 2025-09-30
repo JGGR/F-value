@@ -124,6 +124,7 @@ pub(crate) fn calculate_x3(
     let b = calculate_b(&info_pop_aliene);
 
     let x3 = 0.5 * (a + b);
+    let rounded_x3 = (1000.0 * x3).round() / 1000.0;
 
     let mut errors = Vec::<String>::new();
     let mut submetriche = HashMap::<String, SubmetricheX3>::new();
@@ -241,7 +242,7 @@ pub(crate) fn calculate_x3(
         return Err(errors);
     }
 
-    Ok((x3, Some(MetricheX3::new(a, b, submetriche))))
+    Ok((rounded_x3, Some(MetricheX3::new(a, b, submetriche))))
 }
 
 fn calculate_classi_eta_alieni(c: &CampionamentoNISECI) -> ClassiEtaAlieniNISECI {
