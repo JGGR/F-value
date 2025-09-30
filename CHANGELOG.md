@@ -13,6 +13,7 @@
 - Round `x1`, `x2`, `x3` to 3 decimal digits
 - Round `RQE Niseci` to 2 decimal digits
 - Update `ComunitaNISECI` format
+- Update pdf contents
 
 ## [0.0.26] - 2025-09-16
 
