@@ -256,18 +256,18 @@ impl fmt::Display for ComunitaNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let string_representation = match self.tipo {
             TipoComunitaNISECI::Redatta | TipoComunitaNISECI::Dm260_2010 => {
-                format!("ComunitaNISECI: {{ tipo: {{{}}} }}", self.tipo)
+                format!("Comunita di Riferimento: {{ tipo: {{{}}} }}", self.tipo)
             }
             TipoComunitaNISECI::Recuperata => {
                 if let Some(fonte) = &self.fonte {
                     //TODO: is this good?
                     format!(
-                        "ComunitaNISECI: {{ tipo: {{{}}}, fonte: {{{}}} }}",
+                        "Comunita di Riferimento: {{ tipo: {{{}}}, fonte: {{{}}} }}",
                         self.tipo, fonte
                     )
                 } else {
                     format!(
-                        "ComunitaNISECI: {{ tipo: {{{}}}, fonte: MANCANTE }}",
+                        "Comunita di Riferimento: {{ tipo: {{{}}}, fonte: MANCANTE }}",
                         self.tipo
                     )
                 }
@@ -276,12 +276,12 @@ impl fmt::Display for ComunitaNISECI {
                 if let Some(num_proto) = &self.numero_protocollo {
                     //TODO: is this good?
                     format!(
-                        "ComunitaNISECI: {{ tipo: {{{}}}, numero_protocollo: {{{}}} }}",
+                        "Comunita di Riferimento: {{ tipo: {{{}}}, numero_protocollo: {{{}}} }}",
                         self.tipo, num_proto
                     )
                 } else {
                     format!(
-                        "ComunitaNISECI: {{ tipo: {{{}}}, numero_protocollo: MANCANTE }}",
+                        "Comunita di Riferimento: {{ tipo: {{{}}}, numero_protocollo: MANCANTE }}",
                         self.tipo
                     )
                 }
