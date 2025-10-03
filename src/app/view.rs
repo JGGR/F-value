@@ -539,7 +539,7 @@ pub(crate) fn draw_main(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
 
     let core_button_width = propwidth(d, 25);
     let core_button_heigth = core_button_width;
-    let core_buttons_count = 6;
+    let core_buttons_count = 5;
     let core_buttons_x_padding = propwidth(d, 5);
     let core_buttons_y_padding = core_buttons_x_padding;
     let core_buttons_panel_height = navbar_height;
@@ -605,59 +605,11 @@ pub(crate) fn draw_main(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
         main_state.showing_reset_win = true;
     }
 
-    let changeview_button_width = reset_button_width;
-    let changeview_button_x = reset_button_x + reset_button_width + core_buttons_x_padding;
-    let changeview_button_height = reset_button_height;
-    let changeview_button_y = reset_button_y;
-
-    // "Change view" button
-    let itext = d.gui_icon_text(ICON_PLAYER_NEXT, "");
-    if d.gui_button(
-        rrect(
-            changeview_button_x,
-            changeview_button_y,
-            changeview_button_width,
-            changeview_button_height,
-        ),
-        itext.as_str(),
-    ) {
-        match main_state.current_view {
-            CurrentView::Home => {
-                main_state.set_current_view(CurrentView::Second);
-            }
-            CurrentView::Second => {
-                main_state.set_current_view(CurrentView::SelezioneIndice);
-            }
-            CurrentView::SelezioneIndice => {
-                main_state.set_current_view(CurrentView::SelezioneFileInput);
-            }
-            CurrentView::SelezioneFileInput => {
-                main_state.set_current_view(CurrentView::ValidazioneFileInput);
-            }
-            CurrentView::ValidazioneFileInput => {
-                main_state.set_current_view(CurrentView::SelezioneInfoAggiuntive);
-            }
-            CurrentView::SelezioneInfoAggiuntive => {
-                main_state.set_current_view(CurrentView::ValidazioneInfoAggiuntive);
-            }
-            CurrentView::ValidazioneInfoAggiuntive => {
-                main_state.set_current_view(CurrentView::ProduzioneOutput);
-            }
-            CurrentView::ProduzioneOutput => {
-                main_state.set_current_view(CurrentView::ProduzionePDF);
-            }
-            CurrentView::ProduzionePDF => {
-                main_state.set_current_view(CurrentView::Home);
-            }
-            _ => {}
-        }
-    }
-
     // License button
-    let license_button_width = changeview_button_width;
-    let license_button_x = changeview_button_x + changeview_button_width + core_buttons_x_padding;
-    let license_button_height = changeview_button_height;
-    let license_button_y = changeview_button_y;
+    let license_button_width = reset_button_width;
+    let license_button_x = reset_button_x + reset_button_width + core_buttons_x_padding;
+    let license_button_height = reset_button_height;
+    let license_button_y = reset_button_y;
     let itext = d.gui_icon_text(ICON_TEXT_NOTES, "");
     if d.gui_button(
         rrect(

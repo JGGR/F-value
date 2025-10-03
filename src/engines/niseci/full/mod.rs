@@ -155,7 +155,7 @@ pub(crate) fn calculate_rqe_niseci(niseci: Option<f32>) -> Option<f32> {
     let rqe =
         niseci.map(|val| (val.log(10.0) + RQE_NISECI_MAGIC_ADDEND) / RQE_NISECI_MAGIC_QUOTIENT);
     if let Some(r) = rqe {
-        let rounded_rqe = (1000.0 * r).round() / 1000.0;
+        let rounded_rqe = (100.0 * r).round() / 100.0;
         Some(rounded_rqe)
     } else {
         rqe

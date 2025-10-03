@@ -18,13 +18,16 @@ pub(crate) struct FileInputController;
 use crate::app::model::SubModel;
 use crate::controllers::{Controller, CurrentView, FileInputModel};
 use crate::core::csv::deser::{
-    check_campionamento_hfbi_path, check_campionamento_niseci_path, check_riferimento_niseci_path,
-    process_csv_errors, VeryItalianRecordCsvCampionamentoHFBI,
-    VeryItalianRecordCsvCampionamentoNISECI, VeryItalianRecordCsvRiferimentoNISECI,
+    hfbi::{check_campionamento_hfbi_path, VeryItalianRecordCsvCampionamentoHFBI},
+    niseci::{
+        check_campionamento_niseci_path, check_riferimento_niseci_path,
+        VeryItalianRecordCsvCampionamentoNISECI, VeryItalianRecordCsvRiferimentoNISECI,
+    },
+    process_csv_errors,
 };
 use crate::core::csv::parser::{
-    check_records_campionamento_hfbi, check_records_campionamento_niseci,
-    check_records_riferimento_niseci,
+    hfbi::check_records_campionamento_hfbi,
+    niseci::{check_records_campionamento_niseci, check_records_riferimento_niseci},
 };
 use crate::core::csv::TipoRecordCsv;
 use crate::domain::hfbi::CampionamentoHFBI;

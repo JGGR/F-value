@@ -1,3 +1,25 @@
+## [0.0.27] - 2025-10-03
+
+### Added
+
+- Add reset button in pdf output view
+- Add data, regione, idroecoregione, area, bacino to log
+- Add names in home page
+
+### Changed
+
+- Drop panel for output in PDF view
+- Drop "change view" button
+- Split `core::csv::{deser, parser}` into niseci and hfbi
+- Round `x1`, `x2`, `x3` to 3 decimal digits
+- Round `RQE Niseci` to 2 decimal digits
+- Update `ComunitaNISECI` format
+- Update pdf contents
+- Update `IdroEcoRegioneNISECI` to use a different order
+  - Drop `CalabriaNebrodi`
+  - Split `RomaViterbese` and `Vesuvio`
+- Refactor `Second` view and controller to `Help`
+
 ## [0.0.26] - 2025-09-16
 
 ### Changed

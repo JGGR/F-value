@@ -16,16 +16,23 @@
 */
 
 use crate::core::csv::deser::{
-    check_anagrafica_hfbi_path, check_anagrafica_niseci_path, check_campionamento_hfbi_path,
-    check_campionamento_niseci_path, check_path_is_file_ends_with_csv,
-    check_riferimento_niseci_path, VeryItalianRecordCsvAnagraficaHFBI,
-    VeryItalianRecordCsvAnagraficaNISECI, VeryItalianRecordCsvCampionamentoHFBI,
-    VeryItalianRecordCsvCampionamentoNISECI, VeryItalianRecordCsvRiferimentoNISECI,
+    check_path_is_file_ends_with_csv,
+    hfbi::{
+        check_anagrafica_hfbi_path, check_campionamento_hfbi_path,
+        VeryItalianRecordCsvAnagraficaHFBI, VeryItalianRecordCsvCampionamentoHFBI,
+    },
+    niseci::{
+        check_anagrafica_niseci_path, check_campionamento_niseci_path,
+        check_riferimento_niseci_path, VeryItalianRecordCsvAnagraficaNISECI,
+        VeryItalianRecordCsvCampionamentoNISECI, VeryItalianRecordCsvRiferimentoNISECI,
+    },
 };
 use crate::core::csv::parser::{
-    check_records_anagrafica_hfbi, check_records_anagrafica_niseci,
-    check_records_campionamento_hfbi, check_records_campionamento_niseci,
-    check_records_riferimento_niseci,
+    hfbi::{check_records_anagrafica_hfbi, check_records_campionamento_hfbi},
+    niseci::{
+        check_records_anagrafica_niseci, check_records_campionamento_niseci,
+        check_records_riferimento_niseci,
+    },
 };
 use crate::core::pdf::{esporta_pdf_hfbi, esporta_pdf_niseci};
 use crate::core::{COPYRIGHT_INFO, PROJECT_NAME, PROJECT_VERSION_FULL, SHORT_PROJECT_VERSION};
@@ -47,7 +54,7 @@ use std::path::PathBuf;
 pub(crate) fn esox_usage() {
     println!("{PROJECT_NAME} v{SHORT_PROJECT_VERSION}");
     println!("Usage: {PROJECT_NAME} [--headless] <campionamento.csv> <riferimento.csv> <anagrafica.csv> [pdf_export_path]");
-    println!("       {PROJECT_NAME} [--headless] --hfbi <campionamento.csv> <anagrafica.csv>");
+    println!("       {PROJECT_NAME} [--headless] --hfbi <campionamento.csv> <anagrafica.csv> [pdf_export_path]");
     println!(
         "Flags:
   --headless               Run without GUI

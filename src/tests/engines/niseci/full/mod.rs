@@ -15,12 +15,12 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::core::csv::deser::{
+use crate::core::csv::deser::niseci::{
     check_anagrafica_niseci_reader, check_campionamento_niseci_reader,
     check_riferimento_niseci_reader, VeryItalianRecordCsvAnagraficaNISECI,
     VeryItalianRecordCsvCampionamentoNISECI, VeryItalianRecordCsvRiferimentoNISECI,
 };
-use crate::core::csv::parser::{
+use crate::core::csv::parser::niseci::{
     check_records_anagrafica_niseci, check_records_campionamento_niseci,
     check_records_riferimento_niseci,
 };
@@ -134,7 +134,7 @@ fn calculate_niseci_template() {
     let (niseci, intermediates) = calc_niseci_res.expect("is_ok() was checked before");
 
     assert_eq!(niseci, Some(0.209));
-    assert_eq!(intermediates.x1, 0.42857146);
-    assert_eq!(intermediates.x2, Some(0.26666668));
+    assert_eq!(intermediates.x1, 0.429);
+    assert_eq!(intermediates.x2, Some(0.267));
     assert_eq!(intermediates.x3, 1.0);
 }

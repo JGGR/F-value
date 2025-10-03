@@ -37,7 +37,7 @@ fn test_calculate_x1_mixed_campionamento() {
     let riferimento = create_dummy_riferimento();
     let campionamento = create_dummy_campionamento_chopped();
     let x1_calcolato = calculate_x1(&campionamento, &riferimento);
-    let x1_atteso = 5.0 / 6.0;
+    let x1_atteso = (1000.0_f32 * 5.0 / 6.0).round() / 1000.0;
     let epsilon: f32 = 1e-6;
     assert!((x1_calcolato - x1_atteso).abs() < epsilon);
 }

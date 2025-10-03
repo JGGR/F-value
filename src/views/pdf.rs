@@ -16,8 +16,10 @@
 */
 use crate::controllers::{output::OutputController, Controller};
 use crate::domain::index::Indice;
+use crate::views::GuiIconName::ICON_RESTART;
 use crate::views::{propheight, propwidth, rrect, View};
 use crate::MainState;
+use raylib::consts::GuiState::{STATE_DISABLED, STATE_NORMAL};
 use raylib::drawing::RaylibDrawHandle;
 use raylib::prelude::*;
 use raylib::RaylibThread;
@@ -47,17 +49,12 @@ impl View for ProduzionePDFView {
         let button_esporta_width = propwidth(d, 200);
         let button_esporta_x = d.get_screen_width() / 2 - button_esporta_width / 2;
         let button_esporta_height = propwidth(d, 50);
-        let button_esporta_y = d.get_screen_height() / 4 - button_esporta_height / 2;
+        let button_esporta_y = d.get_screen_height() / 2 - button_esporta_height / 2;
 
         let groupbox_width = button_esporta_width + propwidth(d, 100);
         let groupbox_x = button_esporta_x - propwidth(d, 50);
         let groupbox_height = button_esporta_height + propheight(d, 100);
         let groupbox_y = button_esporta_y - propheight(d, 50);
-
-        let panel_width = groupbox_width + propwidth(d, 100);
-        let panel_x = d.get_screen_width() / 2 - panel_width / 2;
-        let panel_y = groupbox_y + groupbox_height + propwidth(d, 50);
-        let panel_height = groupbox_height + propheight(d, 50);
 
         d.gui_group_box(
             rrect(groupbox_x, groupbox_y, groupbox_width, groupbox_height),
@@ -73,7 +70,6 @@ impl View for ProduzionePDFView {
             ),
             "Esporta",
         ) {
-            //TODO: esporta pdf
             let file = FileDialog::new()
                 .add_filter("pdf", &["pdf"])
                 .set_directory("/")
@@ -95,10 +91,37 @@ impl View for ProduzionePDFView {
             }
         }
 
-        d.gui_panel(
-            rrect(panel_x, panel_y, panel_width, panel_height),
-            "TODO: Output qui",
-        );
+        let button_reset_width = propwidth(d, 200);
+        let button_reset_x = groupbox_x
+            + groupbox_width
+            + (d.get_screen_width() - (groupbox_x + groupbox_width + button_reset_width)) / 2;
+        let button_reset_height = propwidth(d, 50);
+        let button_reset_y = d.get_screen_height() / 2 - button_reset_height / 2;
+
+        let done_export = controller.get_is_done_export();
+        let reset_itext = d.gui_icon_text(ICON_RESTART, "Reset");
+
+        let lock_button_reset = !done_export;
+
+        if lock_button_reset {
+            d.gui_lock();
+            d.gui_set_state(STATE_DISABLED);
+        }
+        if d.gui_button(
+            rrect(
+                button_reset_x,
+                button_reset_y,
+                button_reset_width,
+                button_reset_height,
+            ),
+            reset_itext.as_str(),
+        ) {
+            controller.prompt_reset();
+        }
+        if lock_button_reset {
+            d.gui_set_state(STATE_NORMAL);
+            d.gui_unlock();
+        }
     }
 }
 
