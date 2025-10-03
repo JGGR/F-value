@@ -18,6 +18,7 @@
 - Update `IdroEcoRegioneNISECI` to use a different order
   - Drop `CalabriaNebrodi`
   - Split `RomaViterbese` and `Vesuvio`
+- Refactor `Second` view and controller to `Help`
 
 ## [0.0.26] - 2025-09-16
 

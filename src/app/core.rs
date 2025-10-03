@@ -51,7 +51,7 @@ pub(crate) const SUPPORT_HEADLESS: bool = true;
 #[derive(Copy, Clone)]
 pub(crate) enum CurrentView {
     Home,
-    Second,
+    Help,
     SelezioneIndice,
     SelezioneFileInput,
     ValidazioneFileInput,
@@ -66,7 +66,7 @@ impl fmt::Display for CurrentView {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let string_representation = match *self {
             CurrentView::Home => "Home",
-            CurrentView::Second => "Second",
+            CurrentView::Help => "Help",
             CurrentView::SelezioneIndice => "Selezione Indice",
             CurrentView::SelezioneFileInput => "Selezione File Input",
             CurrentView::ValidazioneFileInput => "Validazione File Input",

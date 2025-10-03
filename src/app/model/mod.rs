@@ -26,7 +26,7 @@ use std::collections::HashMap;
 use std::path::PathBuf;
 
 pub(crate) trait SubModel {
-    fn get_frame_counter(&self) -> u32;
+    fn _get_frame_counter(&self) -> u32;
     fn increment_frame_counter(&mut self);
     fn reset(&mut self);
 }
@@ -36,10 +36,11 @@ pub(crate) trait SubModel {
 pub(crate) struct HomeModel {
     frame_counter: u32,
     user_continued: bool,
+    user_wants_info: bool,
 }
 
 impl SubModel for HomeModel {
-    fn get_frame_counter(&self) -> u32 {
+    fn _get_frame_counter(&self) -> u32 {
         self.frame_counter
     }
     fn increment_frame_counter(&mut self) {
@@ -48,6 +49,7 @@ impl SubModel for HomeModel {
     fn reset(&mut self) {
         self.frame_counter = 0;
         self.set_user_continued(false);
+        self.set_user_wants_info(false);
     }
 }
 
@@ -58,19 +60,23 @@ impl HomeModel {
     pub(crate) fn set_user_continued(&mut self, val: bool) {
         self.user_continued = val;
     }
+    pub(crate) fn get_user_wants_info(&self) -> bool {
+        self.user_wants_info
+    }
+    pub(crate) fn set_user_wants_info(&mut self, val: bool) {
+        self.user_wants_info = val;
+    }
 }
 
 // State struct holding non-`Copy` types
 #[derive(Clone)]
-pub(crate) struct SecondModel {
+pub(crate) struct HelpModel {
     frame_counter: u32,
-    value: i32,
-    name: String,
     user_continued: bool,
 }
 
-impl SubModel for SecondModel {
-    fn get_frame_counter(&self) -> u32 {
+impl SubModel for HelpModel {
+    fn _get_frame_counter(&self) -> u32 {
         self.frame_counter
     }
     fn increment_frame_counter(&mut self) {
@@ -79,26 +85,10 @@ impl SubModel for SecondModel {
     fn reset(&mut self) {
         self.frame_counter = 0;
         self.set_user_continued(false);
-        self.set_value(0);
-        self.set_name("".to_string());
     }
 }
 
-impl SecondModel {
-    pub(crate) fn get_value(&self) -> i32 {
-        self.value
-    }
-
-    pub(crate) fn set_value(&mut self, val: i32) {
-        self.value = val;
-    }
-    pub(crate) fn get_name(&self) -> String {
-        self.name.clone()
-    }
-
-    pub(crate) fn set_name(&mut self, new_name: String) {
-        self.name = new_name;
-    }
+impl HelpModel {
     pub(crate) fn get_user_continued(&self) -> bool {
         self.user_continued
     }
@@ -115,7 +105,7 @@ pub(crate) struct IndiceModel {
 }
 
 impl SubModel for IndiceModel {
-    fn get_frame_counter(&self) -> u32 {
+    fn _get_frame_counter(&self) -> u32 {
         self.frame_counter
     }
     fn increment_frame_counter(&mut self) {
@@ -149,7 +139,7 @@ pub(crate) struct FileInputModel {
 }
 
 impl SubModel for FileInputModel {
-    fn get_frame_counter(&self) -> u32 {
+    fn _get_frame_counter(&self) -> u32 {
         self.frame_counter
     }
     fn increment_frame_counter(&mut self) {
@@ -217,7 +207,7 @@ pub(crate) struct InfoAggiuntiveModel {
 }
 
 impl SubModel for InfoAggiuntiveModel {
-    fn get_frame_counter(&self) -> u32 {
+    fn _get_frame_counter(&self) -> u32 {
         self.frame_counter
     }
 
@@ -269,7 +259,7 @@ pub(crate) struct OutputModel {
 }
 
 impl SubModel for OutputModel {
-    fn get_frame_counter(&self) -> u32 {
+    fn _get_frame_counter(&self) -> u32 {
         self.frame_counter
     }
     fn increment_frame_counter(&mut self) {
@@ -326,7 +316,7 @@ pub(crate) struct ConsoleModel {
 }
 
 impl SubModel for ConsoleModel {
-    fn get_frame_counter(&self) -> u32 {
+    fn _get_frame_counter(&self) -> u32 {
         self.frame_counter
     }
     fn increment_frame_counter(&mut self) {
@@ -381,7 +371,7 @@ pub(crate) struct DataModel {
 }
 
 impl SubModel for DataModel {
-    fn get_frame_counter(&self) -> u32 {
+    fn _get_frame_counter(&self) -> u32 {
         self.frame_counter
     }
     fn increment_frame_counter(&mut self) {
@@ -465,7 +455,7 @@ impl DataModel {
 #[derive(Clone)]
 pub(crate) struct Model {
     pub(crate) home_model: HomeModel,
-    pub(crate) second_model: SecondModel,
+    pub(crate) second_model: HelpModel,
     pub(crate) indice_model: IndiceModel,
     pub(crate) fileinput_model: FileInputModel,
     pub(crate) infoaggiuntive_model: InfoAggiuntiveModel,
@@ -480,11 +470,10 @@ impl Model {
             home_model: HomeModel {
                 frame_counter: 0,
                 user_continued: false,
+                user_wants_info: false,
             },
-            second_model: SecondModel {
+            second_model: HelpModel {
                 frame_counter: 0,
-                value: 1,
-                name: "Initial".to_string(),
                 user_continued: false,
             },
             indice_model: IndiceModel {

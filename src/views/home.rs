@@ -19,7 +19,7 @@ use crate::views::{propheight, propwidth, rrect, View};
 use crate::MainState;
 use crate::SHORT_PROJECT_VERSION;
 use raylib::color::Color;
-use raylib::consts::GuiIconName::ICON_PLAYER_NEXT;
+use raylib::consts::GuiIconName::{ICON_PLAYER_NEXT, ICON_INFO};
 use raylib::drawing::RaylibDrawHandle;
 use raylib::math::{Rectangle, Vector2};
 use raylib::prelude::*;
@@ -262,11 +262,24 @@ impl View for HomeView {
 
         let continue_itext = d.gui_icon_text(ICON_PLAYER_NEXT, ": Continua");
 
+        let info_width = continue_width;
+        let info_x = continue_x;
+        let info_height = continue_height;
+        let info_y = continue_y - continue_height*2;
+
+        let info_itext = d.gui_icon_text(ICON_INFO, ": Info");
+
         if d.gui_button(
             rrect(continue_x, continue_y, continue_width, continue_height),
             continue_itext.as_str(),
         ) {
             controller.set_user_continued(true);
+        }
+        if d.gui_button(
+            rrect(info_x, info_y, info_width, info_height),
+            info_itext.as_str(),
+        ) {
+            controller.set_user_wants_info(true);
         }
     }
 }

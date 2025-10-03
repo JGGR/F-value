@@ -15,56 +15,49 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 // Controller to update and access the state
-pub(crate) struct HomeController;
 
-use super::{Controller, CurrentView, HomeModel};
+use super::{Controller, CurrentView, HelpModel};
 use crate::app::model::SubModel;
 use crate::state::GLOBAL_STATE;
 use crate::MainState;
 use raylib::RaylibHandle;
 
-impl Controller for HomeController {
-    type SubModel = HomeModel;
+pub(crate) struct HelpController;
 
+impl Controller for HelpController {
+    type SubModel = HelpModel;
     fn update(&self, _rl: &mut RaylibHandle, main_state: &mut MainState) {
         let mut state = GLOBAL_STATE.lock().unwrap();
-        state.home_model.increment_frame_counter();
-        if state.home_model.get_user_continued() {
-            eprintln!("HomeController:  L'utente ha premuto Continua");
-            eprintln!("HomeController:  Let's update current view and go to SelezioneIndice.");
+        state.second_model.increment_frame_counter();
+        if state.second_model.get_user_continued() {
+            eprintln!("HelpController:  L'utente ha premuto Continua");
+            eprintln!("HelpController:  Let's update current view and go to SelezioneIndice.");
             main_state.set_current_view(CurrentView::SelezioneIndice)
         }
-        if state.home_model.get_user_wants_info() {
-            eprintln!("HomeController:  L'utente ha premuto Info");
-            eprintln!("HomeController:  Let's update current view and go to Help.");
-            main_state.set_current_view(CurrentView::Help)
-        }
-
         if main_state.should_reset {
-            eprintln!("HomeController: Resetting");
+            eprintln!("HelpController: Resetting");
             main_state.should_reset = false;
             state.home_model.reset();
+            state.second_model.reset();
             state.console_model.reset();
+            main_state.set_current_view(CurrentView::Home);
+            return;
         }
     }
 
     fn get_state(&self) -> Self::SubModel {
         let state = GLOBAL_STATE.lock().unwrap();
-        state.home_model.clone()
+        state.second_model.clone()
     }
 }
 
-impl HomeController {
+impl HelpController {
     pub(crate) fn new() -> Self {
         Self
     }
 
     pub(crate) fn set_user_continued(&self, val: bool) {
         let mut state = GLOBAL_STATE.lock().unwrap();
-        state.home_model.set_user_continued(val);
-    }
-    pub(crate) fn set_user_wants_info(&self, val: bool) {
-        let mut state = GLOBAL_STATE.lock().unwrap();
-        state.home_model.set_user_wants_info(val);
+        state.second_model.set_user_continued(val);
     }
 }
