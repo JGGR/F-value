@@ -14,6 +14,9 @@
 - Round `RQE Niseci` to 2 decimal digits
 - Update `ComunitaNISECI` format
 - Update pdf contents
+- Update `IdroEcoRegioneNISECI` to use a different order
+  - Drop `CalabriaNebrodi`
+  - Split `RomaViterbese` and `Vesuvio`
 
 ## [0.0.26] - 2025-09-16
 

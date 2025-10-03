@@ -717,12 +717,12 @@ impl View for SelezioneInfoAggiuntiveView {
                         column_2_groupbox_boxes_width,
                         column_2_groupbox_boxes_height * 4,
                     ),
-                    "AlpiCentroOrientali;AlpiMediterranee;AlpiMeridionali;\
-                    AlpiOccidentali;AppenninoCentrale;AppenninoMeridionale;\
-                    AppenninoPiemontese;AppenninoSettentrionale;BasilicataTavoliere;\
-                    BassoLazio;CalabriaNebrodi;Carso;CostaAdriatica;Monferrato;\
-                    PianuraPadana;PrealpiDolomiti;PugliaGargano;RomaViterbeseVesuvio;\
-                    Sardegna;Sicilia;Toscana",
+                    "1-AlpiOccidentali;2-Prealpi Dolomiti;3-Alpi Centro-Orientali;\
+                    4-Alpi Meridionali;5-Monferrato;6-Pianura Padana;7-Carso;\
+                    8-Appennino Piemontese;9-Alpi Mediterranee;10-Appennino Piemontese;\
+                    11-Toscana;12-Costa Adriatica;13-Appennino Centrale;14-Roma-Viterbese;\
+                    15-Basso Lazio;16-Vesuvio;17-Basilicata-Tavoliere;18-Puglia-Carsica;\
+                    19-Appennino Meridionale;20-Sicilia;21-Sardegna",
                     &mut self.listview_idroecoregione_niseci_scroll_value,
                     &mut self.listview_idroecoregione_niseci_value,
                 );

@@ -352,53 +352,53 @@ impl fmt::Display for AnagraficaNISECI {
 
 #[derive(Clone)]
 pub(crate) enum IdroEcoRegioneNISECI {
-    AlpiCentroOrientali,
-    AlpiMediterranee,
-    AlpiMeridionali,
     AlpiOccidentali,
-    AppenninoCentrale,
-    AppenninoMeridionale,
-    AppenninoPiemontese,
-    AppenninoSettentrionale,
-    BasilicataTavoliere,
-    BassoLazio,
-    CalabriaNebrodi,
-    Carso,
-    CostaAdriatica,
+    PrealpiDolomiti,
+    AlpiCentroOrientali,
+    AlpiMeridionali,
     Monferrato,
     PianuraPadana,
-    PrealpiDolomiti,
-    PugliaGargano,
-    RomaViterbeseVesuvio,
-    Sardegna,
-    Sicilia,
+    Carso,
+    AppenninoPiemontese,
+    AlpiMediterranee,
+    AppenninoSettentrionale,
     Toscana,
+    CostaAdriatica,
+    AppenninoCentrale,
+    RomaViterbese,
+    BassoLazio,
+    Vesuvio,
+    BasilicataTavoliere,
+    PugliaCarsica,
+    AppenninoMeridionale,
+    Sicilia,
+    Sardegna,
 }
 
 impl fmt::Display for IdroEcoRegioneNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let string_representation = match *self {
-            IdroEcoRegioneNISECI::AlpiCentroOrientali => "Alpi Centro-orientali",
-            IdroEcoRegioneNISECI::AlpiMediterranee => "Alpi Mediterranee",
-            IdroEcoRegioneNISECI::AlpiMeridionali => "Alpi Meridionali",
             IdroEcoRegioneNISECI::AlpiOccidentali => "Alpi Occidentali",
-            IdroEcoRegioneNISECI::AppenninoCentrale => "Appennino Centrale",
-            IdroEcoRegioneNISECI::AppenninoMeridionale => "Appennino Meridionale",
-            IdroEcoRegioneNISECI::AppenninoPiemontese => "Appennino Piemontese",
-            IdroEcoRegioneNISECI::AppenninoSettentrionale => "Appennino Settentrionale",
-            IdroEcoRegioneNISECI::BasilicataTavoliere => "Basilicata Tavoliere",
-            IdroEcoRegioneNISECI::BassoLazio => "Basso Lazio",
-            IdroEcoRegioneNISECI::CalabriaNebrodi => "Calabria Nebrodi",
-            IdroEcoRegioneNISECI::Carso => "Carso",
-            IdroEcoRegioneNISECI::CostaAdriatica => "Costa Adriatica",
+            IdroEcoRegioneNISECI::PrealpiDolomiti => "Prealpi Dolomiti",
+            IdroEcoRegioneNISECI::AlpiCentroOrientali => "Alpi Centro-orientali",
+            IdroEcoRegioneNISECI::AlpiMeridionali => "Alpi Meridionali",
             IdroEcoRegioneNISECI::Monferrato => "Monferrato",
             IdroEcoRegioneNISECI::PianuraPadana => "Pianura Padana",
-            IdroEcoRegioneNISECI::PrealpiDolomiti => "Prealpi Dolomiti",
-            IdroEcoRegioneNISECI::PugliaGargano => "Puglia Gargano",
-            IdroEcoRegioneNISECI::RomaViterbeseVesuvio => "Roma-Viterbese-Vesuvio",
-            IdroEcoRegioneNISECI::Sardegna => "Sardegna",
-            IdroEcoRegioneNISECI::Sicilia => "Sicilia",
+            IdroEcoRegioneNISECI::Carso => "Carso",
+            IdroEcoRegioneNISECI::AppenninoPiemontese => "Appennino Piemontese",
+            IdroEcoRegioneNISECI::AlpiMediterranee => "Alpi Mediterranee",
+            IdroEcoRegioneNISECI::AppenninoSettentrionale => "Appennino Settentrionale",
             IdroEcoRegioneNISECI::Toscana => "Toscana",
+            IdroEcoRegioneNISECI::CostaAdriatica => "Costa Adriatica",
+            IdroEcoRegioneNISECI::AppenninoCentrale => "Appennino Centrale",
+            IdroEcoRegioneNISECI::RomaViterbese => "Roma-Viterbese",
+            IdroEcoRegioneNISECI::BassoLazio => "Basso Lazio",
+            IdroEcoRegioneNISECI::Vesuvio => "Vesuvio",
+            IdroEcoRegioneNISECI::BasilicataTavoliere => "Basilicata Tavoliere",
+            IdroEcoRegioneNISECI::PugliaCarsica => "Puglia Carsica",
+            IdroEcoRegioneNISECI::AppenninoMeridionale => "Appennino Meridionale",
+            IdroEcoRegioneNISECI::Sicilia => "Sicilia",
+            IdroEcoRegioneNISECI::Sardegna => "Sardegna",
         };
         write!(f, "{}", string_representation)
     }
@@ -409,42 +409,17 @@ impl TryFrom<i32> for IdroEcoRegioneNISECI {
 
     fn try_from(v: i32) -> Result<Self, Self::Error> {
         match v {
-            x if x == IdroEcoRegioneNISECI::AlpiCentroOrientali as i32 => {
-                Ok(IdroEcoRegioneNISECI::AlpiCentroOrientali)
-            }
-            x if x == IdroEcoRegioneNISECI::AlpiMediterranee as i32 => {
-                Ok(IdroEcoRegioneNISECI::AlpiMediterranee)
-            }
-            x if x == IdroEcoRegioneNISECI::AlpiMeridionali as i32 => {
-                Ok(IdroEcoRegioneNISECI::AlpiMeridionali)
-            }
             x if x == IdroEcoRegioneNISECI::AlpiOccidentali as i32 => {
                 Ok(IdroEcoRegioneNISECI::AlpiOccidentali)
             }
-            x if x == IdroEcoRegioneNISECI::AppenninoCentrale as i32 => {
-                Ok(IdroEcoRegioneNISECI::AppenninoCentrale)
+            x if x == IdroEcoRegioneNISECI::PrealpiDolomiti as i32 => {
+                Ok(IdroEcoRegioneNISECI::PrealpiDolomiti)
             }
-            x if x == IdroEcoRegioneNISECI::AppenninoMeridionale as i32 => {
-                Ok(IdroEcoRegioneNISECI::AppenninoMeridionale)
+            x if x == IdroEcoRegioneNISECI::AlpiCentroOrientali as i32 => {
+                Ok(IdroEcoRegioneNISECI::AlpiCentroOrientali)
             }
-            x if x == IdroEcoRegioneNISECI::AppenninoPiemontese as i32 => {
-                Ok(IdroEcoRegioneNISECI::AppenninoPiemontese)
-            }
-            x if x == IdroEcoRegioneNISECI::AppenninoSettentrionale as i32 => {
-                Ok(IdroEcoRegioneNISECI::AppenninoSettentrionale)
-            }
-            x if x == IdroEcoRegioneNISECI::BasilicataTavoliere as i32 => {
-                Ok(IdroEcoRegioneNISECI::BasilicataTavoliere)
-            }
-            x if x == IdroEcoRegioneNISECI::BassoLazio as i32 => {
-                Ok(IdroEcoRegioneNISECI::BassoLazio)
-            }
-            x if x == IdroEcoRegioneNISECI::CalabriaNebrodi as i32 => {
-                Ok(IdroEcoRegioneNISECI::CalabriaNebrodi)
-            }
-            x if x == IdroEcoRegioneNISECI::Carso as i32 => Ok(IdroEcoRegioneNISECI::Carso),
-            x if x == IdroEcoRegioneNISECI::CostaAdriatica as i32 => {
-                Ok(IdroEcoRegioneNISECI::CostaAdriatica)
+            x if x == IdroEcoRegioneNISECI::AlpiMeridionali as i32 => {
+                Ok(IdroEcoRegioneNISECI::AlpiMeridionali)
             }
             x if x == IdroEcoRegioneNISECI::Monferrato as i32 => {
                 Ok(IdroEcoRegioneNISECI::Monferrato)
@@ -452,18 +427,43 @@ impl TryFrom<i32> for IdroEcoRegioneNISECI {
             x if x == IdroEcoRegioneNISECI::PianuraPadana as i32 => {
                 Ok(IdroEcoRegioneNISECI::PianuraPadana)
             }
-            x if x == IdroEcoRegioneNISECI::PrealpiDolomiti as i32 => {
-                Ok(IdroEcoRegioneNISECI::PrealpiDolomiti)
+            x if x == IdroEcoRegioneNISECI::Carso as i32 => Ok(IdroEcoRegioneNISECI::Carso),
+            x if x == IdroEcoRegioneNISECI::AppenninoPiemontese as i32 => {
+                Ok(IdroEcoRegioneNISECI::AppenninoPiemontese)
             }
-            x if x == IdroEcoRegioneNISECI::PugliaGargano as i32 => {
-                Ok(IdroEcoRegioneNISECI::PugliaGargano)
+            x if x == IdroEcoRegioneNISECI::AlpiMediterranee as i32 => {
+                Ok(IdroEcoRegioneNISECI::AlpiMediterranee)
             }
-            x if x == IdroEcoRegioneNISECI::RomaViterbeseVesuvio as i32 => {
-                Ok(IdroEcoRegioneNISECI::RomaViterbeseVesuvio)
+            x if x == IdroEcoRegioneNISECI::AppenninoSettentrionale as i32 => {
+                Ok(IdroEcoRegioneNISECI::AppenninoSettentrionale)
             }
-            x if x == IdroEcoRegioneNISECI::Sardegna as i32 => Ok(IdroEcoRegioneNISECI::Sardegna),
-            x if x == IdroEcoRegioneNISECI::Sicilia as i32 => Ok(IdroEcoRegioneNISECI::Sicilia),
             x if x == IdroEcoRegioneNISECI::Toscana as i32 => Ok(IdroEcoRegioneNISECI::Toscana),
+            x if x == IdroEcoRegioneNISECI::CostaAdriatica as i32 => {
+                Ok(IdroEcoRegioneNISECI::CostaAdriatica)
+            }
+            x if x == IdroEcoRegioneNISECI::AppenninoCentrale as i32 => {
+                Ok(IdroEcoRegioneNISECI::AppenninoCentrale)
+            }
+            x if x == IdroEcoRegioneNISECI::RomaViterbese as i32 => {
+                Ok(IdroEcoRegioneNISECI::RomaViterbese)
+            }
+            x if x == IdroEcoRegioneNISECI::BassoLazio as i32 => {
+                Ok(IdroEcoRegioneNISECI::BassoLazio)
+            }
+            x if x == IdroEcoRegioneNISECI::Vesuvio as i32 => {
+                Ok(IdroEcoRegioneNISECI::Vesuvio)
+            }
+            x if x == IdroEcoRegioneNISECI::BasilicataTavoliere as i32 => {
+                Ok(IdroEcoRegioneNISECI::BasilicataTavoliere)
+            }
+            x if x == IdroEcoRegioneNISECI::PugliaCarsica as i32 => {
+                Ok(IdroEcoRegioneNISECI::PugliaCarsica)
+            }
+            x if x == IdroEcoRegioneNISECI::AppenninoMeridionale as i32 => {
+                Ok(IdroEcoRegioneNISECI::AppenninoMeridionale)
+            }
+            x if x == IdroEcoRegioneNISECI::Sicilia as i32 => Ok(IdroEcoRegioneNISECI::Sicilia),
+            x if x == IdroEcoRegioneNISECI::Sardegna as i32 => Ok(IdroEcoRegioneNISECI::Sardegna),
             _ => Err(()),
         }
     }
