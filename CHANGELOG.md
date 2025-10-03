@@ -4,6 +4,7 @@
 
 - Add reset button in pdf output view
 - Add data, regione, idroecoregione, area, bacino to log
+- Add names in home page
 
 ### Changed
 

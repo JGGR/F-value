@@ -450,9 +450,7 @@ impl TryFrom<i32> for IdroEcoRegioneNISECI {
             x if x == IdroEcoRegioneNISECI::BassoLazio as i32 => {
                 Ok(IdroEcoRegioneNISECI::BassoLazio)
             }
-            x if x == IdroEcoRegioneNISECI::Vesuvio as i32 => {
-                Ok(IdroEcoRegioneNISECI::Vesuvio)
-            }
+            x if x == IdroEcoRegioneNISECI::Vesuvio as i32 => Ok(IdroEcoRegioneNISECI::Vesuvio),
             x if x == IdroEcoRegioneNISECI::BasilicataTavoliere as i32 => {
                 Ok(IdroEcoRegioneNISECI::BasilicataTavoliere)
             }
