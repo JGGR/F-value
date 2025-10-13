@@ -357,6 +357,14 @@ pub(crate) fn esporta_pdf_niseci(
         content.show(Str(&format!("DM 260/2010").into_bytes()));
         content.end_text();
 
+        content.move_to(x_start, 30.0);
+        content.line_to(x_start + (cols as f32 * cell_width), 30.0);
+        content.stroke();
+
+        content.begin_text();
+        content.next_line(a4.x2 / 2.0 - 45.0, 15.0);
+        content.show(Str(&format!("F-value v{}", env!("CARGO_PKG_VERSION")).into_bytes()));
+        content.end_text();
 
         //This can be used to debug the content before streaming it
         //let content_bytes = content.finish();
@@ -758,6 +766,15 @@ pub(crate) fn esporta_pdf_hfbi(
 
         content.next_line(0.0, -15.0);
         content.show(Str(&format!("DM 260/2010").into_bytes()));
+        content.end_text();
+
+        content.move_to(x_start, 30.0);
+        content.line_to(x_start + (cols as f32 * cell_width), 30.0);
+        content.stroke();
+
+        content.begin_text();
+        content.next_line(a4.x2 / 2.0 - 45.0, 15.0);
+        content.show(Str(&format!("F-value v{}", env!("CARGO_PKG_VERSION")).into_bytes()));
         content.end_text();
 
         let content_id = alloc.bump();
