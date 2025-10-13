@@ -1,3 +1,9 @@
+## [0.0.28] - Unreleased
+
+### Changed
+
+- Use Ispra and Cisba logos in pdf
+
 ## [0.0.27] - 2025-10-03
 
 ### Added

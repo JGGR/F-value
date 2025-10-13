@@ -18,7 +18,7 @@
 use crate::domain::hfbi::{AnagraficaHFBI, RisultatoHFBI};
 use crate::domain::niseci::{AnagraficaNISECI, RiferimentoNISECI, RisultatoNISECI};
 use crate::engines::niseci::full::calculate_stato_ecologico;
-use crate::PROJECT_LOGO_DATA;
+use crate::app::core::{CISBA_LOGO_DATA, ISPRA_LOGO_DATA};
 use image::{ColorType, GenericImageView, ImageFormat};
 use miniz_oxide::deflate::{compress_to_vec_zlib, CompressionLevel};
 use pdf_writer::{Chunk, Content, Filter, Finish, Name, Pdf, Rect, Ref, Str};
@@ -76,14 +76,14 @@ pub(crate) fn esporta_pdf_niseci(
     let s_mask_id = alloc.bump();
 
     // Decode the image.
-    let format = image::guess_format(&PROJECT_LOGO_DATA).unwrap();
-    let dynamic = image::load_from_memory(&PROJECT_LOGO_DATA).unwrap();
+    let format = image::guess_format(&ISPRA_LOGO_DATA).unwrap();
+    let dynamic = image::load_from_memory(&ISPRA_LOGO_DATA).unwrap();
 
     let (filter, encoded, mask) = match format {
         // A JPEG is already valid DCT-encoded data.
         ImageFormat::Jpeg => {
             assert!(dynamic.color() == ColorType::Rgb8);
-            (Filter::DctDecode, PROJECT_LOGO_DATA.to_vec(), None)
+            (Filter::DctDecode, ISPRA_LOGO_DATA.to_vec(), None)
         }
 
         // While PNGs uses deflate internally, we need to re-encode to get just
@@ -136,12 +136,83 @@ pub(crate) fn esporta_pdf_niseci(
     let a4 = Rect::new(0.0, 0.0, 595.0, 842.0);
 
     // Size the image at 1pt per pixel.
-    let w = (dynamic.width() / 6) as f32;
-    let h = (dynamic.height() / 6) as f32;
+    let w = (dynamic.width() / 8) as f32;
+    let h = (dynamic.height() / 8) as f32;
 
     // Center the image on the page.
-    let x = (a4.x2 - w) / 2.0;
-    let y = (a4.y2 - h) / 2.0;
+    let x = 205.0; //(a4.x2 - w) / 2.0;
+    let y = 742.0; //(a4.y2 - h) / 2.0;
+
+    let image_id_2 = alloc.bump();
+    let image_name_2 = Name(b"I2");
+
+    let s_mask_id_2 = alloc.bump();
+
+    // Decode the image.
+    let format_2 = image::guess_format(&CISBA_LOGO_DATA).unwrap();
+    let dynamic_2 = image::load_from_memory(&CISBA_LOGO_DATA).unwrap();
+
+    let (filter_2, encoded_2, mask_2) = match format_2 {
+        // A JPEG is already valid DCT-encoded data.
+        ImageFormat::Jpeg => {
+            assert!(dynamic_2.color() == ColorType::Rgb8);
+            (Filter::DctDecode, CISBA_LOGO_DATA.to_vec(), None)
+        }
+
+        // While PNGs uses deflate internally, we need to re-encode to get just
+        // the raw coded samples without metadata. Also, we need to encode the
+        // RGB and alpha data separately.
+        ImageFormat::Png => {
+            let level = CompressionLevel::DefaultLevel as u8;
+            let encoded = compress_to_vec_zlib(dynamic_2.to_rgb8().as_raw(), level);
+
+            // If there's an alpha channel, extract the pixel alpha values.
+            let mask = dynamic_2.color().has_alpha().then(|| {
+                let alphas: Vec<_> = dynamic_2.pixels().map(|p| (p.2).0[3]).collect();
+                compress_to_vec_zlib(&alphas, level)
+            });
+
+            (Filter::FlateDecode, encoded, mask)
+        }
+
+        // You could handle other image formats similarly or just recode them to
+        // JPEG or PNG, whatever best fits your use case.
+        _ => panic!("unsupported image format"),
+    };
+
+    // Write the stream for the image we want to embed.
+    {
+        let mut image = pdf.image_xobject(image_id_2, &encoded_2);
+        image.filter(filter_2);
+        image.width(dynamic_2.width() as i32);
+        image.height(dynamic_2.height() as i32);
+        image.color_space().device_rgb();
+        image.bits_per_component(8);
+        if mask.is_some() {
+            image.s_mask(s_mask_id_2);
+        }
+        image.finish();
+    }
+
+    {
+        // Add SMask if the image has transparency.
+        if let Some(encoded) = &mask_2 {
+            let mut s_mask = pdf.image_xobject(s_mask_id_2, encoded);
+            s_mask.filter(filter_2);
+            s_mask.width(dynamic_2.width() as i32);
+            s_mask.height(dynamic_2.height() as i32);
+            s_mask.color_space().device_gray();
+            s_mask.bits_per_component(8);
+        }
+    }
+
+    // Size the image at 1pt per pixel.
+    let w_2 = (dynamic_2.width() / 8) as f32;
+    let h_2 = (dynamic_2.height() / 8) as f32;
+
+    // Center the image on the page.
+    let x_2 = x + w + w_2; //(a4.x2 - w) / 2.0;
+    let y_2 = y; //(a4.y2 - h) / 2.0;
 
     // Page 1
     let page_id = alloc.bump();
@@ -155,7 +226,7 @@ pub(crate) fn esporta_pdf_niseci(
     let cell_width = 240.0;
     let cell_height = 30.0;
     let x_start = 58.0;
-    let y_start = height - 88.0;
+    let y_start = height - 148.0;
 
     // Write a page.
     {
@@ -170,7 +241,7 @@ pub(crate) fn esporta_pdf_niseci(
         {
             let mut resources = page.resources();
             resources.fonts().pair(font_name, font_id);
-            resources.x_objects().pair(image_name, image_id);
+            resources.x_objects().pair(image_name, image_id).pair(image_name_2, image_id_2);
         }
 
         // Write a line of text, with the font specified in the resource list
@@ -185,7 +256,7 @@ pub(crate) fn esporta_pdf_niseci(
         content.begin_text();
         content.set_font(font_name, 14.0);
         content.set_leading(30.0);
-        content.next_line(58.0, 764.0);
+        content.next_line(58.0, 704.0);
         content.show(Str(&format!("{}", anagrafica_niseci.comunita).into_bytes()));
         content.next_line(0.0, -30.0);
         content.show(Str(&format!(
@@ -267,6 +338,11 @@ pub(crate) fn esporta_pdf_niseci(
         content.save_state();
         content.transform([w, 0.0, 0.0, h, x, y]);
         content.x_object(image_name);
+        content.restore_state();
+
+        content.save_state();
+        content.transform([w_2, 0.0, 0.0, h_2, x_2, y_2]);
+        content.x_object(image_name_2);
         content.restore_state();
 
         //This can be used to debug the content before streaming it
@@ -409,14 +485,14 @@ pub(crate) fn esporta_pdf_hfbi(
     let s_mask_id = alloc.bump();
 
     // Decode the image.
-    let format = image::guess_format(&PROJECT_LOGO_DATA).unwrap();
-    let dynamic = image::load_from_memory(&PROJECT_LOGO_DATA).unwrap();
+    let format = image::guess_format(&ISPRA_LOGO_DATA).unwrap();
+    let dynamic = image::load_from_memory(&ISPRA_LOGO_DATA).unwrap();
 
     let (filter, encoded, mask) = match format {
         // A JPEG is already valid DCT-encoded data.
         ImageFormat::Jpeg => {
             assert!(dynamic.color() == ColorType::Rgb8);
-            (Filter::DctDecode, PROJECT_LOGO_DATA.to_vec(), None)
+            (Filter::DctDecode, ISPRA_LOGO_DATA.to_vec(), None)
         }
 
         // While PNGs uses deflate internally, we need to re-encode to get just
@@ -469,16 +545,83 @@ pub(crate) fn esporta_pdf_hfbi(
     let a4 = Rect::new(0.0, 0.0, 595.0, 842.0);
 
     // Size the image at 1pt per pixel.
-    let w = (dynamic.width() / 6) as f32;
-    let h = (dynamic.height() / 6) as f32;
+    let w = (dynamic.width() / 8) as f32;
+    let h = (dynamic.height() / 8) as f32;
 
     // Center the image on the page.
-    let x = (a4.x2 - w) / 2.0;
-    let y = (a4.y2 - h) / 2.0;
+    let x = 205.0; //(a4.x2 - w) / 2.0;
+    let y = 742.0; //(a4.y2 - h) / 2.0;
 
-    // Page 1
-    let page_id = alloc.bump();
-    page_ids.push(page_id);
+    let image_id_2 = alloc.bump();
+    let image_name_2 = Name(b"I2");
+
+    let s_mask_id_2 = alloc.bump();
+
+    // Decode the image.
+    let format_2 = image::guess_format(&CISBA_LOGO_DATA).unwrap();
+    let dynamic_2 = image::load_from_memory(&CISBA_LOGO_DATA).unwrap();
+
+    let (filter_2, encoded_2, mask_2) = match format_2 {
+        // A JPEG is already valid DCT-encoded data.
+        ImageFormat::Jpeg => {
+            assert!(dynamic_2.color() == ColorType::Rgb8);
+            (Filter::DctDecode, CISBA_LOGO_DATA.to_vec(), None)
+        }
+
+        // While PNGs uses deflate internally, we need to re-encode to get just
+        // the raw coded samples without metadata. Also, we need to encode the
+        // RGB and alpha data separately.
+        ImageFormat::Png => {
+            let level = CompressionLevel::DefaultLevel as u8;
+            let encoded = compress_to_vec_zlib(dynamic_2.to_rgb8().as_raw(), level);
+
+            // If there's an alpha channel, extract the pixel alpha values.
+            let mask = dynamic_2.color().has_alpha().then(|| {
+                let alphas: Vec<_> = dynamic_2.pixels().map(|p| (p.2).0[3]).collect();
+                compress_to_vec_zlib(&alphas, level)
+            });
+
+            (Filter::FlateDecode, encoded, mask)
+        }
+
+        // You could handle other image formats similarly or just recode them to
+        // JPEG or PNG, whatever best fits your use case.
+        _ => panic!("unsupported image format"),
+    };
+
+    // Write the stream for the image we want to embed.
+    {
+        let mut image = pdf.image_xobject(image_id_2, &encoded_2);
+        image.filter(filter_2);
+        image.width(dynamic_2.width() as i32);
+        image.height(dynamic_2.height() as i32);
+        image.color_space().device_rgb();
+        image.bits_per_component(8);
+        if mask.is_some() {
+            image.s_mask(s_mask_id_2);
+        }
+        image.finish();
+    }
+
+    {
+        // Add SMask if the image has transparency.
+        if let Some(encoded) = &mask_2 {
+            let mut s_mask = pdf.image_xobject(s_mask_id_2, encoded);
+            s_mask.filter(filter_2);
+            s_mask.width(dynamic_2.width() as i32);
+            s_mask.height(dynamic_2.height() as i32);
+            s_mask.color_space().device_gray();
+            s_mask.bits_per_component(8);
+        }
+    }
+
+    // Size the image at 1pt per pixel.
+    let w_2 = (dynamic_2.width() / 8) as f32;
+    let h_2 = (dynamic_2.height() / 8) as f32;
+
+    // Center the image on the page.
+    let x_2 = x + w + w_2; //(a4.x2 - w) / 2.0;
+    let y_2 = y; //(a4.y2 - h) / 2.0;
 
     let font_id = alloc.bump();
     let font_name = Name(b"F1");
@@ -488,9 +631,9 @@ pub(crate) fn esporta_pdf_hfbi(
     let cell_width = 240.0;
     let cell_height = 30.0;
     let x_start = 58.0;
-    let y_start = height - 88.0;
+    let y_start = height - 148.0;
 
-    // Page 2
+    // Page 1
     let page_id = alloc.bump();
     page_ids.push(page_id);
 
@@ -502,7 +645,7 @@ pub(crate) fn esporta_pdf_hfbi(
         {
             let mut resources = page.resources();
             resources.fonts().pair(font_name, font_id);
-            resources.x_objects().pair(image_name, image_id);
+            resources.x_objects().pair(image_name, image_id).pair(image_name_2, image_id_2);
         }
 
         // Content for page
@@ -511,7 +654,7 @@ pub(crate) fn esporta_pdf_hfbi(
         content.begin_text();
         content.set_font(font_name, 14.0);
         content.set_leading(30.0);
-        content.next_line(58.0, 764.0);
+        content.next_line(58.0, 704.0);
         content.show(Str(&format!(
             "Codice stazione: {}",
             anagrafica_hfbi.codice_stazione
@@ -585,6 +728,11 @@ pub(crate) fn esporta_pdf_hfbi(
         content.save_state();
         content.transform([w, 0.0, 0.0, h, x, y]);
         content.x_object(image_name);
+        content.restore_state();
+
+        content.save_state();
+        content.transform([w_2, 0.0, 0.0, h_2, x_2, y_2]);
+        content.x_object(image_name_2);
         content.restore_state();
 
         let content_id = alloc.bump();

@@ -38,6 +38,8 @@ pub(crate) const TERMINAL_THEME_DATA: &[u8] =
 pub(crate) const ASHES_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_ashes.rgs");
 pub(crate) const CONSOLE_FONT_DATA: &[u8] = include_bytes!("../../assets/FreeMono.ttf");
 pub(crate) const PROJECT_LOGO_DATA: &[u8] = include_bytes!("../../assets/logo.png");
+pub(crate) const CISBA_LOGO_DATA: &[u8] = include_bytes!("../../assets/logo_cisba.png");
+pub(crate) const ISPRA_LOGO_DATA: &[u8] = include_bytes!("../../assets/logo_ispra.png");
 
 #[cfg(all(windows, debug_assertions))]
 pub(crate) const SUPPORT_HEADLESS: bool = true;
