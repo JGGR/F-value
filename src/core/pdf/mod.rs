@@ -226,7 +226,7 @@ pub(crate) fn esporta_pdf_niseci(
     let cell_width = 240.0;
     let cell_height = 30.0;
     let x_start = 58.0;
-    let y_start = height - 148.0;
+    let y_start = height - 168.0;
 
     // Write a page.
     {
@@ -256,7 +256,7 @@ pub(crate) fn esporta_pdf_niseci(
         content.begin_text();
         content.set_font(font_name, 14.0);
         content.set_leading(30.0);
-        content.next_line(58.0, 704.0);
+        content.next_line(58.0, 684.0);
         content.show(Str(&format!("{}", anagrafica_niseci.comunita).into_bytes()));
         content.next_line(0.0, -30.0);
         content.show(Str(&format!(
@@ -344,6 +344,19 @@ pub(crate) fn esporta_pdf_niseci(
         content.transform([w_2, 0.0, 0.0, h_2, x_2, y_2]);
         content.x_object(image_name_2);
         content.restore_state();
+
+        content.move_to(x_start, y);
+        content.line_to(x_start + (cols as f32 * cell_width), y);
+        content.stroke();
+
+        content.begin_text();
+        content.next_line(a4.x2 / 2.0 - 30.0, y - 15.0);
+        content.show(Str(&format!("Applicazione NISECI").into_bytes()));
+
+        content.next_line(0.0, -15.0);
+        content.show(Str(&format!("DM 260/2010").into_bytes()));
+        content.end_text();
+
 
         //This can be used to debug the content before streaming it
         //let content_bytes = content.finish();
@@ -631,7 +644,7 @@ pub(crate) fn esporta_pdf_hfbi(
     let cell_width = 240.0;
     let cell_height = 30.0;
     let x_start = 58.0;
-    let y_start = height - 148.0;
+    let y_start = height - 168.0;
 
     // Page 1
     let page_id = alloc.bump();
@@ -654,7 +667,7 @@ pub(crate) fn esporta_pdf_hfbi(
         content.begin_text();
         content.set_font(font_name, 14.0);
         content.set_leading(30.0);
-        content.next_line(58.0, 704.0);
+        content.next_line(58.0, 684.0);
         content.show(Str(&format!(
             "Codice stazione: {}",
             anagrafica_hfbi.codice_stazione
@@ -734,6 +747,18 @@ pub(crate) fn esporta_pdf_hfbi(
         content.transform([w_2, 0.0, 0.0, h_2, x_2, y_2]);
         content.x_object(image_name_2);
         content.restore_state();
+
+        content.move_to(x_start, y);
+        content.line_to(x_start + (cols as f32 * cell_width), y);
+        content.stroke();
+
+        content.begin_text();
+        content.next_line(a4.x2 / 2.0 - 30.0, y - 15.0);
+        content.show(Str(&format!("Applicazione HFBI").into_bytes()));
+
+        content.next_line(0.0, -15.0);
+        content.show(Str(&format!("DM 260/2010").into_bytes()));
+        content.end_text();
 
         let content_id = alloc.bump();
         secondary.stream(content_id, &content.finish());
