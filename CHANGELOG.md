@@ -1,3 +1,13 @@
+## [0.0.28] - 2025-10-14
+
+### Added
+
+- Use `chrono` in `build-dependencies` to set `BUILD_DATE`
+
+### Changed
+
+- Use Ispra and Cisba logos in pdf
+
 ## [0.0.27] - 2025-10-03
 
 ### Added

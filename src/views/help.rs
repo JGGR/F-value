@@ -26,8 +26,7 @@ use raylib::RaylibThread;
 // A view responsible for rendering the state
 // Tightly coupled with its respective controller
 
-pub(crate) struct HelpView {
-}
+pub(crate) struct HelpView {}
 
 impl View for HelpView {
     type Controller = HelpController;
@@ -67,10 +66,7 @@ l'ittiofauna, per la determinazione della qualità ecologica dei corpi idrici.
             &txt,
             // We use propwidth/height for the text starting position:
             // this is not the bound
-            Vector2::new(
-                txt_x as f32,
-                txt_y as f32,
-            ),
+            Vector2::new(txt_x as f32, txt_y as f32),
             main_state.current_font_height as f32,
             main_state.default_txt_spacing as f32,
             main_state.default_txt_color,

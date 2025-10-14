@@ -1,11 +1,14 @@
 [package]
 name = "esox"
-version = "0.0.27"
+version = "0.0.28"
 edition = "2021"
 
 [features]
 default = ["logged"]
 logged = ["dep:flexi_logger", "dep:dirs", "dep:log"]
+
+[build-dependencies]
+chrono = "0.4.39"
 
 [dependencies]
 chrono = "0.4.39"

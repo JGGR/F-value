@@ -45,6 +45,7 @@ pub(crate) const PROJECT_BUILD_TYPE: &str = env!("BUILD_TYPE");
 pub(crate) const PROJECT_BRANCH: &str = env!("BRANCH_NAME");
 pub(crate) const _COMMIT_HASH: &str = env!("COMMIT_HASH");
 pub(crate) const COMMIT_HASH_PLUS: &str = env!("COMMIT_HASH_PLUS");
+pub(crate) const BUILD_DATE: &str = env!("BUILD_DATE");
 
 #[cfg(feature = "logged")]
 use dirs::document_dir;
