@@ -266,7 +266,7 @@ pub(crate) fn esporta_pdf_niseci(
         .into_bytes()));
         content.next_line(0.0, -30.0);
         content.show(Str(
-            &format!("Data: {}", anagrafica_niseci.date_string).into_bytes()
+            &format!("Data campionamento: {}", anagrafica_niseci.date_string).into_bytes()
         ));
         content.next_line(0.0, -30.0);
         content.show(Str(&format!("{}", anagrafica_niseci.area).into_bytes()));
@@ -302,13 +302,13 @@ pub(crate) fn esporta_pdf_niseci(
         .into_bytes()));
         content.next_line(0.0, -30.0);
         content.show(Str(&format!(
-            "Lunghezza media stazione: {}",
+            "Lunghezza stazione: {}",
             anagrafica_niseci.lunghezza_media_stazione
         )
         .into_bytes()));
         content.next_line(0.0, -30.0);
         content.show(Str(&format!(
-            "Larghezza media stazione: {}",
+            "Larghezza stazione: {}",
             anagrafica_niseci.larghezza_media_stazione
         )
         .into_bytes()));
@@ -690,7 +690,7 @@ pub(crate) fn esporta_pdf_hfbi(
         .into_bytes()));
         content.next_line(0.0, -30.0);
         content.show(Str(
-            &format!("Data: {}", anagrafica_hfbi.date_string).into_bytes()
+            &format!("Data campionamento: {}", anagrafica_hfbi.date_string).into_bytes()
         ));
         content.next_line(0.0, -30.0);
         content.show(Str(
@@ -722,13 +722,13 @@ pub(crate) fn esporta_pdf_hfbi(
         .into_bytes()));
         content.next_line(0.0, -30.0);
         content.show(Str(&format!(
-            "Lunghezza media stazione: {}",
+            "Lunghezza stazione: {}",
             anagrafica_hfbi.lunghezza_media_transetto
         )
         .into_bytes()));
         content.next_line(0.0, -30.0);
         content.show(Str(&format!(
-            "Larghezza media stazione: {}",
+            "Larghezza stazione: {}",
             anagrafica_hfbi.larghezza_media_transetto
         )
         .into_bytes()));
