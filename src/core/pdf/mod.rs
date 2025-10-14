@@ -19,6 +19,7 @@ use crate::app::core::{CISBA_LOGO_DATA, ISPRA_LOGO_DATA};
 use crate::domain::hfbi::{AnagraficaHFBI, RisultatoHFBI};
 use crate::domain::niseci::{AnagraficaNISECI, RiferimentoNISECI, RisultatoNISECI};
 use crate::engines::niseci::full::calculate_stato_ecologico;
+use crate::core::BUILD_DATE;
 use image::{ColorType, GenericImageView, ImageFormat};
 use miniz_oxide::deflate::{compress_to_vec_zlib, CompressionLevel};
 use pdf_writer::{Chunk, Content, Filter, Finish, Name, Pdf, Rect, Ref, Str};
@@ -379,9 +380,9 @@ pub(crate) fn esporta_pdf_niseci(
         content.stroke();
 
         content.begin_text();
-        content.next_line(a4.x2 / 2.0 - 45.0, 15.0);
+        content.next_line(a4.x2 / 2.0 - 115.0, 15.0);
         content.show(Str(
-            &format!("F-value v{}", env!("CARGO_PKG_VERSION")).into_bytes()
+            &format!("F-value v{}, Data release: {}", env!("CARGO_PKG_VERSION"), BUILD_DATE).into_bytes()
         ));
         content.end_text();
 
@@ -797,9 +798,9 @@ pub(crate) fn esporta_pdf_hfbi(
         content.stroke();
 
         content.begin_text();
-        content.next_line(a4.x2 / 2.0 - 45.0, 15.0);
+        content.next_line(a4.x2 / 2.0 - 115.0, 15.0);
         content.show(Str(
-            &format!("F-value v{}", env!("CARGO_PKG_VERSION")).into_bytes()
+            &format!("F-value v{}, Data release: {}", env!("CARGO_PKG_VERSION"), BUILD_DATE).into_bytes()
         ));
         content.end_text();
 

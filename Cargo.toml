@@ -7,6 +7,9 @@ edition = "2021"
 default = ["logged"]
 logged = ["dep:flexi_logger", "dep:dirs", "dep:log"]
 
+[build-dependencies]
+chrono = "0.4.39"
+
 [dependencies]
 chrono = "0.4.39"
 csv = "1.3.1"

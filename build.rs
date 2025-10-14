@@ -1,5 +1,6 @@
 use std::env::consts::{ARCH, OS};
 use std::process::Command;
+use chrono::Local;
 
 #[cfg(debug_assertions)]
 const BUILD_TYPE: &str = "debug";
@@ -66,6 +67,8 @@ fn main() {
 
     let short_version_string = format!("{}-{} ({})", pkg_version, commit_hash_plus, BUILD_TYPE);
 
+    let build_date = Local::now().format("%d/%m/%Y").to_string();
+
     println!("cargo:rustc-env=BUILD_TYPE={}", BUILD_TYPE);
     println!("cargo:rustc-env=BRANCH_NAME={}", branch_name);
     println!("cargo:rustc-env=COMMIT_HASH={}", commit_hash);
@@ -75,4 +78,5 @@ fn main() {
         "cargo:rustc-env=SHORT_VERSION_STRING={}",
         short_version_string
     );
+    println!("cargo:rustc-env=BUILD_DATE={}", build_date);
 }

@@ -1,5 +1,9 @@
 ## [0.0.28] - Unreleased
 
+### Added
+
+- Use `chrono` in `build-dependencies` to set `BUILD_DATE`
+
 ### Changed
 
 - Use Ispra and Cisba logos in pdf
