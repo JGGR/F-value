@@ -146,7 +146,7 @@ pub(crate) fn esporta_pdf_niseci(
 
     // Center the image on the page.
     let x = 205.0; //(a4.x2 - w) / 2.0;
-    let y = 742.0; //(a4.y2 - h) / 2.0;
+    let y = 762.0; //(a4.y2 - h) / 2.0;
 
     let image_id_2 = alloc.bump();
     let image_name_2 = Name(b"I2");
@@ -212,11 +212,11 @@ pub(crate) fn esporta_pdf_niseci(
     }
 
     // Size the image at 1pt per pixel.
-    let w_2 = (dynamic_2.width() / 8) as f32;
-    let h_2 = (dynamic_2.height() / 8) as f32;
+    let w_2 = (dynamic_2.width() / 6) as f32;
+    let h_2 = (dynamic_2.height() / 6) as f32;
 
     // Center the image on the page.
-    let x_2 = x + w + w_2; //(a4.x2 - w) / 2.0;
+    let x_2 = x + w + 20.0; //(a4.x2 - w) / 2.0;
     let y_2 = y; //(a4.y2 - h) / 2.0;
 
     // Page 1
@@ -362,13 +362,13 @@ pub(crate) fn esporta_pdf_niseci(
         content.x_object(image_name_2);
         content.restore_state();
 
-        content.move_to(x_start, y);
-        content.line_to(x_start + (cols as f32 * cell_width), y);
+        content.move_to(x_start, y -10.0);
+        content.line_to(x_start + (cols as f32 * cell_width), y -10.0);
         content.stroke();
 
         content.begin_text();
         content.set_font(font_name, 12.0);
-        content.next_line(a4.x2 / 2.0 - 50.0, y - 15.0);
+        content.next_line(a4.x2 / 2.0 - 50.0, y - 30.0);
         content.show(Str(&format!("Applicazione NISECI").into_bytes()));
 
         content.next_line(0.0, -15.0);
@@ -589,7 +589,7 @@ pub(crate) fn esporta_pdf_hfbi(
 
     // Center the image on the page.
     let x = 205.0; //(a4.x2 - w) / 2.0;
-    let y = 742.0; //(a4.y2 - h) / 2.0;
+    let y = 762.0; //(a4.y2 - h) / 2.0;
 
     let image_id_2 = alloc.bump();
     let image_name_2 = Name(b"I2");
@@ -655,11 +655,11 @@ pub(crate) fn esporta_pdf_hfbi(
     }
 
     // Size the image at 1pt per pixel.
-    let w_2 = (dynamic_2.width() / 8) as f32;
-    let h_2 = (dynamic_2.height() / 8) as f32;
+    let w_2 = (dynamic_2.width() / 6) as f32;
+    let h_2 = (dynamic_2.height() / 6) as f32;
 
     // Center the image on the page.
-    let x_2 = x + w + w_2; //(a4.x2 - w) / 2.0;
+    let x_2 = x + w + 20.0; //(a4.x2 - w) / 2.0;
     let y_2 = y; //(a4.y2 - h) / 2.0;
 
     let font_id = alloc.bump();
@@ -774,12 +774,12 @@ pub(crate) fn esporta_pdf_hfbi(
         content.x_object(image_name_2);
         content.restore_state();
 
-        content.move_to(x_start, y);
-        content.line_to(x_start + (cols as f32 * cell_width), y);
+        content.move_to(x_start, y - 10.0);
+        content.line_to(x_start + (cols as f32 * cell_width), y -10.0);
         content.stroke();
 
         content.begin_text();
-        content.next_line(a4.x2 / 2.0 - 50.0, y - 15.0);
+        content.next_line(a4.x2 / 2.0 - 50.0, y - 30.0);
         content.show(Str(&format!("Applicazione HFBI").into_bytes()));
 
         content.next_line(0.0, -15.0);
