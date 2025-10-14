@@ -43,7 +43,12 @@ pub(crate) fn esporta_pdf_niseci(
             Some(v) => &format!("{}", v),
             None => "NC",
         };
-
+    let x1 = &format!("{}", risultato_niseci.get_x1());
+    let x2 = match risultato_niseci.get_x2() {
+        Some(v) => &format!("{}", v),
+        None => "NC",
+    };
+    let x3 = &format!("{}", risultato_niseci.get_x3());
     /*
     let filtered_riferimento_niseci: Vec<SpecieNISECI> = riferimento_niseci
         .elenco_specie
@@ -322,10 +327,22 @@ pub(crate) fn esporta_pdf_niseci(
         content.show(Str(
             &format!("Stato ecologico: {}", stato_eco_niseci).into_bytes()
         ));
+        content.next_line(0.0, -30.0);
+        content.show(Str(
+            &format!("X1: {}", x1).into_bytes()
+        ));
+        content.next_line(0.0, -30.0);
+        content.show(Str(
+            &format!("X2: {}", x2).into_bytes()
+        ));
+        content.next_line(0.0, -30.0);
+        content.show(Str(
+            &format!("X3: {}", x3).into_bytes()
+        ));
         content.end_text();
 
         let cols = 2;
-        let rows = 13;
+        let rows = 16;
 
         // Horizontal lines
         for row in 0..=rows {
