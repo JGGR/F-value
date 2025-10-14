@@ -368,7 +368,7 @@ pub(crate) fn esporta_pdf_niseci(
 
         content.begin_text();
         content.set_font(font_name, 12.0);
-        content.next_line(a4.x2 / 2.0 - 40.0, y - 15.0);
+        content.next_line(a4.x2 / 2.0 - 50.0, y - 15.0);
         content.show(Str(&format!("Applicazione NISECI").into_bytes()));
 
         content.next_line(0.0, -15.0);
@@ -779,7 +779,7 @@ pub(crate) fn esporta_pdf_hfbi(
         content.stroke();
 
         content.begin_text();
-        content.next_line(a4.x2 / 2.0 - 40.0, y - 15.0);
+        content.next_line(a4.x2 / 2.0 - 50.0, y - 15.0);
         content.show(Str(&format!("Applicazione HFBI").into_bytes()));
 
         content.next_line(0.0, -15.0);
