@@ -19,7 +19,7 @@ use crate::views::{propheight, propwidth, rrect, View};
 use crate::MainState;
 use crate::SHORT_PROJECT_VERSION;
 use raylib::color::Color;
-use raylib::consts::GuiIconName::{ICON_PLAYER_NEXT, ICON_INFO};
+use raylib::consts::GuiIconName::{ICON_INFO, ICON_PLAYER_NEXT};
 use raylib::drawing::RaylibDrawHandle;
 use raylib::math::{Rectangle, Vector2};
 use raylib::prelude::*;
@@ -265,7 +265,7 @@ impl View for HomeView {
         let info_width = continue_width;
         let info_x = continue_x;
         let info_height = continue_height;
-        let info_y = continue_y - continue_height*2;
+        let info_y = continue_y - continue_height * 2;
 
         let info_itext = d.gui_icon_text(ICON_INFO, ": Info");
 

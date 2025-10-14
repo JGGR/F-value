@@ -15,10 +15,10 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+use crate::app::core::{CISBA_LOGO_DATA, ISPRA_LOGO_DATA};
 use crate::domain::hfbi::{AnagraficaHFBI, RisultatoHFBI};
 use crate::domain::niseci::{AnagraficaNISECI, RiferimentoNISECI, RisultatoNISECI};
 use crate::engines::niseci::full::calculate_stato_ecologico;
-use crate::app::core::{CISBA_LOGO_DATA, ISPRA_LOGO_DATA};
 use image::{ColorType, GenericImageView, ImageFormat};
 use miniz_oxide::deflate::{compress_to_vec_zlib, CompressionLevel};
 use pdf_writer::{Chunk, Content, Filter, Finish, Name, Pdf, Rect, Ref, Str};
@@ -246,7 +246,10 @@ pub(crate) fn esporta_pdf_niseci(
         {
             let mut resources = page.resources();
             resources.fonts().pair(font_name, font_id);
-            resources.x_objects().pair(image_name, image_id).pair(image_name_2, image_id_2);
+            resources
+                .x_objects()
+                .pair(image_name, image_id)
+                .pair(image_name_2, image_id_2);
         }
 
         // Write a line of text, with the font specified in the resource list
@@ -270,9 +273,11 @@ pub(crate) fn esporta_pdf_niseci(
         )
         .into_bytes()));
         content.next_line(0.0, -30.0);
-        content.show(Str(
-            &format!("Data campionamento: {}", anagrafica_niseci.date_string).into_bytes()
-        ));
+        content.show(Str(&format!(
+            "Data campionamento: {}",
+            anagrafica_niseci.date_string
+        )
+        .into_bytes()));
         content.next_line(0.0, -30.0);
         content.show(Str(&format!("{}", anagrafica_niseci.area).into_bytes()));
         content.next_line(0.0, -30.0);
@@ -328,17 +333,11 @@ pub(crate) fn esporta_pdf_niseci(
             &format!("Stato ecologico: {}", stato_eco_niseci).into_bytes()
         ));
         content.next_line(0.0, -30.0);
-        content.show(Str(
-            &format!("X1: {}", x1).into_bytes()
-        ));
+        content.show(Str(&format!("X1: {}", x1).into_bytes()));
         content.next_line(0.0, -30.0);
-        content.show(Str(
-            &format!("X2: {}", x2).into_bytes()
-        ));
+        content.show(Str(&format!("X2: {}", x2).into_bytes()));
         content.next_line(0.0, -30.0);
-        content.show(Str(
-            &format!("X3: {}", x3).into_bytes()
-        ));
+        content.show(Str(&format!("X3: {}", x3).into_bytes()));
         content.end_text();
 
         let cols = 2;
@@ -362,8 +361,8 @@ pub(crate) fn esporta_pdf_niseci(
         content.x_object(image_name_2);
         content.restore_state();
 
-        content.move_to(x_start, y -10.0);
-        content.line_to(x_start + (cols as f32 * cell_width), y -10.0);
+        content.move_to(x_start, y - 10.0);
+        content.line_to(x_start + (cols as f32 * cell_width), y - 10.0);
         content.stroke();
 
         content.begin_text();
@@ -381,7 +380,9 @@ pub(crate) fn esporta_pdf_niseci(
 
         content.begin_text();
         content.next_line(a4.x2 / 2.0 - 45.0, 15.0);
-        content.show(Str(&format!("F-value v{}", env!("CARGO_PKG_VERSION")).into_bytes()));
+        content.show(Str(
+            &format!("F-value v{}", env!("CARGO_PKG_VERSION")).into_bytes()
+        ));
         content.end_text();
 
         //This can be used to debug the content before streaming it
@@ -684,7 +685,10 @@ pub(crate) fn esporta_pdf_hfbi(
         {
             let mut resources = page.resources();
             resources.fonts().pair(font_name, font_id);
-            resources.x_objects().pair(image_name, image_id).pair(image_name_2, image_id_2);
+            resources
+                .x_objects()
+                .pair(image_name, image_id)
+                .pair(image_name_2, image_id_2);
         }
 
         // Content for page
@@ -706,9 +710,11 @@ pub(crate) fn esporta_pdf_hfbi(
         )
         .into_bytes()));
         content.next_line(0.0, -30.0);
-        content.show(Str(
-            &format!("Data campionamento: {}", anagrafica_hfbi.date_string).into_bytes()
-        ));
+        content.show(Str(&format!(
+            "Data campionamento: {}",
+            anagrafica_hfbi.date_string
+        )
+        .into_bytes()));
         content.next_line(0.0, -30.0);
         content.show(Str(
             &format!("Stagione: {}", anagrafica_hfbi.stagione).into_bytes()
@@ -775,7 +781,7 @@ pub(crate) fn esporta_pdf_hfbi(
         content.restore_state();
 
         content.move_to(x_start, y - 10.0);
-        content.line_to(x_start + (cols as f32 * cell_width), y -10.0);
+        content.line_to(x_start + (cols as f32 * cell_width), y - 10.0);
         content.stroke();
 
         content.begin_text();
@@ -792,7 +798,9 @@ pub(crate) fn esporta_pdf_hfbi(
 
         content.begin_text();
         content.next_line(a4.x2 / 2.0 - 45.0, 15.0);
-        content.show(Str(&format!("F-value v{}", env!("CARGO_PKG_VERSION")).into_bytes()));
+        content.show(Str(
+            &format!("F-value v{}", env!("CARGO_PKG_VERSION")).into_bytes()
+        ));
         content.end_text();
 
         let content_id = alloc.bump();

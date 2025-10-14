@@ -17,8 +17,8 @@
 
 use crate::app::core::{CurrentView, MainState};
 use crate::app::model::{
-    ConsoleModel, FileInputModel, HomeModel, IndiceModel, InfoAggiuntiveModel, OutputModel,
-    HelpModel, SubModel,
+    ConsoleModel, FileInputModel, HelpModel, HomeModel, IndiceModel, InfoAggiuntiveModel,
+    OutputModel, SubModel,
 };
 use crate::domain::index::Indice;
 use crate::state::GLOBAL_STATE;
