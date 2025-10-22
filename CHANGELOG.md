@@ -1,3 +1,9 @@
+## [0.0.29] - 2025-10-22
+
+### Changed
+
+- Center header for pdf export
+
 ## [0.0.28] - 2025-10-14
 
 ### Added
