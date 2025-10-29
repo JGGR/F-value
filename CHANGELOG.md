@@ -1,3 +1,10 @@
+## [0.0.30] - 2025-10-29
+
+### Changed
+
+- Temporarily remove ispra logo from pdfs
+- Fixed typo checking on `mask.is_some()` instead of `mask_2.is_some()`
+
 ## [0.0.29] - 2025-10-22
 
 ### Changed
