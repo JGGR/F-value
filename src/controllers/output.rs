@@ -292,8 +292,8 @@ impl OutputController {
 
                     #[cfg(feature = "logged")]
                     {
-                        info!("Codice stazione, Data, Regione, Idroecoregione, Area pertinenza, Bacino, NISECI, RQE NISECI, Stato ecologico, x1, x2, x3, x2_a, x2_b, x3_a, x3_b\n{}",
-                            format!("{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}",
+                        info!("Codice stazione, Data, Regione, Idroecoregione, Area pertinenza, Bacino, NISECI, RQE NISECI, Stato ecologico, x1, x2, x3, x3_a, x3_b\n{}",
+                            format!("{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}",
                             anagrafica.codice_stazione,
                             anagrafica.date_string,
                             anagrafica.posizione.regione,
@@ -309,8 +309,6 @@ impl OutputController {
                                 None => "NC".to_string(),
                             },
                             intermediates.x3,
-                            intermediates.x2_a,
-                            intermediates.x2_b,
                             match intermediates.x3_a {
                                 Some(v) => format!("{v}"),
                                 None => "NC".to_string(),
