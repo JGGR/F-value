@@ -293,9 +293,10 @@ impl OutputController {
                     #[cfg(feature = "logged")]
                     {
                         info!("Codice stazione, Data, Regione, Idroecoregione, Area pertinenza, Bacino, NISECI, RQE NISECI, Stato ecologico, x1, x2, x3, x2_a, x2_b, x3_a, x3_b\n{}",
-                            format!("{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}",
+                            format!("{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}",
                             anagrafica.codice_stazione,
                             anagrafica.date_string,
+                            anagrafica.posizione.regione,
                             anagrafica.idro_eco_regione,
                             anagrafica.area,
                             anagrafica.corpo_idrico,
