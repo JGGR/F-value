@@ -19,6 +19,7 @@ use crate::domain::niseci::{
     AnagraficaNISECI, AreaNISECI, CampionamentoNISECI, RiferimentoNISECI, StatoEcologicoNISECI,
     ValoriIntermediNISECI, ValoriIntermediSpecieNISECI,
 };
+use crate::engines::niseci::x2::MetricheX2;
 use std::collections::{hash_map::Entry, HashMap};
 
 use super::x1::calculate_x1;
@@ -41,7 +42,7 @@ pub(crate) fn calculate_niseci(
     let mut errors = Vec::new();
     let x1 = calculate_x1(campionamento, riferimento);
 
-    let x2 = calculate_x2(campionamento, anagrafica);
+    let x2 = calculate_x2(campionamento, anagrafica, true);
     match x2 {
         Ok(_) => {}
         Err(x2_errors) => {
@@ -53,28 +54,27 @@ pub(crate) fn calculate_niseci(
     }
     let (x2, criteri_x2) = x2.expect("calc_niseci() returned earlier on Err match");
 
-    let mut valori_intermedi_specie: HashMap<String, ValoriIntermediSpecieNISECI> = HashMap::new();
-
-    let submetriche_map = criteri_x2.get_submetriche_map();
-    for (key, val) in submetriche_map.iter() {
-        let criteri_x2_a = val.get_metriche_x2_a();
-        let classi_eta = val.get_classi_eta();
-        let specie = key.clone();
-        let densita_stimata = val.get_metriche_x2_b().get_densita_stimata();
-        let val = ValoriIntermediSpecieNISECI {
-            classi_eta,
-            densita_stimata,
-            x2_a_a: criteri_x2_a.get_criterio_a(),
-            x2_a_b: criteri_x2_a.get_criterio_b(),
-            rapporto_ad_juv: criteri_x2_a.get_rapporto_ad_juv(),
-        };
-        match valori_intermedi_specie.entry(specie) {
-            Entry::Occupied(_) => {}
-            Entry::Vacant(vacant_entry) => {
-                vacant_entry.insert(val);
+    // calculate x2 for specie non attese
+    let x2_non_attese = calculate_x2(campionamento, anagrafica, false);
+    match x2_non_attese {
+        Ok(_) => {}
+        Err(x2_non_attese_errors) => {
+            for e in x2_non_attese_errors {
+                errors.push(format!("Errore durante calcolo x2_non_attese: {}", e));
             }
+            return Err(errors);
         }
     }
+
+    let (x2_non_attese, criteri_x2_non_attese) = x2_non_attese.expect("calc_niseci() returned earlier on Err match");
+    let mut valori_intermedi_specie: HashMap<String, ValoriIntermediSpecieNISECI> = HashMap::new();
+
+    // add valori intermedi specie attese
+    valori_intermedi_specie.extend(get_valori_intermedi_specie(&criteri_x2));
+    // add valori intermedi specie non attese
+    let intermedi_non_attese = get_valori_intermedi_specie(&criteri_x2_non_attese);
+    valori_intermedi_specie.extend(intermedi_non_attese);
+    
 
     let x3 = calculate_x3(campionamento);
     match x3 {
@@ -195,3 +195,31 @@ pub(crate) fn calculate_stato_ecologico(
         None => None,
     }
 }
+
+fn get_valori_intermedi_specie(criteri: &MetricheX2) -> HashMap<String, ValoriIntermediSpecieNISECI> {
+    let mut valori_intermedi_specie: HashMap<String, ValoriIntermediSpecieNISECI> = HashMap::new();
+
+    let submetriche_map = criteri.get_submetriche_map();
+    for (key, val) in submetriche_map.iter() {
+        let criteri_x2_a = val.get_metriche_x2_a();
+        let classi_eta = val.get_classi_eta();
+        let specie = key.clone();
+        let densita_stimata = val.get_metriche_x2_b().get_densita_stimata();
+        let val = ValoriIntermediSpecieNISECI {
+            classi_eta,
+            densita_stimata,
+            x2_a_a: criteri_x2_a.get_criterio_a(),
+            x2_a_b: criteri_x2_a.get_criterio_b(),
+            rapporto_ad_juv: criteri_x2_a.get_rapporto_ad_juv(),
+        };
+        match valori_intermedi_specie.entry(specie) {
+            Entry::Occupied(_) => {}
+            Entry::Vacant(vacant_entry) => {
+                vacant_entry.insert(val);
+            }
+        }
+    }
+
+    valori_intermedi_specie
+}
+

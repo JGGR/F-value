@@ -107,9 +107,10 @@ impl MetricheX2B {
 pub(crate) fn calculate_x2(
     campionamento: &CampionamentoNISECI,
     anagrafica: &AnagraficaNISECI,
+    require_specie_attesa: bool
 ) -> Result<(Option<f32>, MetricheX2), Vec<String>> {
-    let (x2_a, criteri_vec) = calculate_sommatoria_x2_a(campionamento)?;
-    let (x2_b, densita_vec) = calculate_sommatoria_x2_b(campionamento, anagrafica)?;
+    let (x2_a, criteri_vec) = calculate_sommatoria_x2_a(campionamento, require_specie_attesa)?;
+    let (x2_b, densita_vec) = calculate_sommatoria_x2_b(campionamento, anagrafica, require_specie_attesa)?;
 
     let mut submetriche = HashMap::<String, SubmetricheX2>::new();
 
@@ -157,7 +158,7 @@ pub(crate) fn calculate_x2(
 
     let mut specie_campionate_set: HashMap<String, bool> = HashMap::new();
     for cattura in &campionamento.campionamento {
-        if cattura.specie.specie_attesa
+        if (cattura.specie.specie_attesa == require_specie_attesa)
             && (cattura.specie.tipo_autoctono == 1 || cattura.specie.tipo_autoctono == 2)
         {
             match specie_campionate_set.entry(cattura.specie.id.clone()) {
@@ -214,6 +215,7 @@ impl RecordSubmetricheX2A {
 
 fn calculate_sommatoria_x2_a(
     c: &CampionamentoNISECI,
+    require_specie_attesa: bool
 ) -> Result<(f32, Vec<RecordSubmetricheX2A>), Vec<String>> {
     // ad ogni specie associo le loro classi che andrò poi a riempire
     // ho controllato i campionamenti di andrea e trovto massimo 9 specie diverse
@@ -222,7 +224,7 @@ fn calculate_sommatoria_x2_a(
 
     // riempo l'hashmap con solo le specie autoctone campionate
     for cattura in &c.campionamento {
-        if cattura.specie.specie_attesa
+        if (cattura.specie.specie_attesa == require_specie_attesa)
             && (cattura.specie.tipo_autoctono == 1 || cattura.specie.tipo_autoctono == 2)
         {
             match classi_eta_map.entry(cattura.specie.id.clone()) {
@@ -273,6 +275,7 @@ fn calculate_sommatoria_x2_a(
 fn calculate_sommatoria_x2_b(
     c: &CampionamentoNISECI,
     anagrafica: &AnagraficaNISECI,
+    require_specie_attesa: bool
 ) -> Result<(f32, Vec<MetricheX2B>), Vec<String>> {
     let superficie = anagrafica.get_larghezza_media() * anagrafica.get_lunghezza_media();
 
@@ -280,7 +283,7 @@ fn calculate_sommatoria_x2_b(
         HashMap::with_capacity(10);
 
     for cattura in &c.campionamento {
-        if cattura.specie.specie_attesa
+        if (cattura.specie.specie_attesa == require_specie_attesa)
             && (cattura.specie.tipo_autoctono == 1 || cattura.specie.tipo_autoctono == 2)
         {
             match esemplari_per_cattura_map.entry(cattura.specie.id.clone()) {

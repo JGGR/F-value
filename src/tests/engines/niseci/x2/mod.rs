@@ -190,7 +190,7 @@ fn calculate_x2_test_1() {
         },
     };
 
-    let x2 = calculate_x2(&campionamento, &anagrafica);
+    let x2 = calculate_x2(&campionamento, &anagrafica, true);
 
     assert!(x2.is_ok());
 
@@ -223,7 +223,7 @@ fn calculate_x2_test_1() {
         },
     };
 
-    let x2 = calculate_x2(&campionamento, &anagrafica);
+    let x2 = calculate_x2(&campionamento, &anagrafica, true);
 
     assert!(x2.is_ok());
     let epsilon: f32 = 1e-6;
