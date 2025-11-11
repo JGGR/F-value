@@ -118,6 +118,7 @@ pub(crate) fn calculate_niseci(
             let val = ValoriIntermediSpecieNISECI {
                 classi_eta,
                 densita_stimata,
+                quantita_stimata: 0,
                 rapporto_ad_juv: val.get_rapporto_ad_juv(),
                 x2_a_a: subvalue_a,
                 x2_a_b: subvalue_b,
@@ -224,9 +225,11 @@ fn get_valori_intermedi_specie(criteri: &MetricheX2) -> HashMap<String, ValoriIn
         let classi_eta = val.get_classi_eta();
         let specie = key.clone();
         let densita_stimata = val.get_metriche_x2_b().get_densita_stimata();
+        let quantita_stimata = val.get_metriche_x2_b().get_quantita_stimata();
         let val = ValoriIntermediSpecieNISECI {
             classi_eta,
             densita_stimata,
+            quantita_stimata,
             x2_a_a: criteri_x2_a.get_criterio_a(),
             x2_a_b: criteri_x2_a.get_criterio_b(),
             rapporto_ad_juv: criteri_x2_a.get_rapporto_ad_juv(),

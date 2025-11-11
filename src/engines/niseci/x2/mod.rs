@@ -87,13 +87,15 @@ impl MetricheX2 {
 pub(crate) struct MetricheX2B {
     id_specie: String,
     densita_stimata: f32,
+    quantita_stimata: u32,
 }
 
 impl MetricheX2B {
-    pub(crate) fn new(id_specie: String, densita_stimata: f32) -> Self {
+    pub(crate) fn new(id_specie: String, densita_stimata: f32, quantita_stimata: u32) -> Self {
         Self {
             id_specie,
             densita_stimata,
+            quantita_stimata,
         }
     }
     pub(crate) fn get_id(&self) -> String {
@@ -101,6 +103,9 @@ impl MetricheX2B {
     }
     pub(crate) fn get_densita_stimata(&self) -> f32 {
         self.densita_stimata
+    }
+    pub(crate) fn get_quantita_stimata(&self) -> u32 {
+        self.quantita_stimata
     }
 }
 
@@ -123,7 +128,7 @@ pub(crate) fn calculate_x2(
                     SubmetricheX2::new(
                         crit.get_metriche_x2a(),
                         crit.get_classi_eta(),
-                        MetricheX2B::new(crit.get_codice_specie(), -1.0),
+                        MetricheX2B::new(crit.get_codice_specie(), -1.0, 0),
                     ),
                 );
             }
@@ -177,7 +182,7 @@ pub(crate) fn calculate_x2_per_alloctone(
                     SubmetricheX2::new(
                         crit.get_metriche_x2a(),
                         crit.get_classi_eta(),
-                        MetricheX2B::new(crit.get_codice_specie(), -1.0),
+                        MetricheX2B::new(crit.get_codice_specie(), -1.0, 0),
                     ),
                 );
             }
@@ -422,9 +427,9 @@ fn calculate_sommatoria_x2_b_absolute(esemplari_per_cattura_map: HashMap<String,
     let mut densita_vec: Vec<MetricheX2B> = Vec::with_capacity(esemplari_per_cattura_map.len());
     for catture in esemplari_per_cattura_map.values() {
         match calculate_x2_b(catture, &superficie) {
-            Ok((x2_b, densita_stimata)) => {
+            Ok((x2_b, densita_stimata, quantita_stimata)) => {
                 sommatoria_x2_b += x2_b;
-                densita_vec.push(MetricheX2B::new(catture.specie.id.clone(), densita_stimata));
+                densita_vec.push(MetricheX2B::new(catture.specie.id.clone(), densita_stimata, quantita_stimata));
             }
             Err(err_mess) => errors.push(err_mess),
         }
@@ -460,7 +465,7 @@ fn calculate_x2_a(classe: &ClassiEtaSpecieNISECI) -> Result<(f32, MetricheX2A), 
     classe.calculate_struttura_popolazione()
 }
 
-fn calculate_x2_b(e: &EsemplariPerCattura, superficie: &f32) -> Result<(f32, f32), String> {
+fn calculate_x2_b(e: &EsemplariPerCattura, superficie: &f32) -> Result<(f32, f32, u32), String> {
     match get_quantita_stimata(&e.mappa) {
         Ok(q_stimata) => {
             // calcolo densita stimata
@@ -468,12 +473,12 @@ fn calculate_x2_b(e: &EsemplariPerCattura, superficie: &f32) -> Result<(f32, f32
 
             // trovo ora x2_b
             if densita_stimata > e.specie.dens_soglia2 {
-                return Ok((1.0, densita_stimata));
+                return Ok((1.0, densita_stimata, q_stimata));
             }
             if densita_stimata > e.specie.dens_soglia1 {
-                return Ok((0.5, densita_stimata));
+                return Ok((0.5, densita_stimata, q_stimata));
             }
-            Ok((0.0, densita_stimata))
+            Ok((0.0, densita_stimata, q_stimata))
         }
         Err(err_message) => Err(err_message),
     }
@@ -544,7 +549,7 @@ fn fill_submetriche(densita_vec: Vec<MetricheX2B>, submetriche: &mut HashMap<Str
                 *submetr = SubmetricheX2::new(
                     submetr.get_metriche_x2_a(),
                     submetr.get_classi_eta(),
-                    MetricheX2B::new(id, dens.get_densita_stimata()),
+                    MetricheX2B::new(id, dens.get_densita_stimata(), dens.get_quantita_stimata()),
                 );
             }
             Entry::Vacant(_) => {
@@ -705,7 +710,7 @@ mod x2_private_tests {
 
         assert!(x2_b.is_ok());
 
-        let (x2_b, _densita_stimata) = x2_b.unwrap();
+        let (x2_b, _densita_stimata, _q_stimata) = x2_b.unwrap();
         assert_eq!(x2_b, 1.0)
     }
 
@@ -728,7 +733,7 @@ mod x2_private_tests {
 
         assert!(x2_b.is_ok());
 
-        let (x2_b, _densita_stimata) = x2_b.unwrap();
+        let (x2_b, _densita_stimata, _q_stimata) = x2_b.unwrap();
         assert_eq!(x2_b, 0.5)
     }
 
@@ -751,7 +756,7 @@ mod x2_private_tests {
 
         assert!(x2_b.is_ok());
 
-        let (x2_b, _densita_stimata) = x2_b.unwrap();
+        let (x2_b, _densita_stimata, _q_stimata) = x2_b.unwrap();
         assert_eq!(x2_b, 0.0)
     }
 

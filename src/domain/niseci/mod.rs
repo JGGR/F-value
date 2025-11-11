@@ -470,6 +470,7 @@ impl TryFrom<i32> for IdroEcoRegioneNISECI {
 #[derive(Clone)]
 pub(crate) struct ValoriIntermediSpecieNISECI {
     pub(crate) densita_stimata: f32,
+    pub(crate) quantita_stimata: u32,
     pub(crate) classi_eta: ClassiEtaSpecieNISECI,
     pub(crate) rapporto_ad_juv: Option<f32>,
     pub(crate) x2_a_a: u8,
@@ -485,8 +486,8 @@ impl fmt::Display for ValoriIntermediSpecieNISECI {
             None => "NC".to_string(),
         };
         let string_representation = format!(
-            "{}; {}; {}; {}; {}",
-            self.classi_eta, self.densita_stimata, rapporto_ad_juv_str, self.x2_a_a, self.x2_a_b
+            "{}; {}; {}; {}; {}; {}",
+            self.classi_eta, self.densita_stimata, self.quantita_stimata, rapporto_ad_juv_str, self.x2_a_a, self.x2_a_b
         );
         write!(f, "{}", string_representation)
     }
