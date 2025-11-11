@@ -132,22 +132,7 @@ pub(crate) fn calculate_x2(
 
     let mut errors = Vec::<String>::new();
 
-    for dens in &densita_vec {
-        let id = dens.get_id();
-        match submetriche.entry(id.clone()) {
-            Entry::Occupied(mut entry) => {
-                let submetr = entry.get_mut();
-                *submetr = SubmetricheX2::new(
-                    submetr.get_metriche_x2_a(),
-                    submetr.get_classi_eta(),
-                    MetricheX2B::new(id, dens.get_densita_stimata()),
-                );
-            }
-            Entry::Vacant(_) => {
-                errors.push(format!("Errore: specie {} ha una densita stimata ma manca degli altri valori intermedi", id));
-            }
-        }
-    }
+    fill_submetriche(densita_vec, &mut submetriche, &mut errors);
 
     if !errors.is_empty() {
         // In case the densita_vec had some problems
@@ -170,18 +155,60 @@ pub(crate) fn calculate_x2(
         }
     }
 
-    let tot_specie_attese_trovate = specie_campionate_set.len();
+    calculate_x2_absolute(metriche_x2, x2_a, x2_b, &specie_campionate_set)
+}
 
-    if tot_specie_attese_trovate == 0 {
-        // Nel caso in cui nessuna specie attesa sia presente nel campionamento
-        return Ok((None, metriche_x2));
+
+pub(crate) fn calculate_x2_per_alloctone(
+    campionamento: &CampionamentoNISECI,
+    anagrafica: &AnagraficaNISECI,
+) -> Result<(Option<f32>, MetricheX2), Vec<String>> {
+    let (x2_a, criteri_vec) = calculate_sommatoria_x2_a_per_alloctone(campionamento)?;
+    let (x2_b, densita_vec) = calculate_sommatoria_x2_b_per_alloctone(campionamento, anagrafica)?;
+
+    let mut submetriche = HashMap::<String, SubmetricheX2>::new();
+
+    for crit in &criteri_vec {
+        match submetriche.entry(crit.get_codice_specie()) {
+            Entry::Occupied(_) => {}
+            Entry::Vacant(vacant_entry) => {
+                vacant_entry.insert(
+                    // We fill densita_stimata later
+                    SubmetricheX2::new(
+                        crit.get_metriche_x2a(),
+                        crit.get_classi_eta(),
+                        MetricheX2B::new(crit.get_codice_specie(), -1.0),
+                    ),
+                );
+            }
+        }
     }
 
-    let result = (0.6 * x2_a + 0.4 * x2_b) / tot_specie_attese_trovate as f32;
+    let mut errors = Vec::<String>::new();
 
-    let rounded_result = (1000.0 * result).round() / 1000.0;
+    fill_submetriche(densita_vec, &mut submetriche, &mut errors);
 
-    Ok((Some(rounded_result), metriche_x2))
+    if !errors.is_empty() {
+        // In case the densita_vec had some problems
+        return Err(errors);
+    }
+
+    let metriche_x2 = MetricheX2::new(x2_a, x2_b, submetriche);
+
+    let mut specie_campionate_set: HashMap<String, bool> = HashMap::new();
+    for cattura in &campionamento.campionamento {
+        if cattura.specie.tipo_alloctono > 0
+        {
+            match specie_campionate_set.entry(cattura.specie.id.clone()) {
+                Entry::Occupied(_) => {}
+                Entry::Vacant(vacant_entry) => {
+                    vacant_entry.insert(true);
+                }
+            }
+        }
+    }
+
+    calculate_x2_absolute(metriche_x2, x2_a, x2_b, &specie_campionate_set)
 }
 
 struct RecordSubmetricheX2A {
@@ -213,6 +240,26 @@ impl RecordSubmetricheX2A {
     }
 }
 
+fn calculate_x2_absolute(
+    metriche_x2: MetricheX2,
+    x2_a: f32,
+    x2_b: f32,
+    specie_campionate_set: &HashMap<String, bool>
+) -> Result<(Option<f32>, MetricheX2), Vec<String>> {
+    let tot_specie_attese_trovate = specie_campionate_set.len();
+
+    if tot_specie_attese_trovate == 0 {
+        // Nel caso in cui nessuna specie attesa sia presente nel campionamento
+        return Ok((None, metriche_x2));
+    }
+
+    let result = (0.6 * x2_a + 0.4 * x2_b) / tot_specie_attese_trovate as f32;
+
+    let rounded_result = (1000.0 * result).round() / 1000.0;
+
+    Ok((Some(rounded_result), metriche_x2))
+}
+
 fn calculate_sommatoria_x2_a(
     c: &CampionamentoNISECI,
     require_specie_attesa: bool
@@ -237,6 +284,101 @@ fn calculate_sommatoria_x2_a(
             };
         }
     }
+
+    calculate_sommatoria_x2_a_absolute(classi_eta_map)
+}
+
+fn calculate_sommatoria_x2_b(
+    c: &CampionamentoNISECI,
+    anagrafica: &AnagraficaNISECI,
+    require_specie_attesa: bool
+) -> Result<(f32, Vec<MetricheX2B>), Vec<String>> {
+    let superficie = anagrafica.get_larghezza_media() * anagrafica.get_lunghezza_media();
+
+    let mut esemplari_per_cattura_map: HashMap<String, EsemplariPerCattura> =
+        HashMap::with_capacity(10);
+
+    for cattura in &c.campionamento {
+        if (cattura.specie.specie_attesa == require_specie_attesa)
+            && (cattura.specie.tipo_autoctono == 1 || cattura.specie.tipo_autoctono == 2)
+        {
+            match esemplari_per_cattura_map.entry(cattura.specie.id.clone()) {
+                Entry::Occupied(mut occupied_entry) => {
+                    occupied_entry
+                        .get_mut()
+                        .fill_passaggio(cattura.passaggio_cattura);
+                }
+                Entry::Vacant(vacant_entry) => {
+                    vacant_entry.insert(EsemplariPerCattura::new_prevalorized(
+                        cattura.passaggio_cattura,
+                        &cattura.specie,
+                    ));
+                }
+            }
+        }
+    }
+
+    calculate_sommatoria_x2_b_absolute(esemplari_per_cattura_map, superficie)
+}
+
+fn calculate_sommatoria_x2_a_per_alloctone(
+    c: &CampionamentoNISECI,
+) -> Result<(f32, Vec<RecordSubmetricheX2A>), Vec<String>> {
+    // ad ogni specie associo le loro classi che andrò poi a riempire
+    // ho controllato i campionamenti di andrea e trovto massimo 9 specie diverse
+    // per sicurezza prealloco memoria per 10 classi di eta
+    let mut classi_eta_map: HashMap<String, ClassiEtaSpecieNISECI> = HashMap::with_capacity(10);
+
+    // riempo l'hashmap con solo le specie autoctone campionate
+    for cattura in &c.campionamento {
+        if cattura.specie.tipo_alloctono > 0
+        {
+            match classi_eta_map.entry(cattura.specie.id.clone()) {
+                Entry::Occupied(mut entry) => {
+                    entry.get_mut().update_classi_eta(cattura);
+                }
+                Entry::Vacant(entry) => {
+                    entry.insert(ClassiEtaSpecieNISECI::new_cl_prevalorizzata(cattura));
+                }
+            };
+        }
+    }
+
+    calculate_sommatoria_x2_a_absolute(classi_eta_map)
+}
+
+fn calculate_sommatoria_x2_b_per_alloctone(
+    c: &CampionamentoNISECI,
+    anagrafica: &AnagraficaNISECI
+) -> Result<(f32, Vec<MetricheX2B>), Vec<String>> {
+    let superficie = anagrafica.get_larghezza_media() * anagrafica.get_lunghezza_media();
+
+    let mut esemplari_per_cattura_map: HashMap<String, EsemplariPerCattura> =
+        HashMap::with_capacity(10);
+
+    for cattura in &c.campionamento {
+        if cattura.specie.tipo_alloctono > 0
+        {
+            match esemplari_per_cattura_map.entry(cattura.specie.id.clone()) {
+                Entry::Occupied(mut occupied_entry) => {
+                    occupied_entry
+                        .get_mut()
+                        .fill_passaggio(cattura.passaggio_cattura);
+                }
+                Entry::Vacant(vacant_entry) => {
+                    vacant_entry.insert(EsemplariPerCattura::new_prevalorized(
+                        cattura.passaggio_cattura,
+                        &cattura.specie,
+                    ));
+                }
+            }
+        }
+    }
+
+    calculate_sommatoria_x2_b_absolute(esemplari_per_cattura_map, superficie)
+}
+
+fn calculate_sommatoria_x2_a_absolute(classi_eta_map: HashMap<String, ClassiEtaSpecieNISECI>) -> Result<(f32, Vec<RecordSubmetricheX2A>), Vec<String>> {
 
     // ora la mappa è riempita e tutte le classi sono state riempite
     // si procede quindi al calcolo di x2 a per ogni specie campionata autoctona
@@ -272,36 +414,7 @@ fn calculate_sommatoria_x2_a(
     Ok((sommatoria_x2_a, criteri_vec))
 }
 
-fn calculate_sommatoria_x2_b(
-    c: &CampionamentoNISECI,
-    anagrafica: &AnagraficaNISECI,
-    require_specie_attesa: bool
-) -> Result<(f32, Vec<MetricheX2B>), Vec<String>> {
-    let superficie = anagrafica.get_larghezza_media() * anagrafica.get_lunghezza_media();
-
-    let mut esemplari_per_cattura_map: HashMap<String, EsemplariPerCattura> =
-        HashMap::with_capacity(10);
-
-    for cattura in &c.campionamento {
-        if (cattura.specie.specie_attesa == require_specie_attesa)
-            && (cattura.specie.tipo_autoctono == 1 || cattura.specie.tipo_autoctono == 2)
-        {
-            match esemplari_per_cattura_map.entry(cattura.specie.id.clone()) {
-                Entry::Occupied(mut occupied_entry) => {
-                    occupied_entry
-                        .get_mut()
-                        .fill_passaggio(cattura.passaggio_cattura);
-                }
-                Entry::Vacant(vacant_entry) => {
-                    vacant_entry.insert(EsemplariPerCattura::new_prevalorized(
-                        cattura.passaggio_cattura,
-                        &cattura.specie,
-                    ));
-                }
-            }
-        }
-    }
-
+fn calculate_sommatoria_x2_b_absolute(esemplari_per_cattura_map: HashMap<String, EsemplariPerCattura>, superficie: f32) -> Result<(f32, Vec<MetricheX2B>), Vec<String>> {
     // ora che abbiamo riempito la mappa con tutte le catture, possiamo andare
     // a calcolar x2b per ogni specie
     let mut sommatoria_x2_b = 0.0;
@@ -420,6 +533,25 @@ fn calculate_q_stimata_regression(passaggi: &HashMap<u8, u32>) -> Result<u32, St
         .collect();
 
     calculate_quantita_with_regression(points.as_slice())
+}
+
+fn fill_submetriche(densita_vec: Vec<MetricheX2B>, submetriche: &mut HashMap<String, SubmetricheX2>, errors: &mut Vec<String>) -> () {
+    for dens in &densita_vec {
+        let id = dens.get_id();
+        match submetriche.entry(id.clone()) {
+            Entry::Occupied(mut entry) => {
+                let submetr = entry.get_mut();
+                *submetr = SubmetricheX2::new(
+                    submetr.get_metriche_x2_a(),
+                    submetr.get_classi_eta(),
+                    MetricheX2B::new(id, dens.get_densita_stimata()),
+                );
+            }
+            Entry::Vacant(_) => {
+                errors.push(format!("Errore: specie {} ha una densita stimata ma manca degli altri valori intermedi", id));
+            }
+        }
+    }
 }
 
 #[cfg(test)]

@@ -24,6 +24,7 @@ use std::collections::{hash_map::Entry, HashMap};
 
 use super::x1::calculate_x1;
 use super::x2::calculate_x2;
+use super::x2::calculate_x2_per_alloctone;
 use super::x3::calculate_x3;
 
 const RQE_NISECI_MAGIC_ADDEND: f32 = std::f32::consts::FRAC_2_SQRT_PI;
@@ -67,6 +68,22 @@ pub(crate) fn calculate_niseci(
     }
 
     let (x2_non_attese, criteri_x2_non_attese) = x2_non_attese.expect("calc_niseci() returned earlier on Err match");
+
+    // calculate x2 for specie alloctone
+    let x2_per_alloctone = calculate_x2_per_alloctone(campionamento, anagrafica);
+    match x2_per_alloctone {
+        Ok(_) => {}
+        Err(x2_per_alloctone_errors) => {
+            for e in x2_per_alloctone_errors {
+                errors.push(format!("Errore durante calcolo x2_per_alloctone: {}", e));
+            }
+            return Err(errors);
+        }
+    }
+
+    let (x2_per_alloctone, criteri_x2_per_alloctone) = x2_per_alloctone.expect("calc_niseci() returned earlier on Err match");
+
+
     let mut valori_intermedi_specie: HashMap<String, ValoriIntermediSpecieNISECI> = HashMap::new();
 
     // add valori intermedi specie attese
@@ -74,6 +91,8 @@ pub(crate) fn calculate_niseci(
     // add valori intermedi specie non attese
     let intermedi_non_attese = get_valori_intermedi_specie(&criteri_x2_non_attese);
     valori_intermedi_specie.extend(intermedi_non_attese);
+    // add valori intermedi specie alloctone
+    valori_intermedi_specie.extend(get_valori_intermedi_specie(&criteri_x2_per_alloctone));
     
 
     let x3 = calculate_x3(campionamento);
