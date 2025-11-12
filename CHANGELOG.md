@@ -1,3 +1,22 @@
+## [0.0.31] - 2025-10-29
+
+### Changed
+
+- removed sommatoria x2_a and x2_b for intermediates
+- now log csv files use `;` instead of `,` as separator
+- filled `regione` cell in log files
+
+### Added
+
+- new method `calculate_x2_absolute`
+- new method `calculate_x2_a_absolute`
+- new method `calculate_x2_b_absolute`
+- new method `calculate_x2_per_alloctone`
+- new method `calculate_x2_a_per_alloctone`
+- new method `calculate_x2_b_per_alloctone`
+- added intermediates logs for `specie non attese` and `specie alloctone`
+- added `quantita_stimata` as intermediate
+
 ## [0.0.30] - 2025-10-29
 
 ### Changed
