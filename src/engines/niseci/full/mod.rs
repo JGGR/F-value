@@ -67,7 +67,7 @@ pub(crate) fn calculate_niseci(
         }
     }
 
-    let (x2_non_attese, criteri_x2_non_attese) = x2_non_attese.expect("calc_niseci() returned earlier on Err match");
+    let (_x2_non_attese, criteri_x2_non_attese) = x2_non_attese.expect("calc_niseci() returned earlier on Err match");
 
     // calculate x2 for specie alloctone
     let x2_per_alloctone = calculate_x2_per_alloctone(campionamento, anagrafica);
@@ -81,7 +81,7 @@ pub(crate) fn calculate_niseci(
         }
     }
 
-    let (x2_per_alloctone, criteri_x2_per_alloctone) = x2_per_alloctone.expect("calc_niseci() returned earlier on Err match");
+    let (_x2_per_alloctone, criteri_x2_per_alloctone) = x2_per_alloctone.expect("calc_niseci() returned earlier on Err match");
 
 
     let mut valori_intermedi_specie: HashMap<String, ValoriIntermediSpecieNISECI> = HashMap::new();
@@ -93,7 +93,7 @@ pub(crate) fn calculate_niseci(
     valori_intermedi_specie.extend(intermedi_non_attese);
     // add valori intermedi specie alloctone
     valori_intermedi_specie.extend(get_valori_intermedi_specie(&criteri_x2_per_alloctone));
-    
+
 
     let x3 = calculate_x3(campionamento);
     match x3 {
