@@ -52,7 +52,7 @@ impl fmt::Display for SpecieNISECI {
             false => "NO".to_string(),
         };
         let string_representation = format!(
-            "{}, {}, {}, {}, {}",
+            "{}; {}; {}; {}; {}",
             self.id, self.nome, self.tipo_autoctono, self.tipo_alloctono, specie_attesa_str
         );
         write!(f, "{}", string_representation)
@@ -470,6 +470,7 @@ impl TryFrom<i32> for IdroEcoRegioneNISECI {
 #[derive(Clone)]
 pub(crate) struct ValoriIntermediSpecieNISECI {
     pub(crate) densita_stimata: f32,
+    pub(crate) quantita_stimata: u32,
     pub(crate) classi_eta: ClassiEtaSpecieNISECI,
     pub(crate) rapporto_ad_juv: Option<f32>,
     pub(crate) x2_a_a: u8,
@@ -485,8 +486,8 @@ impl fmt::Display for ValoriIntermediSpecieNISECI {
             None => "NC".to_string(),
         };
         let string_representation = format!(
-            "{}, {}, {}, {}, {}",
-            self.classi_eta, self.densita_stimata, rapporto_ad_juv_str, self.x2_a_a, self.x2_a_b
+            "{}; {}; {}; {}; {}; {}",
+            self.classi_eta, self.densita_stimata, self.quantita_stimata, rapporto_ad_juv_str, self.x2_a_a, self.x2_a_b
         );
         write!(f, "{}", string_representation)
     }
@@ -650,7 +651,7 @@ pub(crate) struct ClassiEtaSpecieNISECI {
 impl fmt::Display for ClassiEtaSpecieNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let string_representation = format!(
-            "{}, {}, {}, {}, {}, {}",
+            "{}; {}; {}; {}; {}; {}",
             self.specie, self.cl1, self.cl2, self.cl3, self.cl4, self.cl5
         );
         write!(f, "{}", string_representation)

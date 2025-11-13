@@ -292,10 +292,11 @@ impl OutputController {
 
                     #[cfg(feature = "logged")]
                     {
-                        info!("Codice stazione, Data, Regione, Idroecoregione, Area pertinenza, Bacino, NISECI, RQE NISECI, Stato ecologico, x1, x2, x3, x2_a, x2_b, x3_a, x3_b\n{}",
-                            format!("{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}",
+                        info!("Codice stazione; Data; Regione; Idroecoregione; Area pertinenza; Bacino; NISECI; RQE NISECI; Stato ecologico; x1; x2; x3; x3_a; x3_b\n{}",
+                            format!("{}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}",
                             anagrafica.codice_stazione,
                             anagrafica.date_string,
+                            anagrafica.posizione.regione,
                             anagrafica.idro_eco_regione,
                             anagrafica.area,
                             anagrafica.corpo_idrico,
@@ -308,8 +309,6 @@ impl OutputController {
                                 None => "NC".to_string(),
                             },
                             intermediates.x3,
-                            intermediates.x2_a,
-                            intermediates.x2_b,
                             match intermediates.x3_a {
                                 Some(v) => format!("{v}"),
                                 None => "NC".to_string(),
@@ -345,7 +344,7 @@ impl OutputController {
 
                         match file_result {
                             Ok(mut file) => {
-                                let mut string_representation = format!("specie, nome latino, tipo autoctono, tipo alloctono, specie attesa, cl1, cl2, cl3, cl4, cl5, densita stimata, rapporto ad/juv, x2a_a, x2a_b");
+                                let mut string_representation = format!("specie; nome latino; tipo autoctono; tipo alloctono; specie attesa; cl1; cl2; cl3; cl4; cl5; densita stimata; quantita stimata; rapporto ad/juv; x2a_a; x2a_b");
                                 for (_k, v) in intermediates.specie_specifici.iter() {
                                     string_representation =
                                         format!("{}\n{}", string_representation, v);

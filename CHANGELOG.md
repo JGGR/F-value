@@ -1,3 +1,22 @@
+## [0.0.31] - 2025-11-19
+
+### Changed
+
+- Removed sommatoria x2_a and x2_b for intermediates
+- Wow log csv files uses `;` instead of `,` as delimiter
+- Filled `regione` cell in log files
+
+### Added
+
+- New method `calculate_x2_absolute`
+- New method `calculate_x2_a_absolute`
+- New method `calculate_x2_b_absolute`
+- New method `calculate_x2_per_alloctone`
+- New method `calculate_x2_a_per_alloctone`
+- New method `calculate_x2_b_per_alloctone`
+- Added intermediates logs for `specie non attese` and `specie alloctone`
+- Added `quantita_stimata` as intermediate
+
 ## [0.0.30] - 2025-10-29
 
 ### Changed
