@@ -792,7 +792,7 @@ impl RisultatoHFBI {
     pub(crate) fn get_valore(&self) -> Option<f32> {
         self.valore
     }
-    pub(crate) fn _get_intermediates(&self) -> ValoriIntermediHFBI {
+    pub(crate) fn get_intermediates(&self) -> ValoriIntermediHFBI {
         self.intermediates.clone()
     }
 }
@@ -1024,3 +1024,26 @@ static CONDIZIONI_RIFERIMENTO_HFBI_HASHMAP: Lazy<
 
     map
 });
+
+/// enum per il risultato finale di un calcolo hfbi
+/// (vedi calculate_stato_ecologico)
+pub(crate) enum StatoEcologicoHFBI {
+    Eccellente,
+    Buono,
+    Sufficiente,
+    Scarso,
+    Cattivo,
+}
+
+impl fmt::Display for StatoEcologicoHFBI {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let string_representation = match *self {
+            StatoEcologicoHFBI::Eccellente => "Eccellente",
+            StatoEcologicoHFBI::Buono => "Buono",
+            StatoEcologicoHFBI::Sufficiente => "Sufficiente",
+            StatoEcologicoHFBI::Scarso => "Scarso",
+            StatoEcologicoHFBI::Cattivo => "Cattivo",
+        };
+        write!(f, "{}", string_representation)
+    }
+}

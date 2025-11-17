@@ -18,7 +18,8 @@
 use crate::app::core::{CISBA_LOGO_DATA};//, ISPRA_LOGO_DATA};
 use crate::domain::hfbi::{AnagraficaHFBI, RisultatoHFBI};
 use crate::domain::niseci::{AnagraficaNISECI, RiferimentoNISECI, RisultatoNISECI};
-use crate::engines::niseci::full::calculate_stato_ecologico;
+use crate::engines::niseci::full::calculate_stato_ecologico_niseci;
+use crate::engines::hfbi::full::calculate_stato_ecologico_hfbi;
 use crate::core::BUILD_DATE;
 use image::{ColorType, GenericImageView, ImageFormat};
 use miniz_oxide::deflate::{compress_to_vec_zlib, CompressionLevel};
@@ -40,7 +41,7 @@ pub(crate) fn esporta_pdf_niseci(
         None => "NC",
     };
     let stato_eco_niseci =
-        match calculate_stato_ecologico(risultato_niseci.get_valore(), &anagrafica_niseci.area) {
+        match calculate_stato_ecologico_niseci(risultato_niseci.get_valore(), &anagrafica_niseci.area) {
             Some(v) => &format!("{}", v),
             None => "NC",
         };
@@ -509,6 +510,12 @@ pub(crate) fn esporta_pdf_hfbi(
         Some(v) => &format!("{}", v),
         None => "NC",
     };
+    let valore_mmi = risultato_hfbi.get_intermediates().mmi;
+    let stato_eco = match calculate_stato_ecologico_hfbi(risultato_hfbi.get_valore()) {
+        Some(v) => &format!("{}", v),
+        None => "NC",
+    };
+
     // Define an ID allocator. Every time we need a new object, we just call
     // `alloc.bump()`, which increases `alloc` by one and returns its previous
     // value.
@@ -770,10 +777,14 @@ pub(crate) fn esporta_pdf_hfbi(
         .into_bytes()));
         content.next_line(0.0, -30.0);
         content.show(Str(&format!("Hfbi: {}", valore_hfbi).into_bytes()));
+        content.next_line(0.0, -30.0);
+        content.show(Str(&format!("MMI: {}", valore_mmi).into_bytes()));
+        content.next_line(0.0, -30.0);
+        content.show(Str(&format!("Stato Ecologico: {}", stato_eco).into_bytes()));
         content.end_text();
 
         let cols = 2;
-        let rows = 10;
+        let rows = 12;
 
         // Horizontal lines
         for row in 0..=rows {

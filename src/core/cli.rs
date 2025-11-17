@@ -45,9 +45,9 @@ use crate::domain::niseci::{
     AnagraficaNISECI, AreaNISECI, CampionamentoNISECI, ComunitaNISECI, IdroEcoRegioneNISECI,
     RiferimentoNISECI, RisultatoNISECI, TipoComunitaNISECI,
 };
-use crate::engines::hfbi::full::calculate_hfbi;
+use crate::engines::hfbi::full::{calculate_hfbi, calculate_stato_ecologico_hfbi};
 use crate::engines::niseci::full::{
-    calculate_niseci, calculate_rqe_niseci, calculate_stato_ecologico,
+    calculate_niseci, calculate_rqe_niseci, calculate_stato_ecologico_niseci,
 };
 use std::path::PathBuf;
 
@@ -402,7 +402,7 @@ pub(crate) fn run_headless(do_niseci: bool, args: &[String]) -> bool {
             match calculate_niseci(&campionamento, &riferimento, &anagrafica) {
                 Ok((niseci, intermediates)) => {
                     let rqe_niseci = calculate_rqe_niseci(niseci);
-                    let stato_eco_niseci = calculate_stato_ecologico(niseci, &anagrafica.area);
+                    let stato_eco_niseci = calculate_stato_ecologico_niseci(niseci, &anagrafica.area);
 
                     intermediates.log();
                     match niseci {
@@ -614,6 +614,19 @@ pub(crate) fn run_headless(do_niseci: bool, args: &[String]) -> bool {
                     let risultato_hfbi = RisultatoHFBI::new(Some(hfbi), intermediates);
 
                     println!("HFBI: {hfbi}");
+
+                    let stato_ecologico = calculate_stato_ecologico_hfbi(Some(hfbi));
+                    let stato_ecologico_str;
+
+                    match stato_ecologico {
+                        Some(val) => {
+                            stato_ecologico_str = format!("{val}");
+                        }
+                        None => {
+                            stato_ecologico_str = format!("NC");
+                        }
+                    }
+                    println!("Stato ecologico: {stato_ecologico_str}");
 
                     if passed_pdf_export_path {
                         println!("Esportato pdf in {}", pdf_export_path.display());

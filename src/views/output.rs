@@ -334,6 +334,63 @@ impl View for ProduzioneOutputView {
                     main_state.default_txt_spacing as f32,
                     main_state.default_txt_color,
                 );
+                let data_res_opt = controller.get_data_risultato_hfbi();
+                let mmi_str = match data_res_opt {
+                    Some(v) => {
+                        format!("{}", v.get_intermediates().mmi)
+                    }
+                    None => {
+                        if controller.get_is_done_calc() {
+                            // Could use done_calc and avoid another
+                            // lock call
+                            "NC".to_string()
+                        } else {
+                            "Non calcolato".to_string()
+                        }
+                    }
+                };
+                let mmi_line = format!("MMI: {}", mmi_str);
+                d.draw_text_ex(
+                    &main_state.current_font,
+                    &mmi_line,
+                    // We use propwidth/height for the text starting position:
+                    // this is not the bound
+                    Vector2::new(
+                        (panel_x + propwidth(d, 25)) as f32,
+                        (output_start_y + (y_spacing * 2)) as f32,
+                    ),
+                    main_state.current_font_height as f32,
+                    main_state.default_txt_spacing as f32,
+                    main_state.default_txt_color,
+                );
+                let stato_eco_hfbi_opt = controller.get_stato_eco_hfbi_value();
+                let stato_eco_hfbi_str = match stato_eco_hfbi_opt {
+                    Some(v) => {
+                        format!("{}", v)
+                    }
+                    None => {
+                        if controller.get_is_done_calc() {
+                            "NC".to_string()
+                        } else {
+                            "Non calcolato".to_string()
+                        }
+                    }
+                };
+                let stato_eco_line = format!("STATO ECOLOGICO HFBI: {}", stato_eco_hfbi_str);
+                d.draw_text_ex(
+                    &main_state.current_font,
+                    &stato_eco_line,
+                    // We use propwidth/height for the text starting position:
+                    // this is not the bound
+                    Vector2::new(
+                        (panel_x + propwidth(d, 25)) as f32,
+                        (output_start_y + (y_spacing * 3)) as f32,
+                    ),
+                    main_state.current_font_height as f32,
+                    main_state.default_txt_spacing as f32,
+                    main_state.default_txt_color,
+                );
+
             }
         }
     }

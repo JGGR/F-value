@@ -18,13 +18,13 @@ pub(crate) struct OutputController;
 use crate::app::model::SubModel;
 use crate::controllers::{Controller, CurrentView, OutputModel};
 use crate::core::pdf::{esporta_pdf_hfbi, esporta_pdf_niseci};
-use crate::domain::hfbi::{AnagraficaHFBI, RisultatoHFBI};
+use crate::domain::hfbi::{AnagraficaHFBI, RisultatoHFBI, StatoEcologicoHFBI};
 use crate::domain::niseci::{
     AnagraficaNISECI, RiferimentoNISECI, RisultatoNISECI, StatoEcologicoNISECI,
 };
-use crate::engines::hfbi::full::calculate_hfbi;
+use crate::engines::hfbi::full::{calculate_hfbi, calculate_stato_ecologico_hfbi};
 use crate::engines::niseci::full::{
-    calculate_niseci, calculate_rqe_niseci, calculate_stato_ecologico,
+    calculate_niseci, calculate_rqe_niseci, calculate_stato_ecologico_niseci,
 };
 use crate::state::GLOBAL_STATE;
 use crate::MainState;
@@ -145,7 +145,7 @@ impl OutputController {
                     match opt_anagrafica {
                         Some(anagr) => {
                             let niseci_val = r.get_valore();
-                            calculate_stato_ecologico(niseci_val, &anagr.area)
+                            calculate_stato_ecologico_niseci(niseci_val, &anagr.area)
                         }
                         None => None,
                     }
@@ -278,7 +278,7 @@ impl OutputController {
                     }
                     self.add_console_message(format!("RQE NISECI: {rqe_niseci_str}"));
 
-                    let stato_ecologico = calculate_stato_ecologico(niseci, &anagrafica.area);
+                    let stato_ecologico = calculate_stato_ecologico_niseci(niseci, &anagrafica.area);
                     let stato_ecologico_str;
 
                     match stato_ecologico {
@@ -448,16 +448,30 @@ impl OutputController {
                 Ok((hfbi, intermediates)) => {
                     self.add_console_message(format!("HFBI: {hfbi}"));
 
+                    let stato_ecologico = calculate_stato_ecologico_hfbi(Some(hfbi));
+                    let stato_ecologico_str;
+
+                    match stato_ecologico {
+                        Some(val) => {
+                            stato_ecologico_str = format!("{val}");
+                        }
+                        None => {
+                            stato_ecologico_str = format!("NC");
+                        }
+                    }
+                    self.add_console_message(format!("Stato ecologico: {stato_ecologico_str}"));
+
                     #[cfg(feature = "logged")]
                     {
-                        info!("Codice stazione, stagione, habitat vegetato, tipo laguna, MMI, HFBI\n{}",
-                            format!("{}, {}, {}, {}, {}, {}",
+                        info!("Codice stazione, stagione, habitat vegetato, tipo laguna, MMI, HFBI, Stato ecologico\n{}",
+                            format!("{}, {}, {}, {}, {}, {}, {}",
                             anagrafica.codice_stazione,
                             anagrafica.stagione,
                             anagrafica.habitat_vegetato,
                             anagrafica.tipo_laguna,
                             intermediates.mmi,
-                            hfbi
+                            hfbi,
+                            stato_ecologico_str
                         ));
                     }
 
@@ -564,6 +578,21 @@ impl OutputController {
             let opt_res = self.get_data_risultato_hfbi();
             match opt_res {
                 Some(r) => r.get_valore(),
+                None => None,
+            }
+        } else {
+            None
+        }
+    }
+
+    pub(crate) fn get_stato_eco_hfbi_value(&self) -> Option<StatoEcologicoHFBI> {
+        if self.get_is_done_calc() {
+            let opt_res = self.get_data_risultato_hfbi();
+            match opt_res {
+                Some(r) => {
+                    let hfbi_val = r.get_valore();
+                    calculate_stato_ecologico_hfbi(hfbi_val)
+                }
                 None => None,
             }
         } else {

@@ -1,16 +1,14 @@
 ## [0.0.32] - Unreleased
 
+### Added
+
+- Add `StatoEcologicoHFBI`, to be reported in output and pdf
+
 ### Changed
 
 - Fixed output model non being reset when it should be
 
 ## [0.0.31] - 2025-11-19
-
-### Changed
-
-- Removed sommatoria x2_a and x2_b for intermediates
-- Wow log csv files uses `;` instead of `,` as delimiter
-- Filled `regione` cell in log files
 
 ### Added
 
@@ -22,6 +20,12 @@
 - New method `calculate_x2_b_per_alloctone`
 - Added intermediates logs for `specie non attese` and `specie alloctone`
 - Added `quantita_stimata` as intermediate
+
+### Changed
+
+- Removed sommatoria x2_a and x2_b for intermediates
+- Wow log csv files uses `;` instead of `,` as delimiter
+- Filled `regione` cell in log files
 
 ## [0.0.30] - 2025-10-29
 

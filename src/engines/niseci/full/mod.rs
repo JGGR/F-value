@@ -183,7 +183,7 @@ pub(crate) fn calculate_rqe_niseci(niseci: Option<f32>) -> Option<f32> {
     }
 }
 
-pub(crate) fn calculate_stato_ecologico(
+pub(crate) fn calculate_stato_ecologico_niseci(
     niseci: Option<f32>,
     area: &AreaNISECI,
 ) -> Option<StatoEcologicoNISECI> {
