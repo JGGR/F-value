@@ -37,6 +37,7 @@ impl Controller for ConsoleController {
             state.fileinput_model.reset();
             state.infoaggiuntive_model.reset();
             state.data_model.reset();
+            state.output_model.reset();
             state.console_model.reset();
             main_state.set_current_view(CurrentView::Home);
             return;

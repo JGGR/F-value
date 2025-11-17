@@ -1,3 +1,9 @@
+## [0.0.32] - Unreleased
+
+### Changed
+
+- Fixed output model non being reset when it should be
+
 ## [0.0.31] - 2025-11-19
 
 ### Changed
