@@ -3,6 +3,7 @@
 ### Added
 
 - Add `StatoEcologicoHFBI`, to be reported in output and pdf
+- Hfbi log csv files uses `;` instead of `,` as delimiter
 
 ### Changed
 
@@ -24,7 +25,7 @@
 ### Changed
 
 - Removed sommatoria x2_a and x2_b for intermediates
-- Wow log csv files uses `;` instead of `,` as delimiter
+- Now log csv files uses `;` instead of `,` as delimiter
 - Filled `regione` cell in log files
 
 ## [0.0.30] - 2025-10-29

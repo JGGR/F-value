@@ -463,8 +463,8 @@ impl OutputController {
 
                     #[cfg(feature = "logged")]
                     {
-                        info!("Codice stazione, stagione, habitat vegetato, tipo laguna, MMI, HFBI, Stato ecologico\n{}",
-                            format!("{}, {}, {}, {}, {}, {}, {}",
+                        info!("Codice stazione; stagione; habitat vegetato; tipo laguna; MMI; HFBI; Stato ecologico\n{}",
+                            format!("{}; {}; {}; {}; {}; {}; {}",
                             anagrafica.codice_stazione,
                             anagrafica.stagione,
                             anagrafica.habitat_vegetato,
@@ -501,7 +501,7 @@ impl OutputController {
                         match file_result {
                             Ok(mut file) => {
                                 let string_representation = format!(
-                                    "bbent, bn, dbent, ddom, dhzp, dmig\n{}, {}, {}, {}, {}, {}",
+                                    "bbent; bn; dbent; ddom; dhzp; dmig\n{}; {}; {}; {}; {}; {}",
                                     intermediates.bbent,
                                     intermediates.bn,
                                     intermediates.dbent,
