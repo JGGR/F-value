@@ -15,12 +15,12 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::app::core::{CISBA_LOGO_DATA};//, ISPRA_LOGO_DATA};
+use crate::app::core::CISBA_LOGO_DATA; //, ISPRA_LOGO_DATA};
+use crate::core::BUILD_DATE;
 use crate::domain::hfbi::{AnagraficaHFBI, RisultatoHFBI};
 use crate::domain::niseci::{AnagraficaNISECI, RiferimentoNISECI, RisultatoNISECI};
-use crate::engines::niseci::full::calculate_stato_ecologico_niseci;
 use crate::engines::hfbi::full::calculate_stato_ecologico_hfbi;
-use crate::core::BUILD_DATE;
+use crate::engines::niseci::full::calculate_stato_ecologico_niseci;
 use image::{ColorType, GenericImageView, ImageFormat};
 use miniz_oxide::deflate::{compress_to_vec_zlib, CompressionLevel};
 use pdf_writer::{Chunk, Content, Filter, Finish, Name, Pdf, Rect, Ref, Str};
@@ -40,11 +40,13 @@ pub(crate) fn esporta_pdf_niseci(
         Some(v) => &format!("{}", v),
         None => "NC",
     };
-    let stato_eco_niseci =
-        match calculate_stato_ecologico_niseci(risultato_niseci.get_valore(), &anagrafica_niseci.area) {
-            Some(v) => &format!("{}", v),
-            None => "NC",
-        };
+    let stato_eco_niseci = match calculate_stato_ecologico_niseci(
+        risultato_niseci.get_valore(),
+        &anagrafica_niseci.area,
+    ) {
+        Some(v) => &format!("{}", v),
+        None => "NC",
+    };
     let x1 = &format!("{}", risultato_niseci.get_x1());
     let x2 = match risultato_niseci.get_x2() {
         Some(v) => &format!("{}", v),
@@ -389,9 +391,12 @@ pub(crate) fn esporta_pdf_niseci(
 
         content.begin_text();
         content.next_line(a4.x2 / 2.0 - 115.0, 15.0);
-        content.show(Str(
-            &format!("F-value v{}, Data release: {}", env!("CARGO_PKG_VERSION"), BUILD_DATE).into_bytes()
-        ));
+        content.show(Str(&format!(
+            "F-value v{}, Data release: {}",
+            env!("CARGO_PKG_VERSION"),
+            BUILD_DATE
+        )
+        .into_bytes()));
         content.end_text();
 
         //This can be used to debug the content before streaming it
@@ -824,9 +829,12 @@ pub(crate) fn esporta_pdf_hfbi(
 
         content.begin_text();
         content.next_line(a4.x2 / 2.0 - 115.0, 15.0);
-        content.show(Str(
-            &format!("F-value v{}, Data release: {}", env!("CARGO_PKG_VERSION"), BUILD_DATE).into_bytes()
-        ));
+        content.show(Str(&format!(
+            "F-value v{}, Data release: {}",
+            env!("CARGO_PKG_VERSION"),
+            BUILD_DATE
+        )
+        .into_bytes()));
         content.end_text();
 
         let content_id = alloc.bump();

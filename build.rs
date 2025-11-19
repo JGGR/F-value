@@ -1,6 +1,6 @@
+use chrono::Local;
 use std::env::consts::{ARCH, OS};
 use std::process::Command;
-use chrono::Local;
 
 #[cfg(debug_assertions)]
 const BUILD_TYPE: &str = "debug";

@@ -366,12 +366,8 @@ impl View for SelezioneInfoAggiuntiveView {
         );
 
         let label_for_station_length = match current_index {
-            Indice::Niseci => {
-                "Lunghezza stazione"
-            }
-            Indice::Hfbi => {
-                "Lunghezza transetto"
-            }
+            Indice::Niseci => "Lunghezza stazione",
+            Indice::Hfbi => "Lunghezza transetto",
         };
         d.gui_label(
             rrect(
@@ -384,12 +380,8 @@ impl View for SelezioneInfoAggiuntiveView {
         );
 
         let label_for_station_width = match current_index {
-            Indice::Niseci => {
-                "Larghezza stazione"
-            }
-            Indice::Hfbi => {
-                "Larghezza transetto"
-            }
+            Indice::Niseci => "Larghezza stazione",
+            Indice::Hfbi => "Larghezza transetto",
         };
 
         d.gui_label(

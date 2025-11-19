@@ -54,9 +54,7 @@ fn calc_bmig(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
     let mut biomig = 0.0;
     for specie in &campione.campionamento {
         match specie.specie.gruppo_eco {
-            GruppoEcoHFBI::Diadromi | GruppoEcoHFBI::MigratoriMarini => {
-                biomig += specie.peso
-            }
+            GruppoEcoHFBI::Diadromi | GruppoEcoHFBI::MigratoriMarini => biomig += specie.peso,
             _ => {}
         }
     }

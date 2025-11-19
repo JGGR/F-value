@@ -258,9 +258,7 @@ impl OutputController {
                         Some(val) => {
                             format!("{val}")
                         }
-                        None => {
-                            "NC".to_string()
-                        }
+                        None => "NC".to_string(),
                     };
                     self.add_console_message(format!("NISECI: {niseci_str}"));
 
@@ -269,20 +267,17 @@ impl OutputController {
                         Some(val) => {
                             format!("{val}")
                         }
-                        None => {
-                            "NC".to_string()
-                        }
+                        None => "NC".to_string(),
                     };
                     self.add_console_message(format!("RQE NISECI: {rqe_niseci_str}"));
 
-                    let stato_ecologico = calculate_stato_ecologico_niseci(niseci, &anagrafica.area);
+                    let stato_ecologico =
+                        calculate_stato_ecologico_niseci(niseci, &anagrafica.area);
                     let stato_ecologico_str = match stato_ecologico {
                         Some(val) => {
                             format!("{val}")
                         }
-                        None => {
-                            "NC".to_string()
-                        }
+                        None => "NC".to_string(),
                     };
                     self.add_console_message(format!("Stato ecologico: {stato_ecologico_str}"));
 
@@ -344,8 +339,7 @@ impl OutputController {
                                     string_representation =
                                         format!("{}\n{}", string_representation, v);
                                 }
-                                let write_result =
-                                    writeln!(file, "{string_representation}");
+                                let write_result = writeln!(file, "{string_representation}");
                                 match write_result {
                                     Ok(_) => println!("Successfully wrote to file."),
                                     Err(e) => eprintln!("Failed to write to file: {}", e),
@@ -447,9 +441,7 @@ impl OutputController {
                         Some(val) => {
                             format!("{val}")
                         }
-                        None => {
-                            "NC".to_string()
-                        }
+                        None => "NC".to_string(),
                     };
                     self.add_console_message(format!("Stato ecologico: {stato_ecologico_str}"));
 
@@ -500,8 +492,7 @@ impl OutputController {
                                     intermediates.dhzp,
                                     intermediates.dmig
                                 );
-                                let write_result =
-                                    writeln!(file, "{string_representation}");
+                                let write_result = writeln!(file, "{string_representation}");
                                 match write_result {
                                     Ok(_) => println!("Successfully wrote to file."),
                                     Err(e) => eprintln!("Failed to write to file: {}", e),

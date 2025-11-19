@@ -390,7 +390,6 @@ impl View for ProduzioneOutputView {
                     main_state.default_txt_spacing as f32,
                     main_state.default_txt_color,
                 );
-
             }
         }
     }

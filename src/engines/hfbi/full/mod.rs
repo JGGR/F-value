@@ -1,7 +1,7 @@
 use crate::{
     domain::hfbi::{
-        AnagraficaHFBI, CampionamentoHFBI, CondizioniRiferimentoHFBI, ValoriIntermediHFBI,
-        StatoEcologicoHFBI
+        AnagraficaHFBI, CampionamentoHFBI, CondizioniRiferimentoHFBI, StatoEcologicoHFBI,
+        ValoriIntermediHFBI,
     },
     engines::hfbi::{
         bbent::calc_bbent, bn::calc_bn, dbent::calc_dbent, ddom::calc_ddom, dhzp::calc_dhzp,
@@ -91,9 +91,7 @@ pub(crate) fn calculate_hfbi(
     }
 }
 
-pub(crate) fn calculate_stato_ecologico_hfbi(
-    hfbi: Option<f32>,
-) -> Option<StatoEcologicoHFBI> {
+pub(crate) fn calculate_stato_ecologico_hfbi(hfbi: Option<f32>) -> Option<StatoEcologicoHFBI> {
     match hfbi {
         Some(val) => {
             if val >= STATO_ECOLOGICO_HFBI_SOGLIA_ECCELLENTE {

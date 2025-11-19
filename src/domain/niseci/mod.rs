@@ -488,7 +488,13 @@ impl fmt::Display for ValoriIntermediSpecieNISECI {
         };
         let string_representation = format!(
             "{}; {}; {}; {}; {}; {}; {}",
-            self.classi_eta, self.densita_stimata, self.quantita_stimata, self.x2_b, rapporto_ad_juv_str, self.x2_a_a, self.x2_a_b
+            self.classi_eta,
+            self.densita_stimata,
+            self.quantita_stimata,
+            self.x2_b,
+            rapporto_ad_juv_str,
+            self.x2_a_a,
+            self.x2_a_b
         );
         write!(f, "{}", string_representation)
     }

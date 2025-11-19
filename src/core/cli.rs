@@ -402,7 +402,8 @@ pub(crate) fn run_headless(do_niseci: bool, args: &[String]) -> bool {
             match calculate_niseci(&campionamento, &riferimento, &anagrafica) {
                 Ok((niseci, intermediates)) => {
                     let rqe_niseci = calculate_rqe_niseci(niseci);
-                    let stato_eco_niseci = calculate_stato_ecologico_niseci(niseci, &anagrafica.area);
+                    let stato_eco_niseci =
+                        calculate_stato_ecologico_niseci(niseci, &anagrafica.area);
 
                     intermediates.log();
                     match niseci {
@@ -620,9 +621,7 @@ pub(crate) fn run_headless(do_niseci: bool, args: &[String]) -> bool {
                         Some(val) => {
                             format!("{val}")
                         }
-                        None => {
-                            "NC".to_string()
-                        }
+                        None => "NC".to_string(),
                     };
                     println!("Stato ecologico: {stato_ecologico_str}");
 
