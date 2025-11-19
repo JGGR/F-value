@@ -41,7 +41,6 @@ impl Controller for HelpController {
             state.second_model.reset();
             state.console_model.reset();
             main_state.set_current_view(CurrentView::Home);
-            return;
         }
     }
 

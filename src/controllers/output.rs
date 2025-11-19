@@ -254,47 +254,41 @@ impl OutputController {
 
             match calculate_niseci(&campionamento, &riferimento, &anagrafica) {
                 Ok((niseci, intermediates)) => {
-                    let niseci_str;
-                    match niseci {
+                    let niseci_str = match niseci {
                         Some(val) => {
-                            niseci_str = format!("{val}");
+                            format!("{val}")
                         }
                         None => {
-                            niseci_str = format!("NC");
+                            "NC".to_string()
                         }
-                    }
+                    };
                     self.add_console_message(format!("NISECI: {niseci_str}"));
 
                     let rqe_niseci = calculate_rqe_niseci(niseci);
-                    let rqe_niseci_str;
-
-                    match rqe_niseci {
+                    let rqe_niseci_str = match rqe_niseci {
                         Some(val) => {
-                            rqe_niseci_str = format!("{val}");
+                            format!("{val}")
                         }
                         None => {
-                            rqe_niseci_str = format!("NC");
+                            "NC".to_string()
                         }
-                    }
+                    };
                     self.add_console_message(format!("RQE NISECI: {rqe_niseci_str}"));
 
                     let stato_ecologico = calculate_stato_ecologico_niseci(niseci, &anagrafica.area);
-                    let stato_ecologico_str;
-
-                    match stato_ecologico {
+                    let stato_ecologico_str = match stato_ecologico {
                         Some(val) => {
-                            stato_ecologico_str = format!("{val}");
+                            format!("{val}")
                         }
                         None => {
-                            stato_ecologico_str = format!("NC");
+                            "NC".to_string()
                         }
-                    }
+                    };
                     self.add_console_message(format!("Stato ecologico: {stato_ecologico_str}"));
 
                     #[cfg(feature = "logged")]
                     {
-                        info!("Codice stazione; Data; Regione; Idroecoregione; Area pertinenza; Bacino; NISECI; RQE NISECI; Stato ecologico; x1; x2; x3; x3_a; x3_b\n{}",
-                            format!("{}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}",
+                        info!("Codice stazione; Data; Regione; Idroecoregione; Area pertinenza; Bacino; NISECI; RQE NISECI; Stato ecologico; x1; x2; x3; x3_a; x3_b\n{}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}",
                             anagrafica.codice_stazione,
                             anagrafica.date_string,
                             anagrafica.posizione.regione,
@@ -318,7 +312,7 @@ impl OutputController {
                                 Some(v) => format!("{v}"),
                                 None => "NC".to_string(),
                             }
-                        ));
+                        );
                     }
 
                     //This logs to stdout
@@ -345,13 +339,13 @@ impl OutputController {
 
                         match file_result {
                             Ok(mut file) => {
-                                let mut string_representation = format!("specie; nome latino; tipo autoctono; tipo alloctono; specie attesa; cl1; cl2; cl3; cl4; cl5; densita stimata; quantita stimata; x2b; rapporto ad/juv; x2a_a; x2a_b");
+                                let mut string_representation = "specie; nome latino; tipo autoctono; tipo alloctono; specie attesa; cl1; cl2; cl3; cl4; cl5; densita stimata; quantita stimata; rapporto ad/juv; x2a_a; x2a_b".to_string();
                                 for (_k, v) in intermediates.specie_specifici.iter() {
                                     string_representation =
                                         format!("{}\n{}", string_representation, v);
                                 }
                                 let write_result =
-                                    writeln!(file, "{}", format!("{string_representation}"));
+                                    writeln!(file, "{string_representation}");
                                 match write_result {
                                     Ok(_) => println!("Successfully wrote to file."),
                                     Err(e) => eprintln!("Failed to write to file: {}", e),
@@ -449,22 +443,19 @@ impl OutputController {
                     self.add_console_message(format!("HFBI: {hfbi}"));
 
                     let stato_ecologico = calculate_stato_ecologico_hfbi(Some(hfbi));
-                    let stato_ecologico_str;
-
-                    match stato_ecologico {
+                    let stato_ecologico_str = match stato_ecologico {
                         Some(val) => {
-                            stato_ecologico_str = format!("{val}");
+                            format!("{val}")
                         }
                         None => {
-                            stato_ecologico_str = format!("NC");
+                            "NC".to_string()
                         }
-                    }
+                    };
                     self.add_console_message(format!("Stato ecologico: {stato_ecologico_str}"));
 
                     #[cfg(feature = "logged")]
                     {
-                        info!("Codice stazione; stagione; habitat vegetato; tipo laguna; MMI; HFBI; Stato ecologico\n{}",
-                            format!("{}; {}; {}; {}; {}; {}; {}",
+                        info!("Codice stazione; stagione; habitat vegetato; tipo laguna; MMI; HFBI; Stato ecologico\n{}; {}; {}; {}; {}; {}; {}",
                             anagrafica.codice_stazione,
                             anagrafica.stagione,
                             anagrafica.habitat_vegetato,
@@ -472,7 +463,7 @@ impl OutputController {
                             intermediates.mmi,
                             hfbi,
                             stato_ecologico_str
-                        ));
+                        );
                     }
 
                     //This logs to stdout
@@ -510,7 +501,7 @@ impl OutputController {
                                     intermediates.dmig
                                 );
                                 let write_result =
-                                    writeln!(file, "{}", format!("{string_representation}"));
+                                    writeln!(file, "{string_representation}");
                                 match write_result {
                                     Ok(_) => println!("Successfully wrote to file."),
                                     Err(e) => eprintln!("Failed to write to file: {}", e),

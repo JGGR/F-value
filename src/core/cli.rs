@@ -616,16 +616,14 @@ pub(crate) fn run_headless(do_niseci: bool, args: &[String]) -> bool {
                     println!("HFBI: {hfbi}");
 
                     let stato_ecologico = calculate_stato_ecologico_hfbi(Some(hfbi));
-                    let stato_ecologico_str;
-
-                    match stato_ecologico {
+                    let stato_ecologico_str = match stato_ecologico {
                         Some(val) => {
-                            stato_ecologico_str = format!("{val}");
+                            format!("{val}")
                         }
                         None => {
-                            stato_ecologico_str = format!("NC");
+                            "NC".to_string()
                         }
-                    }
+                    };
                     println!("Stato ecologico: {stato_ecologico_str}");
 
                     if passed_pdf_export_path {

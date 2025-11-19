@@ -21,8 +21,7 @@ pub(crate) fn calc_ddom(campionamento: &CampionamentoHFBI, anagrafica: &Anagrafi
     let (s90, b90): (u32, f32) = calc_s90_b90(campionamento, anagrafica);
 
     let ddom = (((s90 as f32 - 1.0) / b90) + 1.0).ln();
-    let rounded_ddom = (1000.0 * ddom).round() / 1000.0;
-    rounded_ddom
+    (1000.0 * ddom).round() / 1000.0
 }
 
 fn calc_s90_b90(campionamento: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> (u32, f32) {
@@ -44,7 +43,7 @@ fn calc_s90_b90(campionamento: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) 
     }
 
     let area: f32 = anagrafica.lunghezza_media_transetto * anagrafica.larghezza_media_transetto;
-    let b90: f32 = ((biomassa_90 as f32 / area) * 100.0 + 1.0).ln();
+    let b90: f32 = ((biomassa_90 / area) * 100.0 + 1.0).ln();
 
     (n_specie_90, b90)
 }

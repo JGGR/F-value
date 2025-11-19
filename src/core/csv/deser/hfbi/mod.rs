@@ -22,7 +22,7 @@ use crate::core::csv::{RecordCsvAnagraficaHFBI, RecordCsvCampionamentoHFBI, Tipo
 use std::any::TypeId;
 use std::fmt;
 use std::fs::File;
-use std::io::{Error, ErrorKind, Read};
+use std::io::{Error, Read};
 use std::path::PathBuf;
 
 #[derive(Debug, serde::Deserialize)]
@@ -167,8 +167,7 @@ where
 {
     if !check_path_is_file_ends_with_csv(&path) {
         eprintln!("Il file {} non è un .csv", path.display());
-        let err = csv::Error::from(Error::new(
-            ErrorKind::Other,
+        let err = csv::Error::from(Error::other(
             "Errore campionamento HFBI: il file non è un .csv",
         ));
         let err_vec: Vec<csv::Error> = vec![err];
@@ -397,8 +396,7 @@ where
 {
     if !check_path_is_file_ends_with_csv(&path) {
         eprintln!("Il file {} non è un .csv", path.display());
-        let err = csv::Error::from(Error::new(
-            ErrorKind::Other,
+        let err = csv::Error::from(Error::other(
             "Errore anagrafica HFBI: il file non è un .csv",
         ));
         let err_vec: Vec<csv::Error> = vec![err];

@@ -24,8 +24,8 @@ pub(crate) fn calc_bbent(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHF
             GruppoEcoHFBI::Diadromi
             | GruppoEcoHFBI::MigratoriMarini
             | GruppoEcoHFBI::ResidentiDiEstuario => {
-                biobent += specie.peso as f32 * (specie.specie.gruppo_trofico.microbentivori)
-                    + specie.peso as f32 * (specie.specie.gruppo_trofico.macrobentivori)
+                biobent += specie.peso * (specie.specie.gruppo_trofico.microbentivori)
+                    + specie.peso * (specie.specie.gruppo_trofico.macrobentivori)
             }
             _ => {}
         }
@@ -40,8 +40,7 @@ pub(crate) fn calc_bbent(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHF
 
     let bbent = ((biobent / area) * 100.0 + 1.0).ln();
 
-    let rounded_bbent = (1000.0 * bbent).round() / 1000.0;
-    rounded_bbent
+    (1000.0 * bbent).round() / 1000.0
 }
 
 #[cfg(test)]

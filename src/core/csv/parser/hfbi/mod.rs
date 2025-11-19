@@ -95,7 +95,7 @@ pub(crate) fn parse_recordcsv_campionamento_hfbi<T: RecordCsvCampionamentoHFBI>(
         let hfbi_rec = RecordHFBI {
             specie: matched_specie.clone(),
             numero_individui: r.numero_individui(),
-            peso: peso,
+            peso,
         };
         campioni.push(hfbi_rec);
     }
@@ -305,9 +305,9 @@ pub(crate) fn parse_recordcsv_anagrafica_hfbi<T: RecordCsvAnagraficaHFBI>(
         },
         lunghezza_media_transetto: r.lunghezza_stazione(),
         larghezza_media_transetto: r.larghezza_stazione(),
-        stagione: stagione,
+        stagione,
         habitat_vegetato: habitat,
-        tipo_laguna: tipo_laguna,
+        tipo_laguna,
     };
     Ok(res)
 }

@@ -47,8 +47,7 @@ pub(crate) fn calc_dmig(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFB
     }
 
     let dmig = (((smig as f32 - 1.0) / bmig.ln()) + 1.0).ln();
-    let rounded_dmig = (1000.0 * dmig).round() / 1000.0;
-    rounded_dmig
+    (1000.0 * dmig).round() / 1000.0
 }
 
 fn calc_bmig(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
@@ -56,7 +55,7 @@ fn calc_bmig(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
     for specie in &campione.campionamento {
         match specie.specie.gruppo_eco {
             GruppoEcoHFBI::Diadromi | GruppoEcoHFBI::MigratoriMarini => {
-                biomig += specie.peso as f32
+                biomig += specie.peso
             }
             _ => {}
         }

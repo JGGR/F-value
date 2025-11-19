@@ -715,11 +715,11 @@ impl AnagraficaHFBI {
     }
 
     pub(crate) fn get_cond_riferimento_key(&self) -> CondizioniRiferimentoKeyHFBI {
-        return CondizioniRiferimentoKeyHFBI {
+        CondizioniRiferimentoKeyHFBI {
             tipo_laguna: self.tipo_laguna.clone(),
             stagione: self.stagione.clone(),
             habitat_vegetato: self.habitat_vegetato.clone(),
-        };
+        }
     }
 }
 
@@ -749,7 +749,7 @@ impl fmt::Display for ValoriIntermediHFBI {
             self.bbent, self.bn, self.dbent, self.ddom, self.dhzp, self.dmig, self.mmi
         );
 
-        string_representation = format!("{}", string_representation);
+        string_representation = string_representation.to_string(); //FIXME: Why is this here?
         write!(f, "{}", string_representation)
     }
 }
@@ -829,14 +829,14 @@ impl CondizioniRiferimentoHFBI {
         anagrafica: &AnagraficaHFBI,
     ) -> Option<&'static CondizioniRiferimentoHFBI> {
         let key = anagrafica.get_cond_riferimento_key();
-        return CONDIZIONI_RIFERIMENTO_HFBI_HASHMAP.get(&key);
+        CONDIZIONI_RIFERIMENTO_HFBI_HASHMAP.get(&key)
     }
 }
 
 static CONDIZIONI_RIFERIMENTO_HFBI_HASHMAP: Lazy<
     HashMap<CondizioniRiferimentoKeyHFBI, CondizioniRiferimentoHFBI>,
 > = Lazy::new(|| {
-    let map = HashMap::from([
+    HashMap::from([
         // M-AT-1 data
         (
             CondizioniRiferimentoKeyHFBI {
@@ -1020,9 +1020,7 @@ static CONDIZIONI_RIFERIMENTO_HFBI_HASHMAP: Lazy<
                 dhzp: 2.083,
             },
         ),
-    ]);
-
-    map
+    ])
 });
 
 /// enum per il risultato finale di un calcolo hfbi

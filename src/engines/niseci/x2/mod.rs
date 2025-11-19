@@ -545,7 +545,7 @@ fn calculate_q_stimata_regression(passaggi: &HashMap<u8, u32>) -> Result<u32, St
     calculate_quantita_with_regression(points.as_slice())
 }
 
-fn fill_submetriche(densita_vec: Vec<MetricheX2B>, submetriche: &mut HashMap<String, SubmetricheX2>, errors: &mut Vec<String>) -> () {
+fn fill_submetriche(densita_vec: Vec<MetricheX2B>, submetriche: &mut HashMap<String, SubmetricheX2>, errors: &mut Vec<String>) {
     for dens in &densita_vec {
         let id = dens.get_id();
         match submetriche.entry(id.clone()) {

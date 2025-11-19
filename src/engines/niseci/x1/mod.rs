@@ -73,6 +73,5 @@ pub(crate) fn calculate_x1(
     // this is the formula use in the NISECI docs
     let x1 = (1.2 * n_i + 0.8 * n_a) / (1.2 * m_i + 0.8 * m_a);
 
-    let rounded_x1 = (1000.0 * x1).round() / 1000.0;
-    rounded_x1
+    (1000.0 * x1).round() / 1000.0
 }

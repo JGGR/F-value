@@ -161,8 +161,8 @@ pub(crate) fn esporta_pdf_niseci(
     let s_mask_id_2 = alloc.bump();
 
     // Decode the image.
-    let format_2 = image::guess_format(&CISBA_LOGO_DATA).unwrap();
-    let dynamic_2 = image::load_from_memory(&CISBA_LOGO_DATA).unwrap();
+    let format_2 = image::guess_format(CISBA_LOGO_DATA).unwrap();
+    let dynamic_2 = image::load_from_memory(CISBA_LOGO_DATA).unwrap();
 
     let (filter_2, encoded_2, mask_2) = match format_2 {
         // A JPEG is already valid DCT-encoded data.
@@ -377,10 +377,10 @@ pub(crate) fn esporta_pdf_niseci(
         content.begin_text();
         content.set_font(font_name, 12.0);
         content.next_line(a4.x2 / 2.0 - 60.0, y - 30.0);
-        content.show(Str(&format!("Applicazione NISECI").into_bytes()));
+        content.show(Str(&"Applicazione NISECI".to_string().into_bytes()));
 
         content.next_line(20.0, -15.0);
-        content.show(Str(&format!("DM 260/2010").into_bytes()));
+        content.show(Str(&"DM 260/2010".to_string().into_bytes()));
         content.end_text();
 
         content.move_to(x_start, 30.0);
@@ -618,8 +618,8 @@ pub(crate) fn esporta_pdf_hfbi(
     let s_mask_id_2 = alloc.bump();
 
     // Decode the image.
-    let format_2 = image::guess_format(&CISBA_LOGO_DATA).unwrap();
-    let dynamic_2 = image::load_from_memory(&CISBA_LOGO_DATA).unwrap();
+    let format_2 = image::guess_format(CISBA_LOGO_DATA).unwrap();
+    let dynamic_2 = image::load_from_memory(CISBA_LOGO_DATA).unwrap();
 
     let (filter_2, encoded_2, mask_2) = match format_2 {
         // A JPEG is already valid DCT-encoded data.
@@ -812,10 +812,10 @@ pub(crate) fn esporta_pdf_hfbi(
 
         content.begin_text();
         content.next_line(a4.x2 / 2.0 - 60.0, y - 30.0);
-        content.show(Str(&format!("Applicazione HFBI").into_bytes()));
+        content.show(Str(&"Applicazione HFBI".to_string().into_bytes()));
 
         content.next_line(15.0, -15.0);
-        content.show(Str(&format!("DM 260/2010").into_bytes()));
+        content.show(Str(&"DM 260/2010".to_string().into_bytes()));
         content.end_text();
 
         content.move_to(x_start, 30.0);

@@ -103,7 +103,7 @@ pub(crate) fn calculate_quantita_with_regression(
     }
 
     // l'incorcio della retta con l'asse x ci da la quantita stimata
-    let quantita_stimata = (-1.0 * (b / m)) as i32;
+    let quantita_stimata = (-(b / m)) as i32;
     if quantita_stimata < 0 {
         return Err(format!("quantita stimata negativa {}", quantita_stimata));
     }
