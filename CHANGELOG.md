@@ -9,6 +9,7 @@
 
 - Fixed output model non being reset when it should be
 - Solved many clippy lints
+- Bump dependencies
 
 ## [0.0.31] - 2025-11-19
 
