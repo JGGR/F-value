@@ -138,6 +138,11 @@ impl TryFrom<i32> for GuiTheme {
     }
 }
 
+pub(crate) enum Localize {
+    Italian,
+    International
+}
+
 pub(crate) struct MainState {
     pub(crate) frame_counter: u32,
     pub(crate) showing_reset_win: bool,
@@ -158,6 +163,7 @@ pub(crate) struct MainState {
     pub(crate) current_font: WeakFont,
     pub(crate) default_bg_color: Color,
     pub(crate) logo_texture: Option<Texture2D>,
+    pub(crate) locale: Localize,
 }
 
 impl MainState {
@@ -169,6 +175,7 @@ impl MainState {
         default_txt_color: Color,
         default_bg_color: Color,
         logo_texture: Option<Texture2D>,
+        locale: Localize
     ) -> Self {
         Self {
             frame_counter: 0,
@@ -190,6 +197,7 @@ impl MainState {
             current_font,
             default_bg_color,
             logo_texture,
+            locale
         }
     }
 

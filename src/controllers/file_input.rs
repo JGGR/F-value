@@ -22,6 +22,7 @@ use crate::core::csv::deser::{
     niseci::{
         check_campionamento_niseci_path, check_riferimento_niseci_path,
         VeryItalianRecordCsvCampionamentoNISECI, VeryItalianRecordCsvRiferimentoNISECI,
+        PlainRecordCsvRiferimentoNISECI,
     },
     process_csv_errors,
 };
@@ -29,12 +30,12 @@ use crate::core::csv::parser::{
     hfbi::check_records_campionamento_hfbi,
     niseci::{check_records_campionamento_niseci, check_records_riferimento_niseci},
 };
-use crate::core::csv::TipoRecordCsv;
+use crate::core::csv::{TipoRecordCsv, RecordCsvRiferimentoNISECI, RecordCsvCampionamentoNISECI, RecordCsvCampionamentoHFBI};
 use crate::domain::hfbi::CampionamentoHFBI;
 use crate::domain::index::Indice;
 use crate::domain::niseci::{CampionamentoNISECI, RiferimentoNISECI};
 use crate::state::GLOBAL_STATE;
-use crate::MainState;
+use crate::app::core::{MainState, Localize};
 use raylib::RaylibHandle;
 use std::path::PathBuf;
 
@@ -231,11 +232,9 @@ impl FileInputController {
         state.data_model.get_riferimento_niseci()
     }
 
-    pub(crate) fn valida_riferimento_niseci_path(&self) {
+    pub(crate) fn valida_riferimento_niseci_path<T: RecordCsvRiferimentoNISECI + 'static>(&self) {
         if let Some(path) = self.get_riferimento_path() {
-            // Using italian deser for now
-            let csv_check =
-                check_riferimento_niseci_path::<VeryItalianRecordCsvRiferimentoNISECI>(path);
+            let csv_check = check_riferimento_niseci_path::<T>(path);
 
             match csv_check {
                 Ok(records) => {
@@ -324,11 +323,10 @@ impl FileInputController {
         state.data_model.get_campionamento_niseci()
     }
 
-    pub(crate) fn valida_campionamento_niseci_path(&self) {
+    pub(crate) fn valida_campionamento_niseci_path<T: RecordCsvCampionamentoNISECI + 'static>(&self) {
         if let Some(path) = self.get_campionamento_path() {
-            // Using italian deser for now
             let csv_check =
-                check_campionamento_niseci_path::<VeryItalianRecordCsvCampionamentoNISECI>(path);
+                check_campionamento_niseci_path::<T>(path);
 
             match csv_check {
                 Ok(records) => {
@@ -392,11 +390,10 @@ impl FileInputController {
             }
         }
     }
-    pub(crate) fn valida_campionamento_hfbi_path(&self) {
+    pub(crate) fn valida_campionamento_hfbi_path<T: RecordCsvCampionamentoHFBI + 'static>(&self) {
         if let Some(path) = self.get_campionamento_path() {
-            // Using italian deser for now
             let csv_check =
-                check_campionamento_hfbi_path::<VeryItalianRecordCsvCampionamentoHFBI>(path);
+                check_campionamento_hfbi_path::<T>(path);
 
             match csv_check {
                 Ok(records) => {

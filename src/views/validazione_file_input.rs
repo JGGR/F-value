@@ -17,7 +17,9 @@
 use crate::controllers::{file_input::FileInputController, Controller};
 use crate::domain::index::Indice;
 use crate::views::{propheight, propwidth, rrect, View};
-use crate::MainState;
+use crate::app::core::{Localize, MainState};
+use crate::core::csv::deser::niseci::{VeryItalianRecordCsvRiferimentoNISECI, PlainRecordCsvRiferimentoNISECI, VeryItalianRecordCsvCampionamentoNISECI, PlainRecordCsvCampionamentoNISECI};
+use crate::core::csv::deser::hfbi::{VeryItalianRecordCsvCampionamentoHFBI, PlainRecordCsvCampionamentoHFBI};
 use raylib::consts::GuiState::{STATE_DISABLED, STATE_NORMAL};
 use raylib::drawing::RaylibDrawHandle;
 use raylib::prelude::*;
@@ -87,7 +89,14 @@ impl View for ValidazioneFileInputView {
                 "Valida Riferimento",
             )
         {
-            controller.valida_riferimento_niseci_path();
+            match main_state.locale {
+                Localize::Italian => {
+                    controller.valida_riferimento_niseci_path::<VeryItalianRecordCsvRiferimentoNISECI>();
+                }
+                Localize::International => {
+                    controller.valida_riferimento_niseci_path::<PlainRecordCsvRiferimentoNISECI>();
+                }
+            }
         }
 
         let mut turn_off_button_campionamento = false;
@@ -108,10 +117,24 @@ impl View for ValidazioneFileInputView {
         ) {
             match current_index {
                 Indice::Niseci => {
-                    controller.valida_campionamento_niseci_path();
+                    match main_state.locale {
+                        Localize::Italian => {
+                            controller.valida_campionamento_niseci_path::<VeryItalianRecordCsvCampionamentoNISECI>();
+                        }
+                        Localize::International => {
+                            controller.valida_campionamento_niseci_path::<PlainRecordCsvCampionamentoNISECI>();
+                        }
+                    }
                 }
                 Indice::Hfbi => {
-                    controller.valida_campionamento_hfbi_path();
+                    match main_state.locale {
+                        Localize::Italian => {
+                            controller.valida_campionamento_hfbi_path::<VeryItalianRecordCsvCampionamentoHFBI>();
+                        }
+                        Localize::International => {
+                            controller.valida_campionamento_hfbi_path::<PlainRecordCsvCampionamentoHFBI>();
+                        }
+                    }
                 }
             }
         }
