@@ -797,22 +797,12 @@ impl RisultatoHFBI {
     }
 }
 
-#[derive(Hash)]
+#[derive(Hash, PartialEq, Eq)]
 pub(crate) struct CondizioniRiferimentoKeyHFBI {
     pub(crate) tipo_laguna: TipoLagunaCostieraHFBI,
     pub(crate) stagione: StagioneHFBI,
     pub(crate) habitat_vegetato: HabitatHFBI,
 }
-
-impl PartialEq for CondizioniRiferimentoKeyHFBI {
-    fn eq(&self, other: &Self) -> bool {
-        self.habitat_vegetato == other.habitat_vegetato
-            && self.stagione == other.stagione
-            && self.tipo_laguna == other.tipo_laguna
-    }
-}
-
-impl Eq for CondizioniRiferimentoKeyHFBI {}
 
 #[derive(Clone)]
 pub(crate) struct CondizioniRiferimentoHFBI {
