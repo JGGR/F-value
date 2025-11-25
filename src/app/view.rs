@@ -16,8 +16,8 @@
 */
 
 use super::core::{
-    propheight, propwidth, CurrentView, GuiTheme, MainState, GUI_THEME_COMBOBOX_STR,
-    LOCALE_COMBOBOX_STR, get_locale
+    get_locale, propheight, propwidth, CurrentView, GuiTheme, MainState, GUI_THEME_COMBOBOX_STR,
+    LOCALE_COMBOBOX_STR,
 };
 use crate::core::{
     rrect, AUTHOR_GIONINJO, AUTHOR_GIONINJO_LINK, AUTHOR_JGABAUT, AUTHOR_JGABAUT_LINK,

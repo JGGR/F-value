@@ -54,7 +54,7 @@ pub(crate) fn update_main(rl: &mut RaylibHandle, main_state: &mut MainState) {
             Ok(locale) => {
                 main_state.locale = locale;
             }
-            Err(_) => eprintln!("unknown number in current theme check"),
+            Err(_) => eprintln!("unknown number in current locale check"),
         }
     }
 

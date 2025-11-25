@@ -99,3 +99,17 @@ pub(crate) fn prep_logger() -> Result<(), String> {
     }
     Ok(())
 }
+
+pub(crate) trait CommaFormat {
+    fn comma(self) -> String;
+}
+
+impl CommaFormat for f32 {
+    fn comma(self) -> String {
+        let mut s = self.to_string();
+        if let Some(pos) = s.find('.') {
+            s.replace_range(pos..=pos, ",");
+        }
+        s
+    }
+}

@@ -157,8 +157,6 @@ pub(crate) fn parse_recordcsv_riferimento_niseci<T: RecordCsvRiferimentoNISECI>(
 
         let nome = r.nome_latino(); //TODO: controllare se dovrebbe essere nome_comune
 
-        //TODO: update when SpecieNISECI has the missing fields
-
         let epsilon: f32 = 1e-6;
 
         // Check dens_soglia
@@ -299,7 +297,6 @@ pub(crate) fn parse_recordcsv_campionamento_niseci<T: RecordCsvCampionamentoNISE
             continue;
         }
 
-        //TODO: update this abomination when records change to have an integer directly
         if r.num_passaggio() < 1 {
             let err = RecordCsvCampionamentoNISECIError::ValoreInvalido {
                 msg: format!(

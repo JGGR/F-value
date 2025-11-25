@@ -78,10 +78,10 @@ impl View for ProduzioneOutputView {
             //TODO: calcola indice
             match current_index {
                 Indice::Niseci => {
-                    controller.calc_niseci();
+                    controller.calc_niseci(main_state.locale);
                 }
                 Indice::Hfbi => {
-                    controller.calc_hfbi();
+                    controller.calc_hfbi(main_state.locale);
                 }
             }
         }
