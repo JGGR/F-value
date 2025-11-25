@@ -336,8 +336,32 @@ impl OutputController {
                             Ok(mut file) => {
                                 let mut string_representation = "specie; nome latino; tipo autoctono; tipo alloctono; specie attesa; cl1; cl2; cl3; cl4; cl5; densita stimata; quantita stimata; rapporto ad/juv; x2a_a; x2a_b".to_string();
                                 for (_k, v) in intermediates.specie_specifici.iter() {
+                                    let rapporto_ad_juv_str = match v.rapporto_ad_juv {
+                                        Some(v) => format!("{v}"),
+                                        None => "NC".to_string(),
+                                    };
+                                    let specie_attesa_str = if v.classi_eta.specie.specie_attesa {
+                                        "SI".to_string()
+                                    } else {
+                                        "NO".to_string()
+                                    };
                                     string_representation =
-                                        format!("{}\n{}", string_representation, v);
+                                        format!("{}\n{}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}", string_representation,
+                                            v.classi_eta.specie.id,
+                                            v.classi_eta.specie.nome,
+                                            v.classi_eta.specie.tipo_autoctono,
+                                            v.classi_eta.specie.tipo_alloctono,
+                                            specie_attesa_str,
+                                            v.classi_eta.cl1,
+                                            v.classi_eta.cl2,
+                                            v.classi_eta.cl3,
+                                            v.classi_eta.cl4,
+                                            v.classi_eta.cl5,
+                                            v.densita_stimata,
+                                            v.quantita_stimata,
+                                            rapporto_ad_juv_str,
+                                            v.x2_a_a,
+                                            v.x2_a_b);
                                 }
                                 let write_result = writeln!(file, "{string_representation}");
                                 match write_result {
