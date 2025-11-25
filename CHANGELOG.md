@@ -15,6 +15,7 @@
 - Refactor settings window
 - Avoid niseci's `log_intermediates` relying on format implementation
 - Drop `logged` feature guards
+- Collect logging to file into functions
 - Solved many clippy lints
 - Bump dependencies
 
