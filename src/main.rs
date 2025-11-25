@@ -56,11 +56,9 @@ use raylib::consts::TraceLogLevel;
 use raylib::core::texture::Image;
 use std::env;
 
-#[cfg(feature = "logged")]
 use crate::core::prep_logger;
 
 fn main() {
-    #[cfg(feature = "logged")]
     let _ = prep_logger();
 
     let args: Vec<String> = env::args().collect(); // Using this panics on receiving invalid Unicode

@@ -47,13 +47,9 @@ pub(crate) const _COMMIT_HASH: &str = env!("COMMIT_HASH");
 pub(crate) const COMMIT_HASH_PLUS: &str = env!("COMMIT_HASH_PLUS");
 pub(crate) const BUILD_DATE: &str = env!("BUILD_DATE");
 
-#[cfg(feature = "logged")]
 use dirs::document_dir;
-#[cfg(feature = "logged")]
 use flexi_logger::{FileSpec, Logger, WriteMode};
-#[cfg(feature = "logged")]
 use log::Record;
-#[cfg(feature = "logged")]
 use std::path::PathBuf;
 
 use raylib::math::Rectangle;
@@ -70,7 +66,6 @@ pub fn rrect<T1: AsF32, T2: AsF32, T3: AsF32, T4: AsF32>(
     Rectangle::new(x.as_f32(), y.as_f32(), width.as_f32(), height.as_f32())
 }
 
-#[cfg(feature = "logged")]
 pub(crate) fn prep_logger() -> Result<(), String> {
     let log_file_path;
     if let Some(documents_dir) = document_dir() {

@@ -14,6 +14,7 @@
 - Fixed output model non being reset when it should be
 - Refactor settings window
 - Avoid niseci's `log_intermediates` relying on format implementation
+- Drop `logged` feature guards
 - Solved many clippy lints
 - Bump dependencies
 
