@@ -15,9 +15,9 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 use crate::controllers::home::HomeController;
+use crate::core::SHORT_PROJECT_VERSION;
 use crate::views::{propheight, propwidth, rrect, View};
 use crate::MainState;
-use crate::SHORT_PROJECT_VERSION;
 use raylib::color::Color;
 use raylib::consts::GuiIconName::{ICON_INFO, ICON_PLAYER_NEXT};
 use raylib::drawing::RaylibDrawHandle;

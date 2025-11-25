@@ -16,6 +16,7 @@
 - Avoid niseci's `log_intermediates` relying on format implementation
 - Drop `logged` feature guards
 - Collect logging to file into functions
+- Collect args handling into separate module
 - Solved many clippy lints
 - Bump dependencies
 
