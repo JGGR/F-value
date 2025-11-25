@@ -5,17 +5,17 @@
 ## Table of Contents
 
 + [What is this thing?](#witt)
-+ [References](#references)
++ [Input templates](#input_templates)
 + [Locale](#locale)
++ [References](#references)
 
 ## What is this thing? <a name = "witt"></a>
 
 This is a tool for calculating the NISECI and/or HFBI index for a dataset.
 
-## References <a name = "references"></a>
+## Input templates <a name = "input_templates"></a>
 
-- [ISPRA - Nuove indice dello stato ecologico delle comunità ittiche - NISECI](https://www.isprambiente.gov.it/it/pubblicazioni/manuali-e-linee-guida/nuovo-indice-dello-stato-ecologico-delle-comunita-ittiche-niseci)
-- [ISPRA - Manuale per la classificazione dell'Elemento di Qualità Biologica "Fauna Ittica" nelle lagune costiere italiane - HFBI](https://www.isprambiente.gov.it/it/pubblicazioni/manuali-e-linee-guida/manuale-per-la-classificazione-dell-elemento-di-qualita-biologica-fauna-ittica-nelle-lagune-costiere-italiane)
+You can find templates for the input files in the `templates` folder.
 
 ## Locale <a name = "locale"></a>
 
@@ -30,3 +30,8 @@ The format differences are:
 - International:
   - Input expectes `,` as csv field delimiter, and `.` as float decimal delimiter
   - Output uses `,` as csv field delimiter, and floats are printed with `.` as decimal delimiter
+
+## References <a name = "references"></a>
+
+- [ISPRA - Nuove indice dello stato ecologico delle comunità ittiche - NISECI](https://www.isprambiente.gov.it/it/pubblicazioni/manuali-e-linee-guida/nuovo-indice-dello-stato-ecologico-delle-comunita-ittiche-niseci)
+- [ISPRA - Manuale per la classificazione dell'Elemento di Qualità Biologica "Fauna Ittica" nelle lagune costiere italiane - HFBI](https://www.isprambiente.gov.it/it/pubblicazioni/manuali-e-linee-guida/manuale-per-la-classificazione-dell-elemento-di-qualita-biologica-fauna-ittica-nelle-lagune-costiere-italiane)
