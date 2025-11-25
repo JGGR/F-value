@@ -10,6 +10,7 @@
 ### Changed
 
 - Fixed output model non being reset when it should be
+- Refactor settings window
 - Solved many clippy lints
 - Bump dependencies
 

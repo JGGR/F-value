@@ -17,7 +17,7 @@
 
 use super::core::{
     propheight, propwidth, CurrentView, GuiTheme, MainState, GUI_THEME_COMBOBOX_STR,
-    LOCALE_COMBOBOX_STR,
+    LOCALE_COMBOBOX_STR, get_locale
 };
 use crate::core::{
     rrect, AUTHOR_GIONINJO, AUTHOR_GIONINJO_LINK, AUTHOR_JGABAUT, AUTHOR_JGABAUT_LINK,
@@ -398,7 +398,7 @@ pub(crate) fn draw_settings_box(d: &mut RaylibDrawHandle, main_state: &mut MainS
             Color::RAYWHITE.alpha(0.8),
         );
         let itext = d.gui_icon_text(ICON_GEAR, "Impostazioni");
-        let settingsbox_width = propwidth(d, 250);
+        let settingsbox_width = propwidth(d, 450);
         let settingsbox_x = d.get_screen_width() / 2 - settingsbox_width / 2;
         let settingsbox_height = propheight(d, 300);
         let settingsbox_y = d.get_screen_height() / 2 - settingsbox_height / 2;
@@ -411,7 +411,7 @@ pub(crate) fn draw_settings_box(d: &mut RaylibDrawHandle, main_state: &mut MainS
             ),
             itext.as_str(),
         );
-        let y_spacing = propheight(d, 15);
+        let y_spacing = propheight(d, 20);
         let x_spacing = propwidth(d, 15);
         let fontsize_label_width = settingsbox_width / 2 - x_spacing - x_spacing / 2;
         let fontsize_label_x = settingsbox_x + x_spacing;
@@ -520,16 +520,17 @@ pub(crate) fn draw_settings_box(d: &mut RaylibDrawHandle, main_state: &mut MainS
         // Reset settings button
         if d.gui_button(
             rrect(
-                fontsize_label_x,
-                fontsize_label_y + fontsize_label_height * 3,
-                fontsize_label_width,
-                fontsize_label_height,
+                locale_label_x,
+                locale_label_y + locale_label_height * 3,
+                locale_label_width,
+                locale_label_height,
             ),
             "Reset",
         ) {
             main_state.current_font_height = main_state.default_font_height;
             d.gui_set_style(DEFAULT, TEXT_SIZE, main_state.current_font_height);
             main_state.gui_theme_combobox_active = GuiTheme::Light as i32;
+            main_state.locale_combobox_active = get_locale() as i32;
         }
 
         if result {
