@@ -17,6 +17,7 @@
 
 use super::core::{
     propheight, propwidth, CurrentView, GuiTheme, MainState, GUI_THEME_COMBOBOX_STR,
+    LOCALE_COMBOBOX_STR,
 };
 use crate::core::{
     rrect, AUTHOR_GIONINJO, AUTHOR_GIONINJO_LINK, AUTHOR_JGABAUT, AUTHOR_JGABAUT_LINK,
@@ -483,6 +484,37 @@ pub(crate) fn draw_settings_box(d: &mut RaylibDrawHandle, main_state: &mut MainS
             ),
             gui_theme_str,
             &mut main_state.gui_theme_combobox_active,
+        );
+
+        let locale_label_width = gui_theme_label_width;
+        let locale_label_x = gui_theme_label_x;
+        let locale_label_height = gui_theme_label_height;
+        let locale_label_y = gui_theme_label_y + y_spacing * 2;
+        d.gui_label(
+            rrect(
+                locale_label_x,
+                locale_label_y,
+                locale_label_width,
+                locale_label_height,
+            ),
+            "Locale",
+        );
+        let locale_button_x = locale_label_x + locale_label_width + x_spacing;
+        let locale_button_y = locale_label_y;
+        let locale_button_width = locale_label_width;
+        let locale_button_height = locale_label_height;
+
+        let locale_str = LOCALE_COMBOBOX_STR;
+
+        d.gui_combo_box(
+            rrect(
+                locale_button_x,
+                locale_button_y,
+                locale_button_width,
+                locale_button_height,
+            ),
+            locale_str,
+            &mut main_state.locale_combobox_active,
         );
 
         // Reset settings button

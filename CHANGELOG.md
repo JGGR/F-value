@@ -4,7 +4,8 @@
 
 - Add `StatoEcologicoHFBI`, to be reported in output and pdf
 - Hfbi log csv files uses `;` instead of `,` as delimiter
-- Add `Localize` to support selective language mode
+- Add locale setting to support selective language mode
+  - For now, it toggles mode for csv deserialization
 
 ### Changed
 

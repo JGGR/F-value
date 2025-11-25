@@ -29,7 +29,8 @@ mod tests;
 mod views;
 
 use crate::app::core::{
-    Localize, MainState, ESOX_SCREEN_HEIGHT, ESOX_SCREEN_WIDTH, PROJECT_LOGO_DATA, SUPPORT_HEADLESS,
+    get_locale, MainState, ESOX_SCREEN_HEIGHT, ESOX_SCREEN_WIDTH, PROJECT_LOGO_DATA,
+    SUPPORT_HEADLESS,
 };
 use crate::controllers::Controllers;
 use crate::core::cli::{esox_usage, print_copyright_splash, print_warranty_info, run_headless};
@@ -220,22 +221,7 @@ fn main() {
     let txt_spacing = rl.gui_get_style(DEFAULT, TEXT_SPACING) * 2;
     rl.gui_set_style(DEFAULT, TEXT_SPACING, txt_spacing);
     let current_font = rl.gui_get_font();
-    let locale_str = locale_config::Locale::user_default();
-    let mut is_italian = false;
-    for l in locale_str.as_ref().split(",") {
-        match l.replace("-","_").as_str() {
-            "it_IT" | "it_CH" | "it_SM" | "it_VA" => {
-                is_italian = true;
-                break;
-            }
-            _ => {}
-        }
-    }
-    let locale = if is_italian {
-        Localize::Italian }
-    else {
-        Localize::International
-    };
+    let locale = get_locale();
     let mut main_state = MainState::new(
         gui_default_font_height,
         gui_current_font_height,
@@ -244,7 +230,7 @@ fn main() {
         Color::get_color(txt_color_int as u32),
         Color::get_color(bg_color_int as u32),
         logo_texture,
-        locale
+        locale,
     );
 
     let controllers = Controllers::new();
