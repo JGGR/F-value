@@ -236,6 +236,7 @@ where
 
 pub(crate) fn check_riferimento_niseci_reader<R: Read, T>(
     reader: R,
+    has_headers: bool,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
     T: RecordCsvRiferimentoNISECI + 'static,
@@ -252,6 +253,7 @@ where
 
     let rdr = csv::ReaderBuilder::new()
         .delimiter(delimiter)
+        .has_headers(has_headers)
         .from_reader(normalizing_reader);
     let (records, errors) = parse_csv_riferimento_niseci(rdr);
 
@@ -289,7 +291,10 @@ where
     }
 }
 
-pub(crate) fn check_riferimento_niseci_path<T>(path: PathBuf) -> Result<Vec<T>, Vec<csv::Error>>
+pub(crate) fn check_riferimento_niseci_path<T>(
+    path: PathBuf,
+    has_headers: bool,
+) -> Result<Vec<T>, Vec<csv::Error>>
 where
     T: RecordCsvRiferimentoNISECI + 'static,
 {
@@ -302,7 +307,7 @@ where
         return Err(err_vec);
     }
     let file = File::open(path).expect("Unable to open file");
-    check_riferimento_niseci_reader(file)
+    check_riferimento_niseci_reader(file, has_headers)
 }
 
 #[derive(Debug, serde::Deserialize)]
@@ -413,6 +418,7 @@ where
 
 pub(crate) fn check_campionamento_niseci_reader<R: Read, T>(
     reader: R,
+    has_headers: bool,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
     T: RecordCsvCampionamentoNISECI + 'static,
@@ -429,6 +435,7 @@ where
 
     let rdr = csv::ReaderBuilder::new()
         .delimiter(delimiter)
+        .has_headers(has_headers)
         .from_reader(normalizing_reader);
     let (records, errors) = parse_csv_campionamento_niseci(rdr);
 
@@ -466,7 +473,10 @@ where
     }
 }
 
-pub(crate) fn check_campionamento_niseci_path<T>(path: PathBuf) -> Result<Vec<T>, Vec<csv::Error>>
+pub(crate) fn check_campionamento_niseci_path<T>(
+    path: PathBuf,
+    has_headers: bool,
+) -> Result<Vec<T>, Vec<csv::Error>>
 where
     T: RecordCsvCampionamentoNISECI + 'static,
 {
@@ -479,7 +489,7 @@ where
         return Err(err_vec);
     }
     let file = File::open(path).expect("Unable to open file");
-    check_campionamento_niseci_reader(file)
+    check_campionamento_niseci_reader(file, has_headers)
 }
 
 #[derive(Debug, serde::Deserialize)]
@@ -678,6 +688,7 @@ where
 
 pub(crate) fn check_anagrafica_niseci_reader<R: Read, T>(
     reader: R,
+    has_headers: bool,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
     T: RecordCsvAnagraficaNISECI + 'static,
@@ -694,6 +705,7 @@ where
 
     let rdr = csv::ReaderBuilder::new()
         .delimiter(delimiter)
+        .has_headers(has_headers)
         .from_reader(normalizing_reader);
     let (records, errors) = parse_csv_anagrafica_niseci(rdr);
 
@@ -731,7 +743,10 @@ where
     }
 }
 
-pub(crate) fn check_anagrafica_niseci_path<T>(path: PathBuf) -> Result<Vec<T>, Vec<csv::Error>>
+pub(crate) fn check_anagrafica_niseci_path<T>(
+    path: PathBuf,
+    has_headers: bool,
+) -> Result<Vec<T>, Vec<csv::Error>>
 where
     T: RecordCsvAnagraficaNISECI + 'static,
 {
@@ -744,5 +759,5 @@ where
         return Err(err_vec);
     }
     let file = File::open(path).expect("Unable to open file");
-    check_anagrafica_niseci_reader(file)
+    check_anagrafica_niseci_reader(file, has_headers)
 }

@@ -37,7 +37,7 @@ fn calculate_hfbi_template() {
     let campionamento_csv_check = check_campionamento_hfbi_reader::<
         _,
         VeryItalianRecordCsvCampionamentoHFBI,
-    >(campionamento_reader);
+    >(campionamento_reader, true);
 
     assert!(campionamento_csv_check.is_ok());
 
@@ -51,8 +51,10 @@ fn calculate_hfbi_template() {
 
     let anagrafica_reader = Cursor::new(ANAGRAFICA_HFBI_TEMPLATE_DATA);
 
-    let anagrafica_csv_check =
-        check_anagrafica_hfbi_reader::<_, VeryItalianRecordCsvAnagraficaHFBI>(anagrafica_reader);
+    let anagrafica_csv_check = check_anagrafica_hfbi_reader::<_, VeryItalianRecordCsvAnagraficaHFBI>(
+        anagrafica_reader,
+        true,
+    );
 
     assert!(anagrafica_csv_check.is_ok());
 

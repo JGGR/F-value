@@ -40,6 +40,8 @@ pub(crate) fn handle_args() {
 
     let mut indice_niseci = true;
 
+    let mut has_headers = true;
+
     match args.len() {
         1 => {}
         _ => {
@@ -125,6 +127,10 @@ pub(crate) fn handle_args() {
                         indice_niseci = false;
                         mutargs.remove(1);
                     }
+                    "--no-headers" => {
+                        has_headers = false;
+                        mutargs.remove(1);
+                    }
                     "-W" | "--warranty" | "-warranty" => {
                         return print_warranty_info();
                     }
@@ -142,7 +148,7 @@ pub(crate) fn handle_args() {
     print_copyright_splash();
 
     if headless {
-        let res = run_headless(indice_niseci, &mutargs);
+        let res = run_headless(indice_niseci, has_headers, &mutargs);
 
         if !res {
             eprintln!("Headless run failed");

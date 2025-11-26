@@ -108,6 +108,7 @@ where
 
 pub(crate) fn check_campionamento_hfbi_reader<R: Read, T>(
     reader: R,
+    has_headers: bool,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
     T: RecordCsvCampionamentoHFBI + 'static,
@@ -124,6 +125,7 @@ where
 
     let rdr = csv::ReaderBuilder::new()
         .delimiter(delimiter)
+        .has_headers(has_headers)
         .from_reader(normalizing_reader);
     let (records, errors) = parse_csv_campionamento_hfbi(rdr);
 
@@ -161,7 +163,10 @@ where
     }
 }
 
-pub(crate) fn check_campionamento_hfbi_path<T>(path: PathBuf) -> Result<Vec<T>, Vec<csv::Error>>
+pub(crate) fn check_campionamento_hfbi_path<T>(
+    path: PathBuf,
+    has_headers: bool,
+) -> Result<Vec<T>, Vec<csv::Error>>
 where
     T: RecordCsvCampionamentoHFBI + 'static,
 {
@@ -174,7 +179,7 @@ where
         return Err(err_vec);
     }
     let file = File::open(path).expect("Unable to open file");
-    check_campionamento_hfbi_reader(file)
+    check_campionamento_hfbi_reader(file, has_headers)
 }
 
 #[derive(Debug, serde::Deserialize)]
@@ -337,7 +342,10 @@ where
     (records, errors)
 }
 
-pub(crate) fn check_anagrafica_hfbi_reader<R: Read, T>(reader: R) -> Result<Vec<T>, Vec<csv::Error>>
+pub(crate) fn check_anagrafica_hfbi_reader<R: Read, T>(
+    reader: R,
+    has_headers: bool,
+) -> Result<Vec<T>, Vec<csv::Error>>
 where
     T: RecordCsvAnagraficaHFBI + 'static,
 {
@@ -353,6 +361,7 @@ where
 
     let rdr = csv::ReaderBuilder::new()
         .delimiter(delimiter)
+        .has_headers(has_headers)
         .from_reader(normalizing_reader);
     let (records, errors) = parse_csv_anagrafica_hfbi(rdr);
 
@@ -390,7 +399,10 @@ where
     }
 }
 
-pub(crate) fn check_anagrafica_hfbi_path<T>(path: PathBuf) -> Result<Vec<T>, Vec<csv::Error>>
+pub(crate) fn check_anagrafica_hfbi_path<T>(
+    path: PathBuf,
+    has_headers: bool,
+) -> Result<Vec<T>, Vec<csv::Error>>
 where
     T: RecordCsvAnagraficaHFBI + 'static,
 {
@@ -403,5 +415,5 @@ where
         return Err(err_vec);
     }
     let file = File::open(path).expect("Unable to open file");
-    check_anagrafica_hfbi_reader(file)
+    check_anagrafica_hfbi_reader(file, has_headers)
 }

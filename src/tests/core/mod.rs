@@ -49,7 +49,7 @@ fn test_csv_riferimento_niseci_found_string_expect_int() {
     );
     let reader = Cursor::new(csv_data);
     let result =
-        check_riferimento_niseci_reader::<_, VeryItalianRecordCsvRiferimentoNISECI>(reader);
+        check_riferimento_niseci_reader::<_, VeryItalianRecordCsvRiferimentoNISECI>(reader, true);
 
     assert!(result.is_err());
     let errors = result.err().unwrap();
@@ -66,7 +66,7 @@ fn test_csv_riferimento_niseci_found_string_expect_float() {
     );
     let reader = Cursor::new(csv_data);
     let result =
-        check_riferimento_niseci_reader::<_, VeryItalianRecordCsvRiferimentoNISECI>(reader);
+        check_riferimento_niseci_reader::<_, VeryItalianRecordCsvRiferimentoNISECI>(reader, true);
 
     assert!(result.is_err());
     let errors = result.err().unwrap();
@@ -83,7 +83,7 @@ fn test_csv_riferimento_niseci_found_empty_string_expect_int() {
     );
     let reader = Cursor::new(csv_data);
     let result =
-        check_riferimento_niseci_reader::<_, VeryItalianRecordCsvRiferimentoNISECI>(reader);
+        check_riferimento_niseci_reader::<_, VeryItalianRecordCsvRiferimentoNISECI>(reader, true);
 
     assert!(result.is_err());
     let errors = result.err().unwrap();
@@ -100,7 +100,7 @@ fn test_csv_riferimento_niseci_found_empty_string_expect_float() {
     );
     let reader = Cursor::new(csv_data);
     let result =
-        check_riferimento_niseci_reader::<_, VeryItalianRecordCsvRiferimentoNISECI>(reader);
+        check_riferimento_niseci_reader::<_, VeryItalianRecordCsvRiferimentoNISECI>(reader, true);
 
     assert!(result.is_err());
     let errors = result.err().unwrap();
@@ -117,7 +117,7 @@ fn test_csv_riferimento_niseci_found_float_expect_int() {
     );
     let reader = Cursor::new(csv_data);
     let result =
-        check_riferimento_niseci_reader::<_, VeryItalianRecordCsvRiferimentoNISECI>(reader);
+        check_riferimento_niseci_reader::<_, VeryItalianRecordCsvRiferimentoNISECI>(reader, true);
 
     assert!(result.is_err());
     let errors = result.err().unwrap();
@@ -136,7 +136,7 @@ fn test_csv_riferimento_niseci_err_found_cl_negative() {
     );
     let reader = Cursor::new(csv_data);
     let result =
-        check_riferimento_niseci_reader::<_, VeryItalianRecordCsvRiferimentoNISECI>(reader);
+        check_riferimento_niseci_reader::<_, VeryItalianRecordCsvRiferimentoNISECI>(reader, true);
 
     assert!(result.is_err());
     let errors = result.err().unwrap();
@@ -153,7 +153,7 @@ fn test_csv_riferimento_niseci_lessfields() {
     );
     let reader = Cursor::new(csv_data);
     let result =
-        check_riferimento_niseci_reader::<_, VeryItalianRecordCsvRiferimentoNISECI>(reader);
+        check_riferimento_niseci_reader::<_, VeryItalianRecordCsvRiferimentoNISECI>(reader, true);
 
     assert!(result.is_err());
     let errors = result.err().unwrap();
@@ -173,7 +173,7 @@ fn test_valid_csv_riferimento_niseci() {
     );
     let reader = Cursor::new(csv_data);
     let result =
-        check_riferimento_niseci_reader::<_, VeryItalianRecordCsvRiferimentoNISECI>(reader);
+        check_riferimento_niseci_reader::<_, VeryItalianRecordCsvRiferimentoNISECI>(reader, true);
 
     assert!(!result.is_err());
 }
@@ -183,7 +183,7 @@ fn test_empty_csv_riferimento_niseci() {
     let csv_data = RIFERIMENTO_NISECI_HEADER.to_string(); // Only header, no data
     let reader = Cursor::new(csv_data);
     let result =
-        check_riferimento_niseci_reader::<_, VeryItalianRecordCsvRiferimentoNISECI>(reader);
+        check_riferimento_niseci_reader::<_, VeryItalianRecordCsvRiferimentoNISECI>(reader, true);
 
     assert!(result.is_ok());
     let records = result.unwrap();
@@ -284,8 +284,9 @@ fn test_csv_campionamento_niseci_found_string_expect_int() {
         CAMPIONAMENTO_NISECI_HEADER
     );
     let reader = Cursor::new(csv_data);
-    let result =
-        check_campionamento_niseci_reader::<_, VeryItalianRecordCsvCampionamentoNISECI>(reader);
+    let result = check_campionamento_niseci_reader::<_, VeryItalianRecordCsvCampionamentoNISECI>(
+        reader, true,
+    );
 
     assert!(result.is_err());
     let errors = result.err().unwrap();
@@ -301,8 +302,9 @@ fn test_csv_campionamento_niseci_found_empty_string_expect_int() {
         CAMPIONAMENTO_NISECI_HEADER
     );
     let reader = Cursor::new(csv_data);
-    let result =
-        check_campionamento_niseci_reader::<_, VeryItalianRecordCsvCampionamentoNISECI>(reader);
+    let result = check_campionamento_niseci_reader::<_, VeryItalianRecordCsvCampionamentoNISECI>(
+        reader, true,
+    );
 
     assert!(result.is_err());
     let errors = result.err().unwrap();
@@ -318,8 +320,9 @@ fn test_csv_campionamento_niseci_found_float_expect_int() {
         CAMPIONAMENTO_NISECI_HEADER
     );
     let reader = Cursor::new(csv_data);
-    let result =
-        check_campionamento_niseci_reader::<_, VeryItalianRecordCsvCampionamentoNISECI>(reader);
+    let result = check_campionamento_niseci_reader::<_, VeryItalianRecordCsvCampionamentoNISECI>(
+        reader, true,
+    );
 
     assert!(result.is_err());
     let errors = result.err().unwrap();
@@ -335,8 +338,9 @@ fn test_csv_campionamento_niseci_lessfields() {
         CAMPIONAMENTO_NISECI_HEADER
     );
     let reader = Cursor::new(csv_data);
-    let result =
-        check_campionamento_niseci_reader::<_, VeryItalianRecordCsvCampionamentoNISECI>(reader);
+    let result = check_campionamento_niseci_reader::<_, VeryItalianRecordCsvCampionamentoNISECI>(
+        reader, true,
+    );
 
     assert!(result.is_err());
     let errors = result.err().unwrap();
@@ -355,8 +359,9 @@ fn test_valid_csv_campionamento_niseci() {
         CAMPIONAMENTO_NISECI_HEADER
     );
     let reader = Cursor::new(csv_data);
-    let result =
-        check_campionamento_niseci_reader::<_, VeryItalianRecordCsvCampionamentoNISECI>(reader);
+    let result = check_campionamento_niseci_reader::<_, VeryItalianRecordCsvCampionamentoNISECI>(
+        reader, true,
+    );
 
     assert!(!result.is_err());
 }
@@ -365,8 +370,9 @@ fn test_valid_csv_campionamento_niseci() {
 fn test_empty_csv_campionamento_niseci() {
     let csv_data = CAMPIONAMENTO_NISECI_HEADER.to_string(); // Only header, no data
     let reader = Cursor::new(csv_data);
-    let result =
-        check_campionamento_niseci_reader::<_, VeryItalianRecordCsvCampionamentoNISECI>(reader);
+    let result = check_campionamento_niseci_reader::<_, VeryItalianRecordCsvCampionamentoNISECI>(
+        reader, true,
+    );
 
     assert!(result.is_ok());
     let records = result.unwrap();
@@ -416,7 +422,8 @@ fn test_csv_anagrafica_niseci_found_string_expect_int() {
         ANAGRAFICA_NISECI_HEADER
     );
     let reader = Cursor::new(csv_data);
-    let result = check_anagrafica_niseci_reader::<_, VeryItalianRecordCsvAnagraficaNISECI>(reader);
+    let result =
+        check_anagrafica_niseci_reader::<_, VeryItalianRecordCsvAnagraficaNISECI>(reader, true);
 
     assert!(result.is_err());
     let errors = result.err().unwrap();
@@ -432,7 +439,8 @@ fn test_csv_anagrafica_niseci_found_empty_string_expect_int() {
         ANAGRAFICA_NISECI_HEADER
     );
     let reader = Cursor::new(csv_data);
-    let result = check_anagrafica_niseci_reader::<_, VeryItalianRecordCsvAnagraficaNISECI>(reader);
+    let result =
+        check_anagrafica_niseci_reader::<_, VeryItalianRecordCsvAnagraficaNISECI>(reader, true);
 
     assert!(result.is_err());
     let errors = result.err().unwrap();
@@ -448,7 +456,8 @@ fn test_csv_anagrafica_niseci_found_float_expect_int() {
         ANAGRAFICA_NISECI_HEADER
     );
     let reader = Cursor::new(csv_data);
-    let result = check_anagrafica_niseci_reader::<_, VeryItalianRecordCsvAnagraficaNISECI>(reader);
+    let result =
+        check_anagrafica_niseci_reader::<_, VeryItalianRecordCsvAnagraficaNISECI>(reader, true);
 
     assert!(result.is_err());
     let errors = result.err().unwrap();
@@ -464,7 +473,8 @@ fn test_csv_anagrafica_niseci_lessfields() {
         ANAGRAFICA_NISECI_HEADER
     );
     let reader = Cursor::new(csv_data);
-    let result = check_anagrafica_niseci_reader::<_, VeryItalianRecordCsvAnagraficaNISECI>(reader);
+    let result =
+        check_anagrafica_niseci_reader::<_, VeryItalianRecordCsvAnagraficaNISECI>(reader, true);
 
     assert!(result.is_err());
     let errors = result.err().unwrap();
@@ -481,7 +491,8 @@ fn test_valid_csv_anagrafica_niseci() {
         ANAGRAFICA_NISECI_HEADER
     );
     let reader = Cursor::new(csv_data);
-    let result = check_anagrafica_niseci_reader::<_, VeryItalianRecordCsvAnagraficaNISECI>(reader);
+    let result =
+        check_anagrafica_niseci_reader::<_, VeryItalianRecordCsvAnagraficaNISECI>(reader, true);
 
     assert!(!result.is_err());
 }
@@ -490,7 +501,8 @@ fn test_valid_csv_anagrafica_niseci() {
 fn test_empty_csv_anagrafica_niseci() {
     let csv_data = ANAGRAFICA_NISECI_HEADER.to_string(); // Only header, no data
     let reader = Cursor::new(csv_data);
-    let result = check_anagrafica_niseci_reader::<_, VeryItalianRecordCsvAnagraficaNISECI>(reader);
+    let result =
+        check_anagrafica_niseci_reader::<_, VeryItalianRecordCsvAnagraficaNISECI>(reader, true);
 
     assert!(result.is_ok());
     let records = result.unwrap();
@@ -525,7 +537,7 @@ fn test_csv_campionamento_hfbi_found_string_expect_int() {
     let csv_data = format!("{}\nAN;foo;240", CAMPIONAMENTO_HFBI_HEADER);
     let reader = Cursor::new(csv_data);
     let result =
-        check_campionamento_hfbi_reader::<_, VeryItalianRecordCsvCampionamentoHFBI>(reader);
+        check_campionamento_hfbi_reader::<_, VeryItalianRecordCsvCampionamentoHFBI>(reader, true);
 
     assert!(result.is_err());
     let errors = result.err().unwrap();
@@ -539,7 +551,7 @@ fn test_csv_campionamento_hfbi_found_empty_string_expect_int() {
     let csv_data = format!("{}\nAN;;240", CAMPIONAMENTO_HFBI_HEADER);
     let reader = Cursor::new(csv_data);
     let result =
-        check_campionamento_hfbi_reader::<_, VeryItalianRecordCsvCampionamentoHFBI>(reader);
+        check_campionamento_hfbi_reader::<_, VeryItalianRecordCsvCampionamentoHFBI>(reader, true);
 
     assert!(result.is_err());
     let errors = result.err().unwrap();
@@ -553,7 +565,7 @@ fn test_csv_campionamento_hfbi_found_float_expect_int() {
     let csv_data = format!("{}\nAN;2.75;240", CAMPIONAMENTO_HFBI_HEADER);
     let reader = Cursor::new(csv_data);
     let result =
-        check_campionamento_hfbi_reader::<_, VeryItalianRecordCsvCampionamentoHFBI>(reader);
+        check_campionamento_hfbi_reader::<_, VeryItalianRecordCsvCampionamentoHFBI>(reader, true);
 
     assert!(result.is_err());
     let errors = result.err().unwrap();
@@ -567,7 +579,7 @@ fn test_csv_campionamento_hfbi_lessfields() {
     let csv_data = format!("{}\nAN;2.75", CAMPIONAMENTO_HFBI_HEADER);
     let reader = Cursor::new(csv_data);
     let result =
-        check_campionamento_hfbi_reader::<_, VeryItalianRecordCsvCampionamentoHFBI>(reader);
+        check_campionamento_hfbi_reader::<_, VeryItalianRecordCsvCampionamentoHFBI>(reader, true);
 
     assert!(result.is_err());
     let errors = result.err().unwrap();
@@ -582,7 +594,7 @@ fn test_valid_csv_campionamento_hfbi() {
     let csv_data = format!("{}\nAN;25;240", CAMPIONAMENTO_HFBI_HEADER);
     let reader = Cursor::new(csv_data);
     let result =
-        check_campionamento_hfbi_reader::<_, VeryItalianRecordCsvCampionamentoHFBI>(reader);
+        check_campionamento_hfbi_reader::<_, VeryItalianRecordCsvCampionamentoHFBI>(reader, true);
 
     assert!(!result.is_err());
 }
@@ -592,7 +604,7 @@ fn test_empty_csv_campionamento_hfbi() {
     let csv_data = CAMPIONAMENTO_HFBI_HEADER.to_string(); // Only header, no data
     let reader = Cursor::new(csv_data);
     let result =
-        check_campionamento_hfbi_reader::<_, VeryItalianRecordCsvCampionamentoHFBI>(reader);
+        check_campionamento_hfbi_reader::<_, VeryItalianRecordCsvCampionamentoHFBI>(reader, true);
 
     assert!(result.is_ok());
     let records = result.unwrap();
@@ -619,7 +631,8 @@ fn test_csv_anagrafica_hfbi_found_string_expect_int() {
         ANAGRAFICA_HFBI_HEADER
     );
     let reader = Cursor::new(csv_data);
-    let result = check_anagrafica_hfbi_reader::<_, VeryItalianRecordCsvAnagraficaHFBI>(reader);
+    let result =
+        check_anagrafica_hfbi_reader::<_, VeryItalianRecordCsvAnagraficaHFBI>(reader, true);
 
     assert!(result.is_err());
     let errors = result.err().unwrap();
@@ -635,7 +648,8 @@ fn test_csv_anagrafica_hfbi_found_empty_string_expect_int() {
         ANAGRAFICA_HFBI_HEADER
     );
     let reader = Cursor::new(csv_data);
-    let result = check_anagrafica_hfbi_reader::<_, VeryItalianRecordCsvAnagraficaHFBI>(reader);
+    let result =
+        check_anagrafica_hfbi_reader::<_, VeryItalianRecordCsvAnagraficaHFBI>(reader, true);
 
     assert!(result.is_err());
     let errors = result.err().unwrap();
@@ -651,7 +665,8 @@ fn test_csv_anagrafica_hfbi_found_float_expect_int() {
         ANAGRAFICA_HFBI_HEADER
     );
     let reader = Cursor::new(csv_data);
-    let result = check_anagrafica_hfbi_reader::<_, VeryItalianRecordCsvAnagraficaHFBI>(reader);
+    let result =
+        check_anagrafica_hfbi_reader::<_, VeryItalianRecordCsvAnagraficaHFBI>(reader, true);
 
     assert!(result.is_err());
     let errors = result.err().unwrap();
@@ -667,7 +682,8 @@ fn test_csv_anagrafica_hfbi_lessfields() {
         ANAGRAFICA_HFBI_HEADER
     );
     let reader = Cursor::new(csv_data);
-    let result = check_anagrafica_hfbi_reader::<_, VeryItalianRecordCsvAnagraficaHFBI>(reader);
+    let result =
+        check_anagrafica_hfbi_reader::<_, VeryItalianRecordCsvAnagraficaHFBI>(reader, true);
 
     assert!(result.is_err());
     let errors = result.err().unwrap();
@@ -684,7 +700,8 @@ fn test_valid_csv_anagrafica_hfbi() {
         ANAGRAFICA_HFBI_HEADER
     );
     let reader = Cursor::new(csv_data);
-    let result = check_anagrafica_hfbi_reader::<_, VeryItalianRecordCsvAnagraficaHFBI>(reader);
+    let result =
+        check_anagrafica_hfbi_reader::<_, VeryItalianRecordCsvAnagraficaHFBI>(reader, true);
 
     assert!(!result.is_err());
 }
@@ -693,7 +710,8 @@ fn test_valid_csv_anagrafica_hfbi() {
 fn test_empty_csv_anagrafica_hfbi() {
     let csv_data = ANAGRAFICA_HFBI_HEADER.to_string(); // Only header, no data
     let reader = Cursor::new(csv_data);
-    let result = check_anagrafica_hfbi_reader::<_, VeryItalianRecordCsvAnagraficaHFBI>(reader);
+    let result =
+        check_anagrafica_hfbi_reader::<_, VeryItalianRecordCsvAnagraficaHFBI>(reader, true);
 
     assert!(result.is_ok());
     let records = result.unwrap();

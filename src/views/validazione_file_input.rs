@@ -97,10 +97,14 @@ impl View for ValidazioneFileInputView {
             match main_state.locale {
                 Localize::Italian => {
                     controller
-                        .valida_riferimento_niseci_path::<VeryItalianRecordCsvRiferimentoNISECI>();
+                        .valida_riferimento_niseci_path::<VeryItalianRecordCsvRiferimentoNISECI>(
+                            true,
+                        ); //TODO: get user preference on headers
                 }
                 Localize::International => {
-                    controller.valida_riferimento_niseci_path::<PlainRecordCsvRiferimentoNISECI>();
+                    controller
+                        .valida_riferimento_niseci_path::<PlainRecordCsvRiferimentoNISECI>(true);
+                    //TODO: get user preference on headers
                 }
             }
         }
@@ -125,20 +129,25 @@ impl View for ValidazioneFileInputView {
                 Indice::Niseci => {
                     match main_state.locale {
                         Localize::Italian => {
-                            controller.valida_campionamento_niseci_path::<VeryItalianRecordCsvCampionamentoNISECI>();
+                            controller.valida_campionamento_niseci_path::<VeryItalianRecordCsvCampionamentoNISECI>(true);
+                            //TODO: get user preference on headers
                         }
                         Localize::International => {
-                            controller.valida_campionamento_niseci_path::<PlainRecordCsvCampionamentoNISECI>();
+                            controller.valida_campionamento_niseci_path::<PlainRecordCsvCampionamentoNISECI>(true);
+                            //TODO: get user preference on headers
                         }
                     }
                 }
                 Indice::Hfbi => match main_state.locale {
                     Localize::Italian => {
-                        controller.valida_campionamento_hfbi_path::<VeryItalianRecordCsvCampionamentoHFBI>();
+                        controller.valida_campionamento_hfbi_path::<VeryItalianRecordCsvCampionamentoHFBI>(true);
+                        //TODO: get user preference on headers
                     }
                     Localize::International => {
                         controller
-                            .valida_campionamento_hfbi_path::<PlainRecordCsvCampionamentoHFBI>();
+                            .valida_campionamento_hfbi_path::<PlainRecordCsvCampionamentoHFBI>(
+                                true,
+                            ); //TODO: get user preference on headers
                     }
                 },
             }

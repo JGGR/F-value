@@ -231,9 +231,12 @@ impl FileInputController {
         state.data_model.get_riferimento_niseci()
     }
 
-    pub(crate) fn valida_riferimento_niseci_path<T: RecordCsvRiferimentoNISECI + 'static>(&self) {
+    pub(crate) fn valida_riferimento_niseci_path<T: RecordCsvRiferimentoNISECI + 'static>(
+        &self,
+        has_headers: bool,
+    ) {
         if let Some(path) = self.get_riferimento_path() {
-            let csv_check = check_riferimento_niseci_path::<T>(path);
+            let csv_check = check_riferimento_niseci_path::<T>(path, has_headers);
 
             match csv_check {
                 Ok(records) => {
@@ -324,9 +327,10 @@ impl FileInputController {
 
     pub(crate) fn valida_campionamento_niseci_path<T: RecordCsvCampionamentoNISECI + 'static>(
         &self,
+        has_headers: bool,
     ) {
         if let Some(path) = self.get_campionamento_path() {
-            let csv_check = check_campionamento_niseci_path::<T>(path);
+            let csv_check = check_campionamento_niseci_path::<T>(path, has_headers);
 
             match csv_check {
                 Ok(records) => {
@@ -390,9 +394,12 @@ impl FileInputController {
             }
         }
     }
-    pub(crate) fn valida_campionamento_hfbi_path<T: RecordCsvCampionamentoHFBI + 'static>(&self) {
+    pub(crate) fn valida_campionamento_hfbi_path<T: RecordCsvCampionamentoHFBI + 'static>(
+        &self,
+        has_headers: bool,
+    ) {
         if let Some(path) = self.get_campionamento_path() {
-            let csv_check = check_campionamento_hfbi_path::<T>(path);
+            let csv_check = check_campionamento_hfbi_path::<T>(path, has_headers);
 
             match csv_check {
                 Ok(records) => {

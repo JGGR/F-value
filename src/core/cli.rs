@@ -59,6 +59,7 @@ pub(crate) fn esox_usage() {
         "Flags:
   --headless               Run without GUI
   --hfbi                   Run with HFBI
+  --no-headers             Expect no headers in input files
   --version, -v            Print version and quit
   --info                   Print debug info and quit
   --help, -h               Print this message and quit"
@@ -83,7 +84,7 @@ pub(crate) fn print_copyright_splash() {
     println!("{splash}\n");
 }
 
-pub(crate) fn run_headless(do_niseci: bool, args: &[String]) -> bool {
+pub(crate) fn run_headless(do_niseci: bool, has_headers: bool, args: &[String]) -> bool {
     let mut arg_i = 0;
     let mut campionamento_path_str = "";
     let mut riferimento_path_str = "";
@@ -157,7 +158,7 @@ pub(crate) fn run_headless(do_niseci: bool, args: &[String]) -> bool {
         // Using italian deser for now
         let riferimento_csv_check_res = check_riferimento_niseci_path::<
             VeryItalianRecordCsvRiferimentoNISECI,
-        >(riferimento_path);
+        >(riferimento_path, has_headers);
         let mut riferimento_specie = Vec::new(); // Holds parsed SpecieNISECI
         match riferimento_csv_check_res {
             Ok(csv_recs) => {
@@ -215,7 +216,7 @@ pub(crate) fn run_headless(do_niseci: bool, args: &[String]) -> bool {
         // Using italian deser for now
         let campionamento_csv_check_res = check_campionamento_niseci_path::<
             VeryItalianRecordCsvCampionamentoNISECI,
-        >(campionamento_path);
+        >(campionamento_path, has_headers);
         let mut campionamento_specie = Vec::new(); // Holds parsed RecordNISECI
         match campionamento_csv_check_res {
             Ok(csv_recs) => {
@@ -341,7 +342,7 @@ pub(crate) fn run_headless(do_niseci: bool, args: &[String]) -> bool {
             // Using italian deser for now
             let anagrafica_csv_check_res = check_anagrafica_niseci_path::<
                 VeryItalianRecordCsvAnagraficaNISECI,
-            >(anagrafica_path);
+            >(anagrafica_path, has_headers);
             match anagrafica_csv_check_res {
                 Ok(csv_recs) => {
                     /* TODO: handle verbosity
@@ -459,7 +460,7 @@ pub(crate) fn run_headless(do_niseci: bool, args: &[String]) -> bool {
         let mut campionamento_valueparse_failed = false;
         let campionamento_check_res = check_campionamento_hfbi_path::<
             VeryItalianRecordCsvCampionamentoHFBI,
-        >(campionamento_path);
+        >(campionamento_path, has_headers);
         let mut campionamento_specie = Vec::new(); // Holds parsed RecordHFBI
         match campionamento_check_res {
             Ok(csv_recs) => {
@@ -553,8 +554,9 @@ pub(crate) fn run_headless(do_niseci: bool, args: &[String]) -> bool {
             }
             */
             // Using italian deser for now
-            let anagrafica_csv_check_res =
-                check_anagrafica_hfbi_path::<VeryItalianRecordCsvAnagraficaHFBI>(anagrafica_path);
+            let anagrafica_csv_check_res = check_anagrafica_hfbi_path::<
+                VeryItalianRecordCsvAnagraficaHFBI,
+            >(anagrafica_path, has_headers);
             match anagrafica_csv_check_res {
                 Ok(csv_recs) => {
                     /* TODO: handle verbosity
