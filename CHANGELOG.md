@@ -8,6 +8,7 @@
   - Toggles mode for csv deserialization and log output
   - International mode: `,` csv field delimiter, `.` decimal delimiter
   - Italian mode: `;` csv field delimiter, `,` decimal delimiter
+- Add `NSIS` script for installer
 
 ### Changed
 
