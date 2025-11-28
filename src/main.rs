@@ -76,6 +76,8 @@ fn main() {
     let mut logo_texture = None;
     if let Some(img) = logo_img {
         logo_texture = Some(rl.load_texture_from_image(&thread, &img).unwrap());
+        // Set the window icon
+        rl.set_window_icon(&img);
     }
 
     // 10 is way too small for the default font height
