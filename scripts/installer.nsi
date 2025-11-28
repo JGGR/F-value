@@ -9,6 +9,10 @@ InstallDir "$PROGRAMFILES\F_value"
 RequestExecutionLevel admin
 VIProductVersion "0.0.32.0"
 VIAddVersionKey "CompanyName"     "GtoR"
+Icon "../assets/icon.ico"
+UninstallIcon "../assets/icon.ico"
+!define MUI_ICON "../assets/icon.ico"
+!define MUI_UNICON "../assets/icon.ico"
 
 ;--------------------------------
 ; --- UI Pages ---
