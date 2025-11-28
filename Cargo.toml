@@ -3,6 +3,10 @@ name = "esox"
 version = "0.0.32"
 edition = "2021"
 
+[features]
+default = ["embed-icon"]
+embed-icon = []
+
 [build-dependencies]
 chrono = "0.4.39"
 

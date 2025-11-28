@@ -9,6 +9,7 @@
   - International mode: `,` csv field delimiter, `.` decimal delimiter
   - Italian mode: `;` csv field delimiter, `,` decimal delimiter
 - Add `NSIS` script for installer
+- Add icon embedding using `windres`
 
 ### Changed
 

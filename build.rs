@@ -79,4 +79,24 @@ fn main() {
         short_version_string
     );
     println!("cargo:rustc-env=BUILD_DATE={}", build_date);
+
+    let target = std::env::var("CARGO_CFG_TARGET_OS").unwrap();
+    let host = std::env::var("HOST").unwrap(); // triple like x86_64-pc-windows-msvc
+
+    let embed_icon = std::env::var("CARGO_FEATURE_EMBED_ICON").is_ok();
+
+    if embed_icon && host.contains("linux") && target == "windows" {
+        let out_dir = std::env::var("OUT_DIR").unwrap();
+        let res_path = format!("{}/app.res", out_dir);
+        // compile the .rc file
+        let output = std::process::Command::new("x86_64-w64-mingw32-windres")
+            .args(&["scripts/app.rc", "-O", "coff", "-o", &res_path])
+            .status()
+            .expect("failed to run windres");
+
+        assert!(output.success(), "windres failed");
+
+        // Instruct rustc to link the resource
+        println!("cargo:rustc-link-arg-bins={}", res_path);
+    }
 }
