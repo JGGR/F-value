@@ -23,7 +23,7 @@
 - Solved many clippy lints
 - Bump dependencies
 
-## [0.0.31] - 2025-11-19
+## [0.0.31] - 2025-11-13
 
 ### Added
 
