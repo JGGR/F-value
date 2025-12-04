@@ -88,16 +88,21 @@ pub(crate) struct MetricheX2B {
     id_specie: String,
     densita_stimata: f32,
     quantita_stimata: u32,
-    x2_b: f32
+    x2_b: f32,
 }
 
 impl MetricheX2B {
-    pub(crate) fn new(id_specie: String, densita_stimata: f32, quantita_stimata: u32, x2_b: f32) -> Self {
+    pub(crate) fn new(
+        id_specie: String,
+        densita_stimata: f32,
+        quantita_stimata: u32,
+        x2_b: f32,
+    ) -> Self {
         Self {
             id_specie,
             densita_stimata,
             quantita_stimata,
-            x2_b
+            x2_b,
         }
     }
     pub(crate) fn get_id(&self) -> String {
@@ -439,7 +444,7 @@ fn calculate_sommatoria_x2_b_absolute(
                     catture.specie.id.clone(),
                     densita_stimata,
                     quantita_stimata,
-                    x2_b
+                    x2_b,
                 ));
             }
             Err(err_mess) => errors.push(err_mess),
@@ -564,7 +569,12 @@ fn fill_submetriche(
                 *submetr = SubmetricheX2::new(
                     submetr.get_metriche_x2_a(),
                     submetr.get_classi_eta(),
-                    MetricheX2B::new(id, dens.get_densita_stimata(), dens.get_quantita_stimata(), dens.get_x2_b()),
+                    MetricheX2B::new(
+                        id,
+                        dens.get_densita_stimata(),
+                        dens.get_quantita_stimata(),
+                        dens.get_x2_b(),
+                    ),
                 );
             }
             Entry::Vacant(_) => {
