@@ -475,6 +475,7 @@ pub(crate) struct ValoriIntermediSpecieNISECI {
     pub(crate) rapporto_ad_juv: Option<f32>,
     pub(crate) x2_a_a: u8,
     pub(crate) x2_a_b: u8,
+    pub(crate) x2_b: f32,
 }
 
 impl fmt::Display for ValoriIntermediSpecieNISECI {
@@ -486,8 +487,8 @@ impl fmt::Display for ValoriIntermediSpecieNISECI {
             None => "NC".to_string(),
         };
         let string_representation = format!(
-            "{}; {}; {}; {}; {}; {}",
-            self.classi_eta, self.densita_stimata, self.quantita_stimata, rapporto_ad_juv_str, self.x2_a_a, self.x2_a_b
+            "{}; {}; {}; {}; {}; {}; {}",
+            self.classi_eta, self.densita_stimata, self.quantita_stimata, self.x2_b, rapporto_ad_juv_str, self.x2_a_a, self.x2_a_b
         );
         write!(f, "{}", string_representation)
     }
@@ -519,7 +520,7 @@ impl fmt::Display for ValoriIntermediNISECI {
             Some(v) => format!("{v}"),
             None => "NC".to_string(),
         };
-        let mut string_representation = format!("x1: {}, x2: {}, x3: {},\nx2_a: {}, x2_b: {}, x3_a: {}, x3_b: {},\n\nspecie, nome latino, tipo autoctono, tipo alloctono, specie attesa, cl1, cl2, cl3, cl4, cl5, densita stimata, rapporto ad/juv, x2a_a, x2a_b\n",
+        let mut string_representation = format!("x1: {}, x2: {}, x3: {},\nx2_a: {}, x2_b: {}, x3_a: {}, x3_b: {},\n\nspecie, nome latino, tipo autoctono, tipo alloctono, specie attesa, cl1, cl2, cl3, cl4, cl5, densita stimata, quantita stimata, x2_b, rapporto ad/juv, x2a_a, x2a_b\n",
         self.x1, x2_str, self.x3,
         self.x2_a, self.x2_b, x3_a_str, x3_b_str);
 
