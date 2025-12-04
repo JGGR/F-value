@@ -40,6 +40,7 @@ Section "Install"
   SetOutPath "$INSTDIR"
   File "/oname=F-value.exe" "..\target\x86_64-pc-windows-gnu\release\esox.exe"
   File "..\LICENSE"
+  File "..\README.md"
 
   ; Create a desktop shortcut
   CreateShortCut "$DESKTOP\F-value.lnk" "$INSTDIR\F-value.exe"
