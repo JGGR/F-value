@@ -344,7 +344,7 @@ impl OutputController {
 
                         match file_result {
                             Ok(mut file) => {
-                                let mut string_representation = format!("specie; nome latino; tipo autoctono; tipo alloctono; specie attesa; cl1; cl2; cl3; cl4; cl5; densita stimata; quantita stimata; rapporto ad/juv; x2a_a; x2a_b");
+                                let mut string_representation = format!("specie; nome latino; tipo autoctono; tipo alloctono; specie attesa; cl1; cl2; cl3; cl4; cl5; densita stimata; quantita stimata; x2b; rapporto ad/juv; x2a_a; x2a_b");
                                 for (_k, v) in intermediates.specie_specifici.iter() {
                                     string_representation =
                                         format!("{}\n{}", string_representation, v);
