@@ -1,4 +1,4 @@
-## [0.0.32] - Unreleased
+## [0.0.32] - 2025-12-05
 
 ### Added
 
@@ -14,6 +14,7 @@
 ### Changed
 
 - Fixed output model non being reset when it should be
+- Add `x2_b` to `ValoriIntermediSpecieNISECI`
 - Refactor settings window
 - Avoid niseci's `log_intermediates` relying on format implementation
 - Drop `logged` feature guards
