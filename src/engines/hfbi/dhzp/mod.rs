@@ -41,8 +41,7 @@ pub(crate) fn calc_dhzp(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFB
     }
 
     let dhzp = (((shzp - 0.2) / bhzp.ln()) + 1.0).ln();
-    let rounded_dhzp = (1000.0 * dhzp).round() / 1000.0;
-    rounded_dhzp
+    (1000.0 * dhzp).round() / 1000.0
 }
 
 fn calc_bhzp(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
@@ -52,7 +51,7 @@ fn calc_bhzp(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
             GruppoEcoHFBI::Diadromi
             | GruppoEcoHFBI::MigratoriMarini
             | GruppoEcoHFBI::ResidentiDiEstuario => {
-                biohzp += specie.peso as f32 * (specie.specie.gruppo_trofico.iperbentivori)
+                biohzp += specie.peso * (specie.specie.gruppo_trofico.iperbentivori)
             }
             _ => {}
         }

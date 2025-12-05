@@ -88,16 +88,21 @@ pub(crate) struct MetricheX2B {
     id_specie: String,
     densita_stimata: f32,
     quantita_stimata: u32,
-    x2_b: f32
+    x2_b: f32,
 }
 
 impl MetricheX2B {
-    pub(crate) fn new(id_specie: String, densita_stimata: f32, quantita_stimata: u32, x2_b: f32) -> Self {
+    pub(crate) fn new(
+        id_specie: String,
+        densita_stimata: f32,
+        quantita_stimata: u32,
+        x2_b: f32,
+    ) -> Self {
         Self {
             id_specie,
             densita_stimata,
             quantita_stimata,
-            x2_b
+            x2_b,
         }
     }
     pub(crate) fn get_id(&self) -> String {
@@ -117,10 +122,11 @@ impl MetricheX2B {
 pub(crate) fn calculate_x2(
     campionamento: &CampionamentoNISECI,
     anagrafica: &AnagraficaNISECI,
-    require_specie_attesa: bool
+    require_specie_attesa: bool,
 ) -> Result<(Option<f32>, MetricheX2), Vec<String>> {
     let (x2_a, criteri_vec) = calculate_sommatoria_x2_a(campionamento, require_specie_attesa)?;
-    let (x2_b, densita_vec) = calculate_sommatoria_x2_b(campionamento, anagrafica, require_specie_attesa)?;
+    let (x2_b, densita_vec) =
+        calculate_sommatoria_x2_b(campionamento, anagrafica, require_specie_attesa)?;
 
     let mut submetriche = HashMap::<String, SubmetricheX2>::new();
 
@@ -168,7 +174,6 @@ pub(crate) fn calculate_x2(
     calculate_x2_absolute(metriche_x2, x2_a, x2_b, &specie_campionate_set)
 }
 
-
 pub(crate) fn calculate_x2_per_alloctone(
     campionamento: &CampionamentoNISECI,
     anagrafica: &AnagraficaNISECI,
@@ -207,8 +212,7 @@ pub(crate) fn calculate_x2_per_alloctone(
 
     let mut specie_campionate_set: HashMap<String, bool> = HashMap::new();
     for cattura in &campionamento.campionamento {
-        if cattura.specie.tipo_alloctono > 0
-        {
+        if cattura.specie.tipo_alloctono > 0 {
             match specie_campionate_set.entry(cattura.specie.id.clone()) {
                 Entry::Occupied(_) => {}
                 Entry::Vacant(vacant_entry) => {
@@ -254,7 +258,7 @@ fn calculate_x2_absolute(
     metriche_x2: MetricheX2,
     x2_a: f32,
     x2_b: f32,
-    specie_campionate_set: &HashMap<String, bool>
+    specie_campionate_set: &HashMap<String, bool>,
 ) -> Result<(Option<f32>, MetricheX2), Vec<String>> {
     let tot_specie_attese_trovate = specie_campionate_set.len();
 
@@ -272,7 +276,7 @@ fn calculate_x2_absolute(
 
 fn calculate_sommatoria_x2_a(
     c: &CampionamentoNISECI,
-    require_specie_attesa: bool
+    require_specie_attesa: bool,
 ) -> Result<(f32, Vec<RecordSubmetricheX2A>), Vec<String>> {
     // ad ogni specie associo le loro classi che andrò poi a riempire
     // ho controllato i campionamenti di andrea e trovto massimo 9 specie diverse
@@ -301,7 +305,7 @@ fn calculate_sommatoria_x2_a(
 fn calculate_sommatoria_x2_b(
     c: &CampionamentoNISECI,
     anagrafica: &AnagraficaNISECI,
-    require_specie_attesa: bool
+    require_specie_attesa: bool,
 ) -> Result<(f32, Vec<MetricheX2B>), Vec<String>> {
     let superficie = anagrafica.get_larghezza_media() * anagrafica.get_lunghezza_media();
 
@@ -341,8 +345,7 @@ fn calculate_sommatoria_x2_a_per_alloctone(
 
     // riempo l'hashmap con solo le specie autoctone campionate
     for cattura in &c.campionamento {
-        if cattura.specie.tipo_alloctono > 0
-        {
+        if cattura.specie.tipo_alloctono > 0 {
             match classi_eta_map.entry(cattura.specie.id.clone()) {
                 Entry::Occupied(mut entry) => {
                     entry.get_mut().update_classi_eta(cattura);
@@ -359,7 +362,7 @@ fn calculate_sommatoria_x2_a_per_alloctone(
 
 fn calculate_sommatoria_x2_b_per_alloctone(
     c: &CampionamentoNISECI,
-    anagrafica: &AnagraficaNISECI
+    anagrafica: &AnagraficaNISECI,
 ) -> Result<(f32, Vec<MetricheX2B>), Vec<String>> {
     let superficie = anagrafica.get_larghezza_media() * anagrafica.get_lunghezza_media();
 
@@ -367,8 +370,7 @@ fn calculate_sommatoria_x2_b_per_alloctone(
         HashMap::with_capacity(10);
 
     for cattura in &c.campionamento {
-        if cattura.specie.tipo_alloctono > 0
-        {
+        if cattura.specie.tipo_alloctono > 0 {
             match esemplari_per_cattura_map.entry(cattura.specie.id.clone()) {
                 Entry::Occupied(mut occupied_entry) => {
                     occupied_entry
@@ -388,8 +390,9 @@ fn calculate_sommatoria_x2_b_per_alloctone(
     calculate_sommatoria_x2_b_absolute(esemplari_per_cattura_map, superficie)
 }
 
-fn calculate_sommatoria_x2_a_absolute(classi_eta_map: HashMap<String, ClassiEtaSpecieNISECI>) -> Result<(f32, Vec<RecordSubmetricheX2A>), Vec<String>> {
-
+fn calculate_sommatoria_x2_a_absolute(
+    classi_eta_map: HashMap<String, ClassiEtaSpecieNISECI>,
+) -> Result<(f32, Vec<RecordSubmetricheX2A>), Vec<String>> {
     // ora la mappa è riempita e tutte le classi sono state riempite
     // si procede quindi al calcolo di x2 a per ogni specie campionata autoctona
     // e si va a fare la sommatoria dei parametri trovati
@@ -424,7 +427,10 @@ fn calculate_sommatoria_x2_a_absolute(classi_eta_map: HashMap<String, ClassiEtaS
     Ok((sommatoria_x2_a, criteri_vec))
 }
 
-fn calculate_sommatoria_x2_b_absolute(esemplari_per_cattura_map: HashMap<String, EsemplariPerCattura>, superficie: f32) -> Result<(f32, Vec<MetricheX2B>), Vec<String>> {
+fn calculate_sommatoria_x2_b_absolute(
+    esemplari_per_cattura_map: HashMap<String, EsemplariPerCattura>,
+    superficie: f32,
+) -> Result<(f32, Vec<MetricheX2B>), Vec<String>> {
     // ora che abbiamo riempito la mappa con tutte le catture, possiamo andare
     // a calcolar x2b per ogni specie
     let mut sommatoria_x2_b = 0.0;
@@ -434,7 +440,12 @@ fn calculate_sommatoria_x2_b_absolute(esemplari_per_cattura_map: HashMap<String,
         match calculate_x2_b(catture, &superficie) {
             Ok((x2_b, densita_stimata, quantita_stimata)) => {
                 sommatoria_x2_b += x2_b;
-                densita_vec.push(MetricheX2B::new(catture.specie.id.clone(), densita_stimata, quantita_stimata, x2_b));
+                densita_vec.push(MetricheX2B::new(
+                    catture.specie.id.clone(),
+                    densita_stimata,
+                    quantita_stimata,
+                    x2_b,
+                ));
             }
             Err(err_mess) => errors.push(err_mess),
         }
@@ -545,7 +556,11 @@ fn calculate_q_stimata_regression(passaggi: &HashMap<u8, u32>) -> Result<u32, St
     calculate_quantita_with_regression(points.as_slice())
 }
 
-fn fill_submetriche(densita_vec: Vec<MetricheX2B>, submetriche: &mut HashMap<String, SubmetricheX2>, errors: &mut Vec<String>) -> () {
+fn fill_submetriche(
+    densita_vec: Vec<MetricheX2B>,
+    submetriche: &mut HashMap<String, SubmetricheX2>,
+    errors: &mut Vec<String>,
+) {
     for dens in &densita_vec {
         let id = dens.get_id();
         match submetriche.entry(id.clone()) {
@@ -554,7 +569,12 @@ fn fill_submetriche(densita_vec: Vec<MetricheX2B>, submetriche: &mut HashMap<Str
                 *submetr = SubmetricheX2::new(
                     submetr.get_metriche_x2_a(),
                     submetr.get_classi_eta(),
-                    MetricheX2B::new(id, dens.get_densita_stimata(), dens.get_quantita_stimata(), dens.get_x2_b()),
+                    MetricheX2B::new(
+                        id,
+                        dens.get_densita_stimata(),
+                        dens.get_quantita_stimata(),
+                        dens.get_x2_b(),
+                    ),
                 );
             }
             Entry::Vacant(_) => {

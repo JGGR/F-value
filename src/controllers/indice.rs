@@ -43,7 +43,6 @@ impl Controller for IndiceController {
             state.indice_model.reset();
             state.console_model.reset();
             main_state.set_current_view(CurrentView::Home);
-            return;
         }
     }
     fn get_state(&self) -> Self::SubModel {

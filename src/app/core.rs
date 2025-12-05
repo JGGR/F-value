@@ -86,6 +86,9 @@ impl fmt::Display for CurrentView {
 pub(crate) const GUI_THEME_COMBOBOX_STR: &str =
     "Light;Dark;Bluish;Candy;Cherry;Cyber;Jungle;Lavanda;Terminal;Ashes";
 
+//TODO: add test to check if this string respects the discriminant ordering in Localize
+pub(crate) const LOCALE_COMBOBOX_STR: &str = "Italian;International";
+
 #[derive(Copy, Clone)]
 pub(crate) enum GuiTheme {
     Light,
@@ -138,6 +141,24 @@ impl TryFrom<i32> for GuiTheme {
     }
 }
 
+#[derive(Copy, Clone)]
+pub(crate) enum Localize {
+    Italian,
+    International,
+}
+
+impl TryFrom<i32> for Localize {
+    type Error = ();
+
+    fn try_from(v: i32) -> Result<Self, Self::Error> {
+        match v {
+            x if x == Localize::Italian as i32 => Ok(Localize::Italian),
+            x if x == Localize::International as i32 => Ok(Localize::International),
+            _ => Err(()),
+        }
+    }
+}
+
 pub(crate) struct MainState {
     pub(crate) frame_counter: u32,
     pub(crate) showing_reset_win: bool,
@@ -158,6 +179,8 @@ pub(crate) struct MainState {
     pub(crate) current_font: WeakFont,
     pub(crate) default_bg_color: Color,
     pub(crate) logo_texture: Option<Texture2D>,
+    pub(crate) locale: Localize,
+    pub(crate) locale_combobox_active: i32,
 }
 
 impl MainState {
@@ -169,6 +192,7 @@ impl MainState {
         default_txt_color: Color,
         default_bg_color: Color,
         logo_texture: Option<Texture2D>,
+        locale: Localize,
     ) -> Self {
         Self {
             frame_counter: 0,
@@ -190,6 +214,8 @@ impl MainState {
             current_font,
             default_bg_color,
             logo_texture,
+            locale,
+            locale_combobox_active: locale as i32,
         }
     }
 
@@ -256,4 +282,17 @@ pub(crate) fn propheight(d: &RaylibDrawHandle<'_>, to_scale: i32) -> i32 {
     }
     let current_screen_height = d.get_screen_height();
     current_screen_height * to_scale / ESOX_SCREEN_HEIGHT
+}
+
+pub(crate) fn get_locale() -> Localize {
+    let locale_str = locale_config::Locale::user_default();
+    for l in locale_str.as_ref().split(",") {
+        match l.replace("-", "_").as_str() {
+            "it_IT" | "it_CH" | "it_SM" | "it_VA" => {
+                return Localize::Italian;
+            }
+            _ => {}
+        }
+    }
+    Localize::International
 }

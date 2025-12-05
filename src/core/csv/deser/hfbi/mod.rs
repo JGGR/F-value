@@ -22,7 +22,7 @@ use crate::core::csv::{RecordCsvAnagraficaHFBI, RecordCsvCampionamentoHFBI, Tipo
 use std::any::TypeId;
 use std::fmt;
 use std::fs::File;
-use std::io::{Error, ErrorKind, Read};
+use std::io::{Error, Read};
 use std::path::PathBuf;
 
 #[derive(Debug, serde::Deserialize)]
@@ -108,6 +108,7 @@ where
 
 pub(crate) fn check_campionamento_hfbi_reader<R: Read, T>(
     reader: R,
+    has_headers: bool,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
     T: RecordCsvCampionamentoHFBI + 'static,
@@ -124,6 +125,7 @@ where
 
     let rdr = csv::ReaderBuilder::new()
         .delimiter(delimiter)
+        .has_headers(has_headers)
         .from_reader(normalizing_reader);
     let (records, errors) = parse_csv_campionamento_hfbi(rdr);
 
@@ -161,21 +163,23 @@ where
     }
 }
 
-pub(crate) fn check_campionamento_hfbi_path<T>(path: PathBuf) -> Result<Vec<T>, Vec<csv::Error>>
+pub(crate) fn check_campionamento_hfbi_path<T>(
+    path: PathBuf,
+    has_headers: bool,
+) -> Result<Vec<T>, Vec<csv::Error>>
 where
     T: RecordCsvCampionamentoHFBI + 'static,
 {
     if !check_path_is_file_ends_with_csv(&path) {
         eprintln!("Il file {} non è un .csv", path.display());
-        let err = csv::Error::from(Error::new(
-            ErrorKind::Other,
+        let err = csv::Error::from(Error::other(
             "Errore campionamento HFBI: il file non è un .csv",
         ));
         let err_vec: Vec<csv::Error> = vec![err];
         return Err(err_vec);
     }
     let file = File::open(path).expect("Unable to open file");
-    check_campionamento_hfbi_reader(file)
+    check_campionamento_hfbi_reader(file, has_headers)
 }
 
 #[derive(Debug, serde::Deserialize)]
@@ -338,7 +342,10 @@ where
     (records, errors)
 }
 
-pub(crate) fn check_anagrafica_hfbi_reader<R: Read, T>(reader: R) -> Result<Vec<T>, Vec<csv::Error>>
+pub(crate) fn check_anagrafica_hfbi_reader<R: Read, T>(
+    reader: R,
+    has_headers: bool,
+) -> Result<Vec<T>, Vec<csv::Error>>
 where
     T: RecordCsvAnagraficaHFBI + 'static,
 {
@@ -354,6 +361,7 @@ where
 
     let rdr = csv::ReaderBuilder::new()
         .delimiter(delimiter)
+        .has_headers(has_headers)
         .from_reader(normalizing_reader);
     let (records, errors) = parse_csv_anagrafica_hfbi(rdr);
 
@@ -391,19 +399,21 @@ where
     }
 }
 
-pub(crate) fn check_anagrafica_hfbi_path<T>(path: PathBuf) -> Result<Vec<T>, Vec<csv::Error>>
+pub(crate) fn check_anagrafica_hfbi_path<T>(
+    path: PathBuf,
+    has_headers: bool,
+) -> Result<Vec<T>, Vec<csv::Error>>
 where
     T: RecordCsvAnagraficaHFBI + 'static,
 {
     if !check_path_is_file_ends_with_csv(&path) {
         eprintln!("Il file {} non è un .csv", path.display());
-        let err = csv::Error::from(Error::new(
-            ErrorKind::Other,
+        let err = csv::Error::from(Error::other(
             "Errore anagrafica HFBI: il file non è un .csv",
         ));
         let err_vec: Vec<csv::Error> = vec![err];
         return Err(err_vec);
     }
     let file = File::open(path).expect("Unable to open file");
-    check_anagrafica_hfbi_reader(file)
+    check_anagrafica_hfbi_reader(file, has_headers)
 }

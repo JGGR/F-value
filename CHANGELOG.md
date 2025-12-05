@@ -1,10 +1,30 @@
-## [0.0.31] - 2025-11-19
+## [0.0.32] - 2025-12-05
+
+### Added
+
+- Add `StatoEcologicoHFBI`, to be reported in output and pdf
+- Hfbi log csv files uses `;` instead of `,` as delimiter
+- Add locale setting to support selective language mode
+  - Toggles mode for csv deserialization and log output
+  - International mode: `,` csv field delimiter, `.` decimal delimiter
+  - Italian mode: `;` csv field delimiter, `,` decimal delimiter
+- Add `NSIS` script for installer
+- Add icon embedding using `windres`
 
 ### Changed
 
-- Removed sommatoria x2_a and x2_b for intermediates
-- Wow log csv files uses `;` instead of `,` as delimiter
-- Filled `regione` cell in log files
+- Fixed output model non being reset when it should be
+- Add `x2_b` to `ValoriIntermediSpecieNISECI`
+- Refactor settings window
+- Avoid niseci's `log_intermediates` relying on format implementation
+- Drop `logged` feature guards
+- Collect logging to file into functions
+- Collect args handling into separate module
+- Use logo for window icon
+- Solved many clippy lints
+- Bump dependencies
+
+## [0.0.31] - 2025-11-13
 
 ### Added
 
@@ -16,6 +36,12 @@
 - New method `calculate_x2_b_per_alloctone`
 - Added intermediates logs for `specie non attese` and `specie alloctone`
 - Added `quantita_stimata` as intermediate
+
+### Changed
+
+- Removed sommatoria x2_a and x2_b for intermediates
+- Now log csv files uses `;` instead of `,` as delimiter
+- Filled `regione` cell in log files
 
 ## [0.0.30] - 2025-10-29
 

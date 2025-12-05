@@ -14,10 +14,17 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+use crate::app::core::{Localize, MainState};
 use crate::controllers::{file_input::FileInputController, Controller};
+use crate::core::csv::deser::hfbi::{
+    PlainRecordCsvCampionamentoHFBI, VeryItalianRecordCsvCampionamentoHFBI,
+};
+use crate::core::csv::deser::niseci::{
+    PlainRecordCsvCampionamentoNISECI, PlainRecordCsvRiferimentoNISECI,
+    VeryItalianRecordCsvCampionamentoNISECI, VeryItalianRecordCsvRiferimentoNISECI,
+};
 use crate::domain::index::Indice;
 use crate::views::{propheight, propwidth, rrect, View};
-use crate::MainState;
 use raylib::consts::GuiState::{STATE_DISABLED, STATE_NORMAL};
 use raylib::drawing::RaylibDrawHandle;
 use raylib::prelude::*;
@@ -87,7 +94,19 @@ impl View for ValidazioneFileInputView {
                 "Valida Riferimento",
             )
         {
-            controller.valida_riferimento_niseci_path();
+            match main_state.locale {
+                Localize::Italian => {
+                    controller
+                        .valida_riferimento_niseci_path::<VeryItalianRecordCsvRiferimentoNISECI>(
+                            true,
+                        ); //TODO: get user preference on headers
+                }
+                Localize::International => {
+                    controller
+                        .valida_riferimento_niseci_path::<PlainRecordCsvRiferimentoNISECI>(true);
+                    //TODO: get user preference on headers
+                }
+            }
         }
 
         let mut turn_off_button_campionamento = false;
@@ -108,11 +127,29 @@ impl View for ValidazioneFileInputView {
         ) {
             match current_index {
                 Indice::Niseci => {
-                    controller.valida_campionamento_niseci_path();
+                    match main_state.locale {
+                        Localize::Italian => {
+                            controller.valida_campionamento_niseci_path::<VeryItalianRecordCsvCampionamentoNISECI>(true);
+                            //TODO: get user preference on headers
+                        }
+                        Localize::International => {
+                            controller.valida_campionamento_niseci_path::<PlainRecordCsvCampionamentoNISECI>(true);
+                            //TODO: get user preference on headers
+                        }
+                    }
                 }
-                Indice::Hfbi => {
-                    controller.valida_campionamento_hfbi_path();
-                }
+                Indice::Hfbi => match main_state.locale {
+                    Localize::Italian => {
+                        controller.valida_campionamento_hfbi_path::<VeryItalianRecordCsvCampionamentoHFBI>(true);
+                        //TODO: get user preference on headers
+                    }
+                    Localize::International => {
+                        controller
+                            .valida_campionamento_hfbi_path::<PlainRecordCsvCampionamentoHFBI>(
+                                true,
+                            ); //TODO: get user preference on headers
+                    }
+                },
             }
         }
 

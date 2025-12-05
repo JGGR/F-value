@@ -715,11 +715,11 @@ impl AnagraficaHFBI {
     }
 
     pub(crate) fn get_cond_riferimento_key(&self) -> CondizioniRiferimentoKeyHFBI {
-        return CondizioniRiferimentoKeyHFBI {
+        CondizioniRiferimentoKeyHFBI {
             tipo_laguna: self.tipo_laguna.clone(),
             stagione: self.stagione.clone(),
             habitat_vegetato: self.habitat_vegetato.clone(),
-        };
+        }
     }
 }
 
@@ -749,7 +749,7 @@ impl fmt::Display for ValoriIntermediHFBI {
             self.bbent, self.bn, self.dbent, self.ddom, self.dhzp, self.dmig, self.mmi
         );
 
-        string_representation = format!("{}", string_representation);
+        string_representation = string_representation.to_string(); //FIXME: Why is this here?
         write!(f, "{}", string_representation)
     }
 }
@@ -792,27 +792,17 @@ impl RisultatoHFBI {
     pub(crate) fn get_valore(&self) -> Option<f32> {
         self.valore
     }
-    pub(crate) fn _get_intermediates(&self) -> ValoriIntermediHFBI {
+    pub(crate) fn get_intermediates(&self) -> ValoriIntermediHFBI {
         self.intermediates.clone()
     }
 }
 
-#[derive(Hash)]
+#[derive(Hash, PartialEq, Eq)]
 pub(crate) struct CondizioniRiferimentoKeyHFBI {
     pub(crate) tipo_laguna: TipoLagunaCostieraHFBI,
     pub(crate) stagione: StagioneHFBI,
     pub(crate) habitat_vegetato: HabitatHFBI,
 }
-
-impl PartialEq for CondizioniRiferimentoKeyHFBI {
-    fn eq(&self, other: &Self) -> bool {
-        self.habitat_vegetato == other.habitat_vegetato
-            && self.stagione == other.stagione
-            && self.tipo_laguna == other.tipo_laguna
-    }
-}
-
-impl Eq for CondizioniRiferimentoKeyHFBI {}
 
 #[derive(Clone)]
 pub(crate) struct CondizioniRiferimentoHFBI {
@@ -829,14 +819,14 @@ impl CondizioniRiferimentoHFBI {
         anagrafica: &AnagraficaHFBI,
     ) -> Option<&'static CondizioniRiferimentoHFBI> {
         let key = anagrafica.get_cond_riferimento_key();
-        return CONDIZIONI_RIFERIMENTO_HFBI_HASHMAP.get(&key);
+        CONDIZIONI_RIFERIMENTO_HFBI_HASHMAP.get(&key)
     }
 }
 
 static CONDIZIONI_RIFERIMENTO_HFBI_HASHMAP: Lazy<
     HashMap<CondizioniRiferimentoKeyHFBI, CondizioniRiferimentoHFBI>,
 > = Lazy::new(|| {
-    let map = HashMap::from([
+    HashMap::from([
         // M-AT-1 data
         (
             CondizioniRiferimentoKeyHFBI {
@@ -1020,7 +1010,28 @@ static CONDIZIONI_RIFERIMENTO_HFBI_HASHMAP: Lazy<
                 dhzp: 2.083,
             },
         ),
-    ]);
-
-    map
+    ])
 });
+
+/// enum per il risultato finale di un calcolo hfbi
+/// (vedi calculate_stato_ecologico)
+pub(crate) enum StatoEcologicoHFBI {
+    Eccellente,
+    Buono,
+    Sufficiente,
+    Scarso,
+    Cattivo,
+}
+
+impl fmt::Display for StatoEcologicoHFBI {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let string_representation = match *self {
+            StatoEcologicoHFBI::Eccellente => "Eccellente",
+            StatoEcologicoHFBI::Buono => "Buono",
+            StatoEcologicoHFBI::Sufficiente => "Sufficiente",
+            StatoEcologicoHFBI::Scarso => "Scarso",
+            StatoEcologicoHFBI::Cattivo => "Cattivo",
+        };
+        write!(f, "{}", string_representation)
+    }
+}

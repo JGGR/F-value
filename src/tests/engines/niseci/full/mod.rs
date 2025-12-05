@@ -73,7 +73,7 @@ fn calculate_niseci_template() {
     let riferimento_csv_check = check_riferimento_niseci_reader::<
         _,
         VeryItalianRecordCsvRiferimentoNISECI,
-    >(riferimento_reader);
+    >(riferimento_reader, true);
 
     assert!(riferimento_csv_check.is_ok());
 
@@ -90,7 +90,7 @@ fn calculate_niseci_template() {
     let campionamento_csv_check = check_campionamento_niseci_reader::<
         _,
         VeryItalianRecordCsvCampionamentoNISECI,
-    >(campionamento_reader);
+    >(campionamento_reader, true);
 
     assert!(campionamento_csv_check.is_ok());
 
@@ -108,7 +108,7 @@ fn calculate_niseci_template() {
     let anagrafica_csv_check = check_anagrafica_niseci_reader::<
         _,
         VeryItalianRecordCsvAnagraficaNISECI,
-    >(anagrafica_reader);
+    >(anagrafica_reader, true);
 
     assert!(anagrafica_csv_check.is_ok());
 

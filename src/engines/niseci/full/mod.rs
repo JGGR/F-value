@@ -67,7 +67,8 @@ pub(crate) fn calculate_niseci(
         }
     }
 
-    let (_x2_non_attese, criteri_x2_non_attese) = x2_non_attese.expect("calc_niseci() returned earlier on Err match");
+    let (_x2_non_attese, criteri_x2_non_attese) =
+        x2_non_attese.expect("calc_niseci() returned earlier on Err match");
 
     // calculate x2 for specie alloctone
     let x2_per_alloctone = calculate_x2_per_alloctone(campionamento, anagrafica);
@@ -81,8 +82,8 @@ pub(crate) fn calculate_niseci(
         }
     }
 
-    let (_x2_per_alloctone, criteri_x2_per_alloctone) = x2_per_alloctone.expect("calc_niseci() returned earlier on Err match");
-
+    let (_x2_per_alloctone, criteri_x2_per_alloctone) =
+        x2_per_alloctone.expect("calc_niseci() returned earlier on Err match");
 
     let mut valori_intermedi_specie: HashMap<String, ValoriIntermediSpecieNISECI> = HashMap::new();
 
@@ -93,7 +94,6 @@ pub(crate) fn calculate_niseci(
     valori_intermedi_specie.extend(intermedi_non_attese);
     // add valori intermedi specie alloctone
     valori_intermedi_specie.extend(get_valori_intermedi_specie(&criteri_x2_per_alloctone));
-
 
     let x3 = calculate_x3(campionamento);
     match x3 {
@@ -183,7 +183,7 @@ pub(crate) fn calculate_rqe_niseci(niseci: Option<f32>) -> Option<f32> {
     }
 }
 
-pub(crate) fn calculate_stato_ecologico(
+pub(crate) fn calculate_stato_ecologico_niseci(
     niseci: Option<f32>,
     area: &AreaNISECI,
 ) -> Option<StatoEcologicoNISECI> {
@@ -217,7 +217,9 @@ pub(crate) fn calculate_stato_ecologico(
     }
 }
 
-fn get_valori_intermedi_specie(criteri: &MetricheX2) -> HashMap<String, ValoriIntermediSpecieNISECI> {
+fn get_valori_intermedi_specie(
+    criteri: &MetricheX2,
+) -> HashMap<String, ValoriIntermediSpecieNISECI> {
     let mut valori_intermedi_specie: HashMap<String, ValoriIntermediSpecieNISECI> = HashMap::new();
 
     let submetriche_map = criteri.get_submetriche_map();
@@ -247,4 +249,3 @@ fn get_valori_intermedi_specie(criteri: &MetricheX2) -> HashMap<String, ValoriIn
 
     valori_intermedi_specie
 }
-

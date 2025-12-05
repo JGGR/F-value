@@ -1,6 +1,7 @@
 use crate::{
     domain::hfbi::{
-        AnagraficaHFBI, CampionamentoHFBI, CondizioniRiferimentoHFBI, ValoriIntermediHFBI,
+        AnagraficaHFBI, CampionamentoHFBI, CondizioniRiferimentoHFBI, StatoEcologicoHFBI,
+        ValoriIntermediHFBI,
     },
     engines::hfbi::{
         bbent::calc_bbent, bn::calc_bn, dbent::calc_dbent, ddom::calc_ddom, dhzp::calc_dhzp,
@@ -19,6 +20,11 @@ const W_DHZP: f32 = 0.84;
 // MAGIC CONST
 const HFBI_T: f32 = -0.167;
 const HFBI_S: f32 = 0.150;
+
+const STATO_ECOLOGICO_HFBI_SOGLIA_ECCELLENTE: f32 = 0.94;
+const STATO_ECOLOGICO_HFBI_SOGLIA_BUONO: f32 = 0.55;
+const STATO_ECOLOGICO_HFBI_SOGLIA_SUFFICIENTE: f32 = 0.33;
+const STATO_ECOLOGICO_HFBI_SOGLIA_SCARSO: f32 = 0.11;
 
 pub(crate) fn calculate_mmi(
     campionamento: &CampionamentoHFBI,
@@ -82,6 +88,27 @@ pub(crate) fn calculate_hfbi(
             Ok((rounded_hfbi, intermediates))
         }
         Err(error) => Err(error),
+    }
+}
+
+pub(crate) fn calculate_stato_ecologico_hfbi(hfbi: Option<f32>) -> Option<StatoEcologicoHFBI> {
+    match hfbi {
+        Some(val) => {
+            if val >= STATO_ECOLOGICO_HFBI_SOGLIA_ECCELLENTE {
+                return Some(StatoEcologicoHFBI::Eccellente);
+            }
+            if val >= STATO_ECOLOGICO_HFBI_SOGLIA_BUONO {
+                return Some(StatoEcologicoHFBI::Buono);
+            }
+            if val >= STATO_ECOLOGICO_HFBI_SOGLIA_SUFFICIENTE {
+                return Some(StatoEcologicoHFBI::Sufficiente);
+            }
+            if val >= STATO_ECOLOGICO_HFBI_SOGLIA_SCARSO {
+                return Some(StatoEcologicoHFBI::Scarso);
+            }
+            Some(StatoEcologicoHFBI::Cattivo)
+        }
+        None => None,
     }
 }
 

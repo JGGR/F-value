@@ -488,7 +488,13 @@ impl fmt::Display for ValoriIntermediSpecieNISECI {
         };
         let string_representation = format!(
             "{}; {}; {}; {}; {}; {}; {}",
-            self.classi_eta, self.densita_stimata, self.quantita_stimata, self.x2_b, rapporto_ad_juv_str, self.x2_a_a, self.x2_a_b
+            self.classi_eta,
+            self.densita_stimata,
+            self.quantita_stimata,
+            self.x2_b,
+            rapporto_ad_juv_str,
+            self.x2_a_a,
+            self.x2_a_b
         );
         write!(f, "{}", string_representation)
     }
@@ -527,7 +533,7 @@ impl fmt::Display for ValoriIntermediNISECI {
         for (_k, v) in self.specie_specifici.iter() {
             string_representation = format!("{}\n{}", string_representation, v);
         }
-        string_representation = format!("{}", string_representation);
+        string_representation = string_representation.to_string(); //FIXME: Why is this here?
         write!(f, "{}", string_representation)
     }
 }

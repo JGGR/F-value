@@ -16,9 +16,9 @@
 */
 
 use super::core::{
-    GuiTheme, MainState, ASHES_THEME_DATA, BLUISH_THEME_DATA, CANDY_THEME_DATA, CHERRY_THEME_DATA,
-    CYBER_THEME_DATA, DARK_THEME_DATA, EXIT_KEY, JUNGLE_THEME_DATA, LAVANDA_THEME_DATA,
-    TERMINAL_THEME_DATA,
+    GuiTheme, Localize, MainState, ASHES_THEME_DATA, BLUISH_THEME_DATA, CANDY_THEME_DATA,
+    CHERRY_THEME_DATA, CYBER_THEME_DATA, DARK_THEME_DATA, EXIT_KEY, JUNGLE_THEME_DATA,
+    LAVANDA_THEME_DATA, TERMINAL_THEME_DATA,
 };
 use raylib::color::Color;
 use raylib::consts::GuiControl::DEFAULT;
@@ -43,7 +43,18 @@ pub(crate) fn update_main(rl: &mut RaylibHandle, main_state: &mut MainState) {
             Ok(theme) => {
                 theme.load_and_set(rl, main_state);
             }
-            Err(_) => eprintln!("unknown number"),
+            Err(_) => eprintln!("unknown number in current theme check"),
+        }
+    }
+
+    let current_locale_idx = main_state.locale_combobox_active;
+
+    if current_locale_idx != main_state.locale as i32 {
+        match <Localize as TryFrom<i32>>::try_from(current_locale_idx) {
+            Ok(locale) => {
+                main_state.locale = locale;
+            }
+            Err(_) => eprintln!("unknown number in current locale check"),
         }
     }
 

@@ -365,15 +365,10 @@ impl View for SelezioneInfoAggiuntiveView {
             "Data",
         );
 
-        let label_for_station_length;
-        match current_index {
-            Indice::Niseci => {
-                label_for_station_length = "Lunghezza stazione";
-            }
-            Indice::Hfbi => {
-                label_for_station_length = "Lunghezza transetto";
-            }
-        }
+        let label_for_station_length = match current_index {
+            Indice::Niseci => "Lunghezza stazione",
+            Indice::Hfbi => "Lunghezza transetto",
+        };
         d.gui_label(
             rrect(
                 column_1_labels_x,
@@ -384,15 +379,10 @@ impl View for SelezioneInfoAggiuntiveView {
             label_for_station_length,
         );
 
-        let label_for_station_width;
-        match current_index {
-            Indice::Niseci => {
-                label_for_station_width = "Larghezza stazione";
-            }
-            Indice::Hfbi => {
-                label_for_station_width = "Larghezza transetto";
-            }
-        }
+        let label_for_station_width = match current_index {
+            Indice::Niseci => "Larghezza stazione",
+            Indice::Hfbi => "Larghezza transetto",
+        };
 
         d.gui_label(
             rrect(
