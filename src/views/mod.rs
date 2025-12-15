@@ -15,8 +15,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::app::core::{propheight, propwidth, CurrentView, MainState};
-use crate::controllers::{Controller, Controllers};
+use crate::app::core::{propheight, propwidth, Action, CurrentView, MainState};
+use crate::app::model::Model;
 use crate::core::rrect;
 use raylib::prelude::*;
 
@@ -78,91 +78,46 @@ impl Views {
         &mut self,
         d: &mut RaylibDrawHandle,
         thread: &RaylibThread,
-        controllers: &Controllers,
+        state: &Model,
         main_state: &MainState,
-    ) {
+    ) -> Vec<Action> {
         match main_state.current_view {
-            CurrentView::Home => {
-                self.home_view
-                    .draw(d, thread, &controllers.home_controller, main_state);
-            }
-            CurrentView::Help => {
-                self.help_view
-                    .draw(d, thread, &controllers.help_controller, main_state);
-            }
-            CurrentView::SelezioneIndice => {
-                self.selezione_indice_view.draw(
-                    d,
-                    thread,
-                    &controllers.indice_controller,
-                    main_state,
-                );
-            }
-            CurrentView::SelezioneFileInput => {
-                self.selezione_fileinput_view.draw(
-                    d,
-                    thread,
-                    &controllers.fileinput_controller,
-                    main_state,
-                );
-            }
-            CurrentView::ValidazioneFileInput => {
-                self.validazione_fileinput_view.draw(
-                    d,
-                    thread,
-                    &controllers.fileinput_controller,
-                    main_state,
-                );
-            }
-            CurrentView::SelezioneInfoAggiuntive => {
-                self.selezione_infoaggiuntive_view.draw(
-                    d,
-                    thread,
-                    &controllers.infoaggiuntive_controller,
-                    main_state,
-                );
-            }
-            CurrentView::ValidazioneInfoAggiuntive => {
-                self.validazione_infoaggiuntive_view.draw(
-                    d,
-                    thread,
-                    &controllers.infoaggiuntive_controller,
-                    main_state,
-                );
-            }
-            CurrentView::ProduzioneOutput => {
-                self.produzione_output_view.draw(
-                    d,
-                    thread,
-                    &controllers.output_controller,
-                    main_state,
-                );
-            }
+            CurrentView::Home => self.home_view.draw(d, thread, state, main_state),
+            CurrentView::Help => self.help_view.draw(d, thread, state, main_state),
+            CurrentView::SelezioneIndice => self
+                .selezione_indice_view
+                .draw(d, thread, state, main_state),
+            CurrentView::SelezioneFileInput => self
+                .selezione_fileinput_view
+                .draw(d, thread, state, main_state),
+            CurrentView::ValidazioneFileInput => self
+                .validazione_fileinput_view
+                .draw(d, thread, state, main_state),
+            CurrentView::SelezioneInfoAggiuntive => self
+                .selezione_infoaggiuntive_view
+                .draw(d, thread, state, main_state),
+            CurrentView::ValidazioneInfoAggiuntive => self
+                .validazione_infoaggiuntive_view
+                .draw(d, thread, state, main_state),
+            CurrentView::ProduzioneOutput => self
+                .produzione_output_view
+                .draw(d, thread, state, main_state),
             CurrentView::ProduzionePDF => {
-                self.produzione_pdf_view.draw(
-                    d,
-                    thread,
-                    &controllers.output_controller,
-                    main_state,
-                );
+                self.produzione_pdf_view.draw(d, thread, state, main_state)
             }
-            CurrentView::Console => {
-                self.console_view
-                    .draw(d, thread, &controllers.console_controller, main_state);
-            }
+            CurrentView::Console => self.console_view.draw(d, thread, state, main_state),
         }
     }
 }
 
 pub(crate) trait View {
-    type Controller: Controller;
     fn draw(
         &mut self,
         d: &mut RaylibDrawHandle,
         _thread: &RaylibThread,
-        controller: &Self::Controller,
+        state: &Model,
         main_state: &MainState,
-    );
+    ) -> Vec<Action>;
 }
 
 fn _rainbow_color_from_framecounter(frame_counter: u32, speed: f32) -> Color {

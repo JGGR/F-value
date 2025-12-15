@@ -15,21 +15,18 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 pub(crate) struct OutputController;
-use crate::app::core::Localize;
-use crate::app::model::SubModel;
+use crate::app::core::{Action, Localize};
+use crate::app::model::{Model, SubModel};
 use crate::controllers::{Controller, CurrentView, OutputModel};
 use crate::core::pdf::{esporta_pdf_hfbi, esporta_pdf_niseci};
 use crate::core::CommaFormat;
-use crate::domain::hfbi::{AnagraficaHFBI, RisultatoHFBI, StatoEcologicoHFBI, ValoriIntermediHFBI};
-use crate::domain::niseci::{
-    AnagraficaNISECI, RiferimentoNISECI, RisultatoNISECI, StatoEcologicoNISECI,
-    ValoriIntermediNISECI,
-};
+use crate::domain::hfbi::{AnagraficaHFBI, RisultatoHFBI, ValoriIntermediHFBI};
+use crate::domain::index::Indice;
+use crate::domain::niseci::{AnagraficaNISECI, RisultatoNISECI, ValoriIntermediNISECI};
 use crate::engines::hfbi::full::{calculate_hfbi, calculate_stato_ecologico_hfbi};
 use crate::engines::niseci::full::{
     calculate_niseci, calculate_rqe_niseci, calculate_stato_ecologico_niseci,
 };
-use crate::state::GLOBAL_STATE;
 use crate::MainState;
 use dirs::document_dir;
 use log::info;
@@ -41,8 +38,13 @@ use std::path::PathBuf;
 impl Controller for OutputController {
     type SubModel = OutputModel;
 
-    fn update(&self, _rl: &mut RaylibHandle, main_state: &mut MainState) {
-        let mut state = GLOBAL_STATE.lock().unwrap();
+    fn update(
+        &self,
+        _rl: &mut RaylibHandle,
+        state: &mut Model,
+        actions: &mut Vec<Action>,
+        main_state: &mut MainState,
+    ) {
         state.output_model.increment_frame_counter();
 
         if state.output_model.get_should_reset() {
@@ -72,6 +74,54 @@ impl Controller for OutputController {
             eprintln!("OutputController:  Clearing error state");
             state.data_model.set_errors_occurred(false);
         }
+
+        for a in actions.drain(..) {
+            match a {
+                Action::RunCalc => {
+                    if let Some(idx) = state.indice_model.get_selected_index() {
+                        match idx {
+                            Indice::Niseci => {
+                                self.calc_niseci(state, main_state.locale);
+                            }
+                            Indice::Hfbi => {
+                                self.calc_hfbi(state, main_state.locale);
+                            }
+                        }
+                    } else {
+                        eprintln!(
+                            "OutputController:  Can't handle action {} without a selected index",
+                            a
+                        );
+                    }
+                }
+                Action::ConfirmCalc => {
+                    self.user_confirm_calc(state);
+                }
+                Action::ExportPdf(path) => {
+                    if let Some(idx) = state.indice_model.get_selected_index() {
+                        match idx {
+                            Indice::Niseci => {
+                                self.esporta_pdf_niseci(state, path);
+                            }
+                            Indice::Hfbi => {
+                                self.esporta_pdf_hfbi(state, path);
+                            }
+                        }
+                    } else {
+                        eprintln!(
+                            "OutputController:  Can't handle action pdf export without a selected index"
+
+                        );
+                    }
+                }
+                Action::Reset => {
+                    self.prompt_reset(state);
+                }
+                _ => {
+                    println!("OutputController:  Got action {}", a);
+                }
+            }
+        }
         match main_state.current_view {
             CurrentView::ProduzioneOutput => {
                 if state.output_model.is_done_user_confirm() {
@@ -86,11 +136,6 @@ impl Controller for OutputController {
             _ => {}
         }
     }
-
-    fn get_state(&self) -> Self::SubModel {
-        let state = GLOBAL_STATE.lock().unwrap();
-        state.output_model.clone()
-    }
 }
 
 impl OutputController {
@@ -98,128 +143,23 @@ impl OutputController {
         Self
     }
 
-    pub(crate) fn get_is_done_calc(&self) -> bool {
-        let state = GLOBAL_STATE.lock().unwrap();
+    pub(crate) fn get_is_done_calc(&self, state: &Model) -> bool {
         state.output_model.is_done_calc()
     }
 
-    pub(crate) fn get_is_done_export(&self) -> bool {
-        let state = GLOBAL_STATE.lock().unwrap();
-        state.output_model.is_done_export()
-    }
-
-    pub(crate) fn get_niseci_value(&self) -> Option<f32> {
-        if self.get_is_done_calc() {
-            let opt_res = self.get_data_risultato_niseci();
-            match opt_res {
-                Some(r) => r.get_valore(),
-                None => None,
-            }
-        } else {
-            None
-        }
-    }
-
-    pub(crate) fn get_rqe_niseci_value(&self) -> Option<f32> {
-        if self.get_is_done_calc() {
-            let opt_res = self.get_data_risultato_niseci();
-            match opt_res {
-                Some(r) => r.get_rqe(),
-                None => None,
-            }
-        } else {
-            None
-        }
-    }
-
-    pub(crate) fn get_stato_eco_niseci_value(&self) -> Option<StatoEcologicoNISECI> {
-        if self.get_is_done_calc() {
-            let opt_res = self.get_data_risultato_niseci();
-            match opt_res {
-                Some(r) => {
-                    let state = GLOBAL_STATE.lock().unwrap();
-                    let opt_anagrafica = state.data_model.get_anagrafica_niseci();
-                    match opt_anagrafica {
-                        Some(anagr) => {
-                            let niseci_val = r.get_valore();
-                            calculate_stato_ecologico_niseci(niseci_val, &anagr.area)
-                        }
-                        None => None,
-                    }
-                }
-                None => None,
-            }
-        } else {
-            None
-        }
-    }
-
-    pub(crate) fn get_x1_value(&self) -> Option<f32> {
-        if self.get_is_done_calc() {
-            let opt_res = self.get_data_risultato_niseci();
-            opt_res.map(|r| r.get_x1())
-        } else {
-            None
-        }
-    }
-
-    pub(crate) fn get_x2_value(&self) -> Option<f32> {
-        if self.get_is_done_calc() {
-            let opt_res = self.get_data_risultato_niseci();
-            match opt_res {
-                Some(r) => r.get_x2(),
-                None => None,
-            }
-        } else {
-            None
-        }
-    }
-
-    pub(crate) fn get_x3_value(&self) -> Option<f32> {
-        if self.get_is_done_calc() {
-            let opt_res = self.get_data_risultato_niseci();
-            opt_res.map(|r| r.get_x3())
-        } else {
-            None
-        }
-    }
-
-    fn set_data_risultato_niseci(&self, risultato: RisultatoNISECI) {
-        self.set_console_env(("risultato_niseci".to_string(), format!("{risultato}")));
-        let mut state = GLOBAL_STATE.lock().unwrap();
+    fn set_data_risultato_niseci(&self, state: &mut Model, risultato: RisultatoNISECI) {
+        self.set_console_env(
+            state,
+            ("risultato_niseci".to_string(), format!("{risultato}")),
+        );
         state.data_model.set_risultato_niseci(Some(risultato));
         state.output_model.set_done_calc(true);
     }
 
-    pub(crate) fn get_data_risultato_niseci(&self) -> Option<RisultatoNISECI> {
-        if self.get_is_done_calc() {
-            let state = GLOBAL_STATE.lock().unwrap();
-            state.data_model.get_risultato_niseci()
-        } else {
-            None
-        }
-    }
-
-    pub(crate) fn get_data_anagrafica_niseci(&self) -> Option<AnagraficaNISECI> {
-        let state = GLOBAL_STATE.lock().unwrap();
-        state.data_model.get_anagrafica_niseci()
-    }
-
-    pub(crate) fn get_data_riferimento_niseci(&self) -> Option<RiferimentoNISECI> {
-        let state = GLOBAL_STATE.lock().unwrap();
-        state.data_model.get_riferimento_niseci()
-    }
-
-    pub(crate) fn calc_niseci(&self, locale: Localize) {
-        let riferimento;
-        let campionamento;
-        let anagrafica;
-        {
-            let state = GLOBAL_STATE.lock().unwrap();
-            riferimento = state.data_model.get_riferimento_niseci();
-            campionamento = state.data_model.get_campionamento_niseci();
-            anagrafica = state.data_model.get_anagrafica_niseci();
-        }
+    pub(crate) fn calc_niseci(&self, state: &mut Model, locale: Localize) {
+        let riferimento = state.data_model.get_riferimento_niseci();
+        let campionamento = state.data_model.get_campionamento_niseci();
+        let anagrafica = state.data_model.get_anagrafica_niseci();
 
         let mut valid = true;
 
@@ -227,6 +167,7 @@ impl OutputController {
             // Implementation error, this should never happen
             valid = false;
             self.add_console_message(
+                state,
                 "IMPLEMENTATION ERROR: riferimento niseci was None in calc_niseci()".to_string(),
             );
         }
@@ -234,6 +175,7 @@ impl OutputController {
             // Implementation error, this should never happen
             valid = false;
             self.add_console_message(
+                state,
                 "IMPLEMENTATION ERROR: campionamento niseci was None in calc_niseci()".to_string(),
             );
         }
@@ -241,6 +183,7 @@ impl OutputController {
             // Implementation error, this should never happen
             valid = false;
             self.add_console_message(
+                state,
                 "IMPLEMENTATION ERROR: anagrafica niseci was None in calc_niseci()".to_string(),
             );
         }
@@ -260,7 +203,7 @@ impl OutputController {
                         },
                         None => "NC".to_string(),
                     };
-                    self.add_console_message(format!("NISECI: {niseci_str}"));
+                    self.add_console_message(state, format!("NISECI: {niseci_str}"));
 
                     let rqe_niseci = calculate_rqe_niseci(niseci);
                     let rqe_niseci_str = match rqe_niseci {
@@ -272,7 +215,7 @@ impl OutputController {
                         },
                         None => "NC".to_string(),
                     };
-                    self.add_console_message(format!("RQE NISECI: {rqe_niseci_str}"));
+                    self.add_console_message(state, format!("RQE NISECI: {rqe_niseci_str}"));
 
                     let stato_ecologico =
                         calculate_stato_ecologico_niseci(niseci, &anagrafica.area);
@@ -282,7 +225,10 @@ impl OutputController {
                         }
                         None => "NC".to_string(),
                     };
-                    self.add_console_message(format!("Stato ecologico: {stato_ecologico_str}"));
+                    self.add_console_message(
+                        state,
+                        format!("Stato ecologico: {stato_ecologico_str}"),
+                    );
 
                     self.log_niseci_values(
                         locale,
@@ -296,23 +242,22 @@ impl OutputController {
                     //This logs to stdout
                     intermediates.log();
 
-                    self.add_console_message(format!("{intermediates}"));
+                    self.add_console_message(state, format!("{intermediates}"));
 
                     self.log_niseci_intermediates(locale, &intermediates);
 
                     let risultato_niseci = RisultatoNISECI::new(niseci, rqe_niseci, intermediates);
 
-                    self.set_data_risultato_niseci(risultato_niseci);
+                    self.set_data_risultato_niseci(state, risultato_niseci);
                     println!("OutputController: Finished NISECI calc");
                 }
                 Err(niseci_errors) => {
                     for e in niseci_errors {
-                        self.add_console_message(format!(
-                            "Errore durante il calcolo NISECI: {}",
-                            e
-                        ));
+                        self.add_console_message(
+                            state,
+                            format!("Errore durante il calcolo NISECI: {}", e),
+                        );
                     }
-                    let mut state = GLOBAL_STATE.lock().unwrap();
                     state.data_model.set_errors_occurred(true);
                     state.output_model.set_done_calc(false);
                     state.data_model.set_risultato_niseci(None);
@@ -320,9 +265,9 @@ impl OutputController {
             }
         } else {
             self.add_console_message(
+                state,
                 "IMPLEMENTATION ERROR: spurious state in calc_niseci()".to_string(),
             );
-            let mut state = GLOBAL_STATE.lock().unwrap();
             state.data_model.set_errors_occurred(true);
         }
     }
@@ -492,19 +437,25 @@ impl OutputController {
         }
     }
 
-    pub(crate) fn esporta_pdf_niseci(&self, export_path: PathBuf) {
-        self.add_console_message(format!("Esportazione pdf in {}", export_path.display()));
+    pub(crate) fn esporta_pdf_niseci(&self, state: &mut Model, export_path: PathBuf) {
+        self.add_console_message(
+            state,
+            format!("Esportazione pdf in {}", export_path.display()),
+        );
 
-        let risultato_niseci = self
-            .get_data_risultato_niseci()
+        let risultato_niseci = state
+            .data_model
+            .get_risultato_niseci()
             .expect("Failed calculating NISECI before requesting export");
 
-        let anagrafica_niseci = self
-            .get_data_anagrafica_niseci()
+        let anagrafica_niseci = state
+            .data_model
+            .get_anagrafica_niseci()
             .expect("Failed getting AnagraficaNISECI before requesting export");
 
-        let riferimento_niseci = self
-            .get_data_riferimento_niseci()
+        let riferimento_niseci = state
+            .data_model
+            .get_riferimento_niseci()
             .expect("Failed getting RiferimentoNISECI before requesting export");
 
         esporta_pdf_niseci(
@@ -513,17 +464,12 @@ impl OutputController {
             anagrafica_niseci,
             risultato_niseci,
         );
-        self.set_done_export(true);
+        self.set_done_export(state, true);
     }
 
-    pub(crate) fn calc_hfbi(&self, locale: Localize) {
-        let campionamento;
-        let anagrafica;
-        {
-            let mut state = GLOBAL_STATE.lock().unwrap();
-            campionamento = state.data_model.get_campionamento_hfbi();
-            anagrafica = state.data_model.get_anagrafica_hfbi();
-        }
+    pub(crate) fn calc_hfbi(&self, state: &mut Model, locale: Localize) {
+        let campionamento = state.data_model.get_campionamento_hfbi();
+        let anagrafica = state.data_model.get_anagrafica_hfbi();
 
         let mut valid = true;
 
@@ -531,6 +477,7 @@ impl OutputController {
             // Implementation error, this should never happen
             valid = false;
             self.add_console_message(
+                state,
                 "IMPLEMENTATION ERROR: campionamento hfbi was None in calc_hfbi()".to_string(),
             );
         }
@@ -538,6 +485,7 @@ impl OutputController {
             // Implementation error, this should never happen
             valid = false;
             self.add_console_message(
+                state,
                 "IMPLEMENTATION ERROR: anagrafica hfbi was None in calc_hfbi()".to_string(),
             );
         }
@@ -548,7 +496,7 @@ impl OutputController {
 
             match calculate_hfbi(&campionamento, &anagrafica) {
                 Ok((hfbi, intermediates)) => {
-                    self.add_console_message(format!("HFBI: {hfbi}"));
+                    self.add_console_message(state, format!("HFBI: {hfbi}"));
 
                     let stato_ecologico = calculate_stato_ecologico_hfbi(Some(hfbi));
                     let stato_ecologico_str = match stato_ecologico {
@@ -557,7 +505,10 @@ impl OutputController {
                         }
                         None => "NC".to_string(),
                     };
-                    self.add_console_message(format!("Stato ecologico: {stato_ecologico_str}"));
+                    self.add_console_message(
+                        state,
+                        format!("Stato ecologico: {stato_ecologico_str}"),
+                    );
 
                     self.log_hfbi_values(
                         locale,
@@ -571,21 +522,20 @@ impl OutputController {
                     intermediates.log();
                     println!("HFBI: {hfbi}");
 
-                    self.add_console_message(format!("{intermediates}"));
+                    self.add_console_message(state, format!("{intermediates}"));
 
                     self.log_hfbi_intermediates(locale, &intermediates);
 
                     let risultato_hfbi = RisultatoHFBI::new(Some(hfbi), intermediates);
 
-                    self.set_data_risultato_hfbi(risultato_hfbi);
+                    self.set_data_risultato_hfbi(state, risultato_hfbi);
                     println!("OutputController: Finished HFBI calc");
                 }
                 Err(hfbi_errors) => {
-                    self.add_console_message(format!(
-                        "Errore durante il calcolo HFBI: {}",
-                        hfbi_errors
-                    ));
-                    let mut state = GLOBAL_STATE.lock().unwrap();
+                    self.add_console_message(
+                        state,
+                        format!("Errore durante il calcolo HFBI: {}", hfbi_errors),
+                    );
                     state.data_model.set_errors_occurred(true);
                     state.output_model.set_done_calc(false);
                     state.data_model.set_risultato_hfbi(None);
@@ -593,9 +543,9 @@ impl OutputController {
             }
         } else {
             self.add_console_message(
+                state,
                 "IMPLEMENTATION ERROR: spurious state in calc_hfbi()".to_string(),
             );
-            let mut state = GLOBAL_STATE.lock().unwrap();
             state.data_model.set_errors_occurred(true);
         }
     }
@@ -690,89 +640,58 @@ impl OutputController {
         }
     }
 
-    pub(crate) fn esporta_pdf_hfbi(&self, export_path: PathBuf) {
-        self.add_console_message(format!("Esportazione pdf in {}", export_path.display()));
+    pub(crate) fn esporta_pdf_hfbi(&self, state: &mut Model, export_path: PathBuf) {
+        self.add_console_message(
+            state,
+            format!("Esportazione pdf in {}", export_path.display()),
+        );
 
         let risultato_hfbi = self
-            .get_data_risultato_hfbi()
+            .get_data_risultato_hfbi(state)
             .expect("Failed calculating HFBI before requesting export");
 
         let anagrafica_hfbi = self
-            .get_data_anagrafica_hfbi()
+            .get_data_anagrafica_hfbi(state)
             .expect("Failed getting AnagraficaHFBI before requesting export");
 
         esporta_pdf_hfbi(export_path, anagrafica_hfbi, risultato_hfbi);
-        self.set_done_export(true);
+        self.set_done_export(state, true);
     }
 
-    pub(crate) fn user_confirm_calc(&self) {
-        let mut state = GLOBAL_STATE.lock().unwrap();
-
+    pub(crate) fn user_confirm_calc(&self, state: &mut Model) {
         state.output_model.set_done_user_confirm(true);
     }
 
-    pub(crate) fn set_done_export(&self, val: bool) {
-        let mut state = GLOBAL_STATE.lock().unwrap();
-
+    pub(crate) fn set_done_export(&self, state: &mut Model, val: bool) {
         state.output_model.set_done_export(val);
     }
 
-    pub(crate) fn get_hfbi_value(&self) -> Option<f32> {
-        if self.get_is_done_calc() {
-            let opt_res = self.get_data_risultato_hfbi();
-            match opt_res {
-                Some(r) => r.get_valore(),
-                None => None,
-            }
-        } else {
-            None
-        }
-    }
-
-    pub(crate) fn get_stato_eco_hfbi_value(&self) -> Option<StatoEcologicoHFBI> {
-        if self.get_is_done_calc() {
-            let opt_res = self.get_data_risultato_hfbi();
-            match opt_res {
-                Some(r) => {
-                    let hfbi_val = r.get_valore();
-                    calculate_stato_ecologico_hfbi(hfbi_val)
-                }
-                None => None,
-            }
-        } else {
-            None
-        }
-    }
-
-    pub(crate) fn get_data_risultato_hfbi(&self) -> Option<RisultatoHFBI> {
-        if self.get_is_done_calc() {
-            let state = GLOBAL_STATE.lock().unwrap();
+    pub(crate) fn get_data_risultato_hfbi(&self, state: &Model) -> Option<RisultatoHFBI> {
+        if self.get_is_done_calc(state) {
             state.data_model.get_risultato_hfbi()
         } else {
             None
         }
     }
 
-    pub(crate) fn get_data_anagrafica_hfbi(&self) -> Option<AnagraficaHFBI> {
-        let state = GLOBAL_STATE.lock().unwrap();
+    pub(crate) fn get_data_anagrafica_hfbi(&self, state: &Model) -> Option<AnagraficaHFBI> {
         state.data_model.get_anagrafica_hfbi()
     }
 
-    fn set_data_risultato_hfbi(&self, risultato: RisultatoHFBI) {
-        self.set_console_env(("risultato_hfbi".to_string(), format!("{risultato}")));
-        let mut state = GLOBAL_STATE.lock().unwrap();
+    fn set_data_risultato_hfbi(&self, state: &mut Model, risultato: RisultatoHFBI) {
+        self.set_console_env(
+            state,
+            ("risultato_hfbi".to_string(), format!("{risultato}")),
+        );
         state.data_model.set_risultato_hfbi(Some(risultato));
         state.output_model.set_done_calc(true);
     }
 
-    pub(crate) fn prompt_reset(&self) {
-        let mut state = GLOBAL_STATE.lock().unwrap();
+    pub(crate) fn prompt_reset(&self, state: &mut Model) {
         state.output_model.set_should_reset(true);
     }
 
-    pub(crate) fn set_console_env(&self, (key, val): (String, String)) {
-        let mut state = GLOBAL_STATE.lock().unwrap();
-
+    pub(crate) fn set_console_env(&self, state: &mut Model, (key, val): (String, String)) {
         state.console_model.console.set_env((key, val));
     }
 }

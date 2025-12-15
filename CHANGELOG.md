@@ -1,3 +1,9 @@
+## [0.0.33] - Unreleased
+
+### Changed
+
+- Refactor state to be handled explicitly
+
 ## [0.0.32] - 2025-12-05
 
 ### Added

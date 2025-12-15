@@ -14,7 +14,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-use crate::controllers::{file_input::FileInputController, Controller};
+use crate::app::core::{Action, Action::*};
+use crate::app::model::Model;
 use crate::domain::index::Indice;
 use crate::views::{propheight, propwidth, rrect, View};
 use crate::MainState;
@@ -26,19 +27,16 @@ use rfd::FileDialog;
 pub(crate) struct SelezioneFileInputView {}
 
 impl View for SelezioneFileInputView {
-    type Controller = FileInputController;
-
     fn draw(
         &mut self,
         d: &mut RaylibDrawHandle,
         _thread: &RaylibThread,
-        controller: &Self::Controller,
+        state: &Model,
         main_state: &MainState,
-    ) {
+    ) -> Vec<Action> {
         d.clear_background(main_state.default_bg_color);
 
-        let _state = controller.get_state();
-        let current_index = match controller.get_current_index() {
+        let current_index = match state.indice_model.get_selected_index() {
             Some(index) => index,
             None => {
                 eprintln!("SelezioneFileInputView: Per qualche assurdo motivo l'indice corrente non è validato. Uso NISECI.");
@@ -76,8 +74,10 @@ impl View for SelezioneFileInputView {
             "Seleziona file di input",
         );
 
+        let mut actions = Vec::<Action>::new();
+
         if current_index != Indice::Hfbi {
-            if let Some(_filepath) = controller.get_riferimento_path() {
+            if let Some(_filepath) = state.fileinput_model.get_riferimento_path() {
                 // A file is already set, display button to clear it
                 let rif_itext = d.gui_icon_text(ICON_BIN, "Annulla Riferimento");
                 if d.gui_button(
@@ -89,8 +89,9 @@ impl View for SelezioneFileInputView {
                     ),
                     rif_itext.as_str(),
                 ) {
-                    controller.set_riferimento_path(None); // Should already also clear the path_valid
-                                                           // state inside it
+                    actions.push(PickRiferimentoPath(None));
+                    //controller.set_riferimento_path(None); // Should already also clear the path_valid
+                    // state inside it
                 }
             } else {
                 let rif_itext = d.gui_icon_text(ICON_FILE_OPEN, "Riferimento");
@@ -109,18 +110,15 @@ impl View for SelezioneFileInputView {
                         .pick_file();
 
                     if let Some(filepath) = file {
-                        controller.set_riferimento_path(Some(filepath));
+                        actions.push(PickRiferimentoPath(Some(filepath)));
                     } else {
                         eprintln!("Error: failed getting a file.");
-                        controller.add_console_message(
-                            "Failed getting a file for riferimento".to_string(),
-                        );
                     }
                 }
             }
         }
 
-        if let Some(_filepath) = controller.get_campionamento_path() {
+        if let Some(_filepath) = state.fileinput_model.get_campionamento_path() {
             // A file is already set, display button to clear it
             let camp_itext = d.gui_icon_text(ICON_BIN, "Annulla Campionamento");
             if d.gui_button(
@@ -132,8 +130,9 @@ impl View for SelezioneFileInputView {
                 ),
                 camp_itext.as_str(),
             ) {
-                controller.set_campionamento_path(None); // Should already also clear the path_valid
-                                                         // state inside it
+                actions.push(PickCampionamentoPath(None));
+                //controller.set_campionamento_path(None); // Should already also clear the path_valid
+                // state inside it
             }
         } else {
             let camp_itext = d.gui_icon_text(ICON_FILE_OPEN, "Campionamento");
@@ -152,14 +151,14 @@ impl View for SelezioneFileInputView {
                     .pick_file();
 
                 if let Some(filepath) = file {
-                    controller.set_campionamento_path(Some(filepath));
+                    actions.push(PickCampionamentoPath(Some(filepath)));
                 } else {
                     eprintln!("Error: failed getting a file.");
-                    controller
-                        .add_console_message("Failed getting a file for campionamento".to_string());
                 }
             }
         }
+
+        actions
     }
 }
 

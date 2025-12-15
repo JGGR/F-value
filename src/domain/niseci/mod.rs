@@ -320,6 +320,20 @@ impl TryFrom<i32> for AreaNISECI {
 }
 
 #[derive(Clone)]
+pub(crate) struct AnagraficaNISECIDraft {
+    pub(crate) comunita: ComunitaNISECI,
+    pub(crate) codice_stazione: String,
+    pub(crate) date_string: String, // Formato gg/mm/aaaa
+    pub(crate) area: AreaNISECI,
+    pub(crate) corpo_idrico: String,
+    pub(crate) bacino_appartenenza: String,
+    pub(crate) idro_eco_regione: IdroEcoRegioneNISECI,
+    pub(crate) posizione: Location,
+    pub(crate) lunghezza_media_stazione: String,
+    pub(crate) larghezza_media_stazione: String,
+}
+
+#[derive(Clone)]
 pub(crate) struct AnagraficaNISECI {
     pub(crate) comunita: ComunitaNISECI,
     pub(crate) codice_stazione: String,

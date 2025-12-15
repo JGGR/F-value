@@ -14,15 +14,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-use crate::app::core::{Localize, MainState};
-use crate::controllers::{file_input::FileInputController, Controller};
-use crate::core::csv::deser::hfbi::{
-    PlainRecordCsvCampionamentoHFBI, VeryItalianRecordCsvCampionamentoHFBI,
-};
-use crate::core::csv::deser::niseci::{
-    PlainRecordCsvCampionamentoNISECI, PlainRecordCsvRiferimentoNISECI,
-    VeryItalianRecordCsvCampionamentoNISECI, VeryItalianRecordCsvRiferimentoNISECI,
-};
+use crate::app::core::{Action, Action::*, MainState};
+use crate::app::model::Model;
 use crate::domain::index::Indice;
 use crate::views::{propheight, propwidth, rrect, View};
 use raylib::consts::GuiState::{STATE_DISABLED, STATE_NORMAL};
@@ -33,19 +26,16 @@ use std::process::exit;
 pub(crate) struct ValidazioneFileInputView {}
 
 impl View for ValidazioneFileInputView {
-    type Controller = FileInputController;
-
     fn draw(
         &mut self,
         d: &mut RaylibDrawHandle,
         _thread: &RaylibThread,
-        controller: &Self::Controller,
+        state: &Model,
         main_state: &MainState,
-    ) {
+    ) -> Vec<Action> {
         d.clear_background(main_state.default_bg_color);
 
-        let _state = controller.get_state();
-        let current_index = match controller.get_current_index() {
+        let current_index = match state.indice_model.get_selected_index() {
             Some(index) => index,
             None => {
                 eprintln!("Indice non selezionato");
@@ -83,6 +73,8 @@ impl View for ValidazioneFileInputView {
             "Valida file di input",
         );
 
+        let mut actions = Vec::<Action>::new();
+
         if current_index != Indice::Hfbi
             && d.gui_button(
                 rrect(
@@ -94,23 +86,11 @@ impl View for ValidazioneFileInputView {
                 "Valida Riferimento",
             )
         {
-            match main_state.locale {
-                Localize::Italian => {
-                    controller
-                        .valida_riferimento_niseci_path::<VeryItalianRecordCsvRiferimentoNISECI>(
-                            true,
-                        ); //TODO: get user preference on headers
-                }
-                Localize::International => {
-                    controller
-                        .valida_riferimento_niseci_path::<PlainRecordCsvRiferimentoNISECI>(true);
-                    //TODO: get user preference on headers
-                }
-            }
+            actions.push(ValidaRiferimentoPath(true));
         }
 
         let mut turn_off_button_campionamento = false;
-        if current_index == Indice::Niseci && !controller.get_riferimento_path_valid() {
+        if current_index == Indice::Niseci && !state.fileinput_model.get_riferimento_path_valid() {
             turn_off_button_campionamento = true;
             d.gui_lock();
             d.gui_set_state(STATE_DISABLED);
@@ -125,38 +105,15 @@ impl View for ValidazioneFileInputView {
             ),
             "Valida Campionamento",
         ) {
-            match current_index {
-                Indice::Niseci => {
-                    match main_state.locale {
-                        Localize::Italian => {
-                            controller.valida_campionamento_niseci_path::<VeryItalianRecordCsvCampionamentoNISECI>(true);
-                            //TODO: get user preference on headers
-                        }
-                        Localize::International => {
-                            controller.valida_campionamento_niseci_path::<PlainRecordCsvCampionamentoNISECI>(true);
-                            //TODO: get user preference on headers
-                        }
-                    }
-                }
-                Indice::Hfbi => match main_state.locale {
-                    Localize::Italian => {
-                        controller.valida_campionamento_hfbi_path::<VeryItalianRecordCsvCampionamentoHFBI>(true);
-                        //TODO: get user preference on headers
-                    }
-                    Localize::International => {
-                        controller
-                            .valida_campionamento_hfbi_path::<PlainRecordCsvCampionamentoHFBI>(
-                                true,
-                            ); //TODO: get user preference on headers
-                    }
-                },
-            }
+            actions.push(ValidaCampionamentoPath(true));
         }
 
         if turn_off_button_campionamento {
             d.gui_set_state(STATE_NORMAL);
             d.gui_unlock();
         }
+
+        actions
     }
 }
 

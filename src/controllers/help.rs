@@ -17,8 +17,8 @@
 // Controller to update and access the state
 
 use super::{Controller, CurrentView, HelpModel};
-use crate::app::model::SubModel;
-use crate::state::GLOBAL_STATE;
+use crate::app::core::Action;
+use crate::app::model::{Model, SubModel};
 use crate::MainState;
 use raylib::RaylibHandle;
 
@@ -26,8 +26,13 @@ pub(crate) struct HelpController;
 
 impl Controller for HelpController {
     type SubModel = HelpModel;
-    fn update(&self, _rl: &mut RaylibHandle, main_state: &mut MainState) {
-        let mut state = GLOBAL_STATE.lock().unwrap();
+    fn update(
+        &self,
+        _rl: &mut RaylibHandle,
+        state: &mut Model,
+        actions: &mut Vec<Action>,
+        main_state: &mut MainState,
+    ) {
         state.second_model.increment_frame_counter();
         if state.second_model.get_user_continued() {
             eprintln!("HelpController:  L'utente ha premuto Continua");
@@ -42,11 +47,17 @@ impl Controller for HelpController {
             state.console_model.reset();
             main_state.set_current_view(CurrentView::Home);
         }
-    }
 
-    fn get_state(&self) -> Self::SubModel {
-        let state = GLOBAL_STATE.lock().unwrap();
-        state.second_model.clone()
+        for a in actions.drain(..) {
+            match a {
+                Action::UserContinued => {
+                    self.set_user_continued(state, true);
+                }
+                _ => {
+                    println!("HelpController:  Got action {}", a);
+                }
+            }
+        }
     }
 }
 
@@ -55,8 +66,7 @@ impl HelpController {
         Self
     }
 
-    pub(crate) fn set_user_continued(&self, val: bool) {
-        let mut state = GLOBAL_STATE.lock().unwrap();
+    pub(crate) fn set_user_continued(&self, state: &mut Model, val: bool) {
         state.second_model.set_user_continued(val);
     }
 }

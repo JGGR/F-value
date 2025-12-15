@@ -15,8 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::app::core::{propheight, propwidth};
-use crate::controllers::console::ConsoleController;
+use crate::app::core::{propheight, propwidth, Action, Action::*};
 use crate::core::rrect;
 use raylib::consts::GuiIconName::ICON_MONITOR;
 use raylib::prelude::*;
@@ -246,12 +245,12 @@ impl Console {
     pub(crate) fn draw(
         &self,
         d: &mut RaylibDrawHandle,
-        controller: &ConsoleController,
         txt_color: Color,
         font_size: i32,
         font_spacing: i32,
         font: &Font,
-    ) {
+    ) -> Vec<Action> {
+        let mut actions = Vec::<Action>::new();
         let line_height = propheight(d, font_size + 4); // Adjust as needed
         let console_height = (self.max_lines_visible + 1) * line_height as usize; // +1 for user
                                                                                   // prompt
@@ -300,7 +299,7 @@ impl Console {
             rrect(backout_x, backout_y, backout_width, backout_height),
             backout_itext.as_str(),
         ) {
-            controller.backout();
+            actions.push(ConsoleBackout);
         }
 
         for (i, line) in self
@@ -336,5 +335,6 @@ impl Console {
             0.0,
             prompt_color,
         );
+        actions
     }
 }

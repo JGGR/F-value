@@ -14,7 +14,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-use crate::controllers::{output::OutputController, Controller};
+use crate::app::core::{Action, Action::*};
+use crate::app::model::Model;
 use crate::domain::index::Indice;
 use crate::views::{propheight, propwidth, rrect, View};
 use crate::MainState;
@@ -26,19 +27,16 @@ use raylib::RaylibThread;
 pub(crate) struct ProduzioneOutputView {}
 
 impl View for ProduzioneOutputView {
-    type Controller = OutputController;
-
     fn draw(
         &mut self,
         d: &mut RaylibDrawHandle,
         _thread: &RaylibThread,
-        controller: &Self::Controller,
+        state: &Model,
         main_state: &MainState,
-    ) {
+    ) -> Vec<Action> {
         d.clear_background(main_state.default_bg_color);
 
-        let _state = controller.get_state();
-        let current_index = match controller.get_current_index() {
+        let current_index = match state.indice_model.get_selected_index() {
             Some(index) => index,
             None => {
                 eprintln!("ProduzioneOutputView: Per qualche assurdo motivo l'indice corrente non è validato. Uso NISECI.");
@@ -66,6 +64,8 @@ impl View for ProduzioneOutputView {
             "Produzione output",
         );
 
+        let mut actions = Vec::<Action>::new();
+
         if d.gui_button(
             rrect(
                 button_calcola_x,
@@ -75,15 +75,7 @@ impl View for ProduzioneOutputView {
             ),
             "Calcola",
         ) {
-            //TODO: calcola indice
-            match current_index {
-                Indice::Niseci => {
-                    controller.calc_niseci(main_state.locale);
-                }
-                Indice::Hfbi => {
-                    controller.calc_hfbi(main_state.locale);
-                }
-            }
+            actions.push(RunCalc);
         }
 
         let submit_width = propwidth(d, 125);
@@ -94,13 +86,13 @@ impl View for ProduzioneOutputView {
 
         let confirm_itext = d.gui_icon_text(ICON_OK_TICK, "Conferma");
 
-        let done_calc = controller.get_is_done_calc();
+        let done_calc = state.output_model.is_done_calc();
 
         let _really_done_calc = match current_index {
             // This distinguishes the case where the calc finished but the resulting value is None.
             // It should only really happen when we try to get x2 with a divide-by-zero, as in:
             // our campionamento had no records matching a riferimentore record with specie_attesa == 1
-            Indice::Niseci => done_calc && controller.get_niseci_value().is_some(),
+            Indice::Niseci => done_calc && state.data_model.get_niseci_value().is_some(),
             Indice::Hfbi => {
                 false //TODO: Implement this
                       //
@@ -122,7 +114,7 @@ impl View for ProduzioneOutputView {
             rrect(submit_x, submit_y, submit_width, submit_height),
             confirm_itext.as_str(),
         ) {
-            controller.user_confirm_calc();
+            actions.push(ConfirmCalc);
         }
         if lock_user_submit {
             d.gui_set_state(STATE_NORMAL);
@@ -136,13 +128,13 @@ impl View for ProduzioneOutputView {
 
         match current_index {
             Indice::Niseci => {
-                let niseci_opt = controller.get_niseci_value();
+                let niseci_opt = state.data_model.get_niseci_value();
                 let niseci_str = match niseci_opt {
                     Some(v) => {
                         format!("{}", v)
                     }
                     None => {
-                        if controller.get_is_done_calc() {
+                        if state.output_model.is_done_calc() {
                             // Could use done_calc and avoid another
                             // lock call
                             "NC".to_string()
@@ -165,13 +157,13 @@ impl View for ProduzioneOutputView {
                     main_state.default_txt_spacing as f32,
                     main_state.default_txt_color,
                 );
-                let rqe_niseci_opt = controller.get_rqe_niseci_value();
+                let rqe_niseci_opt = state.data_model.get_rqe_niseci_value();
                 let rqe_niseci_str = match rqe_niseci_opt {
                     Some(v) => {
                         format!("{}", v)
                     }
                     None => {
-                        if controller.get_is_done_calc() {
+                        if state.output_model.is_done_calc() {
                             "NC".to_string()
                         } else {
                             "Non calcolato".to_string()
@@ -192,13 +184,13 @@ impl View for ProduzioneOutputView {
                     main_state.default_txt_spacing as f32,
                     main_state.default_txt_color,
                 );
-                let stato_eco_niseci_opt = controller.get_stato_eco_niseci_value();
+                let stato_eco_niseci_opt = state.data_model.get_stato_eco_niseci_value(state);
                 let stato_eco_niseci_str = match stato_eco_niseci_opt {
                     Some(v) => {
                         format!("{}", v)
                     }
                     None => {
-                        if controller.get_is_done_calc() {
+                        if state.output_model.is_done_calc() {
                             "NC".to_string()
                         } else {
                             "Non calcolato".to_string()
@@ -220,13 +212,13 @@ impl View for ProduzioneOutputView {
                     main_state.default_txt_color,
                 );
 
-                let x1_opt = controller.get_x1_value();
+                let x1_opt = state.data_model.get_x1_value();
                 let x1_str = match x1_opt {
                     Some(v) => {
                         format!("{}", v)
                     }
                     None => {
-                        if controller.get_is_done_calc() {
+                        if state.output_model.is_done_calc() {
                             "NC".to_string()
                         } else {
                             "Non calcolato".to_string()
@@ -248,13 +240,13 @@ impl View for ProduzioneOutputView {
                     main_state.default_txt_color,
                 );
 
-                let x2_opt = controller.get_x2_value();
+                let x2_opt = state.data_model.get_x2_value();
                 let x2_str = match x2_opt {
                     Some(v) => {
                         format!("{}", v)
                     }
                     None => {
-                        if controller.get_is_done_calc() {
+                        if state.output_model.is_done_calc() {
                             "NC".to_string()
                         } else {
                             "Non calcolato".to_string()
@@ -276,13 +268,13 @@ impl View for ProduzioneOutputView {
                     main_state.default_txt_color,
                 );
 
-                let x3_opt = controller.get_x3_value();
+                let x3_opt = state.data_model.get_x3_value();
                 let x3_str = match x3_opt {
                     Some(v) => {
                         format!("{}", v)
                     }
                     None => {
-                        if controller.get_is_done_calc() {
+                        if state.output_model.is_done_calc() {
                             "NC".to_string()
                         } else {
                             "Non calcolato".to_string()
@@ -305,13 +297,13 @@ impl View for ProduzioneOutputView {
                 );
             }
             Indice::Hfbi => {
-                let hfbi_opt = controller.get_hfbi_value();
+                let hfbi_opt = state.data_model.get_hfbi_value();
                 let hfbi_str = match hfbi_opt {
                     Some(v) => {
                         format!("{}", v)
                     }
                     None => {
-                        if controller.get_is_done_calc() {
+                        if state.output_model.is_done_calc() {
                             // Could use done_calc and avoid another
                             // lock call
                             "NC".to_string()
@@ -334,13 +326,13 @@ impl View for ProduzioneOutputView {
                     main_state.default_txt_spacing as f32,
                     main_state.default_txt_color,
                 );
-                let data_res_opt = controller.get_data_risultato_hfbi();
+                let data_res_opt = state.data_model.get_risultato_hfbi();
                 let mmi_str = match data_res_opt {
                     Some(v) => {
                         format!("{}", v.get_intermediates().mmi)
                     }
                     None => {
-                        if controller.get_is_done_calc() {
+                        if state.output_model.is_done_calc() {
                             // Could use done_calc and avoid another
                             // lock call
                             "NC".to_string()
@@ -363,13 +355,13 @@ impl View for ProduzioneOutputView {
                     main_state.default_txt_spacing as f32,
                     main_state.default_txt_color,
                 );
-                let stato_eco_hfbi_opt = controller.get_stato_eco_hfbi_value();
+                let stato_eco_hfbi_opt = state.data_model.get_stato_eco_hfbi_value(state);
                 let stato_eco_hfbi_str = match stato_eco_hfbi_opt {
                     Some(v) => {
                         format!("{}", v)
                     }
                     None => {
-                        if controller.get_is_done_calc() {
+                        if state.output_model.is_done_calc() {
                             "NC".to_string()
                         } else {
                             "Non calcolato".to_string()
@@ -392,6 +384,7 @@ impl View for ProduzioneOutputView {
                 );
             }
         }
+        actions
     }
 }
 

@@ -15,9 +15,9 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 pub(crate) struct ConsoleController;
-use crate::app::model::SubModel;
+use crate::app::core::Action;
+use crate::app::model::{Model, SubModel};
 use crate::controllers::{ConsoleModel, Controller, CurrentView};
-use crate::state::GLOBAL_STATE;
 use crate::MainState;
 use raylib::consts::KeyboardKey::*;
 use raylib::RaylibHandle;
@@ -25,9 +25,13 @@ use raylib::RaylibHandle;
 impl Controller for ConsoleController {
     type SubModel = ConsoleModel;
 
-    fn update(&self, rl: &mut RaylibHandle, main_state: &mut MainState) {
-        let mut state = GLOBAL_STATE.lock().unwrap();
-
+    fn update(
+        &self,
+        rl: &mut RaylibHandle,
+        state: &mut Model,
+        actions: &mut Vec<Action>,
+        main_state: &mut MainState,
+    ) {
         if main_state.should_reset {
             eprintln!("ConsoleController: Resetting");
             main_state.should_reset = false;
@@ -48,6 +52,17 @@ impl Controller for ConsoleController {
             let prev = main_state.previous_view;
             main_state.set_current_view(prev);
             return;
+        }
+
+        for a in actions.drain(..) {
+            match a {
+                Action::ConsoleBackout => {
+                    self.backout(state);
+                }
+                _ => {
+                    println!("ConsoleController: Got action {}", a);
+                }
+            }
         }
 
         // Handle input
@@ -98,11 +113,6 @@ impl Controller for ConsoleController {
         }
         state.console_model.set_name("Updated".to_string());
     }
-
-    fn get_state(&self) -> Self::SubModel {
-        let state = GLOBAL_STATE.lock().unwrap();
-        state.console_model.clone()
-    }
 }
 
 impl ConsoleController {
@@ -110,14 +120,11 @@ impl ConsoleController {
         Self
     }
 
-    pub(crate) fn backout(&self) {
-        let mut state = GLOBAL_STATE.lock().unwrap();
+    pub(crate) fn backout(&self, state: &mut Model) {
         state.console_model.set_should_backout(true);
     }
 
-    pub(crate) fn _set_console_env(&self, (key, val): (String, String)) {
-        let mut state = GLOBAL_STATE.lock().unwrap();
-
+    pub(crate) fn _set_console_env(&self, state: &mut Model, (key, val): (String, String)) {
         state.console_model.console.set_env((key, val));
     }
 }

@@ -14,8 +14,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-use crate::app::core::CONSOLE_FONT_DATA;
-use crate::controllers::{console::ConsoleController, Controller};
+use crate::app::core::{Action, CONSOLE_FONT_DATA};
+use crate::app::model::Model;
 use crate::views::View;
 use crate::MainState;
 use raylib::drawing::RaylibDrawHandle;
@@ -29,27 +29,21 @@ pub(crate) struct ConsoleView {
 }
 
 impl View for ConsoleView {
-    type Controller = ConsoleController;
-
     fn draw(
         &mut self,
         d: &mut RaylibDrawHandle,
         _thread: &RaylibThread,
-        controller: &Self::Controller,
+        state: &Model,
         main_state: &MainState,
-    ) {
+    ) -> Vec<Action> {
         d.clear_background(main_state.default_bg_color);
-
-        let state = controller.get_state();
-
-        state.console.draw(
+        state.console_model.console.draw(
             d,
-            controller,
             main_state.default_txt_color,
             self.current_font_size,
             self.font_spacing,
             &self.font,
-        );
+        )
     }
 }
 

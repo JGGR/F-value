@@ -153,6 +153,5 @@ pub(crate) fn handle_args() {
         if !res {
             eprintln!("Headless run failed");
         }
-        return;
     }
 }

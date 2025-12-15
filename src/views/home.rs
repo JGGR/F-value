@@ -14,7 +14,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-use crate::controllers::home::HomeController;
+use crate::app::core::{Action, Action::*};
+use crate::app::model::Model;
 use crate::core::SHORT_PROJECT_VERSION;
 use crate::views::{propheight, propwidth, rrect, View};
 use crate::MainState;
@@ -28,15 +29,13 @@ use std::cmp::max;
 pub(crate) struct HomeView {}
 
 impl View for HomeView {
-    type Controller = HomeController;
-
     fn draw(
         &mut self,
         d: &mut RaylibDrawHandle,
         _thread: &RaylibThread,
-        controller: &Self::Controller,
+        _state: &Model,
         main_state: &MainState,
-    ) {
+    ) -> Vec<Action> {
         d.clear_background(main_state.default_bg_color);
 
         let texture_target_width = propwidth(d, 205);
@@ -269,18 +268,22 @@ impl View for HomeView {
 
         let info_itext = d.gui_icon_text(ICON_INFO, ": Info");
 
+        let mut actions = Vec::<Action>::new();
+
         if d.gui_button(
             rrect(continue_x, continue_y, continue_width, continue_height),
             continue_itext.as_str(),
         ) {
-            controller.set_user_continued(true);
+            actions.push(UserContinued);
         }
         if d.gui_button(
             rrect(info_x, info_y, info_width, info_height),
             info_itext.as_str(),
         ) {
-            controller.set_user_wants_info(true);
+            actions.push(UserWantsInfo);
         }
+
+        actions
     }
 }
 
