@@ -1,8 +1,9 @@
-## [0.0.33] - Unreleased
+## [0.0.33] - 2025-12-16
 
 ### Changed
 
 - Refactor state to be handled explicitly
+- Add `x2_b` to niseci's `log_intermediates`
 
 ## [0.0.32] - 2025-12-05
 
