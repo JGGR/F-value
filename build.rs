@@ -17,9 +17,14 @@ fn get_commit_hash() -> String {
         .output()
         .unwrap();
 
-    assert!(output.status.success());
-
-    String::from_utf8_lossy(&output.stdout).to_string()
+    if output.status.success() {
+        String::from_utf8_lossy(&output.stdout).to_string()
+    } else {
+        std::env::var("GITHUB_SHA")
+            .ok()
+            .map(|s| s[..7].to_string())
+            .unwrap_or_else(|| "unknown".into())
+    }
 }
 
 fn get_branch_name() -> String {
@@ -31,11 +36,14 @@ fn get_branch_name() -> String {
         .output()
         .unwrap();
 
-    assert!(output.status.success());
-
-    String::from_utf8_lossy(&output.stdout)
-        .trim_end()
-        .to_string()
+    if output.status.success() {
+        String::from_utf8_lossy(&output.stdout)
+            .trim_end()
+            .to_string()
+    } else {
+        std::env::var("GITHUB_REF_NAME")
+            .unwrap_or_else(|_| "unknown".into())
+    }
 }
 
 fn is_working_tree_clean() -> bool {

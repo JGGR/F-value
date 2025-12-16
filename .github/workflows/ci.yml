@@ -1,0 +1,163 @@
+name: CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+  workflow_dispatch:
+
+env:
+  CARGO_HOME: ${{ github.workspace }}/.cargo
+
+permissions:
+  contents: read
+  packages: read   # required to pull the org container image
+
+jobs:
+  build-debug:
+    name: Build (debug)
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/jggr/f-value-builder:latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            target
+            .cargo/registry
+            .cargo/git
+          key: cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            cargo-${{ runner.os }}-
+
+      - name: Build
+        run: cargo build
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: esox-debug-linux
+          path: target/debug/esox
+          retention-days: 7
+
+  build-release:
+    name: Build (release)
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/jggr/f-value-builder:latest
+    needs: build-debug
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            target
+            .cargo/registry
+            .cargo/git
+          key: cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            cargo-${{ runner.os }}-
+
+      - name: Build
+        run: cargo build --release
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: esox-release-linux
+          path: target/release/esox
+          retention-days: 7
+
+  test-debug:
+    name: Test
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/jggr/f-value-builder:latest
+    needs: build-debug
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            target
+            .cargo/registry
+            .cargo/git
+          key: cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            cargo-${{ runner.os }}-
+
+      - name: Test
+        run: cargo test
+
+  crossbuild-debug:
+    name: Cross-build Windows (debug)
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/jggr/f-value-builder:latest
+    needs: build-debug
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            target
+            .cargo/registry
+            .cargo/git
+          key: cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            cargo-${{ runner.os }}-
+
+      - name: Build
+        run: cargo build --target x86_64-pc-windows-gnu
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: esox-debug-windows
+          path: target/x86_64-pc-windows-gnu/debug/esox.exe
+          retention-days: 7
+
+  crossbuild-release:
+    name: Cross-build Windows (release)
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/jggr/f-value-builder:latest
+    needs: crossbuild-debug
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            target
+            .cargo/registry
+            .cargo/git
+          key: cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            cargo-${{ runner.os }}-
+
+      - name: Build
+        run: cargo build --target x86_64-pc-windows-gnu --release
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: esox-release-windows
+          path: target/x86_64-pc-windows-gnu/release/esox.exe
+          retention-days: 7
