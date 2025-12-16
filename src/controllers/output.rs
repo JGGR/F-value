@@ -361,10 +361,10 @@ impl OutputController {
             Ok(mut file) => {
                 let mut string_representation = match locale {
                     Localize::Italian => {
-                        "specie; nome latino; tipo autoctono; tipo alloctono; specie attesa; cl1; cl2; cl3; cl4; cl5; densita stimata; quantita stimata; rapporto ad/juv; x2a_a; x2a_b".to_string()
+                        "specie; nome latino; tipo autoctono; tipo alloctono; specie attesa; cl1; cl2; cl3; cl4; cl5; densita stimata; quantita stimata; x2b; rapporto ad/juv; x2a_a; x2a_b".to_string()
                     }
                     Localize::International => {
-                        "specie, nome latino, tipo autoctono, tipo alloctono, specie attesa, cl1, cl2, cl3, cl4, cl5, densita stimata, quantita stimata, rapporto ad/juv, x2a_a, x2a_b".to_string()
+                        "specie, nome latino, tipo autoctono, tipo alloctono, specie attesa, cl1, cl2, cl3, cl4, cl5, densita stimata, quantita stimata, x2b, rapporto ad/juv, x2a_a, x2a_b".to_string()
                     }
                 };
                 for (_k, v) in intermediates.specie_specifici.iter() {
@@ -383,7 +383,7 @@ impl OutputController {
                     string_representation = match locale {
                         Localize::Italian => {
                             format!(
-                                "{}\n{}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}",
+                                "{}\n{}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}",
                                 string_representation,
                                 v.classi_eta.specie.id,
                                 v.classi_eta.specie.nome,
@@ -397,6 +397,7 @@ impl OutputController {
                                 v.classi_eta.cl5,
                                 v.densita_stimata.comma(),
                                 v.quantita_stimata,
+                                v.x2_b,
                                 rapporto_ad_juv_str,
                                 v.x2_a_a,
                                 v.x2_a_b
@@ -404,7 +405,7 @@ impl OutputController {
                         }
                         Localize::International => {
                             format!(
-                                "{}\n{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}",
+                                "{}\n{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}",
                                 string_representation,
                                 v.classi_eta.specie.id,
                                 v.classi_eta.specie.nome,
@@ -418,6 +419,7 @@ impl OutputController {
                                 v.classi_eta.cl5,
                                 v.densita_stimata,
                                 v.quantita_stimata,
+                                v.x2_b,
                                 rapporto_ad_juv_str,
                                 v.x2_a_a,
                                 v.x2_a_b
