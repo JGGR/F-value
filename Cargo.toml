@@ -2,6 +2,13 @@
 name = "esox"
 version = "0.1.0"
 edition = "2021"
+description = "Tool for NISECI and HFBI calc"
+license = "GPL-3.0-only"
+exclude = [
+    ".github/**",
+    "assets",
+    "templates",
+]
 
 [features]
 default = ["embed-icon"]
