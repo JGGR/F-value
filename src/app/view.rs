@@ -275,8 +275,8 @@ pub(crate) fn draw_info_box(
             raylib::core::misc::open_url(copyright_actual_link);
         }
 
-        let display_link = "Example: F-value-website.it";
-        let actual_link = "https://duckduckgo.com/?t=h_&q=esox+lucius";
+        let display_link = "Repository";
+        let actual_link = "https://github.com/JGGR/F-value";
         let link_str = display_link;
         let link_x = proj_name_str2_x;
         let link_y = copyright_link_y + copyright_link_height;
@@ -297,8 +297,8 @@ pub(crate) fn draw_info_box(
             raylib::core::misc::open_url(actual_link);
         }
 
-        let support_email = "mario@rossi.it";
-        let mail_display_link = "Example: ".to_owned() + support_email;
+        let support_email = "a.marchi@hsbologna.it";
+        let mail_display_link = support_email.to_owned();
         let mail_actual_link = "mailto:".to_owned() + support_email;
         let mail_link_str = mail_display_link;
         let mail_link_x = link_x;

@@ -1,3 +1,13 @@
+## [0.1.0] - Unreleased
+
+### Added
+
+- Add `.github/workflows/ci.yml`
+
+### Changed
+
+- Update `build.rs` to support github actions
+
 ## [0.0.33] - 2025-12-16
 
 ### Changed
