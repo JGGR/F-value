@@ -14,7 +14,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-use crate::controllers::indice::IndiceController;
+use crate::app::core::{Action, Action::*};
+use crate::app::model::Model;
 use crate::domain::index::Indice;
 use crate::views::{propheight, propwidth, rrect, View};
 use crate::MainState;
@@ -24,15 +25,13 @@ use raylib::RaylibThread;
 pub(crate) struct SelezioneIndiceView {}
 
 impl View for SelezioneIndiceView {
-    type Controller = IndiceController;
-
     fn draw(
         &mut self,
         d: &mut RaylibDrawHandle,
         _thread: &RaylibThread,
-        controller: &Self::Controller,
+        _state: &Model,
         main_state: &MainState,
-    ) {
+    ) -> Vec<Action> {
         d.clear_background(main_state.default_bg_color);
 
         let button_niseci_width = propwidth(d, 200);
@@ -60,6 +59,8 @@ impl View for SelezioneIndiceView {
             "Seleziona Indice",
         );
 
+        let mut actions = Vec::<Action>::new();
+
         if d.gui_button(
             rrect(
                 button_niseci_x,
@@ -69,7 +70,7 @@ impl View for SelezioneIndiceView {
             ),
             "NISECI",
         ) {
-            controller.set_indice_corrente(Indice::Niseci);
+            actions.push(PickIndice(Indice::Niseci));
         }
 
         if d.gui_button(
@@ -81,8 +82,10 @@ impl View for SelezioneIndiceView {
             ),
             "HFBI",
         ) {
-            controller.set_indice_corrente(Indice::Hfbi);
+            actions.push(PickIndice(Indice::Hfbi));
         }
+
+        actions
     }
 }
 

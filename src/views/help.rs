@@ -14,7 +14,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-use crate::controllers::help::HelpController;
+use crate::app::core::{Action, Action::*};
+use crate::app::model::Model;
 use crate::views::{propheight, propwidth, rrect, View};
 use crate::MainState;
 use raylib::consts::GuiIconName::ICON_PLAYER_NEXT;
@@ -29,15 +30,13 @@ use raylib::RaylibThread;
 pub(crate) struct HelpView {}
 
 impl View for HelpView {
-    type Controller = HelpController;
-
     fn draw(
         &mut self,
         d: &mut RaylibDrawHandle,
         _thread: &RaylibThread,
-        controller: &Self::Controller,
+        _state: &Model,
         main_state: &MainState,
-    ) {
+    ) -> Vec<Action> {
         d.clear_background(main_state.default_bg_color);
 
         let txt =
@@ -79,12 +78,15 @@ l'ittiofauna, per la determinazione della qualità ecologica dei corpi idrici.
 
         let continue_itext = d.gui_icon_text(ICON_PLAYER_NEXT, ": Continua");
 
+        let mut actions = Vec::<Action>::new();
+
         if d.gui_button(
             rrect(continue_x, continue_y, continue_width, continue_height),
             continue_itext.as_str(),
         ) {
-            controller.set_user_continued(true);
+            actions.push(UserContinued);
         }
+        actions
     }
 }
 

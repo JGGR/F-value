@@ -14,8 +14,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-use crate::controllers::{output::OutputController, Controller};
-use crate::domain::index::Indice;
+use crate::app::core::{Action, Action::*};
+use crate::app::model::Model;
 use crate::views::GuiIconName::ICON_RESTART;
 use crate::views::{propheight, propwidth, rrect, View};
 use crate::MainState;
@@ -27,25 +27,15 @@ use rfd::FileDialog;
 pub(crate) struct ProduzionePDFView {}
 
 impl View for ProduzionePDFView {
-    type Controller = OutputController;
-
     fn draw(
         &mut self,
         d: &mut RaylibDrawHandle,
         _thread: &RaylibThread,
-        controller: &Self::Controller,
+        state: &Model,
         main_state: &MainState,
-    ) {
+    ) -> Vec<Action> {
         d.clear_background(main_state.default_bg_color);
 
-        let _state = controller.get_state();
-        let current_index = match controller.get_current_index() {
-            Some(index) => index,
-            None => {
-                eprintln!("ProduzionePDFView: Per qualche assurdo motivo l'indice corrente non è validato. Uso NISECI.");
-                Indice::Niseci
-            }
-        };
         let button_esporta_width = propwidth(d, 200);
         let button_esporta_x = d.get_screen_width() / 2 - button_esporta_width / 2;
         let button_esporta_height = propwidth(d, 50);
@@ -60,6 +50,8 @@ impl View for ProduzionePDFView {
             rrect(groupbox_x, groupbox_y, groupbox_width, groupbox_height),
             "Produzione PDF",
         );
+
+        let mut actions = Vec::<Action>::new();
 
         if d.gui_button(
             rrect(
@@ -76,18 +68,9 @@ impl View for ProduzionePDFView {
                 .save_file();
 
             if let Some(filepath) = file {
-                match current_index {
-                    Indice::Niseci => {
-                        controller.esporta_pdf_niseci(filepath);
-                    }
-                    Indice::Hfbi => {
-                        controller.esporta_pdf_hfbi(filepath);
-                    }
-                }
+                actions.push(ExportPdf(filepath));
             } else {
                 eprintln!("Error: failed getting a file.");
-                controller
-                    .add_console_message("Failed getting a file for esportazione".to_string());
             }
         }
 
@@ -98,7 +81,7 @@ impl View for ProduzionePDFView {
         let button_reset_height = propwidth(d, 50);
         let button_reset_y = d.get_screen_height() / 2 - button_reset_height / 2;
 
-        let done_export = controller.get_is_done_export();
+        let done_export = state.output_model.is_done_export();
         let reset_itext = d.gui_icon_text(ICON_RESTART, "Reset");
 
         let lock_button_reset = !done_export;
@@ -116,12 +99,13 @@ impl View for ProduzionePDFView {
             ),
             reset_itext.as_str(),
         ) {
-            controller.prompt_reset();
+            actions.push(Reset);
         }
         if lock_button_reset {
             d.gui_set_state(STATE_NORMAL);
             d.gui_unlock();
         }
+        actions
     }
 }
 

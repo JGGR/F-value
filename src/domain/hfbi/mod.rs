@@ -694,6 +694,19 @@ impl TryFrom<i32> for HabitatHFBI {
 }
 
 #[derive(Clone)]
+pub(crate) struct AnagraficaHFBIDraft {
+    pub(crate) codice_stazione: String,
+    pub(crate) corpo_idrico: String,
+    pub(crate) posizione: Location,
+    pub(crate) date_string: String, // Formato gg/mm/aaaa
+    pub(crate) tipo_laguna: TipoLagunaCostieraHFBI,
+    pub(crate) stagione: StagioneHFBI,
+    pub(crate) habitat_vegetato: HabitatHFBI,
+    pub(crate) lunghezza_media_transetto: String,
+    pub(crate) larghezza_media_transetto: String,
+}
+
+#[derive(Clone)]
 pub(crate) struct AnagraficaHFBI {
     pub(crate) codice_stazione: String,
     pub(crate) corpo_idrico: String,

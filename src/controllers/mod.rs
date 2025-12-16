@@ -15,13 +15,11 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::app::core::{CurrentView, MainState};
+use crate::app::core::{Action, CurrentView, MainState};
 use crate::app::model::{
-    ConsoleModel, FileInputModel, HelpModel, HomeModel, IndiceModel, InfoAggiuntiveModel,
+    ConsoleModel, FileInputModel, HelpModel, HomeModel, IndiceModel, InfoAggiuntiveModel, Model,
     OutputModel, SubModel,
 };
-use crate::domain::index::Indice;
-use crate::state::GLOBAL_STATE;
 use raylib::RaylibHandle;
 
 pub(crate) mod home;
@@ -61,29 +59,40 @@ impl Controllers {
             console_controller: ConsoleController::new(),
         }
     }
-    pub(crate) fn update(&self, rl: &mut RaylibHandle, main_state: &mut MainState) {
+    pub(crate) fn update(
+        &self,
+        rl: &mut RaylibHandle,
+        state: &mut Model,
+        actions: &mut Vec<Action>,
+        main_state: &mut MainState,
+    ) {
         // Current view update step
         match main_state.current_view {
             CurrentView::Home => {
-                self.home_controller.update(rl, main_state);
+                self.home_controller.update(rl, state, actions, main_state);
             }
             CurrentView::Help => {
-                self.help_controller.update(rl, main_state);
+                self.help_controller.update(rl, state, actions, main_state);
             }
             CurrentView::SelezioneIndice => {
-                self.indice_controller.update(rl, main_state);
+                self.indice_controller
+                    .update(rl, state, actions, main_state);
             }
             CurrentView::SelezioneFileInput | CurrentView::ValidazioneFileInput => {
-                self.fileinput_controller.update(rl, main_state);
+                self.fileinput_controller
+                    .update(rl, state, actions, main_state);
             }
             CurrentView::SelezioneInfoAggiuntive | CurrentView::ValidazioneInfoAggiuntive => {
-                self.infoaggiuntive_controller.update(rl, main_state);
+                self.infoaggiuntive_controller
+                    .update(rl, state, actions, main_state);
             }
             CurrentView::ProduzioneOutput | CurrentView::ProduzionePDF => {
-                self.output_controller.update(rl, main_state);
+                self.output_controller
+                    .update(rl, state, actions, main_state);
             }
             CurrentView::Console => {
-                self.console_controller.update(rl, main_state);
+                self.console_controller
+                    .update(rl, state, actions, main_state);
             }
         }
     }
@@ -91,14 +100,14 @@ impl Controllers {
 
 pub(crate) trait Controller {
     type SubModel: SubModel; // Associated type for controller substate
-    fn update(&self, rl: &mut RaylibHandle, main_state: &mut MainState);
-    fn get_state(&self) -> Self::SubModel;
-    fn add_console_message(&self, msg: String) {
-        let mut state = GLOBAL_STATE.lock().unwrap();
+    fn update(
+        &self,
+        rl: &mut RaylibHandle,
+        state: &mut Model,
+        actions: &mut Vec<Action>,
+        main_state: &mut MainState,
+    );
+    fn add_console_message(&self, state: &mut Model, msg: String) {
         state.console_model.console.add_message(msg);
-    }
-    fn get_current_index(&self) -> Option<Indice> {
-        let state = GLOBAL_STATE.lock().unwrap();
-        state.indice_model.get_selected_index()
     }
 }

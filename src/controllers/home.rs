@@ -18,16 +18,21 @@
 pub(crate) struct HomeController;
 
 use super::{Controller, CurrentView, HomeModel};
-use crate::app::model::SubModel;
-use crate::state::GLOBAL_STATE;
+use crate::app::core::Action;
+use crate::app::model::{Model, SubModel};
 use crate::MainState;
 use raylib::RaylibHandle;
 
 impl Controller for HomeController {
     type SubModel = HomeModel;
 
-    fn update(&self, _rl: &mut RaylibHandle, main_state: &mut MainState) {
-        let mut state = GLOBAL_STATE.lock().unwrap();
+    fn update(
+        &self,
+        _rl: &mut RaylibHandle,
+        state: &mut Model,
+        actions: &mut Vec<Action>,
+        main_state: &mut MainState,
+    ) {
         state.home_model.increment_frame_counter();
         if state.home_model.get_user_continued() {
             eprintln!("HomeController:  L'utente ha premuto Continua");
@@ -46,11 +51,20 @@ impl Controller for HomeController {
             state.home_model.reset();
             state.console_model.reset();
         }
-    }
 
-    fn get_state(&self) -> Self::SubModel {
-        let state = GLOBAL_STATE.lock().unwrap();
-        state.home_model.clone()
+        for a in actions.drain(..) {
+            match a {
+                Action::UserContinued => {
+                    self.set_user_continued(state, true);
+                }
+                Action::UserWantsInfo => {
+                    self.set_user_wants_info(state, true);
+                }
+                _ => {
+                    println!("HomeController:  Got action {}", a);
+                }
+            }
+        }
     }
 }
 
@@ -59,12 +73,10 @@ impl HomeController {
         Self
     }
 
-    pub(crate) fn set_user_continued(&self, val: bool) {
-        let mut state = GLOBAL_STATE.lock().unwrap();
+    pub(crate) fn set_user_continued(&self, state: &mut Model, val: bool) {
         state.home_model.set_user_continued(val);
     }
-    pub(crate) fn set_user_wants_info(&self, val: bool) {
-        let mut state = GLOBAL_STATE.lock().unwrap();
+    pub(crate) fn set_user_wants_info(&self, state: &mut Model, val: bool) {
         state.home_model.set_user_wants_info(val);
     }
 }

@@ -90,7 +90,7 @@ fn main() {
         let res_path = format!("{}/app.res", out_dir);
         // compile the .rc file
         let output = std::process::Command::new("x86_64-w64-mingw32-windres")
-            .args(&["scripts/app.rc", "-O", "coff", "-o", &res_path])
+            .args(["scripts/app.rc", "-O", "coff", "-o", &res_path])
             .status()
             .expect("failed to run windres");
 

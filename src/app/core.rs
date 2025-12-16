@@ -17,10 +17,15 @@
 
 use super::controller::update_main;
 use super::view::draw_main;
+use crate::app::model::Model;
 use crate::controllers::Controllers;
+use crate::domain::hfbi::AnagraficaHFBIDraft;
+use crate::domain::index::Indice;
+use crate::domain::niseci::AnagraficaNISECIDraft;
 use crate::views::Views;
 use raylib::prelude::*;
 use std::fmt;
+use std::path::PathBuf;
 
 pub(crate) const EXIT_KEY: raylib::consts::KeyboardKey = raylib::consts::KeyboardKey::KEY_ESCAPE;
 pub(crate) const ESOX_SCREEN_WIDTH: i32 = 960;
@@ -49,6 +54,50 @@ pub(crate) const SUPPORT_HEADLESS: bool = false; // This is due to windows_subsy
 
 #[cfg(not(windows))]
 pub(crate) const SUPPORT_HEADLESS: bool = true;
+
+#[derive(Clone)]
+pub(crate) enum Action {
+    ConsoleBackout,
+    UserContinued,
+    UserWantsInfo,
+    PickIndice(Indice),
+    PickRiferimentoPath(Option<PathBuf>),
+    PickCampionamentoPath(Option<PathBuf>),
+    ValidaRiferimentoPath(bool),
+    ValidaCampionamentoPath(bool),
+    SubmitAnagraficaNISECI(AnagraficaNISECIDraft),
+    SubmitAnagraficaHFBI(AnagraficaHFBIDraft),
+    CheckAnagrafica,
+    BackoutAnagrafica,
+    RunCalc,
+    ConfirmCalc,
+    ExportPdf(PathBuf),
+    Reset,
+}
+
+impl fmt::Display for Action {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let string_representation = match self {
+            Action::ConsoleBackout => "ConsoleBackout",
+            Action::UserContinued => "UserContinued",
+            Action::UserWantsInfo => "UserWantsInfo",
+            Action::PickIndice(_indice) => "PickIndice",
+            Action::PickRiferimentoPath(_path) => "PickRiferimentoPath",
+            Action::PickCampionamentoPath(_path) => "PickCampionamentoPath",
+            Action::ValidaRiferimentoPath(_has_headers) => "ValidaRiferimentoPath",
+            Action::ValidaCampionamentoPath(_has_headers) => "ValidaCampionamentoPath",
+            Action::SubmitAnagraficaNISECI(_a) => "SubmitAnagraficaNISECI",
+            Action::SubmitAnagraficaHFBI(_a) => "SubmitAnagraficaHFBI",
+            Action::CheckAnagrafica => "CheckAnagrafica",
+            Action::BackoutAnagrafica => "BackoutAnagrafica",
+            Action::RunCalc => "RunCalc",
+            Action::ConfirmCalc => "ConfirmCalc",
+            Action::ExportPdf(_path) => "ExportPdf",
+            Action::Reset => "Reset",
+        };
+        write!(f, "{}", string_representation)
+    }
+}
 
 #[derive(Copy, Clone)]
 pub(crate) enum CurrentView {
@@ -236,14 +285,16 @@ impl MainState {
         &mut self,
         rl: &mut RaylibHandle,
         thread: &RaylibThread,
+        state: &mut Model,
         controllers: &Controllers,
         views: &mut Views,
     ) {
+        let mut actions = Vec::<Action>::new();
         while !self.should_quit {
             // Base update step
             update_main(rl, self);
 
-            controllers.update(rl, self);
+            controllers.update(rl, state, &mut actions, self);
 
             let mut d = rl.begin_drawing(thread);
 
@@ -255,7 +306,7 @@ impl MainState {
 
             // Ask the view for render, passing the controller for state changes
             // Current view draw step
-            views.draw(&mut d, thread, controllers, self);
+            actions = views.draw(&mut d, thread, state, self);
 
             if lock_view {
                 d.gui_unlock();

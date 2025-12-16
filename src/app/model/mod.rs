@@ -17,11 +17,13 @@
 
 use crate::console::Console;
 use crate::core::SHORT_PROJECT_VERSION;
-use crate::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI, RisultatoHFBI};
+use crate::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI, RisultatoHFBI, StatoEcologicoHFBI};
 use crate::domain::index::Indice;
 use crate::domain::niseci::{
-    AnagraficaNISECI, CampionamentoNISECI, RiferimentoNISECI, RisultatoNISECI,
+    AnagraficaNISECI, CampionamentoNISECI, RiferimentoNISECI, RisultatoNISECI, StatoEcologicoNISECI,
 };
+use crate::engines::hfbi::full::calculate_stato_ecologico_hfbi;
+use crate::engines::niseci::full::calculate_stato_ecologico_niseci;
 use std::collections::HashMap;
 use std::path::PathBuf;
 
@@ -424,6 +426,56 @@ impl DataModel {
         self.niseci.risultato = risultato;
     }
 
+    pub(crate) fn get_x1_value(&self) -> Option<f32> {
+        let opt_res = self.get_risultato_niseci();
+        opt_res.map(|r| r.get_x1())
+    }
+
+    pub(crate) fn get_x2_value(&self) -> Option<f32> {
+        let opt_res = self.get_risultato_niseci();
+        opt_res.map(|r| r.get_x2())?
+    }
+
+    pub(crate) fn get_x3_value(&self) -> Option<f32> {
+        let opt_res = self.get_risultato_niseci();
+        opt_res.map(|r| r.get_x3())
+    }
+
+    pub(crate) fn get_niseci_value(&self) -> Option<f32> {
+        match &self.niseci.risultato {
+            Some(v) => v.get_valore(),
+            None => None,
+        }
+    }
+
+    pub(crate) fn get_rqe_niseci_value(&self) -> Option<f32> {
+        match &self.niseci.risultato {
+            Some(v) => v.get_rqe(),
+            None => None,
+        }
+    }
+
+    pub(crate) fn get_stato_eco_niseci_value(&self, state: &Model) -> Option<StatoEcologicoNISECI> {
+        if state.output_model.is_done_calc() {
+            let opt_res = state.data_model.get_risultato_niseci();
+            match opt_res {
+                Some(r) => {
+                    let opt_anagrafica = state.data_model.get_anagrafica_niseci();
+                    match opt_anagrafica {
+                        Some(anagr) => {
+                            let niseci_val = r.get_valore();
+                            calculate_stato_ecologico_niseci(niseci_val, &anagr.area)
+                        }
+                        None => None,
+                    }
+                }
+                None => None,
+            }
+        } else {
+            None
+        }
+    }
+
     pub(crate) fn get_campionamento_hfbi(&mut self) -> Option<CampionamentoHFBI> {
         self.hfbi.campionamento.clone()
     }
@@ -441,6 +493,28 @@ impl DataModel {
     }
     pub(crate) fn set_risultato_hfbi(&mut self, risultato: Option<RisultatoHFBI>) {
         self.hfbi.risultato = risultato;
+    }
+
+    pub(crate) fn get_hfbi_value(&self) -> Option<f32> {
+        match &self.hfbi.risultato {
+            Some(v) => v.get_valore(),
+            None => None,
+        }
+    }
+
+    pub(crate) fn get_stato_eco_hfbi_value(&self, state: &Model) -> Option<StatoEcologicoHFBI> {
+        if state.output_model.is_done_calc() {
+            let opt_res = state.data_model.get_risultato_hfbi();
+            match opt_res {
+                Some(r) => {
+                    let hfbi_val = r.get_valore();
+                    calculate_stato_ecologico_hfbi(hfbi_val)
+                }
+                None => None,
+            }
+        } else {
+            None
+        }
     }
 
     pub(crate) fn get_errors_occurred(&self) -> bool {

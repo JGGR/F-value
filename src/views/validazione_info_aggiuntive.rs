@@ -14,8 +14,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-use crate::controllers::{info_aggiuntive::InfoAggiuntiveController, Controller};
-use crate::domain::index::Indice;
+use crate::app::core::{Action, Action::*};
+use crate::app::model::Model;
 use crate::views::{propheight, propwidth, rrect, View};
 use crate::MainState;
 use raylib::consts::GuiIconName::ICON_CROSS;
@@ -25,26 +25,14 @@ use raylib::RaylibThread;
 pub(crate) struct ValidazioneInfoAggiuntiveView {}
 
 impl View for ValidazioneInfoAggiuntiveView {
-    type Controller = InfoAggiuntiveController;
-
     fn draw(
         &mut self,
         d: &mut RaylibDrawHandle,
         _thread: &RaylibThread,
-        controller: &Self::Controller,
+        _state: &Model,
         main_state: &MainState,
-    ) {
+    ) -> Vec<Action> {
         d.clear_background(main_state.default_bg_color);
-
-        let _state = controller.get_state();
-
-        let current_index = match controller.get_current_index() {
-            Some(index) => index,
-            None => {
-                eprintln!("ValidazioneInfoAggiuntiveView: Per qualche assurdo motivo l'indice corrente non è validato. Uso NISECI.");
-                Indice::Niseci
-            }
-        };
 
         let button_valida_width = propwidth(d, 200);
         let button_valida_x = d.get_screen_width() / 2 - button_valida_width / 2;
@@ -67,6 +55,7 @@ impl View for ValidazioneInfoAggiuntiveView {
             "Valida informazioni aggiuntive",
         );
 
+        let mut actions = Vec::<Action>::new();
         if d.gui_button(
             rrect(
                 button_valida_x,
@@ -76,13 +65,7 @@ impl View for ValidazioneInfoAggiuntiveView {
             ),
             "Valida info aggiuntive",
         ) {
-            //Ask controller to validate info aggiuntive indice
-            match current_index {
-                Indice::Niseci => {
-                    controller.valida_anagrafica_niseci();
-                }
-                Indice::Hfbi => controller.valida_anagrafica_hfbi(),
-            }
+            actions.push(CheckAnagrafica);
         }
 
         let indietro_itext = d.gui_icon_text(ICON_CROSS, "Indietro");
@@ -95,16 +78,9 @@ impl View for ValidazioneInfoAggiuntiveView {
             ),
             indietro_itext.as_str(),
         ) {
-            //Ask controller to go back and edit further
-            match current_index {
-                Indice::Niseci => {
-                    controller.backout_anagrafica_niseci();
-                }
-                Indice::Hfbi => {
-                    controller.backout_anagrafica_hfbi();
-                }
-            }
+            actions.push(BackoutAnagrafica);
         }
+        actions
     }
 }
 

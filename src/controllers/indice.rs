@@ -16,18 +16,23 @@
 */
 
 pub(crate) struct IndiceController;
-use crate::app::model::SubModel;
+use crate::app::core::Action;
+use crate::app::model::{Model, SubModel};
 use crate::controllers::{Controller, CurrentView, IndiceModel};
 use crate::domain::index::Indice;
-use crate::state::GLOBAL_STATE;
 use crate::MainState;
 use raylib::RaylibHandle;
 
 impl Controller for IndiceController {
     type SubModel = IndiceModel;
 
-    fn update(&self, _rl: &mut RaylibHandle, main_state: &mut MainState) {
-        let mut state = GLOBAL_STATE.lock().unwrap();
+    fn update(
+        &self,
+        _rl: &mut RaylibHandle,
+        state: &mut Model,
+        actions: &mut Vec<Action>,
+        main_state: &mut MainState,
+    ) {
         state.indice_model.increment_frame_counter();
 
         if let Some(index) = state.indice_model.get_selected_index() {
@@ -44,10 +49,17 @@ impl Controller for IndiceController {
             state.console_model.reset();
             main_state.set_current_view(CurrentView::Home);
         }
-    }
-    fn get_state(&self) -> Self::SubModel {
-        let state = GLOBAL_STATE.lock().unwrap();
-        state.indice_model.clone()
+
+        for a in actions.drain(..) {
+            match a {
+                Action::PickIndice(indice) => {
+                    self.set_indice_corrente(state, indice);
+                }
+                _ => {
+                    println!("IndiceController:  Got action {}", a);
+                }
+            }
+        }
     }
 }
 
@@ -56,8 +68,7 @@ impl IndiceController {
         Self
     }
 
-    pub(crate) fn set_indice_corrente(&self, index: Indice) {
-        let mut state = GLOBAL_STATE.lock().unwrap();
+    pub(crate) fn set_indice_corrente(&self, state: &mut Model, index: Indice) {
         state.indice_model.set_selected_index(Some(index));
     }
 }

@@ -15,13 +15,13 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 pub(crate) struct InfoAggiuntiveController;
-use crate::app::model::SubModel;
+use crate::app::core::Action;
+use crate::app::model::{Model, SubModel};
 use crate::controllers::{Controller, CurrentView, InfoAggiuntiveModel};
 use crate::core::csv::parser::parse_date;
 use crate::domain::hfbi::AnagraficaHFBI;
 use crate::domain::index::Indice;
 use crate::domain::niseci::{AnagraficaNISECI, TipoComunitaNISECI};
-use crate::state::GLOBAL_STATE;
 use crate::MainState;
 use chrono::format::ParseErrorKind;
 use raylib::RaylibHandle;
@@ -29,8 +29,13 @@ use raylib::RaylibHandle;
 impl Controller for InfoAggiuntiveController {
     type SubModel = InfoAggiuntiveModel;
 
-    fn update(&self, _rl: &mut RaylibHandle, main_state: &mut MainState) {
-        let mut state = GLOBAL_STATE.lock().unwrap();
+    fn update(
+        &self,
+        _rl: &mut RaylibHandle,
+        state: &mut Model,
+        actions: &mut Vec<Action>,
+        main_state: &mut MainState,
+    ) {
         state.infoaggiuntive_model.increment_frame_counter();
 
         if main_state.should_reset {
@@ -52,6 +57,107 @@ impl Controller for InfoAggiuntiveController {
             main_state.set_current_view(CurrentView::Console);
             eprintln!("InfoAggiuntiveController:  Clearing error state");
             state.infoaggiuntive_model.set_errors_occurred(false);
+        }
+
+        for a in actions.drain(..) {
+            match a {
+                Action::SubmitAnagraficaNISECI(anagrafica_draft) => {
+                    let larghezza_stazione = match self.check_larghezza_stazione_string(
+                        state,
+                        &anagrafica_draft.larghezza_media_stazione,
+                    ) {
+                        Ok(v) => v,
+                        Err(_e) => {
+                            return; // We change view in the failed check maybe?
+                        }
+                    };
+                    let lunghezza_stazione = match self.check_lunghezza_stazione_string(
+                        state,
+                        &anagrafica_draft.lunghezza_media_stazione,
+                    ) {
+                        Ok(v) => v,
+                        Err(_e) => {
+                            return; // We change view in the failed check maybe?
+                        }
+                    };
+                    let anagrafica = AnagraficaNISECI {
+                        comunita: anagrafica_draft.comunita,
+                        codice_stazione: anagrafica_draft.codice_stazione,
+                        date_string: anagrafica_draft.date_string,
+                        area: anagrafica_draft.area,
+                        corpo_idrico: anagrafica_draft.corpo_idrico,
+                        bacino_appartenenza: anagrafica_draft.bacino_appartenenza,
+                        idro_eco_regione: anagrafica_draft.idro_eco_regione,
+                        posizione: anagrafica_draft.posizione,
+                        lunghezza_media_stazione: lunghezza_stazione,
+                        larghezza_media_stazione: larghezza_stazione,
+                    };
+                    self.submit_anagrafica_niseci(state, anagrafica);
+                }
+                Action::SubmitAnagraficaHFBI(anagrafica_draft) => {
+                    let larghezza_transetto = match self.check_larghezza_stazione_string(
+                        state,
+                        &anagrafica_draft.larghezza_media_transetto,
+                    ) {
+                        Ok(v) => v,
+                        Err(_e) => {
+                            return; // We change view in the failed check maybe?
+                        }
+                    };
+                    let lunghezza_transetto = match self.check_lunghezza_stazione_string(
+                        state,
+                        &anagrafica_draft.lunghezza_media_transetto,
+                    ) {
+                        Ok(v) => v,
+                        Err(_e) => {
+                            return; // We change view in the failed check maybe?
+                        }
+                    };
+                    let anagrafica = AnagraficaHFBI {
+                        codice_stazione: anagrafica_draft.codice_stazione,
+                        corpo_idrico: anagrafica_draft.corpo_idrico,
+                        posizione: anagrafica_draft.posizione,
+                        date_string: anagrafica_draft.date_string,
+                        tipo_laguna: anagrafica_draft.tipo_laguna,
+                        stagione: anagrafica_draft.stagione,
+                        habitat_vegetato: anagrafica_draft.habitat_vegetato,
+                        lunghezza_media_transetto: lunghezza_transetto,
+                        larghezza_media_transetto: larghezza_transetto,
+                    };
+                    self.submit_anagrafica_hfbi(state, anagrafica);
+                }
+                Action::CheckAnagrafica => {
+                    if let Some(idx) = state.indice_model.get_selected_index() {
+                        match idx {
+                            Indice::Niseci => {
+                                self.valida_anagrafica_niseci(state);
+                            }
+                            Indice::Hfbi => {
+                                self.valida_anagrafica_hfbi(state);
+                            }
+                        }
+                    } else {
+                        eprintln!("InfoAggiuntiveController:  Can't handle action {} without a selected index", a);
+                    }
+                }
+                Action::BackoutAnagrafica => {
+                    if let Some(idx) = state.indice_model.get_selected_index() {
+                        match idx {
+                            Indice::Niseci => {
+                                self.backout_anagrafica_niseci(state);
+                            }
+                            Indice::Hfbi => {
+                                self.backout_anagrafica_hfbi(state);
+                            }
+                        }
+                    } else {
+                        eprintln!("InfoAggiuntiveController:  Can't process action {} without a selected index", a);
+                    }
+                }
+                _ => {
+                    println!("InfoAggiuntiveController:  Got action {}", a);
+                }
+            }
         }
 
         let current_indice;
@@ -87,11 +193,6 @@ impl Controller for InfoAggiuntiveController {
             _ => {}
         }
     }
-
-    fn get_state(&self) -> Self::SubModel {
-        let state = GLOBAL_STATE.lock().unwrap();
-        state.infoaggiuntive_model.clone()
-    }
 }
 
 impl InfoAggiuntiveController {
@@ -99,25 +200,31 @@ impl InfoAggiuntiveController {
         Self
     }
 
-    pub(crate) fn get_data_anagrafica_niseci(&self) -> Option<AnagraficaNISECI> {
-        let state = GLOBAL_STATE.lock().unwrap();
+    pub(crate) fn get_data_anagrafica_niseci(&self, state: &Model) -> Option<AnagraficaNISECI> {
         state.data_model.get_anagrafica_niseci()
     }
 
-    pub(crate) fn submit_anagrafica_niseci(&self, anagrafica: AnagraficaNISECI) {
-        self.set_console_env(("anagrafica_niseci".to_string(), format!("{anagrafica}")));
+    pub(crate) fn submit_anagrafica_niseci(&self, state: &mut Model, anagrafica: AnagraficaNISECI) {
+        self.set_console_env(
+            state,
+            ("anagrafica_niseci".to_string(), format!("{anagrafica}")),
+        );
         self.add_console_message(
+            state,
             "InfoAggiuntiveController: L'utente ha completato l'inserimento info aggiuntive."
                 .to_string(),
         );
-        let mut state = GLOBAL_STATE.lock().unwrap();
         assert!(state.data_model.get_anagrafica_niseci().is_none());
         state.data_model.set_anagrafica_niseci(Some(anagrafica));
         state.infoaggiuntive_model.set_done_editing(true);
         state.infoaggiuntive_model.set_valid(false);
     }
 
-    pub(crate) fn check_larghezza_stazione_string(&self, larghezza: &str) -> Result<f32, String> {
+    pub(crate) fn check_larghezza_stazione_string(
+        &self,
+        state: &mut Model,
+        larghezza: &str,
+    ) -> Result<f32, String> {
         let s = larghezza.replace(',', "."); // Replace comma with dot
         match s.parse::<f32>() {
             Ok(value) => Ok(value),
@@ -127,8 +234,7 @@ impl InfoAggiuntiveController {
                     err_msg = err_msg
                         .replace("invalid float literal", "tipo non valido: atteso decimale");
                 }
-                self.add_console_message(format!("InfoAggiuntiveController:  {err_msg}"));
-                let mut state = GLOBAL_STATE.lock().unwrap();
+                self.add_console_message(state, format!("InfoAggiuntiveController:  {err_msg}"));
                 state.data_model.set_anagrafica_niseci(None);
                 state.infoaggiuntive_model.set_done_editing(false);
                 state.infoaggiuntive_model.set_valid(false);
@@ -138,7 +244,11 @@ impl InfoAggiuntiveController {
         }
     }
 
-    pub(crate) fn check_lunghezza_stazione_string(&self, lunghezza: &str) -> Result<f32, String> {
+    pub(crate) fn check_lunghezza_stazione_string(
+        &self,
+        state: &mut Model,
+        lunghezza: &str,
+    ) -> Result<f32, String> {
         let s = lunghezza.replace(',', "."); // Replace comma with dot
         match s.parse::<f32>() {
             Ok(value) => Ok(value),
@@ -148,8 +258,7 @@ impl InfoAggiuntiveController {
                     err_msg = err_msg
                         .replace("invalid float literal", "tipo non valido: atteso decimale");
                 }
-                self.add_console_message(format!("InfoAggiuntiveController:  {err_msg}"));
-                let mut state = GLOBAL_STATE.lock().unwrap();
+                self.add_console_message(state, format!("InfoAggiuntiveController:  {err_msg}"));
                 state.data_model.set_anagrafica_niseci(None);
                 state.infoaggiuntive_model.set_done_editing(false);
                 state.infoaggiuntive_model.set_valid(false);
@@ -159,14 +268,10 @@ impl InfoAggiuntiveController {
         }
     }
 
-    pub(crate) fn valida_anagrafica_niseci(&self) {
-        //We grab the state in a scope to ensure we don't get lock problems
-        {
-            let state = GLOBAL_STATE.lock().unwrap();
-            assert!(state.infoaggiuntive_model.is_done_editing());
-        }
+    pub(crate) fn valida_anagrafica_niseci(&self, state: &mut Model) {
+        assert!(state.infoaggiuntive_model.is_done_editing());
 
-        if let Some(anagrafica) = self.get_data_anagrafica_niseci() {
+        if let Some(anagrafica) = self.get_data_anagrafica_niseci(state) {
             let mut errors: Vec<String> = Vec::new();
 
             if anagrafica.codice_stazione.is_empty() {
@@ -264,10 +369,8 @@ impl InfoAggiuntiveController {
             }
 
             for e in &errors {
-                self.add_console_message(format!("InfoAggiuntiveController:  {e}"));
+                self.add_console_message(state, format!("InfoAggiuntiveController:  {e}"));
             }
-
-            let mut state = GLOBAL_STATE.lock().unwrap();
 
             if errors.is_empty() {
                 state.infoaggiuntive_model.set_valid(true);
@@ -280,49 +383,47 @@ impl InfoAggiuntiveController {
         } else {
             let err_msg = "InfoAggiuntiveController: valida_anagrafica_niseci() ha ricevuto uno stato spurio.";
             eprintln!("{}", err_msg);
-            self.add_console_message(format!("InfoAggiuntiveController:  {err_msg}"));
+            self.add_console_message(state, format!("InfoAggiuntiveController:  {err_msg}"));
         };
     }
 
-    pub(crate) fn backout_anagrafica_niseci(&self) {
-        self.unset_console_env("anagrafica_niseci".to_string());
+    pub(crate) fn backout_anagrafica_niseci(&self, state: &mut Model) {
+        self.unset_console_env(state, "anagrafica_niseci".to_string());
         self.add_console_message(
+            state,
             "InfoAggiuntiveController: L'utente ha annullato l'inserimento info aggiuntive."
                 .to_string(),
         );
-        let mut state = GLOBAL_STATE.lock().unwrap();
         assert!(state.data_model.get_anagrafica_niseci().is_some());
         state.data_model.set_anagrafica_niseci(None);
         state.infoaggiuntive_model.set_done_editing(false);
         state.infoaggiuntive_model.set_valid(false);
     }
 
-    pub(crate) fn get_data_anagrafica_hfbi(&self) -> Option<AnagraficaHFBI> {
-        let state = GLOBAL_STATE.lock().unwrap();
+    pub(crate) fn get_data_anagrafica_hfbi(&self, state: &Model) -> Option<AnagraficaHFBI> {
         state.data_model.get_anagrafica_hfbi()
     }
 
-    pub(crate) fn submit_anagrafica_hfbi(&self, anagrafica: AnagraficaHFBI) {
-        self.set_console_env(("anagrafica_hfbi".to_string(), format!("{anagrafica}")));
+    pub(crate) fn submit_anagrafica_hfbi(&self, state: &mut Model, anagrafica: AnagraficaHFBI) {
+        self.set_console_env(
+            state,
+            ("anagrafica_hfbi".to_string(), format!("{anagrafica}")),
+        );
         self.add_console_message(
+            state,
             "InfoAggiuntiveController: L'utente ha completato l'inserimento info aggiuntive."
                 .to_string(),
         );
-        let mut state = GLOBAL_STATE.lock().unwrap();
         assert!(state.data_model.get_anagrafica_hfbi().is_none());
         state.data_model.set_anagrafica_hfbi(Some(anagrafica));
         state.infoaggiuntive_model.set_done_editing(true);
         state.infoaggiuntive_model.set_valid(false);
     }
 
-    pub(crate) fn valida_anagrafica_hfbi(&self) {
-        //We grab the state in a scope to ensure we don't get lock problems
-        {
-            let state = GLOBAL_STATE.lock().unwrap();
-            assert!(state.infoaggiuntive_model.is_done_editing());
-        }
+    pub(crate) fn valida_anagrafica_hfbi(&self, state: &mut Model) {
+        assert!(state.infoaggiuntive_model.is_done_editing());
 
-        if let Some(anagrafica) = self.get_data_anagrafica_hfbi() {
+        if let Some(anagrafica) = self.get_data_anagrafica_hfbi(state) {
             let mut errors: Vec<String> = Vec::new();
 
             if anagrafica.codice_stazione.is_empty() {
@@ -394,10 +495,8 @@ impl InfoAggiuntiveController {
             }
 
             for e in &errors {
-                self.add_console_message(format!("InfoAggiuntiveController:  {e}"));
+                self.add_console_message(state, format!("InfoAggiuntiveController:  {e}"));
             }
-
-            let mut state = GLOBAL_STATE.lock().unwrap();
 
             if errors.is_empty() {
                 state.infoaggiuntive_model.set_valid(true);
@@ -411,31 +510,28 @@ impl InfoAggiuntiveController {
             let err_msg =
                 "InfoAggiuntiveController: valida_anagrafica_hfbi() ha ricevuto uno stato spurio.";
             eprintln!("{}", err_msg);
-            self.add_console_message(format!("InfoAggiuntiveController:  {err_msg}"));
+            self.add_console_message(state, format!("InfoAggiuntiveController:  {err_msg}"));
         };
     }
 
-    pub(crate) fn backout_anagrafica_hfbi(&self) {
-        self.unset_console_env("anagrafica_hfbi".to_string());
+    pub(crate) fn backout_anagrafica_hfbi(&self, state: &mut Model) {
+        self.unset_console_env(state, "anagrafica_hfbi".to_string());
         self.add_console_message(
+            state,
             "InfoAggiuntiveController: L'utente ha annullato l'inserimento info aggiuntive."
                 .to_string(),
         );
-        let mut state = GLOBAL_STATE.lock().unwrap();
         assert!(state.data_model.get_anagrafica_hfbi().is_some());
         state.data_model.set_anagrafica_hfbi(None);
         state.infoaggiuntive_model.set_done_editing(false);
         state.infoaggiuntive_model.set_valid(false);
     }
 
-    pub(crate) fn set_console_env(&self, (key, val): (String, String)) {
-        let mut state = GLOBAL_STATE.lock().unwrap();
-
+    pub(crate) fn set_console_env(&self, state: &mut Model, (key, val): (String, String)) {
         state.console_model.console.set_env((key, val));
     }
 
-    pub(crate) fn unset_console_env(&self, key: String) {
-        let mut state = GLOBAL_STATE.lock().unwrap();
+    pub(crate) fn unset_console_env(&self, state: &mut Model, key: String) {
         state.console_model.console.remove_env(key);
     }
 }

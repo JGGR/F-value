@@ -24,7 +24,6 @@ mod controllers;
 mod core;
 mod domain;
 mod engines;
-mod state;
 #[cfg(test)]
 mod tests;
 mod views;
@@ -32,6 +31,7 @@ mod views;
 use crate::app::core::{
     get_locale, MainState, ESOX_SCREEN_HEIGHT, ESOX_SCREEN_WIDTH, PROJECT_LOGO_DATA,
 };
+use crate::app::model::Model;
 use crate::args::handle_args;
 use crate::controllers::Controllers;
 use crate::core::{prep_logger, SHORT_PROJECT_VERSION};
@@ -102,9 +102,11 @@ fn main() {
         locale,
     );
 
+    let mut model = Model::new();
+
     let controllers = Controllers::new();
 
     let mut views = Views::new(&mut rl, &thread, gui_current_font_height, txt_spacing);
 
-    main_state.mainloop(&mut rl, &thread, &controllers, &mut views);
+    main_state.mainloop(&mut rl, &thread, &mut model, &controllers, &mut views);
 }

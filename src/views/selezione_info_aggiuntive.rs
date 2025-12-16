@@ -14,13 +14,14 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-use crate::controllers::{info_aggiuntive::InfoAggiuntiveController, Controller};
+use crate::app::core::{Action, Action::*};
+use crate::app::model::Model;
 use crate::domain::{
-    hfbi::{AnagraficaHFBI, HabitatHFBI, StagioneHFBI, TipoLagunaCostieraHFBI},
+    hfbi::{AnagraficaHFBIDraft, HabitatHFBI, StagioneHFBI, TipoLagunaCostieraHFBI},
     index::Indice,
     location::Location,
     niseci::{
-        AnagraficaNISECI, AreaNISECI, ComunitaNISECI, IdroEcoRegioneNISECI, TipoComunitaNISECI,
+        AnagraficaNISECIDraft, AreaNISECI, ComunitaNISECI, IdroEcoRegioneNISECI, TipoComunitaNISECI,
     },
 };
 use crate::views::{propheight, propwidth, rrect, View};
@@ -63,19 +64,16 @@ pub(crate) struct SelezioneInfoAggiuntiveView {
 }
 
 impl View for SelezioneInfoAggiuntiveView {
-    type Controller = InfoAggiuntiveController;
-
     fn draw(
         &mut self,
         d: &mut RaylibDrawHandle,
         _thread: &RaylibThread,
-        controller: &Self::Controller,
+        state: &Model,
         main_state: &MainState,
-    ) {
+    ) -> Vec<Action> {
         d.clear_background(main_state.default_bg_color);
 
-        let _state = controller.get_state();
-        let current_index = match controller.get_current_index() {
+        let current_index = match state.indice_model.get_selected_index() {
             Some(index) => index,
             None => {
                 eprintln!("SelezioneInfoAggiuntiveView: Per qualche assurdo motivo l'indice corrente non è validato. Uso NISECI.");
@@ -101,6 +99,7 @@ impl View for SelezioneInfoAggiuntiveView {
         let submit_y = d.get_screen_height() / 2 - submit_height / 2;
 
         let confirm_itext = d.gui_icon_text(ICON_OK_TICK, "Conferma");
+        let mut actions = Vec::<Action>::new();
         if d.gui_button(
             rrect(submit_x, submit_y, submit_width, submit_height),
             confirm_itext.as_str(),
@@ -141,31 +140,12 @@ impl View for SelezioneInfoAggiuntiveView {
 
             let larghezza_stazione_str = String::from(&self.textbox_larghezza_stazione_buffer);
 
-            let larghezza_stazione =
-                match controller.check_larghezza_stazione_string(&larghezza_stazione_str) {
-                    Ok(v) => v,
-                    Err(_e) => {
-                        return; // This is not very appropriate but we expect the controller to change
-                                // the view for us in case of error so it's ok I guess
-                    }
-                };
-
             let lunghezza_stazione_str = String::from(&self.textbox_lunghezza_stazione_buffer);
-
-            let lunghezza_stazione =
-                match controller.check_lunghezza_stazione_string(&lunghezza_stazione_str) {
-                    Ok(v) => v,
-                    Err(_e) => {
-                        return; // This is not very appropriate but we expect the controller to change
-                                // the view for us in case of error so it's ok I guess
-                    }
-                };
 
             let codice_stazione = String::from(&self.textbox_codice_stazione_buffer);
             let date_string = String::from(&self.textbox_data_buffer);
 
             let corpo_idrico = String::from(&self.textbox_corpo_idrico_buffer);
-
             match current_index {
                 Indice::Niseci => {
                     let tipo_comunita = match <TipoComunitaNISECI as TryFrom<i32>>::try_from(
@@ -218,7 +198,7 @@ impl View for SelezioneInfoAggiuntiveView {
                             }
                         };
 
-                    let anagrafica = AnagraficaNISECI {
+                    let anagrafica = AnagraficaNISECIDraft {
                         comunita,
                         codice_stazione,
                         date_string,
@@ -227,11 +207,11 @@ impl View for SelezioneInfoAggiuntiveView {
                         bacino_appartenenza: bacino_niseci,
                         idro_eco_regione: idro_ecoregione_niseci,
                         posizione,
-                        lunghezza_media_stazione: lunghezza_stazione,
-                        larghezza_media_stazione: larghezza_stazione,
+                        lunghezza_media_stazione: lunghezza_stazione_str,
+                        larghezza_media_stazione: larghezza_stazione_str,
                     };
 
-                    controller.submit_anagrafica_niseci(anagrafica);
+                    actions.push(SubmitAnagraficaNISECI(anagrafica));
                 }
                 Indice::Hfbi => {
                     let tipo_laguna_costiera =
@@ -261,7 +241,7 @@ impl View for SelezioneInfoAggiuntiveView {
                             panic!("Unexpected habitat in SelezioneInfoAggiuntiveView::draw()");
                         }
                     };
-                    let anagrafica = AnagraficaHFBI {
+                    let anagrafica = AnagraficaHFBIDraft {
                         codice_stazione,
                         corpo_idrico,
                         posizione,
@@ -269,10 +249,10 @@ impl View for SelezioneInfoAggiuntiveView {
                         tipo_laguna: tipo_laguna_costiera,
                         stagione,
                         habitat_vegetato,
-                        lunghezza_media_transetto: lunghezza_stazione,
-                        larghezza_media_transetto: larghezza_stazione,
+                        lunghezza_media_transetto: lunghezza_stazione_str,
+                        larghezza_media_transetto: larghezza_stazione_str,
                     };
-                    controller.submit_anagrafica_hfbi(anagrafica);
+                    actions.push(SubmitAnagraficaHFBI(anagrafica));
                 }
             }
         }
@@ -840,6 +820,7 @@ impl View for SelezioneInfoAggiuntiveView {
                 }
             }
         }
+        actions
     }
 }
 
