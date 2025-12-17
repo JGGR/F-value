@@ -41,8 +41,7 @@ fn get_branch_name() -> String {
             .trim_end()
             .to_string()
     } else {
-        std::env::var("GITHUB_REF_NAME")
-            .unwrap_or_else(|_| "unknown".into())
+        std::env::var("GITHUB_REF_NAME").unwrap_or_else(|_| "unknown".into())
     }
 }
 

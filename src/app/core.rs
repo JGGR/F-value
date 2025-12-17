@@ -56,6 +56,50 @@ pub(crate) const SUPPORT_HEADLESS: bool = false; // This is due to windows_subsy
 pub(crate) const SUPPORT_HEADLESS: bool = true;
 
 #[derive(Clone)]
+pub(crate) enum MainAction {
+    SetFontHeight(i32),
+    SetTheme(i32),
+    SetLocale(i32),
+    ResetSettings,
+    CloseSettings,
+    OpenSettings,
+    ShowInfo,
+    CloseInfo,
+    ShowLicense,
+    CloseLicense,
+    ShowReset,
+    CloseReset,
+    ShowConsole,
+    CloseConsole,
+    CloseQuit,
+    Quit,
+}
+
+impl fmt::Display for MainAction {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let string_representation = match self {
+            MainAction::SetFontHeight(_h) => "SetFontHeight",
+            MainAction::SetTheme(_ti) => "SetTheme",
+            MainAction::SetLocale(_li) => "SetLocale",
+            MainAction::ResetSettings => "ResetSettings",
+            MainAction::CloseSettings => "CloseSettings",
+            MainAction::OpenSettings => "OpenSettings",
+            MainAction::ShowInfo => "ShowInfo",
+            MainAction::CloseInfo => "CloseInfo",
+            MainAction::ShowLicense => "ShowLicense",
+            MainAction::CloseLicense => "CloseLicense",
+            MainAction::ShowReset => "ShowReset",
+            MainAction::CloseReset => "CloseReset",
+            MainAction::ShowConsole => "ShowConsole",
+            MainAction::CloseConsole => "CloseConsole",
+            MainAction::Quit => "Quit",
+            MainAction::CloseQuit => "CloseQuit",
+        };
+        write!(f, "{}", string_representation)
+    }
+}
+
+#[derive(Clone)]
 pub(crate) enum Action {
     ConsoleBackout,
     UserContinued,
@@ -290,9 +334,10 @@ impl MainState {
         views: &mut Views,
     ) {
         let mut actions = Vec::<Action>::new();
+        let mut main_actions = Vec::<MainAction>::new();
         while !self.should_quit {
             // Base update step
-            update_main(rl, self);
+            update_main(rl, &mut main_actions, self);
 
             controllers.update(rl, state, &mut actions, self);
 
@@ -314,7 +359,7 @@ impl MainState {
 
             // Base draw step
             // Render stuff not depending on view
-            draw_main(&mut d, self);
+            main_actions = draw_main(&mut d, self);
         }
     }
 }
