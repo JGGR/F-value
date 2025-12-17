@@ -20,7 +20,7 @@ use super::{
     CAMPIONAMENTO_HFBI_HEADER_FIELDS, CAMPIONAMENTO_NISECI_HEADER_FIELDS,
     RIFERIMENTO_NISECI_HEADER_FIELDS,
 };
-use crate::core::csv::TipoRecordCsv;
+use crate::csv::TipoRecordCsv;
 use serde::{de, Deserialize, Deserializer};
 use std::io::{self, Read};
 use std::path::Path;

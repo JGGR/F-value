@@ -18,7 +18,7 @@ pub(crate) struct FileInputController;
 use crate::app::core::{Action, Localize, MainState};
 use crate::app::model::{Model, SubModel};
 use crate::controllers::{Controller, CurrentView, FileInputModel};
-use crate::core::csv::deser::{
+use crate::csv::deser::{
     hfbi::{
         check_campionamento_hfbi_path, PlainRecordCsvCampionamentoHFBI,
         VeryItalianRecordCsvCampionamentoHFBI,
@@ -30,11 +30,11 @@ use crate::core::csv::deser::{
     },
     process_csv_errors,
 };
-use crate::core::csv::parser::{
+use crate::csv::parser::{
     hfbi::check_records_campionamento_hfbi,
     niseci::{check_records_campionamento_niseci, check_records_riferimento_niseci},
 };
-use crate::core::csv::{
+use crate::csv::{
     RecordCsvCampionamentoHFBI, RecordCsvCampionamentoNISECI, RecordCsvRiferimentoNISECI,
     TipoRecordCsv,
 };

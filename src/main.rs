@@ -22,6 +22,7 @@ mod args;
 mod console;
 mod controllers;
 mod core;
+mod csv;
 mod domain;
 mod engines;
 #[cfg(test)]

@@ -16,7 +16,6 @@
 */
 
 pub(crate) mod cli;
-pub(crate) mod csv;
 pub(crate) mod pdf;
 
 pub(crate) const AUTHOR_JGABAUT: &str = "jgabaut";

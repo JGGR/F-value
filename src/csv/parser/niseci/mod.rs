@@ -15,8 +15,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::core::csv::parser::parse_date;
-use crate::core::csv::{
+use crate::csv::parser::parse_date;
+use crate::csv::{
     RecordCsvAnagraficaNISECI, RecordCsvCampionamentoNISECI, RecordCsvRiferimentoNISECI,
 };
 use crate::domain::location::Location;
