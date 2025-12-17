@@ -20,7 +20,7 @@ use once_cell::sync::Lazy;
 use crate::domain::location::Location;
 
 #[derive(Debug, Clone)]
-pub(crate) enum GruppoEcoHFBI {
+pub enum GruppoEcoHFBI {
     MigratoriMarini,
     Diadromi,
     ResidentiDiEstuario,
@@ -44,14 +44,14 @@ impl fmt::Display for GruppoEcoHFBI {
 }
 
 #[derive(Debug, Clone)]
-pub(crate) struct GruppoTrofHFBI {
-    pub(crate) microbentivori: f32,
-    pub(crate) macrobentivori: f32,
-    pub(crate) iperbentivori: f32,
-    pub(crate) erbivori: f32,
-    pub(crate) detritivori: f32,
-    pub(crate) planctivori: f32,
-    pub(crate) onnivori: f32,
+pub struct GruppoTrofHFBI {
+    pub microbentivori: f32,
+    pub macrobentivori: f32,
+    pub iperbentivori: f32,
+    pub erbivori: f32,
+    pub detritivori: f32,
+    pub planctivori: f32,
+    pub onnivori: f32,
 }
 
 impl fmt::Display for GruppoTrofHFBI {
@@ -71,12 +71,12 @@ impl fmt::Display for GruppoTrofHFBI {
 }
 
 #[derive(Debug, Clone)]
-pub(crate) struct SpecieHFBI {
-    pub(crate) nome_comune: &'static str,
-    pub(crate) codice_specie: &'static str,
-    pub(crate) autoctono: bool,
-    pub(crate) gruppo_eco: GruppoEcoHFBI,
-    pub(crate) gruppo_trofico: GruppoTrofHFBI,
+pub struct SpecieHFBI {
+    pub nome_comune: &'static str,
+    pub codice_specie: &'static str,
+    pub autoctono: bool,
+    pub gruppo_eco: GruppoEcoHFBI,
+    pub gruppo_trofico: GruppoTrofHFBI,
 }
 
 impl fmt::Display for SpecieHFBI {
@@ -97,7 +97,7 @@ impl fmt::Display for SpecieHFBI {
     }
 }
 
-pub(crate) const RIFERIMENTO_HFBI: [SpecieHFBI; 31] = [
+pub const RIFERIMENTO_HFBI: [SpecieHFBI; 31] = [
     SpecieHFBI {
         nome_comune: "Cheppia",
         codice_specie: "CH",
@@ -568,10 +568,10 @@ pub(crate) const RIFERIMENTO_HFBI: [SpecieHFBI; 31] = [
 use std::{collections::HashMap, fmt};
 
 #[derive(Debug, Clone)]
-pub(crate) struct RecordHFBI {
-    pub(crate) specie: SpecieHFBI,
-    pub(crate) numero_individui: u32, // in millimetri
-    pub(crate) peso: f32,             // in grammi
+pub struct RecordHFBI {
+    pub specie: SpecieHFBI,
+    pub numero_individui: u32, // in millimetri
+    pub peso: f32,             // in grammi
 }
 
 impl fmt::Display for RecordHFBI {
@@ -585,8 +585,8 @@ impl fmt::Display for RecordHFBI {
 }
 
 #[derive(Clone)]
-pub(crate) struct CampionamentoHFBI {
-    pub(crate) campionamento: Vec<RecordHFBI>,
+pub struct CampionamentoHFBI {
+    pub campionamento: Vec<RecordHFBI>,
 }
 
 impl fmt::Display for CampionamentoHFBI {
@@ -601,13 +601,13 @@ impl fmt::Display for CampionamentoHFBI {
 }
 
 impl CampionamentoHFBI {
-    pub(crate) fn new(campionamento: Vec<RecordHFBI>) -> Self {
+    pub fn new(campionamento: Vec<RecordHFBI>) -> Self {
         Self { campionamento }
     }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub(crate) enum TipoLagunaCostieraHFBI {
+pub enum TipoLagunaCostieraHFBI {
     MAt1,
     MAt2,
     MAt3,
@@ -638,7 +638,7 @@ impl TryFrom<i32> for TipoLagunaCostieraHFBI {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub(crate) enum StagioneHFBI {
+pub enum StagioneHFBI {
     Primavera,
     Autunno,
 }
@@ -666,7 +666,7 @@ impl TryFrom<i32> for StagioneHFBI {
 }
 
 #[derive(Clone, PartialEq, Eq, Hash)]
-pub(crate) enum HabitatHFBI {
+pub enum HabitatHFBI {
     Vegetato,
     NonVegetato,
 }
@@ -694,40 +694,40 @@ impl TryFrom<i32> for HabitatHFBI {
 }
 
 #[derive(Clone)]
-pub(crate) struct AnagraficaHFBIDraft {
-    pub(crate) codice_stazione: String,
-    pub(crate) corpo_idrico: String,
-    pub(crate) posizione: Location,
-    pub(crate) date_string: String, // Formato gg/mm/aaaa
-    pub(crate) tipo_laguna: TipoLagunaCostieraHFBI,
-    pub(crate) stagione: StagioneHFBI,
-    pub(crate) habitat_vegetato: HabitatHFBI,
-    pub(crate) lunghezza_media_transetto: String,
-    pub(crate) larghezza_media_transetto: String,
+pub struct AnagraficaHFBIDraft {
+    pub codice_stazione: String,
+    pub corpo_idrico: String,
+    pub posizione: Location,
+    pub date_string: String, // Formato gg/mm/aaaa
+    pub tipo_laguna: TipoLagunaCostieraHFBI,
+    pub stagione: StagioneHFBI,
+    pub habitat_vegetato: HabitatHFBI,
+    pub lunghezza_media_transetto: String,
+    pub larghezza_media_transetto: String,
 }
 
 #[derive(Clone)]
-pub(crate) struct AnagraficaHFBI {
-    pub(crate) codice_stazione: String,
-    pub(crate) corpo_idrico: String,
-    pub(crate) posizione: Location,
-    pub(crate) date_string: String, // Formato gg/mm/aaaa
-    pub(crate) tipo_laguna: TipoLagunaCostieraHFBI,
-    pub(crate) stagione: StagioneHFBI,
-    pub(crate) habitat_vegetato: HabitatHFBI,
-    pub(crate) lunghezza_media_transetto: f32,
-    pub(crate) larghezza_media_transetto: f32,
+pub struct AnagraficaHFBI {
+    pub codice_stazione: String,
+    pub corpo_idrico: String,
+    pub posizione: Location,
+    pub date_string: String, // Formato gg/mm/aaaa
+    pub tipo_laguna: TipoLagunaCostieraHFBI,
+    pub stagione: StagioneHFBI,
+    pub habitat_vegetato: HabitatHFBI,
+    pub lunghezza_media_transetto: f32,
+    pub larghezza_media_transetto: f32,
 }
 
 impl AnagraficaHFBI {
-    pub(crate) fn get_lunghezza_media(&self) -> f32 {
+    pub fn get_lunghezza_media(&self) -> f32 {
         self.lunghezza_media_transetto
     }
-    pub(crate) fn get_larghezza_media(&self) -> f32 {
+    pub fn get_larghezza_media(&self) -> f32 {
         self.larghezza_media_transetto
     }
 
-    pub(crate) fn get_cond_riferimento_key(&self) -> CondizioniRiferimentoKeyHFBI {
+    pub fn get_cond_riferimento_key(&self) -> CondizioniRiferimentoKeyHFBI {
         CondizioniRiferimentoKeyHFBI {
             tipo_laguna: self.tipo_laguna.clone(),
             stagione: self.stagione.clone(),
@@ -745,14 +745,14 @@ impl fmt::Display for AnagraficaHFBI {
 }
 
 #[derive(Clone)]
-pub(crate) struct ValoriIntermediHFBI {
-    pub(crate) bbent: f32,
-    pub(crate) bn: f32,
-    pub(crate) dbent: f32,
-    pub(crate) ddom: f32,
-    pub(crate) dhzp: f32,
-    pub(crate) dmig: f32,
-    pub(crate) mmi: f32,
+pub struct ValoriIntermediHFBI {
+    pub bbent: f32,
+    pub bn: f32,
+    pub dbent: f32,
+    pub ddom: f32,
+    pub dhzp: f32,
+    pub dmig: f32,
+    pub mmi: f32,
 }
 
 impl fmt::Display for ValoriIntermediHFBI {
@@ -768,7 +768,7 @@ impl fmt::Display for ValoriIntermediHFBI {
 }
 
 impl ValoriIntermediHFBI {
-    pub(crate) fn log(&self) {
+    pub fn log(&self) {
         //TODO: a proper format? we count on the embedded newlines to leverage the
         //chopping on newlines from add_console_message()
         println!("Valori intermedi: {{{self}}}");
@@ -776,7 +776,7 @@ impl ValoriIntermediHFBI {
 }
 
 #[derive(Clone)]
-pub(crate) struct RisultatoHFBI {
+pub struct RisultatoHFBI {
     valore: Option<f32>,
     intermediates: ValoriIntermediHFBI,
 }
@@ -796,39 +796,39 @@ impl fmt::Display for RisultatoHFBI {
 }
 
 impl RisultatoHFBI {
-    pub(crate) fn new(valore: Option<f32>, intermediates: ValoriIntermediHFBI) -> Self {
+    pub fn new(valore: Option<f32>, intermediates: ValoriIntermediHFBI) -> Self {
         Self {
             valore,
             intermediates,
         }
     }
-    pub(crate) fn get_valore(&self) -> Option<f32> {
+    pub fn get_valore(&self) -> Option<f32> {
         self.valore
     }
-    pub(crate) fn get_intermediates(&self) -> ValoriIntermediHFBI {
+    pub fn get_intermediates(&self) -> ValoriIntermediHFBI {
         self.intermediates.clone()
     }
 }
 
 #[derive(Hash, PartialEq, Eq)]
-pub(crate) struct CondizioniRiferimentoKeyHFBI {
-    pub(crate) tipo_laguna: TipoLagunaCostieraHFBI,
-    pub(crate) stagione: StagioneHFBI,
-    pub(crate) habitat_vegetato: HabitatHFBI,
+pub struct CondizioniRiferimentoKeyHFBI {
+    pub tipo_laguna: TipoLagunaCostieraHFBI,
+    pub stagione: StagioneHFBI,
+    pub habitat_vegetato: HabitatHFBI,
 }
 
 #[derive(Clone)]
-pub(crate) struct CondizioniRiferimentoHFBI {
-    pub(crate) bn: f32,
-    pub(crate) ddom: f32,
-    pub(crate) dmig: f32,
-    pub(crate) bbent: f32,
-    pub(crate) dbent: f32,
-    pub(crate) dhzp: f32,
+pub struct CondizioniRiferimentoHFBI {
+    pub bn: f32,
+    pub ddom: f32,
+    pub dmig: f32,
+    pub bbent: f32,
+    pub dbent: f32,
+    pub dhzp: f32,
 }
 
 impl CondizioniRiferimentoHFBI {
-    pub(crate) fn get_cond_riferimento(
+    pub fn get_cond_riferimento(
         anagrafica: &AnagraficaHFBI,
     ) -> Option<&'static CondizioniRiferimentoHFBI> {
         let key = anagrafica.get_cond_riferimento_key();
@@ -1028,7 +1028,7 @@ static CONDIZIONI_RIFERIMENTO_HFBI_HASHMAP: Lazy<
 
 /// enum per il risultato finale di un calcolo hfbi
 /// (vedi calculate_stato_ecologico)
-pub(crate) enum StatoEcologicoHFBI {
+pub enum StatoEcologicoHFBI {
     Eccellente,
     Buono,
     Sufficiente,

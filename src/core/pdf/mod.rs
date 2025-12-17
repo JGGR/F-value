@@ -17,10 +17,10 @@
 
 use crate::app::core::CISBA_LOGO_DATA; //, ISPRA_LOGO_DATA};
 use crate::core::BUILD_DATE;
-use crate::domain::hfbi::{AnagraficaHFBI, RisultatoHFBI};
-use crate::domain::niseci::{AnagraficaNISECI, RiferimentoNISECI, RisultatoNISECI};
-use crate::engines::hfbi::full::calculate_stato_ecologico_hfbi;
-use crate::engines::niseci::full::calculate_stato_ecologico_niseci;
+use esox::domain::hfbi::{AnagraficaHFBI, RisultatoHFBI};
+use esox::domain::niseci::{AnagraficaNISECI, RiferimentoNISECI, RisultatoNISECI};
+use esox::engines::hfbi::full::calculate_stato_ecologico_hfbi;
+use esox::engines::niseci::full::calculate_stato_ecologico_niseci;
 use image::{ColorType, GenericImageView, ImageFormat};
 use miniz_oxide::deflate::{compress_to_vec_zlib, CompressionLevel};
 use pdf_writer::{Chunk, Content, Filter, Finish, Name, Pdf, Rect, Ref, Str};

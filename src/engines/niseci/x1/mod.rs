@@ -19,7 +19,7 @@ use std::collections::HashMap;
 
 use crate::domain::niseci::{CampionamentoNISECI, RecordNISECI, RiferimentoNISECI, SpecieNISECI};
 
-pub(crate) fn calculate_x1(
+pub fn calculate_x1(
     campionamento: &CampionamentoNISECI,
     riferimento: &RiferimentoNISECI,
 ) -> f32 {

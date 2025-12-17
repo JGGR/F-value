@@ -15,5 +15,5 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-pub(crate) mod hfbi;
-pub(crate) mod niseci;
+pub mod hfbi;
+pub mod niseci;

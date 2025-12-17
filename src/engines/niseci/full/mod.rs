@@ -35,7 +35,7 @@ const STATO_ECOLOGICO_NISECI_SOGLIA_BUONO_AREA_MEDITERRANEA: f32 = 0.6;
 const STATO_ECOLOGICO_NISECI_SOGLIA_MODERATO: f32 = 0.4;
 const STATO_ECOLOGICO_NISECI_SOGLIA_SCADENTE: f32 = 0.2;
 
-pub(crate) fn calculate_niseci(
+pub fn calculate_niseci(
     campionamento: &CampionamentoNISECI,
     riferimento: &RiferimentoNISECI,
     anagrafica: &AnagraficaNISECI,
@@ -172,7 +172,7 @@ pub(crate) fn calculate_niseci(
     }
 }
 
-pub(crate) fn calculate_rqe_niseci(niseci: Option<f32>) -> Option<f32> {
+pub fn calculate_rqe_niseci(niseci: Option<f32>) -> Option<f32> {
     let rqe =
         niseci.map(|val| (val.log(10.0) + RQE_NISECI_MAGIC_ADDEND) / RQE_NISECI_MAGIC_QUOTIENT);
     if let Some(r) = rqe {
@@ -183,7 +183,7 @@ pub(crate) fn calculate_rqe_niseci(niseci: Option<f32>) -> Option<f32> {
     }
 }
 
-pub(crate) fn calculate_stato_ecologico_niseci(
+pub fn calculate_stato_ecologico_niseci(
     niseci: Option<f32>,
     area: &AreaNISECI,
 ) -> Option<StatoEcologicoNISECI> {

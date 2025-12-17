@@ -18,19 +18,19 @@
 use core::f32;
 
 #[derive(Debug, PartialEq)]
-pub(crate) struct Point<T> {
-    pub(crate) x: T,
-    pub(crate) y: T,
+pub struct Point<T> {
+    pub x: T,
+    pub y: T,
 }
 
 impl<T> Point<T> {
-    pub(crate) fn new(x: T, y: T) -> Point<T> {
+    pub fn new(x: T, y: T) -> Point<T> {
         Point { x, y }
     }
 }
 
 #[derive(Debug)]
-pub(crate) enum LinearRegressionError {
+pub enum LinearRegressionError {
     SameValues,
 }
 
@@ -54,7 +54,7 @@ fn gradient_descent(m_now: f32, b_now: f32, points: &[Point<f32>], step: f32) ->
     (m, b)
 }
 
-pub(crate) fn gradient_descent_iterate(
+pub fn gradient_descent_iterate(
     points: &[Point<i32>],
 ) -> Result<(f32, f32), LinearRegressionError> {
     let normalized_points = match normalize_points(points) {
@@ -79,7 +79,7 @@ pub(crate) fn gradient_descent_iterate(
     Ok((m_final, b_final))
 }
 
-pub(crate) fn calculate_quantita_with_regression(
+pub fn calculate_quantita_with_regression(
     campionamenti: &[Point<i32>],
 ) -> Result<u32, String> {
     // trova m e b della retta

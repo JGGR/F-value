@@ -15,12 +15,12 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::core::csv::deser::niseci::{
+use crate::csv::deser::niseci::{
     check_anagrafica_niseci_reader, check_campionamento_niseci_reader,
     check_riferimento_niseci_reader, VeryItalianRecordCsvAnagraficaNISECI,
     VeryItalianRecordCsvCampionamentoNISECI, VeryItalianRecordCsvRiferimentoNISECI,
 };
-use crate::core::csv::parser::niseci::{
+use crate::csv::parser::niseci::{
     check_records_anagrafica_niseci, check_records_campionamento_niseci,
     check_records_riferimento_niseci,
 };

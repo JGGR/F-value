@@ -27,22 +27,22 @@ use crate::engines::niseci::linear_regression::Point; // Needed by fishes_for_ev
                                                       // in test builds
 
 #[derive(Debug, Clone)]
-pub(crate) struct SpecieNISECI {
-    pub(crate) id: String,
-    pub(crate) nome: String,
-    pub(crate) tipo_autoctono: u8,
-    pub(crate) tipo_alloctono: u8,
-    pub(crate) specie_attesa: bool,
-    pub(crate) cl_soglia1: u32, // in mm
-    pub(crate) cl_soglia2: u32, // in mm
-    pub(crate) cl_soglia3: u32, // in mm
-    pub(crate) cl_soglia4: u32, // in mm
-    pub(crate) ad_juv_soglia1: f32,
-    pub(crate) ad_juv_soglia2: f32,
-    pub(crate) ad_juv_soglia3: f32,
-    pub(crate) ad_juv_soglia4: f32,
-    pub(crate) dens_soglia1: f32,
-    pub(crate) dens_soglia2: f32,
+pub struct SpecieNISECI {
+    pub id: String,
+    pub nome: String,
+    pub tipo_autoctono: u8,
+    pub tipo_alloctono: u8,
+    pub specie_attesa: bool,
+    pub cl_soglia1: u32, // in mm
+    pub cl_soglia2: u32, // in mm
+    pub cl_soglia3: u32, // in mm
+    pub cl_soglia4: u32, // in mm
+    pub ad_juv_soglia1: f32,
+    pub ad_juv_soglia2: f32,
+    pub ad_juv_soglia3: f32,
+    pub ad_juv_soglia4: f32,
+    pub dens_soglia1: f32,
+    pub dens_soglia2: f32,
 }
 
 impl fmt::Display for SpecieNISECI {
@@ -60,7 +60,7 @@ impl fmt::Display for SpecieNISECI {
 }
 
 impl SpecieNISECI {
-    pub(crate) fn new_dummy_specie() -> SpecieNISECI {
+    pub fn new_dummy_specie() -> SpecieNISECI {
         SpecieNISECI {
             id: "0".to_string(),
             nome: "dummy".to_string(),
@@ -82,8 +82,8 @@ impl SpecieNISECI {
 }
 
 #[derive(Clone)]
-pub(crate) struct RiferimentoNISECI {
-    pub(crate) elenco_specie: Vec<SpecieNISECI>,
+pub struct RiferimentoNISECI {
+    pub elenco_specie: Vec<SpecieNISECI>,
 }
 
 impl fmt::Display for RiferimentoNISECI {
@@ -98,18 +98,18 @@ impl fmt::Display for RiferimentoNISECI {
 }
 
 impl RiferimentoNISECI {
-    pub(crate) fn new(elenco_specie: Vec<SpecieNISECI>) -> Self {
+    pub fn new(elenco_specie: Vec<SpecieNISECI>) -> Self {
         Self { elenco_specie }
     }
 }
 
 #[derive(Debug, Clone)]
-pub(crate) struct RecordNISECI {
-    pub(crate) specie: SpecieNISECI,
-    pub(crate) passaggio_cattura: u8,
-    pub(crate) lunghezza: u32,
+pub struct RecordNISECI {
+    pub specie: SpecieNISECI,
+    pub passaggio_cattura: u8,
+    pub lunghezza: u32,
     /// in millimetri
-    pub(crate) peso: u32, // in grammi
+    pub peso: u32, // in grammi
 }
 
 impl fmt::Display for RecordNISECI {
@@ -121,8 +121,8 @@ impl fmt::Display for RecordNISECI {
 }
 
 #[derive(Clone)]
-pub(crate) struct CampionamentoNISECI {
-    pub(crate) campionamento: Vec<RecordNISECI>,
+pub struct CampionamentoNISECI {
+    pub campionamento: Vec<RecordNISECI>,
 }
 
 impl fmt::Display for CampionamentoNISECI {
@@ -138,7 +138,7 @@ impl fmt::Display for CampionamentoNISECI {
 
 impl CampionamentoNISECI {
     #[cfg(test)]
-    pub(crate) fn fishes_for_every_passage(&self) -> Vec<Point<i32>> {
+    pub fn fishes_for_every_passage(&self) -> Vec<Point<i32>> {
         let mut max_pass = 0;
         for record in self.campionamento.iter() {
             if record.passaggio_cattura > max_pass {
@@ -163,11 +163,11 @@ impl CampionamentoNISECI {
         pass_sum
     }
 
-    pub(crate) fn new(campionamento: Vec<RecordNISECI>) -> Self {
+    pub fn new(campionamento: Vec<RecordNISECI>) -> Self {
         Self { campionamento }
     }
 
-    pub(crate) fn get_numero_pesci_alieni_e_indigeni(&self) -> AlieniIndigeni {
+    pub fn get_numero_pesci_alieni_e_indigeni(&self) -> AlieniIndigeni {
         let mut alieni_indigeni = AlieniIndigeni {
             alieni: 0,
             indigeni: 0,
@@ -184,7 +184,7 @@ impl CampionamentoNISECI {
         alieni_indigeni
     }
 
-    pub(crate) fn get_tot_specie_autoctone_attese(&self) -> usize {
+    pub fn get_tot_specie_autoctone_attese(&self) -> usize {
         let mut map: HashMap<String, bool> = HashMap::new();
 
         for cattura in &self.campionamento {
@@ -204,13 +204,13 @@ impl CampionamentoNISECI {
     }
 }
 
-pub(crate) struct AlieniIndigeni {
-    pub(crate) alieni: u32,
-    pub(crate) indigeni: u32,
+pub struct AlieniIndigeni {
+    pub alieni: u32,
+    pub indigeni: u32,
 }
 
 #[derive(Clone)]
-pub(crate) enum TipoComunitaNISECI {
+pub enum TipoComunitaNISECI {
     Redatta,
     Recuperata,
     Dm260_2010,
@@ -246,10 +246,10 @@ impl TryFrom<i32> for TipoComunitaNISECI {
 }
 
 #[derive(Clone)]
-pub(crate) struct ComunitaNISECI {
-    pub(crate) tipo: TipoComunitaNISECI,
-    pub(crate) fonte: Option<String>,
-    pub(crate) numero_protocollo: Option<String>,
+pub struct ComunitaNISECI {
+    pub tipo: TipoComunitaNISECI,
+    pub fonte: Option<String>,
+    pub numero_protocollo: Option<String>,
 }
 
 impl fmt::Display for ComunitaNISECI {
@@ -292,7 +292,7 @@ impl fmt::Display for ComunitaNISECI {
 }
 
 #[derive(Clone)]
-pub(crate) enum AreaNISECI {
+pub enum AreaNISECI {
     Alpina,
     Mediterranea,
 }
@@ -320,38 +320,38 @@ impl TryFrom<i32> for AreaNISECI {
 }
 
 #[derive(Clone)]
-pub(crate) struct AnagraficaNISECIDraft {
-    pub(crate) comunita: ComunitaNISECI,
-    pub(crate) codice_stazione: String,
-    pub(crate) date_string: String, // Formato gg/mm/aaaa
-    pub(crate) area: AreaNISECI,
-    pub(crate) corpo_idrico: String,
-    pub(crate) bacino_appartenenza: String,
-    pub(crate) idro_eco_regione: IdroEcoRegioneNISECI,
-    pub(crate) posizione: Location,
-    pub(crate) lunghezza_media_stazione: String,
-    pub(crate) larghezza_media_stazione: String,
+pub struct AnagraficaNISECIDraft {
+    pub comunita: ComunitaNISECI,
+    pub codice_stazione: String,
+    pub date_string: String, // Formato gg/mm/aaaa
+    pub area: AreaNISECI,
+    pub corpo_idrico: String,
+    pub bacino_appartenenza: String,
+    pub idro_eco_regione: IdroEcoRegioneNISECI,
+    pub posizione: Location,
+    pub lunghezza_media_stazione: String,
+    pub larghezza_media_stazione: String,
 }
 
 #[derive(Clone)]
-pub(crate) struct AnagraficaNISECI {
-    pub(crate) comunita: ComunitaNISECI,
-    pub(crate) codice_stazione: String,
-    pub(crate) date_string: String, // Formato gg/mm/aaaa
-    pub(crate) area: AreaNISECI,
-    pub(crate) corpo_idrico: String,
-    pub(crate) bacino_appartenenza: String,
-    pub(crate) idro_eco_regione: IdroEcoRegioneNISECI,
-    pub(crate) posizione: Location,
-    pub(crate) lunghezza_media_stazione: f32,
-    pub(crate) larghezza_media_stazione: f32,
+pub struct AnagraficaNISECI {
+    pub comunita: ComunitaNISECI,
+    pub codice_stazione: String,
+    pub date_string: String, // Formato gg/mm/aaaa
+    pub area: AreaNISECI,
+    pub corpo_idrico: String,
+    pub bacino_appartenenza: String,
+    pub idro_eco_regione: IdroEcoRegioneNISECI,
+    pub posizione: Location,
+    pub lunghezza_media_stazione: f32,
+    pub larghezza_media_stazione: f32,
 }
 
 impl AnagraficaNISECI {
-    pub(crate) fn get_lunghezza_media(&self) -> f32 {
+    pub fn get_lunghezza_media(&self) -> f32 {
         self.lunghezza_media_stazione
     }
-    pub(crate) fn get_larghezza_media(&self) -> f32 {
+    pub fn get_larghezza_media(&self) -> f32 {
         self.larghezza_media_stazione
     }
 }
@@ -365,7 +365,7 @@ impl fmt::Display for AnagraficaNISECI {
 }
 
 #[derive(Clone)]
-pub(crate) enum IdroEcoRegioneNISECI {
+pub enum IdroEcoRegioneNISECI {
     AlpiOccidentali,
     PrealpiDolomiti,
     AlpiCentroOrientali,
@@ -482,14 +482,14 @@ impl TryFrom<i32> for IdroEcoRegioneNISECI {
 }
 
 #[derive(Clone)]
-pub(crate) struct ValoriIntermediSpecieNISECI {
-    pub(crate) densita_stimata: f32,
-    pub(crate) quantita_stimata: u32,
-    pub(crate) classi_eta: ClassiEtaSpecieNISECI,
-    pub(crate) rapporto_ad_juv: Option<f32>,
-    pub(crate) x2_a_a: u8,
-    pub(crate) x2_a_b: u8,
-    pub(crate) x2_b: f32,
+pub struct ValoriIntermediSpecieNISECI {
+    pub densita_stimata: f32,
+    pub quantita_stimata: u32,
+    pub classi_eta: ClassiEtaSpecieNISECI,
+    pub rapporto_ad_juv: Option<f32>,
+    pub x2_a_a: u8,
+    pub x2_a_b: u8,
+    pub x2_b: f32,
 }
 
 impl fmt::Display for ValoriIntermediSpecieNISECI {
@@ -515,15 +515,15 @@ impl fmt::Display for ValoriIntermediSpecieNISECI {
 }
 
 #[derive(Clone)]
-pub(crate) struct ValoriIntermediNISECI {
-    pub(crate) x1: f32,
-    pub(crate) x2: Option<f32>,
-    pub(crate) x3: f32,
-    pub(crate) specie_specifici: HashMap<String, ValoriIntermediSpecieNISECI>,
-    pub(crate) x2_a: f32,
-    pub(crate) x2_b: f32,
-    pub(crate) x3_a: Option<f32>,
-    pub(crate) x3_b: Option<f32>,
+pub struct ValoriIntermediNISECI {
+    pub x1: f32,
+    pub x2: Option<f32>,
+    pub x3: f32,
+    pub specie_specifici: HashMap<String, ValoriIntermediSpecieNISECI>,
+    pub x2_a: f32,
+    pub x2_b: f32,
+    pub x3_a: Option<f32>,
+    pub x3_b: Option<f32>,
 }
 
 impl fmt::Display for ValoriIntermediNISECI {
@@ -553,7 +553,7 @@ impl fmt::Display for ValoriIntermediNISECI {
 }
 
 impl ValoriIntermediNISECI {
-    pub(crate) fn log(&self) {
+    pub fn log(&self) {
         //TODO: a proper format? we count on the embedded newlines to leverage the
         //chopping on newlines from add_console_message()
         println!("Valori intermedi: {{{self}}}");
@@ -561,7 +561,7 @@ impl ValoriIntermediNISECI {
 }
 
 #[derive(Clone)]
-pub(crate) struct RisultatoNISECI {
+pub struct RisultatoNISECI {
     valore: Option<f32>,
     rqe: Option<f32>,
     valori_intermedi: ValoriIntermediNISECI,
@@ -583,7 +583,7 @@ impl fmt::Display for RisultatoNISECI {
 }
 
 impl RisultatoNISECI {
-    pub(crate) fn new(
+    pub fn new(
         valore: Option<f32>,
         rqe: Option<f32>,
         valori_intermedi: ValoriIntermediNISECI,
@@ -594,64 +594,64 @@ impl RisultatoNISECI {
             valori_intermedi,
         }
     }
-    pub(crate) fn get_valore(&self) -> Option<f32> {
+    pub fn get_valore(&self) -> Option<f32> {
         self.valore
     }
-    pub(crate) fn get_rqe(&self) -> Option<f32> {
+    pub fn get_rqe(&self) -> Option<f32> {
         self.rqe
     }
-    pub(crate) fn get_x1(&self) -> f32 {
+    pub fn get_x1(&self) -> f32 {
         self.valori_intermedi.x1
     }
-    pub(crate) fn get_x2(&self) -> Option<f32> {
+    pub fn get_x2(&self) -> Option<f32> {
         self.valori_intermedi.x2
     }
-    pub(crate) fn get_x3(&self) -> f32 {
+    pub fn get_x3(&self) -> f32 {
         self.valori_intermedi.x3
     }
 }
 
 #[derive(Clone, Copy)]
-pub(crate) struct MetricheX2aB {
+pub struct MetricheX2aB {
     criterio_b: u8,
     rapporto_ad_juv: Option<f32>,
 }
 
 impl MetricheX2aB {
-    pub(crate) fn new(criterio_b: u8, rapporto_ad_juv: Option<f32>) -> Self {
+    pub fn new(criterio_b: u8, rapporto_ad_juv: Option<f32>) -> Self {
         Self {
             criterio_b,
             rapporto_ad_juv,
         }
     }
-    pub(crate) fn get_criterio_b(&self) -> u8 {
+    pub fn get_criterio_b(&self) -> u8 {
         self.criterio_b
     }
-    pub(crate) fn get_rapporto_ad_juv(&self) -> Option<f32> {
+    pub fn get_rapporto_ad_juv(&self) -> Option<f32> {
         self.rapporto_ad_juv
     }
 }
 
 #[derive(Clone, Copy)]
-pub(crate) struct MetricheX2A {
+pub struct MetricheX2A {
     criterio_a: u8,
     criteri_x2a_b: MetricheX2aB,
 }
 
 impl MetricheX2A {
-    pub(crate) fn new(criterio_a: u8, criteri_x2a_b: MetricheX2aB) -> Self {
+    pub fn new(criterio_a: u8, criteri_x2a_b: MetricheX2aB) -> Self {
         Self {
             criterio_a,
             criteri_x2a_b,
         }
     }
-    pub(crate) fn get_criterio_a(&self) -> u8 {
+    pub fn get_criterio_a(&self) -> u8 {
         self.criterio_a
     }
-    pub(crate) fn get_criterio_b(&self) -> u8 {
+    pub fn get_criterio_b(&self) -> u8 {
         self.criteri_x2a_b.get_criterio_b()
     }
-    pub(crate) fn get_rapporto_ad_juv(&self) -> Option<f32> {
+    pub fn get_rapporto_ad_juv(&self) -> Option<f32> {
         self.criteri_x2a_b.get_rapporto_ad_juv()
     }
 }
@@ -660,13 +660,13 @@ impl MetricheX2A {
 /// nel campionamento per ogni specie catturata
 /// suddivisi nelle loro classi di eta (in base alla lunghezza)
 #[derive(Clone)]
-pub(crate) struct ClassiEtaSpecieNISECI {
-    pub(crate) specie: SpecieNISECI,
-    pub(crate) cl1: u32,
-    pub(crate) cl2: u32,
-    pub(crate) cl3: u32,
-    pub(crate) cl4: u32,
-    pub(crate) cl5: u32,
+pub struct ClassiEtaSpecieNISECI {
+    pub specie: SpecieNISECI,
+    pub cl1: u32,
+    pub cl2: u32,
+    pub cl3: u32,
+    pub cl4: u32,
+    pub cl5: u32,
 }
 
 impl fmt::Display for ClassiEtaSpecieNISECI {
@@ -680,7 +680,7 @@ impl fmt::Display for ClassiEtaSpecieNISECI {
 }
 
 impl ClassiEtaSpecieNISECI {
-    pub(crate) fn new() -> ClassiEtaSpecieNISECI {
+    pub fn new() -> ClassiEtaSpecieNISECI {
         ClassiEtaSpecieNISECI {
             specie: SpecieNISECI::new_dummy_specie(),
             cl1: 0,
@@ -691,14 +691,14 @@ impl ClassiEtaSpecieNISECI {
         }
     }
 
-    pub(crate) fn new_cl_prevalorizzata(record: &RecordNISECI) -> ClassiEtaSpecieNISECI {
+    pub fn new_cl_prevalorizzata(record: &RecordNISECI) -> ClassiEtaSpecieNISECI {
         let mut classe = ClassiEtaSpecieNISECI::new();
         classe.update_classi_eta(record);
         classe.specie = record.specie.clone();
         classe
     }
 
-    pub(crate) fn update_classi_eta(&mut self, record: &RecordNISECI) {
+    pub fn update_classi_eta(&mut self, record: &RecordNISECI) {
         match ClassiEta::find_classe_eta(record) {
             ClassiEta::CL1 => self.cl1 += 1,
             ClassiEta::CL2 => self.cl2 += 1,
@@ -715,7 +715,7 @@ impl ClassiEtaSpecieNISECI {
             .count()
     }
 
-    pub(crate) fn get_x2_a_criterio_a(&self) -> u8 {
+    pub fn get_x2_a_criterio_a(&self) -> u8 {
         let count = self.get_how_many_classes();
         if count >= 4 {
             return 1;
@@ -726,7 +726,7 @@ impl ClassiEtaSpecieNISECI {
         3
     }
 
-    pub(crate) fn get_x2_a_criterio_b(&self) -> (u8, Option<f32>) {
+    pub fn get_x2_a_criterio_b(&self) -> (u8, Option<f32>) {
         if (self.cl2 + self.cl3) == 0 {
             return (3, None);
         }
@@ -749,7 +749,7 @@ impl ClassiEtaSpecieNISECI {
 
     /// questa fn viene usata sia per x2_a che per x3
     /// i suoi test sono esattamente quelli per calculate_x2_a
-    pub(crate) fn calculate_struttura_popolazione(&self) -> Result<(f32, MetricheX2A), String> {
+    pub fn calculate_struttura_popolazione(&self) -> Result<(f32, MetricheX2A), String> {
         let criterio_a: u8 = self.get_x2_a_criterio_a();
         let (criterio_b, ad_juv): (u8, Option<f32>) = self.get_x2_a_criterio_b();
 
@@ -792,7 +792,7 @@ impl ClassiEtaSpecieNISECI {
 
 /// enum che aiuta a valorizzare ClassiEtaSpecieNISECI
 /// (vedi update_classi_eta)
-pub(crate) enum ClassiEta {
+pub enum ClassiEta {
     CL1,
     CL2,
     CL3,
@@ -801,7 +801,7 @@ pub(crate) enum ClassiEta {
 }
 
 impl ClassiEta {
-    pub(crate) fn find_classe_eta(record: &RecordNISECI) -> ClassiEta {
+    pub fn find_classe_eta(record: &RecordNISECI) -> ClassiEta {
         if record.lunghezza < record.specie.cl_soglia1 {
             ClassiEta::CL1
         } else if record.lunghezza < record.specie.cl_soglia2 {
@@ -816,14 +816,14 @@ impl ClassiEta {
     }
 }
 
-pub(crate) struct InfoIntermediePopolazioniNISECI {
+pub struct InfoIntermediePopolazioniNISECI {
     criterio_a: u8,
     criterio_b: u8,
     rapporto_ad_juv: Option<f32>,
 }
 
 impl InfoIntermediePopolazioniNISECI {
-    pub(crate) fn new(
+    pub fn new(
         criterio_a: u8,
         criterio_b: u8,
         rapporto_ad_juv: Option<f32>,
@@ -834,29 +834,29 @@ impl InfoIntermediePopolazioniNISECI {
             rapporto_ad_juv,
         }
     }
-    pub(crate) fn get_criterio_a(&self) -> u8 {
+    pub fn get_criterio_a(&self) -> u8 {
         self.criterio_a
     }
-    pub(crate) fn get_criterio_b(&self) -> u8 {
+    pub fn get_criterio_b(&self) -> u8 {
         self.criterio_b
     }
-    pub(crate) fn get_rapporto_ad_juv(&self) -> Option<f32> {
+    pub fn get_rapporto_ad_juv(&self) -> Option<f32> {
         self.rapporto_ad_juv
     }
 }
 
 /// struct che aiuta nel calcolo di x3
-pub(crate) struct InfoPopolazioniNISECI {
-    pub(crate) popolazione_piu_strutt: f32,
-    pub(crate) species_strutt: u32,
-    pub(crate) species_mediamente_strutt: u32,
-    pub(crate) species_destrutt: u32,
-    pub(crate) tot_species: usize,
-    pub(crate) intermediates_map: HashMap<String, InfoIntermediePopolazioniNISECI>,
+pub struct InfoPopolazioniNISECI {
+    pub popolazione_piu_strutt: f32,
+    pub species_strutt: u32,
+    pub species_mediamente_strutt: u32,
+    pub species_destrutt: u32,
+    pub tot_species: usize,
+    pub intermediates_map: HashMap<String, InfoIntermediePopolazioniNISECI>,
 }
 
 impl InfoPopolazioniNISECI {
-    pub(crate) fn new() -> InfoPopolazioniNISECI {
+    pub fn new() -> InfoPopolazioniNISECI {
         InfoPopolazioniNISECI {
             popolazione_piu_strutt: 0.0,
             species_strutt: 0,
@@ -867,7 +867,7 @@ impl InfoPopolazioniNISECI {
         }
     }
 
-    pub(crate) fn get_info_pop(
+    pub fn get_info_pop(
         map: &HashMap<String, ClassiEtaSpecieNISECI>,
     ) -> Result<InfoPopolazioniNISECI, Vec<String>> {
         let mut errors: Vec<String> = Vec::with_capacity(map.len()); // prenoto ora e poi restringo dopo
@@ -920,17 +920,17 @@ impl InfoPopolazioniNISECI {
 /// una volta valorizzata avremmo tutte le informazioni utili
 /// a calcolare x3
 /// per ogni tipo di alloctono abbiamo una InfoPopolazioniNISECI
-pub(crate) struct InfoPopolazioniAlieneNISECI {
-    pub(crate) tipo_1: InfoPopolazioniNISECI,
-    pub(crate) tipo_2: InfoPopolazioniNISECI,
-    pub(crate) tipo_3: InfoPopolazioniNISECI,
-    pub(crate) tot_specie_aliene: usize,
-    pub(crate) tot_specie_autoctone: usize,
+pub struct InfoPopolazioniAlieneNISECI {
+    pub tipo_1: InfoPopolazioniNISECI,
+    pub tipo_2: InfoPopolazioniNISECI,
+    pub tipo_3: InfoPopolazioniNISECI,
+    pub tot_specie_aliene: usize,
+    pub tot_specie_autoctone: usize,
 }
 
 impl InfoPopolazioniAlieneNISECI {
     #[cfg(test)]
-    pub(crate) fn new() -> InfoPopolazioniAlieneNISECI {
+    pub fn new() -> InfoPopolazioniAlieneNISECI {
         InfoPopolazioniAlieneNISECI {
             tipo_1: InfoPopolazioniNISECI::new(),
             tipo_2: InfoPopolazioniNISECI::new(),
@@ -940,7 +940,7 @@ impl InfoPopolazioniAlieneNISECI {
         }
     }
 
-    pub(crate) fn get_info_pop_aliene(
+    pub fn get_info_pop_aliene(
         classi_eta: &ClassiEtaAlieniNISECI,
     ) -> Result<InfoPopolazioniAlieneNISECI, Vec<String>> {
         let tipo_1 = InfoPopolazioniNISECI::get_info_pop(&classi_eta.map_tipo_1)?;
@@ -958,28 +958,28 @@ impl InfoPopolazioniAlieneNISECI {
         Ok(info_pop_aliene)
     }
 
-    pub(crate) fn get_species_mediamente_strutt(&self) -> u32 {
+    pub fn get_species_mediamente_strutt(&self) -> u32 {
         self.tipo_1.species_mediamente_strutt
             + self.tipo_2.species_mediamente_strutt
             + self.tipo_3.species_mediamente_strutt
     }
-    pub(crate) fn get_species_destrutt(&self) -> u32 {
+    pub fn get_species_destrutt(&self) -> u32 {
         self.tipo_1.species_destrutt + self.tipo_2.species_destrutt + self.tipo_3.species_destrutt
     }
 }
 
 /// struct che aiuta nel calcolo x3
 /// ci aiuta a suddividere le specie aliene in base alla tipologia
-pub(crate) struct ClassiEtaAlieniNISECI {
-    pub(crate) map_tipo_1: HashMap<String, ClassiEtaSpecieNISECI>,
-    pub(crate) map_tipo_2: HashMap<String, ClassiEtaSpecieNISECI>,
-    pub(crate) map_tipo_3: HashMap<String, ClassiEtaSpecieNISECI>,
-    pub(crate) tot_specie_aliene: usize,
-    pub(crate) tot_specie_autoctone: usize,
+pub struct ClassiEtaAlieniNISECI {
+    pub map_tipo_1: HashMap<String, ClassiEtaSpecieNISECI>,
+    pub map_tipo_2: HashMap<String, ClassiEtaSpecieNISECI>,
+    pub map_tipo_3: HashMap<String, ClassiEtaSpecieNISECI>,
+    pub tot_specie_aliene: usize,
+    pub tot_specie_autoctone: usize,
 }
 
 impl ClassiEtaAlieniNISECI {
-    pub(crate) fn new() -> ClassiEtaAlieniNISECI {
+    pub fn new() -> ClassiEtaAlieniNISECI {
         ClassiEtaAlieniNISECI {
             map_tipo_1: HashMap::with_capacity(10),
             map_tipo_2: HashMap::with_capacity(10),
@@ -994,13 +994,13 @@ impl ClassiEtaAlieniNISECI {
 /// esprime, data una SpecieNISECI,
 /// il numero di esemplari trovati
 /// suddivisi in base al numero di passaggio
-pub(crate) struct EsemplariPerCattura {
-    pub(crate) specie: SpecieNISECI,
-    pub(crate) mappa: HashMap<u8, u32>, // la key è il numero del passaggio
+pub struct EsemplariPerCattura {
+    pub specie: SpecieNISECI,
+    pub mappa: HashMap<u8, u32>, // la key è il numero del passaggio
 }
 
 impl EsemplariPerCattura {
-    pub(crate) fn new_prevalorized(
+    pub fn new_prevalorized(
         numero_passaggio: u8,
         specie: &SpecieNISECI,
     ) -> EsemplariPerCattura {
@@ -1013,7 +1013,7 @@ impl EsemplariPerCattura {
         }
     }
 
-    pub(crate) fn fill_passaggio(&mut self, numero_passaggio: u8) {
+    pub fn fill_passaggio(&mut self, numero_passaggio: u8) {
         match self.mappa.entry(numero_passaggio) {
             Entry::Occupied(occupied) => {
                 let numero_esemplari = occupied.get() + 1;
@@ -1028,7 +1028,7 @@ impl EsemplariPerCattura {
 
 /// enum per il risultato finale di un calcolo niseci
 /// (vedi calculate_stato_ecologico)
-pub(crate) enum StatoEcologicoNISECI {
+pub enum StatoEcologicoNISECI {
     Elevato,
     Buono,
     Moderato,

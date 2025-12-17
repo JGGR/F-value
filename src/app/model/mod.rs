@@ -17,13 +17,13 @@
 
 use crate::console::Console;
 use crate::core::SHORT_PROJECT_VERSION;
-use crate::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI, RisultatoHFBI, StatoEcologicoHFBI};
-use crate::domain::index::Indice;
-use crate::domain::niseci::{
+use esox::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI, RisultatoHFBI, StatoEcologicoHFBI};
+use esox::domain::index::Indice;
+use esox::domain::niseci::{
     AnagraficaNISECI, CampionamentoNISECI, RiferimentoNISECI, RisultatoNISECI, StatoEcologicoNISECI,
 };
-use crate::engines::hfbi::full::calculate_stato_ecologico_hfbi;
-use crate::engines::niseci::full::calculate_stato_ecologico_niseci;
+use esox::engines::hfbi::full::calculate_stato_ecologico_hfbi;
+use esox::engines::niseci::full::calculate_stato_ecologico_niseci;
 use std::collections::HashMap;
 use std::path::PathBuf;
 

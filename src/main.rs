@@ -22,11 +22,6 @@ mod args;
 mod console;
 mod controllers;
 mod core;
-mod csv;
-mod domain;
-mod engines;
-#[cfg(test)]
-mod tests;
 mod views;
 
 use crate::app::core::{

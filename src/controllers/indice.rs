@@ -19,7 +19,7 @@ pub(crate) struct IndiceController;
 use crate::app::core::Action;
 use crate::app::model::{Model, SubModel};
 use crate::controllers::{Controller, CurrentView, IndiceModel};
-use crate::domain::index::Indice;
+use esox::domain::index::Indice;
 use crate::MainState;
 use raylib::RaylibHandle;
 

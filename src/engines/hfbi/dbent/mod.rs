@@ -17,7 +17,7 @@
 
 use crate::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI, GruppoEcoHFBI};
 
-pub(crate) fn calc_dbent(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
+pub fn calc_dbent(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
     let mut sbent = 0.0;
     let mut densita_biomassa;
     let mut specie_sbent;

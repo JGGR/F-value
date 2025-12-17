@@ -90,7 +90,7 @@ fn parse_csv_pos(pos: &Option<csv::Position>) -> String {
     res
 }
 
-pub(crate) fn process_csv_errors(errors: &Vec<csv::Error>, tipo_csv: TipoRecordCsv) -> Vec<String> {
+pub fn process_csv_errors(errors: &Vec<csv::Error>, tipo_csv: TipoRecordCsv) -> Vec<String> {
     let mut res = Vec::new();
     for error in errors {
         match error.kind() {
@@ -236,7 +236,7 @@ pub(crate) fn process_csv_errors(errors: &Vec<csv::Error>, tipo_csv: TipoRecordC
     res
 }
 
-pub(crate) fn check_path_is_file_ends_with_csv(path: &Path) -> bool {
+pub fn check_path_is_file_ends_with_csv(path: &Path) -> bool {
     if !path.exists() {
         eprintln!("Error: Passed path does not exist");
         false
@@ -261,7 +261,7 @@ pub(crate) fn check_path_is_file_ends_with_csv(path: &Path) -> bool {
     }
 }
 
-pub(crate) fn translate_error_message(msg: &str) -> String {
+pub fn translate_error_message(msg: &str) -> String {
     if msg.starts_with("missing field") {
         msg.replace("missing field", "campo mancante")
     } else if msg.starts_with("invalid type") {
@@ -299,5 +299,5 @@ pub(crate) fn translate_error_message(msg: &str) -> String {
     }
 }
 
-pub(crate) mod hfbi;
-pub(crate) mod niseci;
+pub mod hfbi;
+pub mod niseci;

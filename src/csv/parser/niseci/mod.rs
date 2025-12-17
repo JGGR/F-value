@@ -48,7 +48,7 @@ fn check_soglie_ad_juv<T: RecordCsvRiferimentoNISECI>(r: &T) -> bool {
 }
 
 #[derive(Debug)]
-pub(crate) enum RecordCsvRiferimentoNISECIError {
+pub enum RecordCsvRiferimentoNISECIError {
     ValoreInvalido { msg: String }, //TODO: add position?
     SoglieCLNonCrescenti { msg: String },
     SoglieADJUVNonCrescenti { msg: String },
@@ -71,7 +71,7 @@ impl fmt::Display for RecordCsvRiferimentoNISECIError {
     }
 }
 
-pub(crate) fn parse_recordcsv_riferimento_niseci<T: RecordCsvRiferimentoNISECI>(
+pub fn parse_recordcsv_riferimento_niseci<T: RecordCsvRiferimentoNISECI>(
     records: Vec<T>,
 ) -> (Vec<SpecieNISECI>, Vec<RecordCsvRiferimentoNISECIError>) {
     let mut specie = Vec::new();
@@ -242,7 +242,7 @@ pub(crate) fn parse_recordcsv_riferimento_niseci<T: RecordCsvRiferimentoNISECI>(
 }
 
 #[derive(Debug)]
-pub(crate) enum RecordCsvCampionamentoNISECIError {
+pub enum RecordCsvCampionamentoNISECIError {
     ValoreInvalido { msg: String }, //TODO: add position?
 }
 
@@ -257,7 +257,7 @@ impl fmt::Display for RecordCsvCampionamentoNISECIError {
     }
 }
 
-pub(crate) fn parse_recordcsv_campionamento_niseci<T: RecordCsvCampionamentoNISECI>(
+pub fn parse_recordcsv_campionamento_niseci<T: RecordCsvCampionamentoNISECI>(
     records: Vec<T>,
     riferimento_specie: Vec<SpecieNISECI>,
 ) -> (Vec<RecordNISECI>, Vec<RecordCsvCampionamentoNISECIError>) {
@@ -321,7 +321,7 @@ pub(crate) fn parse_recordcsv_campionamento_niseci<T: RecordCsvCampionamentoNISE
 }
 
 #[derive(Debug)]
-pub(crate) enum RecordCsvAnagraficaNISECIError {
+pub enum RecordCsvAnagraficaNISECIError {
     ValoreInvalido { msg: String }, //TODO: add position?
 }
 
@@ -336,7 +336,7 @@ impl fmt::Display for RecordCsvAnagraficaNISECIError {
     }
 }
 
-pub(crate) fn parse_recordcsv_anagrafica_niseci<T: RecordCsvAnagraficaNISECI>(
+pub fn parse_recordcsv_anagrafica_niseci<T: RecordCsvAnagraficaNISECI>(
     records: Vec<T>,
 ) -> Result<AnagraficaNISECI, Vec<RecordCsvAnagraficaNISECIError>> {
     let mut errors = Vec::new();
@@ -574,7 +574,7 @@ pub(crate) fn parse_recordcsv_anagrafica_niseci<T: RecordCsvAnagraficaNISECI>(
     Ok(res)
 }
 
-pub(crate) fn check_records_riferimento_niseci<T: RecordCsvRiferimentoNISECI>(
+pub fn check_records_riferimento_niseci<T: RecordCsvRiferimentoNISECI>(
     records: Vec<T>,
 ) -> Result<Vec<SpecieNISECI>, Vec<RecordCsvRiferimentoNISECIError>> {
     let (records, errors) = parse_recordcsv_riferimento_niseci(records);
@@ -608,7 +608,7 @@ pub(crate) fn check_records_riferimento_niseci<T: RecordCsvRiferimentoNISECI>(
     }
 }
 
-pub(crate) fn check_records_campionamento_niseci<T: RecordCsvCampionamentoNISECI>(
+pub fn check_records_campionamento_niseci<T: RecordCsvCampionamentoNISECI>(
     records: Vec<T>,
     riferimento_specie: Vec<SpecieNISECI>,
 ) -> Result<Vec<RecordNISECI>, Vec<RecordCsvCampionamentoNISECIError>> {
@@ -645,7 +645,7 @@ pub(crate) fn check_records_campionamento_niseci<T: RecordCsvCampionamentoNISECI
     }
 }
 
-pub(crate) fn check_records_anagrafica_niseci<T: RecordCsvAnagraficaNISECI>(
+pub fn check_records_anagrafica_niseci<T: RecordCsvAnagraficaNISECI>(
     records: Vec<T>,
 ) -> Result<AnagraficaNISECI, Vec<RecordCsvAnagraficaNISECIError>> {
     let res = parse_recordcsv_anagrafica_niseci(records);

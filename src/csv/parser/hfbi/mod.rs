@@ -25,7 +25,7 @@ use chrono::format::ParseErrorKind;
 use std::fmt;
 
 #[derive(Debug)]
-pub(crate) enum RecordCsvCampionamentoHFBIError {
+pub enum RecordCsvCampionamentoHFBIError {
     ValoreInvalido { msg: String }, //TODO: add position?
 }
 
@@ -40,7 +40,7 @@ impl fmt::Display for RecordCsvCampionamentoHFBIError {
     }
 }
 
-pub(crate) fn parse_recordcsv_campionamento_hfbi<T: RecordCsvCampionamentoHFBI>(
+pub fn parse_recordcsv_campionamento_hfbi<T: RecordCsvCampionamentoHFBI>(
     records: Vec<T>,
 ) -> (Vec<RecordHFBI>, Vec<RecordCsvCampionamentoHFBIError>) {
     let mut campioni = Vec::new();
@@ -103,7 +103,7 @@ pub(crate) fn parse_recordcsv_campionamento_hfbi<T: RecordCsvCampionamentoHFBI>(
 }
 
 #[derive(Debug)]
-pub(crate) enum RecordCsvAnagraficaHFBIError {
+pub enum RecordCsvAnagraficaHFBIError {
     ValoreInvalido { msg: String }, //TODO: add position?
 }
 
@@ -118,7 +118,7 @@ impl fmt::Display for RecordCsvAnagraficaHFBIError {
     }
 }
 
-pub(crate) fn parse_recordcsv_anagrafica_hfbi<T: RecordCsvAnagraficaHFBI>(
+pub fn parse_recordcsv_anagrafica_hfbi<T: RecordCsvAnagraficaHFBI>(
     records: Vec<T>,
 ) -> Result<AnagraficaHFBI, Vec<RecordCsvAnagraficaHFBIError>> {
     let mut errors = Vec::new();
@@ -312,7 +312,7 @@ pub(crate) fn parse_recordcsv_anagrafica_hfbi<T: RecordCsvAnagraficaHFBI>(
     Ok(res)
 }
 
-pub(crate) fn check_records_campionamento_hfbi<T: RecordCsvCampionamentoHFBI>(
+pub fn check_records_campionamento_hfbi<T: RecordCsvCampionamentoHFBI>(
     records: Vec<T>,
 ) -> Result<Vec<RecordHFBI>, Vec<RecordCsvCampionamentoHFBIError>> {
     let (records, errors) = parse_recordcsv_campionamento_hfbi(records);
@@ -346,7 +346,7 @@ pub(crate) fn check_records_campionamento_hfbi<T: RecordCsvCampionamentoHFBI>(
     }
 }
 
-pub(crate) fn check_records_anagrafica_hfbi<T: RecordCsvAnagraficaHFBI>(
+pub fn check_records_anagrafica_hfbi<T: RecordCsvAnagraficaHFBI>(
     records: Vec<T>,
 ) -> Result<AnagraficaHFBI, Vec<RecordCsvAnagraficaHFBIError>> {
     let res = parse_recordcsv_anagrafica_hfbi(records);
