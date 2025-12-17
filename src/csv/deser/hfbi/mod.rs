@@ -15,10 +15,10 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::core::csv::deser::{
+use crate::csv::deser::{
     check_path_is_file_ends_with_csv, deserialize_comma_f32, process_csv_errors, NormalizerReader,
 };
-use crate::core::csv::{RecordCsvAnagraficaHFBI, RecordCsvCampionamentoHFBI, TipoRecordCsv};
+use crate::csv::{RecordCsvAnagraficaHFBI, RecordCsvCampionamentoHFBI, TipoRecordCsv};
 use std::any::TypeId;
 use std::fmt;
 use std::fs::File;

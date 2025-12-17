@@ -18,7 +18,7 @@ pub(crate) struct InfoAggiuntiveController;
 use crate::app::core::Action;
 use crate::app::model::{Model, SubModel};
 use crate::controllers::{Controller, CurrentView, InfoAggiuntiveModel};
-use crate::core::csv::parser::parse_date;
+use crate::csv::parser::parse_date;
 use crate::domain::hfbi::AnagraficaHFBI;
 use crate::domain::index::Indice;
 use crate::domain::niseci::{AnagraficaNISECI, TipoComunitaNISECI};

@@ -3,6 +3,7 @@
 ### Changed
 
 - Refactor `app` module to use `MainAction`
+- Move `csv` module out of `core`
 
 ## [0.1.0] - 2025-12-17
 

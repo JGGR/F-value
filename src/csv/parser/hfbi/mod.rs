@@ -15,8 +15,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::core::csv::parser::parse_date;
-use crate::core::csv::{RecordCsvAnagraficaHFBI, RecordCsvCampionamentoHFBI};
+use crate::csv::parser::parse_date;
+use crate::csv::{RecordCsvAnagraficaHFBI, RecordCsvCampionamentoHFBI};
 use crate::domain::hfbi::{
     AnagraficaHFBI, HabitatHFBI, RecordHFBI, StagioneHFBI, TipoLagunaCostieraHFBI, RIFERIMENTO_HFBI,
 };
