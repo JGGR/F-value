@@ -16,22 +16,20 @@
 */
 
 use super::core::{
-    get_locale, propheight, propwidth, CurrentView, GuiTheme, MainState, GUI_THEME_COMBOBOX_STR,
-    LOCALE_COMBOBOX_STR,
+    propheight, propwidth, CurrentView, MainAction, MainAction::*, MainState,
+    GUI_THEME_COMBOBOX_STR, LOCALE_COMBOBOX_STR,
 };
 use crate::core::{
     rrect, AUTHOR_GIONINJO, AUTHOR_GIONINJO_LINK, AUTHOR_JGABAUT, AUTHOR_JGABAUT_LINK,
     COPYRIGHT_INFO, SHORT_PROJECT_VERSION,
 };
-use raylib::consts::GuiControl::DEFAULT;
-use raylib::consts::GuiDefaultProperty::TEXT_SIZE;
 use raylib::consts::GuiIconName::*;
 use raylib::prelude::*;
 
 pub(crate) fn draw_reset_win(
     d: &mut RaylibDrawHandle,
-    showing_reset_win: &mut bool,
-    should_reset: &mut bool,
+    showing_reset_win: &bool,
+    actions: &mut Vec<MainAction>,
 ) {
     if *showing_reset_win {
         d.draw_rectangle(
@@ -55,18 +53,17 @@ pub(crate) fn draw_reset_win(
         );
 
         if (result == 0) || (result == 2) {
-            *showing_reset_win = false;
+            actions.push(CloseReset);
         } else if result == 1 {
-            *should_reset = true;
-            *showing_reset_win = false;
+            actions.push(ResetSettings);
         }
     }
 }
 
 pub(crate) fn draw_quit_win(
     d: &mut RaylibDrawHandle,
-    showing_quit_win: &mut bool,
-    should_quit: &mut bool,
+    showing_quit_win: &bool,
+    actions: &mut Vec<MainAction>,
 ) {
     if *showing_quit_win {
         d.draw_rectangle(
@@ -90,19 +87,20 @@ pub(crate) fn draw_quit_win(
         );
 
         if (result == 0) || (result == 2) {
-            *showing_quit_win = false;
+            actions.push(CloseQuit);
         } else if result == 1 {
-            *should_quit = true;
+            actions.push(Quit);
         }
     }
 }
 
 pub(crate) fn draw_license_box(
     d: &mut RaylibDrawHandle,
-    showing_license_box: &mut bool,
+    showing_license_box: &bool,
     font: &WeakFont,
     default_txt_spacing: i32,
     current_font_height: i32,
+    actions: &mut Vec<MainAction>,
 ) {
     if *showing_license_box {
         let x_padding = propwidth(d, 50);
@@ -145,18 +143,19 @@ pub(crate) fn draw_license_box(
         );
 
         if result {
-            *showing_license_box = false;
+            actions.push(CloseLicense);
         }
     }
 }
 
 pub(crate) fn draw_info_box(
     d: &mut RaylibDrawHandle,
-    showing_info_box: &mut bool,
+    showing_info_box: &bool,
     font: &WeakFont,
     default_txt_spacing: i32,
     default_txt_color: Color,
     current_font_height: i32,
+    actions: &mut Vec<MainAction>,
 ) {
     if *showing_info_box {
         d.draw_rectangle(
@@ -383,12 +382,16 @@ pub(crate) fn draw_info_box(
         }
 
         if result {
-            *showing_info_box = false;
+            actions.push(CloseInfo);
         }
     }
 }
 
-pub(crate) fn draw_settings_box(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
+pub(crate) fn draw_settings_box(
+    d: &mut RaylibDrawHandle,
+    main_state: &MainState,
+    actions: &mut Vec<MainAction>,
+) {
     if main_state.showing_settings_box {
         d.draw_rectangle(
             0,
@@ -451,8 +454,9 @@ pub(crate) fn draw_settings_box(d: &mut RaylibDrawHandle, main_state: &mut MainS
         if curr_font_height != main_state.current_font_height {
             //Detecting this and acting here is better than doing so in
             //update_main() since we can avoid a hot call on gui_set_style()
-            main_state.current_font_height = curr_font_height;
-            d.gui_set_style(DEFAULT, TEXT_SIZE, main_state.current_font_height);
+            //main_state.current_font_height = curr_font_height;
+            actions.push(SetFontHeight(curr_font_height));
+            //d.gui_set_style(DEFAULT, TEXT_SIZE, main_state.current_font_height);
         }
 
         let gui_theme_label_width = fontsize_label_width;
@@ -474,7 +478,7 @@ pub(crate) fn draw_settings_box(d: &mut RaylibDrawHandle, main_state: &mut MainS
         let gui_theme_button_height = gui_theme_label_height;
 
         let gui_theme_str = GUI_THEME_COMBOBOX_STR;
-
+        let mut current_theme = main_state.gui_theme_combobox_active;
         d.gui_combo_box(
             rrect(
                 gui_theme_button_x,
@@ -483,8 +487,11 @@ pub(crate) fn draw_settings_box(d: &mut RaylibDrawHandle, main_state: &mut MainS
                 gui_theme_button_height,
             ),
             gui_theme_str,
-            &mut main_state.gui_theme_combobox_active,
+            &mut current_theme,
         );
+        if current_theme != main_state.gui_theme_combobox_active {
+            actions.push(SetTheme(current_theme));
+        }
 
         let locale_label_width = gui_theme_label_width;
         let locale_label_x = gui_theme_label_x;
@@ -505,7 +512,7 @@ pub(crate) fn draw_settings_box(d: &mut RaylibDrawHandle, main_state: &mut MainS
         let locale_button_height = locale_label_height;
 
         let locale_str = LOCALE_COMBOBOX_STR;
-
+        let mut current_locale = main_state.locale_combobox_active;
         d.gui_combo_box(
             rrect(
                 locale_button_x,
@@ -514,8 +521,11 @@ pub(crate) fn draw_settings_box(d: &mut RaylibDrawHandle, main_state: &mut MainS
                 locale_button_height,
             ),
             locale_str,
-            &mut main_state.locale_combobox_active,
+            &mut current_locale,
         );
+        if current_locale != main_state.locale_combobox_active {
+            actions.push(SetLocale(current_locale));
+        }
 
         // Reset settings button
         if d.gui_button(
@@ -527,19 +537,18 @@ pub(crate) fn draw_settings_box(d: &mut RaylibDrawHandle, main_state: &mut MainS
             ),
             "Reset",
         ) {
-            main_state.current_font_height = main_state.default_font_height;
-            d.gui_set_style(DEFAULT, TEXT_SIZE, main_state.current_font_height);
-            main_state.gui_theme_combobox_active = GuiTheme::Light as i32;
-            main_state.locale_combobox_active = get_locale() as i32;
+            actions.push(ResetSettings);
         }
 
         if result {
-            main_state.showing_settings_box = false;
+            actions.push(CloseSettings);
+            //main_state.showing_settings_box = false;
         }
     }
 }
 
-pub(crate) fn draw_main(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
+pub(crate) fn draw_main(d: &mut RaylibDrawHandle, main_state: &MainState) -> Vec<MainAction> {
+    let mut actions = Vec::<MainAction>::new();
     let lock_gui = main_state.get_gui_should_lock();
 
     if lock_gui {
@@ -616,7 +625,7 @@ pub(crate) fn draw_main(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
         ),
         itext.as_str(),
     ) {
-        main_state.showing_info_box = true;
+        actions.push(ShowInfo);
     }
 
     let reset_button_width = core_button_width;
@@ -635,7 +644,7 @@ pub(crate) fn draw_main(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
         ),
         itext.as_str(),
     ) {
-        main_state.showing_reset_win = true;
+        actions.push(ShowReset);
     }
 
     // License button
@@ -653,7 +662,7 @@ pub(crate) fn draw_main(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
         ),
         itext.as_str(),
     ) {
-        main_state.showing_license_box = true;
+        actions.push(ShowLicense);
     }
 
     let settings_button_width = license_button_width;
@@ -672,7 +681,7 @@ pub(crate) fn draw_main(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
         ),
         itext.as_str(),
     ) {
-        main_state.showing_settings_box = true;
+        actions.push(OpenSettings);
     }
 
     let console_button_width = settings_button_width;
@@ -693,11 +702,10 @@ pub(crate) fn draw_main(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
     ) {
         match main_state.current_view {
             CurrentView::Console => {
-                let prev = main_state.previous_view;
-                main_state.set_current_view(prev);
+                actions.push(CloseConsole);
             }
             _ => {
-                main_state.set_current_view(CurrentView::Console);
+                actions.push(ShowConsole);
             }
         }
     }
@@ -705,7 +713,7 @@ pub(crate) fn draw_main(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
     if lock_gui && main_state.showing_settings_box {
         d.gui_unlock();
     }
-    draw_settings_box(d, main_state);
+    draw_settings_box(d, main_state, &mut actions);
     if lock_gui && main_state.showing_settings_box {
         d.gui_lock();
     }
@@ -713,13 +721,15 @@ pub(crate) fn draw_main(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
     if lock_gui && main_state.showing_info_box {
         d.gui_unlock();
     }
+    let showing_info_box = main_state.showing_info_box;
     draw_info_box(
         d,
-        &mut main_state.showing_info_box,
+        &showing_info_box,
         &main_state.current_font,
         main_state.default_txt_spacing,
         main_state.default_txt_color,
         main_state.current_font_height,
+        &mut actions,
     );
     if lock_gui && main_state.showing_info_box {
         d.gui_lock();
@@ -728,12 +738,14 @@ pub(crate) fn draw_main(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
     if lock_gui && main_state.showing_license_box {
         d.gui_unlock();
     }
+    let showing_license_box = main_state.showing_license_box;
     draw_license_box(
         d,
-        &mut main_state.showing_license_box,
+        &showing_license_box,
         &main_state.current_font,
         main_state.default_txt_spacing,
         main_state.current_font_height,
+        &mut actions,
     );
     if lock_gui && main_state.showing_license_box {
         d.gui_lock();
@@ -742,11 +754,8 @@ pub(crate) fn draw_main(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
     if lock_gui && main_state.showing_quit_win {
         d.gui_unlock();
     }
-    draw_quit_win(
-        d,
-        &mut main_state.showing_quit_win,
-        &mut main_state.should_quit,
-    );
+    let showing_quit_win = main_state.showing_quit_win;
+    draw_quit_win(d, &showing_quit_win, &mut actions);
     if lock_gui && main_state.showing_quit_win {
         d.gui_lock();
     }
@@ -754,11 +763,8 @@ pub(crate) fn draw_main(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
     if lock_gui && main_state.showing_reset_win {
         d.gui_unlock();
     }
-    draw_reset_win(
-        d,
-        &mut main_state.showing_reset_win,
-        &mut main_state.should_reset,
-    );
+    let showing_reset_win = main_state.showing_reset_win;
+    draw_reset_win(d, &showing_reset_win, &mut actions);
     if lock_gui && main_state.showing_reset_win {
         d.gui_lock();
     }
@@ -766,4 +772,5 @@ pub(crate) fn draw_main(d: &mut RaylibDrawHandle, main_state: &mut MainState) {
     if lock_gui {
         d.gui_unlock();
     }
+    actions
 }

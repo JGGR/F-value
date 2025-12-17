@@ -16,9 +16,9 @@
 */
 
 use super::core::{
-    GuiTheme, Localize, MainState, ASHES_THEME_DATA, BLUISH_THEME_DATA, CANDY_THEME_DATA,
-    CHERRY_THEME_DATA, CYBER_THEME_DATA, DARK_THEME_DATA, EXIT_KEY, JUNGLE_THEME_DATA,
-    LAVANDA_THEME_DATA, TERMINAL_THEME_DATA,
+    get_locale, CurrentView, GuiTheme, Localize, MainAction, MainState, ASHES_THEME_DATA,
+    BLUISH_THEME_DATA, CANDY_THEME_DATA, CHERRY_THEME_DATA, CYBER_THEME_DATA, DARK_THEME_DATA,
+    EXIT_KEY, JUNGLE_THEME_DATA, LAVANDA_THEME_DATA, TERMINAL_THEME_DATA,
 };
 use raylib::color::Color;
 use raylib::consts::GuiControl::DEFAULT;
@@ -31,30 +31,88 @@ use std::io::Write;
 use std::path::PathBuf;
 use uuid::Uuid;
 
-pub(crate) fn update_main(rl: &mut RaylibHandle, main_state: &mut MainState) {
+pub(crate) fn update_main(
+    rl: &mut RaylibHandle,
+    actions: &mut Vec<MainAction>,
+    main_state: &mut MainState,
+) {
     main_state.should_quit = rl.window_should_close();
 
     main_state.frame_counter += 1;
 
-    let current_theme_idx = main_state.gui_theme_combobox_active;
-
-    if current_theme_idx != main_state.theme as i32 {
-        match <GuiTheme as TryFrom<i32>>::try_from(current_theme_idx) {
-            Ok(theme) => {
-                theme.load_and_set(rl, main_state);
+    for a in actions.drain(..) {
+        match a {
+            MainAction::ShowInfo => {
+                main_state.showing_info_box = true;
             }
-            Err(_) => eprintln!("unknown number in current theme check"),
-        }
-    }
-
-    let current_locale_idx = main_state.locale_combobox_active;
-
-    if current_locale_idx != main_state.locale as i32 {
-        match <Localize as TryFrom<i32>>::try_from(current_locale_idx) {
-            Ok(locale) => {
-                main_state.locale = locale;
+            MainAction::CloseInfo => {
+                main_state.showing_info_box = false;
             }
-            Err(_) => eprintln!("unknown number in current locale check"),
+            MainAction::ShowLicense => {
+                main_state.showing_license_box = true;
+            }
+            MainAction::CloseLicense => {
+                main_state.showing_license_box = false;
+            }
+            MainAction::ShowReset => {
+                main_state.showing_reset_win = true;
+            }
+            MainAction::CloseReset => {
+                main_state.showing_reset_win = false;
+            }
+            MainAction::ResetSettings => {
+                main_state.showing_reset_win = false;
+                main_state.current_font_height = main_state.default_font_height;
+                rl.gui_set_style(DEFAULT, TEXT_SIZE, main_state.current_font_height);
+                main_state.gui_theme_combobox_active = GuiTheme::Light as i32;
+                GuiTheme::load_and_set(&GuiTheme::Light, rl, main_state);
+                main_state.locale_combobox_active = get_locale() as i32;
+            }
+            MainAction::ShowConsole => {
+                main_state.set_current_view(CurrentView::Console);
+            }
+            MainAction::CloseConsole => {
+                let prev = main_state.previous_view;
+                main_state.set_current_view(prev);
+            }
+            MainAction::OpenSettings => {
+                main_state.showing_settings_box = true;
+            }
+            MainAction::CloseSettings => {
+                main_state.showing_settings_box = false;
+            }
+            MainAction::SetLocale(locale_idx) => {
+                if locale_idx != main_state.locale as i32 {
+                    match <Localize as TryFrom<i32>>::try_from(locale_idx) {
+                        Ok(l) => {
+                            main_state.locale = l;
+                            main_state.locale_combobox_active = locale_idx;
+                        }
+                        Err(_) => eprintln!("unknown number in current locale check"),
+                    }
+                }
+            }
+            MainAction::SetFontHeight(height) => {
+                main_state.current_font_height = height;
+                rl.gui_set_style(DEFAULT, TEXT_SIZE, main_state.current_font_height);
+            }
+            MainAction::SetTheme(theme_idx) => {
+                if theme_idx != main_state.theme as i32 {
+                    match <GuiTheme as TryFrom<i32>>::try_from(theme_idx) {
+                        Ok(t) => {
+                            main_state.gui_theme_combobox_active = theme_idx;
+                            t.load_and_set(rl, main_state);
+                        }
+                        Err(_) => eprintln!("unknown number in current theme check"),
+                    }
+                }
+            }
+            MainAction::Quit => {
+                eprintln!("MainController:  got action {}", a);
+            }
+            MainAction::CloseQuit => {
+                eprintln!("MainController:  got action {}", a);
+            }
         }
     }
 

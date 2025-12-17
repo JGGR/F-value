@@ -1,4 +1,10 @@
-## [0.1.0] - Unreleased
+## [0.1.1] - Unreleased
+
+### Changed
+
+- Refactor `app` module to use `MainAction`
+
+## [0.1.0] - 2025-12-17
 
 ### Added
 
