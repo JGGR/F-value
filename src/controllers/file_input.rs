@@ -18,7 +18,7 @@ pub(crate) struct FileInputController;
 use crate::app::core::{Action, Localize, MainState};
 use crate::app::model::{Model, SubModel};
 use crate::controllers::{Controller, CurrentView, FileInputModel};
-use crate::csv::deser::{
+use esox::csv::deser::{
     hfbi::{
         check_campionamento_hfbi_path, PlainRecordCsvCampionamentoHFBI,
         VeryItalianRecordCsvCampionamentoHFBI,
@@ -30,17 +30,17 @@ use crate::csv::deser::{
     },
     process_csv_errors,
 };
-use crate::csv::parser::{
+use esox::csv::parser::{
     hfbi::check_records_campionamento_hfbi,
     niseci::{check_records_campionamento_niseci, check_records_riferimento_niseci},
 };
-use crate::csv::{
+use esox::csv::{
     RecordCsvCampionamentoHFBI, RecordCsvCampionamentoNISECI, RecordCsvRiferimentoNISECI,
     TipoRecordCsv,
 };
-use crate::domain::hfbi::CampionamentoHFBI;
-use crate::domain::index::Indice;
-use crate::domain::niseci::{CampionamentoNISECI, RiferimentoNISECI};
+use esox::domain::hfbi::CampionamentoHFBI;
+use esox::domain::index::Indice;
+use esox::domain::niseci::{CampionamentoNISECI, RiferimentoNISECI};
 use raylib::RaylibHandle;
 use std::path::PathBuf;
 

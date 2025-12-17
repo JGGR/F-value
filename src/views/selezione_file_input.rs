@@ -16,7 +16,7 @@
 */
 use crate::app::core::{Action, Action::*};
 use crate::app::model::Model;
-use crate::domain::index::Indice;
+use esox::domain::index::Indice;
 use crate::views::{propheight, propwidth, rrect, View};
 use crate::MainState;
 use raylib::consts::GuiIconName::{ICON_BIN, ICON_FILE_OPEN};

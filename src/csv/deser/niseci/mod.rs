@@ -30,30 +30,30 @@ use std::path::PathBuf;
 
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub(crate) struct VeryItalianRecordCsvRiferimentoNISECI {
-    pub(crate) nome_comune: String,
-    pub(crate) nome_latino: String,
-    pub(crate) codice_specie: String,
-    pub(crate) origine: String,
-    pub(crate) tipo_autoctono: u32,
-    pub(crate) allo_nocivita: u32,
-    pub(crate) specie_attesa: u32,
-    pub(crate) cl_soglia1: u32, // in mm
-    pub(crate) cl_soglia2: u32, // in mm
-    pub(crate) cl_soglia3: u32, // in mm
-    pub(crate) cl_soglia4: u32, // in mm
+pub struct VeryItalianRecordCsvRiferimentoNISECI {
+    pub nome_comune: String,
+    pub nome_latino: String,
+    pub codice_specie: String,
+    pub origine: String,
+    pub tipo_autoctono: u32,
+    pub allo_nocivita: u32,
+    pub specie_attesa: u32,
+    pub cl_soglia1: u32, // in mm
+    pub cl_soglia2: u32, // in mm
+    pub cl_soglia3: u32, // in mm
+    pub cl_soglia4: u32, // in mm
     #[serde(deserialize_with = "deserialize_comma_f32")]
-    pub(crate) ad_juv_soglia1: f32,
+    pub ad_juv_soglia1: f32,
     #[serde(deserialize_with = "deserialize_comma_f32")]
-    pub(crate) ad_juv_soglia2: f32,
+    pub ad_juv_soglia2: f32,
     #[serde(deserialize_with = "deserialize_comma_f32")]
-    pub(crate) ad_juv_soglia3: f32,
+    pub ad_juv_soglia3: f32,
     #[serde(deserialize_with = "deserialize_comma_f32")]
-    pub(crate) ad_juv_soglia4: f32,
+    pub ad_juv_soglia4: f32,
     #[serde(deserialize_with = "deserialize_comma_f32")]
-    pub(crate) dens_soglia1: f32,
+    pub dens_soglia1: f32,
     #[serde(deserialize_with = "deserialize_comma_f32")]
-    pub(crate) dens_soglia2: f32,
+    pub dens_soglia2: f32,
 }
 
 impl RecordCsvRiferimentoNISECI for VeryItalianRecordCsvRiferimentoNISECI {
@@ -126,24 +126,24 @@ impl fmt::Display for VeryItalianRecordCsvRiferimentoNISECI {
 
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub(crate) struct PlainRecordCsvRiferimentoNISECI {
-    pub(crate) nome_comune: String,
-    pub(crate) nome_latino: String,
-    pub(crate) codice_specie: String,
-    pub(crate) origine: String,
-    pub(crate) tipo_autoctono: u32,
-    pub(crate) allo_nocivita: u32,
-    pub(crate) specie_attesa: u32,
-    pub(crate) cl_soglia1: u32, // in mm
-    pub(crate) cl_soglia2: u32, // in mm
-    pub(crate) cl_soglia3: u32, // in mm
-    pub(crate) cl_soglia4: u32, // in mm
-    pub(crate) ad_juv_soglia1: f32,
-    pub(crate) ad_juv_soglia2: f32,
-    pub(crate) ad_juv_soglia3: f32,
-    pub(crate) ad_juv_soglia4: f32,
-    pub(crate) dens_soglia1: f32,
-    pub(crate) dens_soglia2: f32,
+pub struct PlainRecordCsvRiferimentoNISECI {
+    pub nome_comune: String,
+    pub nome_latino: String,
+    pub codice_specie: String,
+    pub origine: String,
+    pub tipo_autoctono: u32,
+    pub allo_nocivita: u32,
+    pub specie_attesa: u32,
+    pub cl_soglia1: u32, // in mm
+    pub cl_soglia2: u32, // in mm
+    pub cl_soglia3: u32, // in mm
+    pub cl_soglia4: u32, // in mm
+    pub ad_juv_soglia1: f32,
+    pub ad_juv_soglia2: f32,
+    pub ad_juv_soglia3: f32,
+    pub ad_juv_soglia4: f32,
+    pub dens_soglia1: f32,
+    pub dens_soglia2: f32,
 }
 
 impl RecordCsvRiferimentoNISECI for PlainRecordCsvRiferimentoNISECI {
@@ -214,7 +214,7 @@ impl fmt::Display for PlainRecordCsvRiferimentoNISECI {
     }
 }
 
-pub(crate) fn parse_csv_riferimento_niseci<R, T>(
+pub fn parse_csv_riferimento_niseci<R, T>(
     mut rdr: csv::Reader<R>,
 ) -> (Vec<T>, Vec<csv::Error>)
 where
@@ -234,7 +234,7 @@ where
     (records, errors)
 }
 
-pub(crate) fn check_riferimento_niseci_reader<R: Read, T>(
+pub fn check_riferimento_niseci_reader<R: Read, T>(
     reader: R,
     has_headers: bool,
 ) -> Result<Vec<T>, Vec<csv::Error>>
@@ -291,7 +291,7 @@ where
     }
 }
 
-pub(crate) fn check_riferimento_niseci_path<T>(
+pub fn check_riferimento_niseci_path<T>(
     path: PathBuf,
     has_headers: bool,
 ) -> Result<Vec<T>, Vec<csv::Error>>
@@ -312,13 +312,13 @@ where
 
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub(crate) struct VeryItalianRecordCsvCampionamentoNISECI {
-    pub(crate) data: String,
-    pub(crate) stazione: String,
-    pub(crate) num_passaggio: u32,
-    pub(crate) codice_specie: String,
-    pub(crate) lunghezza: u32,
-    pub(crate) peso: u32,
+pub struct VeryItalianRecordCsvCampionamentoNISECI {
+    pub data: String,
+    pub stazione: String,
+    pub num_passaggio: u32,
+    pub codice_specie: String,
+    pub lunghezza: u32,
+    pub peso: u32,
 }
 
 impl RecordCsvCampionamentoNISECI for VeryItalianRecordCsvCampionamentoNISECI {
@@ -355,13 +355,13 @@ impl fmt::Display for VeryItalianRecordCsvCampionamentoNISECI {
 
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub(crate) struct PlainRecordCsvCampionamentoNISECI {
-    pub(crate) data: String,
-    pub(crate) stazione: String,
-    pub(crate) num_passaggio: u32,
-    pub(crate) codice_specie: String,
-    pub(crate) lunghezza: u32,
-    pub(crate) peso: u32,
+pub struct PlainRecordCsvCampionamentoNISECI {
+    pub data: String,
+    pub stazione: String,
+    pub num_passaggio: u32,
+    pub codice_specie: String,
+    pub lunghezza: u32,
+    pub peso: u32,
 }
 
 impl RecordCsvCampionamentoNISECI for PlainRecordCsvCampionamentoNISECI {
@@ -396,7 +396,7 @@ impl fmt::Display for PlainRecordCsvCampionamentoNISECI {
     }
 }
 
-pub(crate) fn parse_csv_campionamento_niseci<R, T>(
+pub fn parse_csv_campionamento_niseci<R, T>(
     mut rdr: csv::Reader<R>,
 ) -> (Vec<T>, Vec<csv::Error>)
 where
@@ -416,7 +416,7 @@ where
     (records, errors)
 }
 
-pub(crate) fn check_campionamento_niseci_reader<R: Read, T>(
+pub fn check_campionamento_niseci_reader<R: Read, T>(
     reader: R,
     has_headers: bool,
 ) -> Result<Vec<T>, Vec<csv::Error>>
@@ -473,7 +473,7 @@ where
     }
 }
 
-pub(crate) fn check_campionamento_niseci_path<T>(
+pub fn check_campionamento_niseci_path<T>(
     path: PathBuf,
     has_headers: bool,
 ) -> Result<Vec<T>, Vec<csv::Error>>
@@ -494,22 +494,22 @@ where
 
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub(crate) struct VeryItalianRecordCsvAnagraficaNISECI {
-    pub(crate) codice_stazione: String,
-    pub(crate) corpo_idrico: String,
-    pub(crate) regione: String,
-    pub(crate) provincia: String,
-    pub(crate) data: String,
+pub struct VeryItalianRecordCsvAnagraficaNISECI {
+    pub codice_stazione: String,
+    pub corpo_idrico: String,
+    pub regione: String,
+    pub provincia: String,
+    pub data: String,
     #[serde(deserialize_with = "deserialize_comma_f32")]
-    pub(crate) lunghezza_stazione: f32,
+    pub lunghezza_stazione: f32,
     #[serde(deserialize_with = "deserialize_comma_f32")]
-    pub(crate) larghezza_stazione: f32,
-    pub(crate) tipo_comunita: u32,
-    pub(crate) fonte: String,
-    pub(crate) numero_protocollo: String,
-    pub(crate) idro_eco_regione: u32,
-    pub(crate) area_alpina: u32,
-    pub(crate) nome_bacino: String,
+    pub larghezza_stazione: f32,
+    pub tipo_comunita: u32,
+    pub fonte: String,
+    pub numero_protocollo: String,
+    pub idro_eco_regione: u32,
+    pub area_alpina: u32,
+    pub nome_bacino: String,
 }
 
 impl RecordCsvAnagraficaNISECI for VeryItalianRecordCsvAnagraficaNISECI {
@@ -582,20 +582,20 @@ impl fmt::Display for VeryItalianRecordCsvAnagraficaNISECI {
 
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub(crate) struct PlainRecordCsvAnagraficaNISECI {
-    pub(crate) codice_stazione: String,
-    pub(crate) corpo_idrico: String,
-    pub(crate) regione: String,
-    pub(crate) provincia: String,
-    pub(crate) data: String,
-    pub(crate) lunghezza_stazione: f32,
-    pub(crate) larghezza_stazione: f32,
-    pub(crate) tipo_comunita: u32,
-    pub(crate) fonte: String,
-    pub(crate) numero_protocollo: String,
-    pub(crate) idro_eco_regione: u32,
-    pub(crate) area_alpina: u32,
-    pub(crate) nome_bacino: String,
+pub struct PlainRecordCsvAnagraficaNISECI {
+    pub codice_stazione: String,
+    pub corpo_idrico: String,
+    pub regione: String,
+    pub provincia: String,
+    pub data: String,
+    pub lunghezza_stazione: f32,
+    pub larghezza_stazione: f32,
+    pub tipo_comunita: u32,
+    pub fonte: String,
+    pub numero_protocollo: String,
+    pub idro_eco_regione: u32,
+    pub area_alpina: u32,
+    pub nome_bacino: String,
 }
 
 impl RecordCsvAnagraficaNISECI for PlainRecordCsvAnagraficaNISECI {
@@ -666,7 +666,7 @@ impl fmt::Display for PlainRecordCsvAnagraficaNISECI {
     }
 }
 
-pub(crate) fn parse_csv_anagrafica_niseci<R, T>(
+pub fn parse_csv_anagrafica_niseci<R, T>(
     mut rdr: csv::Reader<R>,
 ) -> (Vec<T>, Vec<csv::Error>)
 where
@@ -686,7 +686,7 @@ where
     (records, errors)
 }
 
-pub(crate) fn check_anagrafica_niseci_reader<R: Read, T>(
+pub fn check_anagrafica_niseci_reader<R: Read, T>(
     reader: R,
     has_headers: bool,
 ) -> Result<Vec<T>, Vec<csv::Error>>
@@ -743,7 +743,7 @@ where
     }
 }
 
-pub(crate) fn check_anagrafica_niseci_path<T>(
+pub fn check_anagrafica_niseci_path<T>(
     path: PathBuf,
     has_headers: bool,
 ) -> Result<Vec<T>, Vec<csv::Error>>

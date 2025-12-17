@@ -17,7 +17,7 @@
 
 use crate::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI, GruppoEcoHFBI};
 
-pub(crate) fn calc_bbent(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
+pub fn calc_bbent(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
     let mut biobent = 0.0;
     for specie in &campione.campionamento {
         match specie.specie.gruppo_eco {

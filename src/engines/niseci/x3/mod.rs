@@ -22,7 +22,7 @@ use std::collections::hash_map::Entry;
 use std::collections::HashMap;
 
 #[derive(Clone)]
-pub(crate) struct SubmetricheX3 {
+pub struct SubmetricheX3 {
     classi_eta: ClassiEtaSpecieNISECI,
     rapporto_ad_juv: Option<f32>,
     criterio_a: u8,
@@ -30,7 +30,7 @@ pub(crate) struct SubmetricheX3 {
 }
 
 impl SubmetricheX3 {
-    pub(crate) fn new(
+    pub fn new(
         classi_eta: ClassiEtaSpecieNISECI,
         rapporto_ad_juv: Option<f32>,
         criterio_a: u8,
@@ -43,28 +43,28 @@ impl SubmetricheX3 {
             criterio_b,
         }
     }
-    pub(crate) fn get_classi_eta(&self) -> ClassiEtaSpecieNISECI {
+    pub fn get_classi_eta(&self) -> ClassiEtaSpecieNISECI {
         self.classi_eta.clone()
     }
-    pub(crate) fn get_rapporto_ad_juv(&self) -> Option<f32> {
+    pub fn get_rapporto_ad_juv(&self) -> Option<f32> {
         self.rapporto_ad_juv
     }
-    pub(crate) fn get_criterio_a(&self) -> u8 {
+    pub fn get_criterio_a(&self) -> u8 {
         self.criterio_a
     }
-    pub(crate) fn get_criterio_b(&self) -> u8 {
+    pub fn get_criterio_b(&self) -> u8 {
         self.criterio_b
     }
 }
 
-pub(crate) struct MetricheX3 {
+pub struct MetricheX3 {
     criterio_a: f32,
     criterio_b: f32,
     submetriche_map: HashMap<String, SubmetricheX3>,
 }
 
 impl MetricheX3 {
-    pub(crate) fn new(
+    pub fn new(
         criterio_a: f32,
         criterio_b: f32,
         submetriche_map: HashMap<String, SubmetricheX3>,
@@ -75,18 +75,18 @@ impl MetricheX3 {
             submetriche_map,
         }
     }
-    pub(crate) fn get_criterio_a(&self) -> f32 {
+    pub fn get_criterio_a(&self) -> f32 {
         self.criterio_a
     }
-    pub(crate) fn get_criterio_b(&self) -> f32 {
+    pub fn get_criterio_b(&self) -> f32 {
         self.criterio_b
     }
-    pub(crate) fn get_submetriche_map(&self) -> HashMap<String, SubmetricheX3> {
+    pub fn get_submetriche_map(&self) -> HashMap<String, SubmetricheX3> {
         self.submetriche_map.clone()
     }
 }
 
-pub(crate) fn calculate_x3(
+pub fn calculate_x3(
     c: &CampionamentoNISECI,
 ) -> Result<(f32, Option<MetricheX3>), Vec<String>> {
     let alieni_indigeni = c.get_numero_pesci_alieni_e_indigeni();
@@ -319,7 +319,7 @@ fn calculate_b(info: &InfoPopolazioniAlieneNISECI) -> f32 {
 
 // tutte le fn private le mettiamo qua
 #[cfg(test)]
-pub(crate) mod tests {
+pub mod tests {
     use super::*;
 
     #[test]

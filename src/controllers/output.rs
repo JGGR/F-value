@@ -20,11 +20,11 @@ use crate::app::model::{Model, SubModel};
 use crate::controllers::{Controller, CurrentView, OutputModel};
 use crate::core::pdf::{esporta_pdf_hfbi, esporta_pdf_niseci};
 use crate::core::CommaFormat;
-use crate::domain::hfbi::{AnagraficaHFBI, RisultatoHFBI, ValoriIntermediHFBI};
-use crate::domain::index::Indice;
-use crate::domain::niseci::{AnagraficaNISECI, RisultatoNISECI, ValoriIntermediNISECI};
-use crate::engines::hfbi::full::{calculate_hfbi, calculate_stato_ecologico_hfbi};
-use crate::engines::niseci::full::{
+use esox::domain::hfbi::{AnagraficaHFBI, RisultatoHFBI, ValoriIntermediHFBI};
+use esox::domain::index::Indice;
+use esox::domain::niseci::{AnagraficaNISECI, RisultatoNISECI, ValoriIntermediNISECI};
+use esox::engines::hfbi::full::{calculate_hfbi, calculate_stato_ecologico_hfbi};
+use esox::engines::niseci::full::{
     calculate_niseci, calculate_rqe_niseci, calculate_stato_ecologico_niseci,
 };
 use crate::MainState;

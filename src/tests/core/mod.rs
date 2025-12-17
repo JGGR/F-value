@@ -15,7 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::core::csv::deser::{
+use crate::csv::deser::{
     hfbi::{
         check_anagrafica_hfbi_reader, check_campionamento_hfbi_reader,
         VeryItalianRecordCsvAnagraficaHFBI, VeryItalianRecordCsvCampionamentoHFBI,
@@ -27,14 +27,14 @@ use crate::core::csv::deser::{
     },
     translate_error_message,
 };
-use crate::core::csv::parser::{
+use crate::csv::parser::{
     hfbi::{check_records_anagrafica_hfbi, check_records_campionamento_hfbi},
     niseci::{
         check_records_anagrafica_niseci, check_records_campionamento_niseci,
         check_records_riferimento_niseci,
     },
 };
-use crate::core::csv::{
+use crate::csv::{
     ANAGRAFICA_HFBI_HEADER, ANAGRAFICA_NISECI_HEADER, CAMPIONAMENTO_HFBI_HEADER,
     CAMPIONAMENTO_NISECI_HEADER, RIFERIMENTO_NISECI_HEADER,
 };

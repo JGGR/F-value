@@ -1,12 +1,12 @@
 use crate::{
-    domain::hfbi::{
-        AnagraficaHFBI, CampionamentoHFBI, CondizioniRiferimentoHFBI, StatoEcologicoHFBI,
-        ValoriIntermediHFBI,
-    },
     engines::hfbi::{
         bbent::calc_bbent, bn::calc_bn, dbent::calc_dbent, ddom::calc_ddom, dhzp::calc_dhzp,
         dmig::calc_dmig,
     },
+};
+use crate::domain::hfbi::{
+        AnagraficaHFBI, CampionamentoHFBI, CondizioniRiferimentoHFBI, StatoEcologicoHFBI,
+        ValoriIntermediHFBI,
 };
 
 // WEIGHTS
@@ -26,7 +26,7 @@ const STATO_ECOLOGICO_HFBI_SOGLIA_BUONO: f32 = 0.55;
 const STATO_ECOLOGICO_HFBI_SOGLIA_SUFFICIENTE: f32 = 0.33;
 const STATO_ECOLOGICO_HFBI_SOGLIA_SCARSO: f32 = 0.11;
 
-pub(crate) fn calculate_mmi(
+pub fn calculate_mmi(
     campionamento: &CampionamentoHFBI,
     anagrafica: &AnagraficaHFBI,
 ) -> Result<ValoriIntermediHFBI, String> {
@@ -77,7 +77,7 @@ pub(crate) fn calculate_mmi(
     Ok(intermediates)
 }
 
-pub(crate) fn calculate_hfbi(
+pub fn calculate_hfbi(
     campionamento: &CampionamentoHFBI,
     anagrafica: &AnagraficaHFBI,
 ) -> Result<(f32, ValoriIntermediHFBI), String> {
@@ -91,7 +91,7 @@ pub(crate) fn calculate_hfbi(
     }
 }
 
-pub(crate) fn calculate_stato_ecologico_hfbi(hfbi: Option<f32>) -> Option<StatoEcologicoHFBI> {
+pub fn calculate_stato_ecologico_hfbi(hfbi: Option<f32>) -> Option<StatoEcologicoHFBI> {
     match hfbi {
         Some(val) => {
             if val >= STATO_ECOLOGICO_HFBI_SOGLIA_ECCELLENTE {

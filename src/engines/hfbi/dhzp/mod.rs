@@ -17,7 +17,7 @@
 
 use crate::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI, GruppoEcoHFBI};
 
-pub(crate) fn calc_dhzp(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
+pub fn calc_dhzp(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
     let mut shzp = 0.0;
     let bhzp = calc_bhzp(campione, anagrafica);
     for specie in &campione.campionamento {

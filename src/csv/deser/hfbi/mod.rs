@@ -27,11 +27,11 @@ use std::path::PathBuf;
 
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub(crate) struct VeryItalianRecordCsvCampionamentoHFBI {
-    pub(crate) codice_specie: String,
-    pub(crate) numero_individui: u32,
+pub struct VeryItalianRecordCsvCampionamentoHFBI {
+    pub codice_specie: String,
+    pub numero_individui: u32,
     #[serde(deserialize_with = "deserialize_comma_f32")]
-    pub(crate) peso: f32,
+    pub peso: f32,
 }
 
 impl RecordCsvCampionamentoHFBI for VeryItalianRecordCsvCampionamentoHFBI {
@@ -58,10 +58,10 @@ impl fmt::Display for VeryItalianRecordCsvCampionamentoHFBI {
 
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub(crate) struct PlainRecordCsvCampionamentoHFBI {
-    pub(crate) codice_specie: String,
-    pub(crate) numero_individui: u32,
-    pub(crate) peso: f32,
+pub struct PlainRecordCsvCampionamentoHFBI {
+    pub codice_specie: String,
+    pub numero_individui: u32,
+    pub peso: f32,
 }
 
 impl RecordCsvCampionamentoHFBI for PlainRecordCsvCampionamentoHFBI {
@@ -86,7 +86,7 @@ impl fmt::Display for PlainRecordCsvCampionamentoHFBI {
     }
 }
 
-pub(crate) fn parse_csv_campionamento_hfbi<R, T>(
+pub fn parse_csv_campionamento_hfbi<R, T>(
     mut rdr: csv::Reader<R>,
 ) -> (Vec<T>, Vec<csv::Error>)
 where
@@ -106,7 +106,7 @@ where
     (records, errors)
 }
 
-pub(crate) fn check_campionamento_hfbi_reader<R: Read, T>(
+pub fn check_campionamento_hfbi_reader<R: Read, T>(
     reader: R,
     has_headers: bool,
 ) -> Result<Vec<T>, Vec<csv::Error>>
@@ -163,7 +163,7 @@ where
     }
 }
 
-pub(crate) fn check_campionamento_hfbi_path<T>(
+pub fn check_campionamento_hfbi_path<T>(
     path: PathBuf,
     has_headers: bool,
 ) -> Result<Vec<T>, Vec<csv::Error>>
@@ -184,19 +184,19 @@ where
 
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub(crate) struct VeryItalianRecordCsvAnagraficaHFBI {
-    pub(crate) codice_stazione: String,
-    pub(crate) corpo_idrico: String,
-    pub(crate) regione: String,
-    pub(crate) provincia: String,
-    pub(crate) data: String,
+pub struct VeryItalianRecordCsvAnagraficaHFBI {
+    pub codice_stazione: String,
+    pub corpo_idrico: String,
+    pub regione: String,
+    pub provincia: String,
+    pub data: String,
     #[serde(deserialize_with = "deserialize_comma_f32")]
-    pub(crate) lunghezza_stazione: f32,
+    pub lunghezza_stazione: f32,
     #[serde(deserialize_with = "deserialize_comma_f32")]
-    pub(crate) larghezza_stazione: f32,
-    pub(crate) stagione: u32,
-    pub(crate) habitat: u32,
-    pub(crate) tipo_laguna: u32,
+    pub larghezza_stazione: f32,
+    pub stagione: u32,
+    pub habitat: u32,
+    pub tipo_laguna: u32,
 }
 
 impl RecordCsvAnagraficaHFBI for VeryItalianRecordCsvAnagraficaHFBI {
@@ -256,17 +256,17 @@ impl fmt::Display for VeryItalianRecordCsvAnagraficaHFBI {
 
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub(crate) struct PlainRecordCsvAnagraficaHFBI {
-    pub(crate) codice_stazione: String,
-    pub(crate) corpo_idrico: String,
-    pub(crate) regione: String,
-    pub(crate) provincia: String,
-    pub(crate) data: String,
-    pub(crate) lunghezza_stazione: f32,
-    pub(crate) larghezza_stazione: f32,
-    pub(crate) stagione: u32,
-    pub(crate) habitat: u32,
-    pub(crate) tipo_laguna: u32,
+pub struct PlainRecordCsvAnagraficaHFBI {
+    pub codice_stazione: String,
+    pub corpo_idrico: String,
+    pub regione: String,
+    pub provincia: String,
+    pub data: String,
+    pub lunghezza_stazione: f32,
+    pub larghezza_stazione: f32,
+    pub stagione: u32,
+    pub habitat: u32,
+    pub tipo_laguna: u32,
 }
 
 impl RecordCsvAnagraficaHFBI for PlainRecordCsvAnagraficaHFBI {
@@ -324,7 +324,7 @@ impl fmt::Display for PlainRecordCsvAnagraficaHFBI {
     }
 }
 
-pub(crate) fn parse_csv_anagrafica_hfbi<R, T>(mut rdr: csv::Reader<R>) -> (Vec<T>, Vec<csv::Error>)
+pub fn parse_csv_anagrafica_hfbi<R, T>(mut rdr: csv::Reader<R>) -> (Vec<T>, Vec<csv::Error>)
 where
     R: std::io::Read,
     T: RecordCsvAnagraficaHFBI,
@@ -342,7 +342,7 @@ where
     (records, errors)
 }
 
-pub(crate) fn check_anagrafica_hfbi_reader<R: Read, T>(
+pub fn check_anagrafica_hfbi_reader<R: Read, T>(
     reader: R,
     has_headers: bool,
 ) -> Result<Vec<T>, Vec<csv::Error>>
@@ -399,7 +399,7 @@ where
     }
 }
 
-pub(crate) fn check_anagrafica_hfbi_path<T>(
+pub fn check_anagrafica_hfbi_path<T>(
     path: PathBuf,
     has_headers: bool,
 ) -> Result<Vec<T>, Vec<csv::Error>>

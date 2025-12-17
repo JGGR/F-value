@@ -4,6 +4,7 @@
 
 - Refactor `app` module to use `MainAction`
 - Move `csv` module out of `core`
+- Expose modules from `lib.rs`
 
 ## [0.1.0] - 2025-12-17
 

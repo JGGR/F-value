@@ -17,7 +17,7 @@
 
 use crate::core::pdf::{esporta_pdf_hfbi, esporta_pdf_niseci};
 use crate::core::{COPYRIGHT_INFO, PROJECT_NAME, PROJECT_VERSION_FULL, SHORT_PROJECT_VERSION};
-use crate::csv::deser::{
+use esox::csv::deser::{
     check_path_is_file_ends_with_csv,
     hfbi::{
         check_anagrafica_hfbi_path, check_campionamento_hfbi_path,
@@ -29,24 +29,24 @@ use crate::csv::deser::{
         VeryItalianRecordCsvCampionamentoNISECI, VeryItalianRecordCsvRiferimentoNISECI,
     },
 };
-use crate::csv::parser::{
+use esox::csv::parser::{
     hfbi::{check_records_anagrafica_hfbi, check_records_campionamento_hfbi},
     niseci::{
         check_records_anagrafica_niseci, check_records_campionamento_niseci,
         check_records_riferimento_niseci,
     },
 };
-use crate::domain::hfbi::{
+use esox::domain::hfbi::{
     AnagraficaHFBI, CampionamentoHFBI, HabitatHFBI, RisultatoHFBI, StagioneHFBI,
     TipoLagunaCostieraHFBI,
 };
-use crate::domain::location::Location;
-use crate::domain::niseci::{
+use esox::domain::location::Location;
+use esox::domain::niseci::{
     AnagraficaNISECI, AreaNISECI, CampionamentoNISECI, ComunitaNISECI, IdroEcoRegioneNISECI,
     RiferimentoNISECI, RisultatoNISECI, TipoComunitaNISECI,
 };
-use crate::engines::hfbi::full::{calculate_hfbi, calculate_stato_ecologico_hfbi};
-use crate::engines::niseci::full::{
+use esox::engines::hfbi::full::{calculate_hfbi, calculate_stato_ecologico_hfbi};
+use esox::engines::niseci::full::{
     calculate_niseci, calculate_rqe_niseci, calculate_stato_ecologico_niseci,
 };
 use std::path::PathBuf;

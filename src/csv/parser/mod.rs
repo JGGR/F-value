@@ -17,10 +17,10 @@
 
 use chrono::NaiveDate;
 
-pub(crate) fn parse_date(date_str: &str) -> Result<NaiveDate, chrono::format::ParseError> {
+pub fn parse_date(date_str: &str) -> Result<NaiveDate, chrono::format::ParseError> {
     let normalized = date_str.replace("/", "-"); // Replace all / with -
     NaiveDate::parse_from_str(&normalized, "%d-%m-%Y")
 }
 
-pub(crate) mod hfbi;
-pub(crate) mod niseci;
+pub mod hfbi;
+pub mod niseci;

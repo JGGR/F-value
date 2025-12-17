@@ -14,11 +14,11 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-use crate::core::csv::deser::hfbi::{
+use crate::csv::deser::hfbi::{
     check_anagrafica_hfbi_reader, check_campionamento_hfbi_reader,
     VeryItalianRecordCsvAnagraficaHFBI, VeryItalianRecordCsvCampionamentoHFBI,
 };
-use crate::core::csv::parser::hfbi::{
+use crate::csv::parser::hfbi::{
     check_records_anagrafica_hfbi, check_records_campionamento_hfbi,
 };
 use crate::domain::hfbi::CampionamentoHFBI;

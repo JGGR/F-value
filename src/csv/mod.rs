@@ -15,12 +15,12 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-pub(crate) mod deser;
-pub(crate) mod parser;
+pub mod deser;
+pub mod parser;
 
 // This must be kept aligned with RecordCsvRiferimentoNISECI definition.
 // TODO: get this stuff with some macro?
-pub(crate) const RIFERIMENTO_NISECI_HEADER_FIELDS: [&str; 17] = [
+pub const RIFERIMENTO_NISECI_HEADER_FIELDS: [&str; 17] = [
     "nomeComune",
     "nomeLatino",
     "codiceSpecie",
@@ -39,16 +39,16 @@ pub(crate) const RIFERIMENTO_NISECI_HEADER_FIELDS: [&str; 17] = [
     "densSoglia1",
     "densSoglia2",
 ];
-pub(crate) const RIFERIMENTO_NISECI_HEADER_FIELD_TYPES: [&str; 17] = [
+pub const RIFERIMENTO_NISECI_HEADER_FIELD_TYPES: [&str; 17] = [
     "String", "String", "String", "String", "u32", "u32", "u32", "u32", "u32", "u32", "u32", "f32",
     "f32", "f32", "f32", "f32", "f32",
 ];
-pub(crate) const RIFERIMENTO_NISECI_HEADER: &str = "\
+pub const RIFERIMENTO_NISECI_HEADER: &str = "\
 nomeComune;nomeLatino;codiceSpecie;origine;tipoAutoctono;alloNocivita;specieAttesa;clSoglia1;clSoglia2;clSoglia3;clSoglia4;adJuvSoglia1;adJuvSoglia2;adJuvSoglia3;adJuvSoglia4;densSoglia1;densSoglia2";
 
 // This must be kept aligned with RecordCsvCampionamentoNISECI definition.
 // TODO: get this stuff with some macro?
-pub(crate) const CAMPIONAMENTO_NISECI_HEADER_FIELDS: [&str; 6] = [
+pub const CAMPIONAMENTO_NISECI_HEADER_FIELDS: [&str; 6] = [
     "data",
     "stazione",
     "numPassaggio",
@@ -56,14 +56,14 @@ pub(crate) const CAMPIONAMENTO_NISECI_HEADER_FIELDS: [&str; 6] = [
     "lunghezza",
     "peso",
 ];
-pub(crate) const CAMPIONAMENTO_NISECI_HEADER_FIELD_TYPES: [&str; 6] =
+pub const CAMPIONAMENTO_NISECI_HEADER_FIELD_TYPES: [&str; 6] =
     ["String", "String", "u32", "String", "u32", "u32"];
-pub(crate) const CAMPIONAMENTO_NISECI_HEADER: &str = "\
+pub const CAMPIONAMENTO_NISECI_HEADER: &str = "\
 data;stazione;numPassaggio;codiceSpecie;lunghezza;peso";
 
 // This must be kept aligned with RecordCsvAnagraficaNISECI definition.
 // TODO: get this stuff with some macro?
-pub(crate) const ANAGRAFICA_NISECI_HEADER_FIELDS: [&str; 13] = [
+pub const ANAGRAFICA_NISECI_HEADER_FIELDS: [&str; 13] = [
     "codiceStazione",
     "corpoIdrico",
     "regione",
@@ -78,24 +78,24 @@ pub(crate) const ANAGRAFICA_NISECI_HEADER_FIELDS: [&str; 13] = [
     "areaAlpina",
     "nomeBacino",
 ];
-pub(crate) const ANAGRAFICA_NISECI_HEADER_FIELD_TYPES: [&str; 13] = [
+pub const ANAGRAFICA_NISECI_HEADER_FIELD_TYPES: [&str; 13] = [
     "String", "String", "String", "String", "String", "f32", "f32", "u32", "String", "String",
     "u32", "u32", "String",
 ];
-pub(crate) const ANAGRAFICA_NISECI_HEADER: &str = "\
+pub const ANAGRAFICA_NISECI_HEADER: &str = "\
 codiceStazione;corpoIdrico;regione;provincia;data;lunghezzaStazione;larghezzaStazione;tipoComunita;fonte;numeroProtocollo;idroEcoRegione;areaAlpina;nomeBacino";
 
 // This must be kept aligned with RecordCsvCampionamentoHFBI definition.
 // TODO: get this stuff with some macro?
-pub(crate) const CAMPIONAMENTO_HFBI_HEADER_FIELDS: [&str; 3] =
+pub const CAMPIONAMENTO_HFBI_HEADER_FIELDS: [&str; 3] =
     ["codiceSpecie", "numeroIndividui", "peso"];
-pub(crate) const CAMPIONAMENTO_HFBI_HEADER_FIELD_TYPES: [&str; 3] = ["String", "u32", "f32"];
-pub(crate) const CAMPIONAMENTO_HFBI_HEADER: &str = "\
+pub const CAMPIONAMENTO_HFBI_HEADER_FIELD_TYPES: [&str; 3] = ["String", "u32", "f32"];
+pub const CAMPIONAMENTO_HFBI_HEADER: &str = "\
 codiceSpecie;numeroIndividui;peso";
 
 // This must be kept aligned with RecordCsvAnagraficaHFBI definition.
 // TODO: get this stuff with some macro?
-pub(crate) const ANAGRAFICA_HFBI_HEADER_FIELDS: [&str; 10] = [
+pub const ANAGRAFICA_HFBI_HEADER_FIELDS: [&str; 10] = [
     "codiceStazione",
     "corpoIdrico",
     "regione",
@@ -107,14 +107,14 @@ pub(crate) const ANAGRAFICA_HFBI_HEADER_FIELDS: [&str; 10] = [
     "habitat",
     "tipoLaguna",
 ];
-pub(crate) const ANAGRAFICA_HFBI_HEADER_FIELD_TYPES: [&str; 10] = [
+pub const ANAGRAFICA_HFBI_HEADER_FIELD_TYPES: [&str; 10] = [
     "String", "String", "String", "String", "String", "f32", "f32", "u32", "u32", "u32",
 ];
-pub(crate) const ANAGRAFICA_HFBI_HEADER: &str = "\
+pub const ANAGRAFICA_HFBI_HEADER: &str = "\
 codiceStazione;corpoIdrico;regione;provincia;data;lunghezzaStazione;larghezzaStazione;stagione;habitat;tipoLaguna";
 
 #[derive(Copy, Clone)]
-pub(crate) enum TipoRecordCsv {
+pub enum TipoRecordCsv {
     RiferimentoNISECI,
     CampionamentoNISECI,
     AnagraficaNISECI,
@@ -122,7 +122,7 @@ pub(crate) enum TipoRecordCsv {
     AnagraficaHFBI,
 }
 
-pub(crate) trait RecordCsvRiferimentoNISECI: serde::de::DeserializeOwned {
+pub trait RecordCsvRiferimentoNISECI: serde::de::DeserializeOwned {
     #[allow(dead_code)]
     fn nome_comune(&self) -> String;
     fn nome_latino(&self) -> String;
@@ -143,7 +143,7 @@ pub(crate) trait RecordCsvRiferimentoNISECI: serde::de::DeserializeOwned {
     fn dens_soglia2(&self) -> f32;
 }
 
-pub(crate) trait RecordCsvCampionamentoNISECI: serde::de::DeserializeOwned {
+pub trait RecordCsvCampionamentoNISECI: serde::de::DeserializeOwned {
     #[allow(dead_code)]
     fn data(&self) -> String;
     #[allow(dead_code)]
@@ -154,7 +154,7 @@ pub(crate) trait RecordCsvCampionamentoNISECI: serde::de::DeserializeOwned {
     fn peso(&self) -> u32;
 }
 
-pub(crate) trait RecordCsvAnagraficaNISECI: serde::de::DeserializeOwned {
+pub trait RecordCsvAnagraficaNISECI: serde::de::DeserializeOwned {
     fn codice_stazione(&self) -> String;
     fn corpo_idrico(&self) -> String;
     fn regione(&self) -> String;
@@ -170,13 +170,13 @@ pub(crate) trait RecordCsvAnagraficaNISECI: serde::de::DeserializeOwned {
     fn nome_bacino(&self) -> String;
 }
 
-pub(crate) trait RecordCsvCampionamentoHFBI: serde::de::DeserializeOwned {
+pub trait RecordCsvCampionamentoHFBI: serde::de::DeserializeOwned {
     fn codice_specie(&self) -> String;
     fn numero_individui(&self) -> u32;
     fn peso(&self) -> f32;
 }
 
-pub(crate) trait RecordCsvAnagraficaHFBI: serde::de::DeserializeOwned {
+pub trait RecordCsvAnagraficaHFBI: serde::de::DeserializeOwned {
     fn codice_stazione(&self) -> String;
     fn corpo_idrico(&self) -> String;
     fn regione(&self) -> String;

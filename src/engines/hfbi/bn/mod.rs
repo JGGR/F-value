@@ -17,7 +17,7 @@
 
 use crate::domain::hfbi::CampionamentoHFBI;
 
-pub(crate) fn calc_bn(campione: &CampionamentoHFBI) -> f32 {
+pub fn calc_bn(campione: &CampionamentoHFBI) -> f32 {
     let mut b = 0.0;
     let mut n = 0.0;
     for specie in &campione.campionamento {

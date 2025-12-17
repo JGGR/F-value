@@ -19,7 +19,7 @@ use std::collections::HashMap;
 
 use crate::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI, GruppoEcoHFBI, SpecieHFBI};
 
-pub(crate) fn calc_dmig(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
+pub fn calc_dmig(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
     let bmig = calc_bmig(campione, anagrafica);
 
     let mut specie_map: HashMap<String, SpecieHFBI> = HashMap::with_capacity(10);

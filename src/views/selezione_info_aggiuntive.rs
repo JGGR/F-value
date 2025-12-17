@@ -16,7 +16,7 @@
 */
 use crate::app::core::{Action, Action::*};
 use crate::app::model::Model;
-use crate::domain::{
+use esox::domain::{
     hfbi::{AnagraficaHFBIDraft, HabitatHFBI, StagioneHFBI, TipoLagunaCostieraHFBI},
     index::Indice,
     location::Location,
