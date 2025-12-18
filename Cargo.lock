@@ -698,22 +698,14 @@ dependencies = [
 
 [[package]]
 name = "esox"
-version = "0.1.1"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "693efd3016004e06d707290b0558e1a89d4b21b72109c81dcca8b8e8de04161f"
 dependencies = [
  "chrono",
  "csv",
- "dirs",
- "flexi_logger",
- "image",
- "locale_config",
- "log",
- "miniz_oxide",
  "once_cell",
- "pdf-writer",
- "raylib",
- "rfd",
  "serde",
- "uuid",
 ]
 
 [[package]]
@@ -750,6 +742,24 @@ dependencies = [
  "rayon-core",
  "smallvec",
  "zune-inflate",
+]
+
+[[package]]
+name = "f_value"
+version = "0.1.1"
+dependencies = [
+ "chrono",
+ "dirs",
+ "esox",
+ "flexi_logger",
+ "image",
+ "locale_config",
+ "log",
+ "miniz_oxide",
+ "pdf-writer",
+ "raylib",
+ "rfd",
+ "uuid",
 ]
 
 [[package]]

@@ -18,7 +18,7 @@ BEGIN
             VALUE "FileVersion",      "0.1.0\0"
             VALUE "ProductName",      "F-value\0"
             VALUE "ProductVersion",   "0.1.0\0"
-            VALUE "OriginalFilename", "esox.exe\0"
+            VALUE "OriginalFilename", "f_value.exe\0"
         END
     END
 

@@ -76,30 +76,6 @@ jobs:
           path: target/release/esox
           retention-days: 7
 
-  test-debug:
-    name: Test
-    runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/jggr/f-value-builder:latest
-    needs: build-debug
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Cache cargo
-        uses: actions/cache@v4
-        with:
-          path: |
-            target
-            .cargo/registry
-            .cargo/git
-          key: cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            cargo-${{ runner.os }}-
-
-      - name: Test
-        run: cargo test
-
   crossbuild-debug:
     name: Cross-build Windows (debug)
     runs-on: ubuntu-latest

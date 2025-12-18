@@ -3,8 +3,8 @@
 ### Changed
 
 - Refactor `app` module to use `MainAction`
-- Move `csv` module out of `core`
-- Expose modules from `lib.rs`
+- Renamed crate to `f_value`
+- Extract core logic to `esox` lib crate
 
 ## [0.1.0] - 2025-12-17
 
