@@ -16,7 +16,7 @@
 */
 
 use crate::app::core::SUPPORT_HEADLESS;
-use crate::core::cli::{esox_usage, print_copyright_splash, print_warranty_info, run_headless};
+use crate::core::cli::{f_value_usage, print_copyright_splash, print_warranty_info, run_headless};
 use crate::core::{
     COMMIT_HASH_PLUS, PROJECT_BRANCH, PROJECT_BUILD_TYPE, PROJECT_NAME, PROJECT_VERSION,
 };
@@ -113,7 +113,7 @@ pub(crate) fn handle_args() {
                         return;
                     }
                     "-h" | "-help" | "--help" => {
-                        return esox_usage();
+                        return f_value_usage();
                     }
                     "--headless" => {
                         if !SUPPORT_HEADLESS {
@@ -137,7 +137,7 @@ pub(crate) fn handle_args() {
                     _ => {
                         if arg.starts_with("--") {
                             eprintln!("Unknown flag: {arg}");
-                            return esox_usage();
+                            return f_value_usage();
                         }
                     }
                 }

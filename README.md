@@ -1,4 +1,4 @@
-# esox
+# F-value
 
 ## Tool for NISECI and HFBI calc
 
