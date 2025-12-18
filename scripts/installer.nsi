@@ -38,7 +38,7 @@ Section "Install"
 
   ; Copy the binary
   SetOutPath "$INSTDIR"
-  File "/oname=F-value.exe" "..\target\x86_64-pc-windows-gnu\release\esox.exe"
+  File "/oname=F-value.exe" "..\target\x86_64-pc-windows-gnu\release\f_value.exe"
   File "..\LICENSE"
   File "..\README.md"
 
@@ -51,7 +51,7 @@ Section "Install"
   ; Add uninstall entry to Windows
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\F-value" "DisplayName" "F-value"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\F-value" "Publisher" "GtoR"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\F-value" "DisplayVersion" "0.1.0"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\F-value" "DisplayVersion" "0.1.1"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\F-value" "UninstallString" "$INSTDIR\uninstall.exe"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\F-value" "InstallLocation" "$INSTDIR"
 
