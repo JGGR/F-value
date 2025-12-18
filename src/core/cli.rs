@@ -51,7 +51,7 @@ use esox::engines::niseci::full::{
 };
 use std::path::PathBuf;
 
-pub(crate) fn esox_usage() {
+pub(crate) fn f_value_usage() {
     println!("{PROJECT_NAME} v{SHORT_PROJECT_VERSION}");
     println!("Usage: {PROJECT_NAME} [--headless] <campionamento.csv> <riferimento.csv> <anagrafica.csv> [pdf_export_path]");
     println!("       {PROJECT_NAME} [--headless] --hfbi <campionamento.csv> <anagrafica.csv> [pdf_export_path]");
@@ -120,13 +120,13 @@ pub(crate) fn run_headless(do_niseci: bool, has_headers: bool, args: &[String]) 
                     passed_pdf_export_path = true;
                 } else {
                     eprintln!("Error: Unexpected arg: {arg}");
-                    esox_usage();
+                    f_value_usage();
                     return false;
                 }
             }
             _ => {
                 eprintln!("Error: Unexpected arg: {arg}");
-                esox_usage();
+                f_value_usage();
                 return false;
             }
         }
