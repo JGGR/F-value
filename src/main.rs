@@ -30,7 +30,7 @@ use crate::app::core::{
 use crate::app::model::Model;
 use crate::args::handle_args;
 use crate::controllers::Controllers;
-use crate::core::{prep_logger, SHORT_PROJECT_VERSION};
+use crate::core::SHORT_PROJECT_VERSION;
 use crate::views::Views;
 use raylib::color::Color;
 use raylib::consts::GuiControl::DEFAULT;
@@ -40,8 +40,6 @@ use raylib::consts::TraceLogLevel;
 use raylib::core::texture::Image;
 
 fn main() {
-    let _ = prep_logger();
-
     handle_args();
 
     let img_load_res = Image::load_image_from_mem(".png", PROJECT_LOGO_DATA);

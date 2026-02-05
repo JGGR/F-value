@@ -18,12 +18,12 @@ pub(crate) struct InfoAggiuntiveController;
 use crate::app::core::Action;
 use crate::app::model::{Model, SubModel};
 use crate::controllers::{Controller, CurrentView, InfoAggiuntiveModel};
+use crate::MainState;
+use chrono::format::ParseErrorKind;
 use esox::csv::parser::parse_date;
 use esox::domain::hfbi::AnagraficaHFBI;
 use esox::domain::index::Indice;
 use esox::domain::niseci::{AnagraficaNISECI, TipoComunitaNISECI};
-use crate::MainState;
-use chrono::format::ParseErrorKind;
 use raylib::RaylibHandle;
 
 impl Controller for InfoAggiuntiveController {

@@ -46,13 +46,10 @@ pub(crate) const _COMMIT_HASH: &str = env!("COMMIT_HASH");
 pub(crate) const COMMIT_HASH_PLUS: &str = env!("COMMIT_HASH_PLUS");
 pub(crate) const BUILD_DATE: &str = env!("BUILD_DATE");
 
-use dirs::document_dir;
-use flexi_logger::{FileSpec, Logger, WriteMode};
-use log::Record;
-use std::path::PathBuf;
-
+use chrono::Local;
 use raylib::math::Rectangle;
 use raylib::misc::AsF32;
+use std::path::PathBuf;
 
 /// A convenience function for making a new `Rectangle`.
 #[inline]
@@ -63,35 +60,6 @@ pub fn rrect<T1: AsF32, T2: AsF32, T3: AsF32, T4: AsF32>(
     height: T4,
 ) -> Rectangle {
     Rectangle::new(x.as_f32(), y.as_f32(), width.as_f32(), height.as_f32())
-}
-
-pub(crate) fn prep_logger() -> Result<(), String> {
-    let log_file_path;
-    if let Some(documents_dir) = document_dir() {
-        log_file_path = documents_dir.join("f_value").join("log.csv");
-    } else {
-        log_file_path = PathBuf::from("./f_value/log.csv");
-    }
-
-    if let Ok(logger_filespec) = FileSpec::try_from(log_file_path) {
-        if let Ok(logger) = Logger::try_with_str("info, core=trace") {
-            if let Err(e) = logger
-                .log_to_file(logger_filespec)
-                .write_mode(WriteMode::BufferAndFlush)
-                .format(|_writer, _now, record: &Record| writeln!(_writer, "{}", record.args()))
-                .start()
-            {
-                eprintln!("Failed starting logger.");
-                eprintln!("Error was: {e}");
-                return Err(format!("Failed starting logger: {e}"));
-            }
-        } else {
-            return Err("Failed loading logger from str LogSpecification".to_string());
-        }
-    } else {
-        return Err("Failed loading logger filespec".to_string());
-    }
-    Ok(())
 }
 
 pub(crate) trait CommaFormat {
@@ -106,4 +74,110 @@ impl CommaFormat for f32 {
         }
         s
     }
+}
+
+/// This function does not handle Unicode validation.
+pub fn sanitize_filename(input: &str) -> String {
+    // Empty input → single underscore
+    if input.is_empty() {
+        return "_".to_string();
+    }
+
+    let mut out = String::with_capacity(input.len());
+
+    for c in input.chars() {
+        let valid = match c {
+            '\0' => false,
+
+            c if c.is_whitespace() => false,
+
+            // path separators
+            '/' => false,
+            '\\' if cfg!(windows) => false,
+
+            // Windows forbidden characters
+            '<' | '>' | ':' | '"' | '|' | '?' | '*' if cfg!(windows) => false,
+
+            // control characters
+            c if c.is_control() => false,
+
+            _ => true,
+        };
+
+        out.push(if valid { c } else { '_' });
+    }
+
+    #[cfg(windows)]
+    {
+        // Windows forbids trailing dots and spaces
+        while out.ends_with('.') || out.ends_with(' ') {
+            out.pop();
+        }
+    }
+
+    if out.is_empty() {
+        out.push('_');
+    }
+
+    // Disallow "." and ".." everywhere
+    if out == "." || out == ".." {
+        out.insert(0, '_');
+    }
+
+    #[cfg(windows)]
+    {
+        // Avoid reserved device names (CON, NUL, COM1, ...)
+        let upper = out.to_ascii_uppercase();
+        let base = upper.split('.').next().unwrap();
+
+        if matches!(
+            base,
+            "CON"
+                | "PRN"
+                | "AUX"
+                | "NUL"
+                | "COM1"
+                | "COM2"
+                | "COM3"
+                | "COM4"
+                | "COM5"
+                | "COM6"
+                | "COM7"
+                | "COM8"
+                | "COM9"
+                | "LPT1"
+                | "LPT2"
+                | "LPT3"
+                | "LPT4"
+                | "LPT5"
+                | "LPT6"
+                | "LPT7"
+                | "LPT8"
+                | "LPT9"
+        ) {
+            out.insert(0, '_');
+        }
+    }
+
+    out
+}
+
+pub fn gen_logfile_name(
+    ref_samp_filename: &PathBuf,
+    station_code: String,
+    is_main_log: bool,
+) -> String {
+    let date = Local::now().format("%d%m%Y").to_string();
+    let ref_samp_filename_noext = ref_samp_filename
+        .file_stem()
+        .unwrap()
+        .to_string_lossy()
+        .into_owned();
+    let tail = if is_main_log { "log" } else { "intermediates" };
+    let unsafe_name = format!(
+        "{}_{}_{}_{}.csv",
+        date, ref_samp_filename_noext, station_code, tail
+    );
+    let name = sanitize_filename(&unsafe_name);
+    name
 }

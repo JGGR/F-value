@@ -19,7 +19,9 @@ use crate::app::core::{Action, Localize};
 use crate::app::model::{Model, SubModel};
 use crate::controllers::{Controller, CurrentView, OutputModel};
 use crate::core::pdf::{esporta_pdf_hfbi, esporta_pdf_niseci};
-use crate::core::CommaFormat;
+use crate::core::{gen_logfile_name, CommaFormat};
+use crate::MainState;
+use dirs::document_dir;
 use esox::domain::hfbi::{AnagraficaHFBI, RisultatoHFBI, ValoriIntermediHFBI};
 use esox::domain::index::Indice;
 use esox::domain::niseci::{AnagraficaNISECI, RisultatoNISECI, ValoriIntermediNISECI};
@@ -27,9 +29,6 @@ use esox::engines::hfbi::full::{calculate_hfbi, calculate_stato_ecologico_hfbi};
 use esox::engines::niseci::full::{
     calculate_niseci, calculate_rqe_niseci, calculate_stato_ecologico_niseci,
 };
-use crate::MainState;
-use dirs::document_dir;
-use log::info;
 use raylib::RaylibHandle;
 use std::fs::OpenOptions;
 use std::io::Write;
@@ -237,6 +236,15 @@ impl OutputController {
                         rqe_niseci_str,
                         stato_ecologico_str,
                         &intermediates,
+                        &state
+                            .fileinput_model
+                            .get_riferimento_path()
+                            .expect("Failed initialising riferimento niseci path"),
+                        state
+                            .data_model
+                            .get_anagrafica_niseci()
+                            .expect("Failed initialising anagrafica niseci")
+                            .codice_stazione,
                     );
 
                     //This logs to stdout
@@ -244,7 +252,19 @@ impl OutputController {
 
                     self.add_console_message(state, format!("{intermediates}"));
 
-                    self.log_niseci_intermediates(locale, &intermediates);
+                    self.log_niseci_intermediates(
+                        locale,
+                        &intermediates,
+                        &state
+                            .fileinput_model
+                            .get_riferimento_path()
+                            .expect("Failed initialising riferimento niseci path"),
+                        state
+                            .data_model
+                            .get_anagrafica_niseci()
+                            .expect("Failed initialising anagrafica niseci")
+                            .codice_stazione,
+                    );
 
                     let risultato_niseci = RisultatoNISECI::new(niseci, rqe_niseci, intermediates);
 
@@ -280,61 +300,88 @@ impl OutputController {
         rqe_niseci_str: String,
         stato_ecologico_str: String,
         intermediates: &ValoriIntermediNISECI,
+        ref_filename: &PathBuf,
+        station_code: String,
     ) {
-        match locale {
-            Localize::Italian => {
-                info!("Codice stazione; Data; Regione; Idroecoregione; Area pertinenza; Bacino; NISECI; RQE NISECI; Stato ecologico; x1; x2; x3; x3_a; x3_b\n{}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}",
-                    anagrafica.codice_stazione,
-                    anagrafica.date_string,
-                    anagrafica.posizione.regione,
-                    anagrafica.idro_eco_regione,
-                    anagrafica.area,
-                    anagrafica.corpo_idrico,
-                    niseci_str,
-                    rqe_niseci_str,
-                    stato_ecologico_str,
-                    intermediates.x1.comma(),
-                    match intermediates.x2 {
-                        Some(v) => v.comma().to_string(),
-                        None => "NC".to_string(),
-                    },
-                    intermediates.x3.comma(),
-                    match intermediates.x3_a {
-                        Some(v) => v.comma().to_string(),
-                        None => "NC".to_string(),
-                    },
-                    match intermediates.x3_b {
-                        Some(v) => v.comma().to_string(),
-                        None => "NC".to_string(),
+        let name = gen_logfile_name(ref_filename, station_code, true);
+        let log_file_path;
+        if let Some(documents_dir) = document_dir() {
+            log_file_path = documents_dir.join("f_value").join(name);
+        } else {
+            log_file_path = PathBuf::from(format!("./f_value/{}", name));
+        }
+        let file_result = OpenOptions::new()
+            .write(true)
+            .truncate(true)
+            .create(true)
+            .open(log_file_path);
+
+        match file_result {
+            Ok(mut file) => {
+                let string_representation = match locale {
+                    Localize::Italian => {
+                        format!("Codice stazione; Data; Regione; Idroecoregione; Area pertinenza; Bacino; NISECI; RQE NISECI; Stato ecologico; x1; x2; x3; x3_a; x3_b\n{}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}",
+                            anagrafica.codice_stazione,
+                            anagrafica.date_string,
+                            anagrafica.posizione.regione,
+                            anagrafica.idro_eco_regione,
+                            anagrafica.area,
+                            anagrafica.corpo_idrico,
+                            niseci_str,
+                            rqe_niseci_str,
+                            stato_ecologico_str,
+                            intermediates.x1.comma(),
+                            match intermediates.x2 {
+                                Some(v) => v.comma().to_string(),
+                                None => "NC".to_string(),
+                            },
+                            intermediates.x3.comma(),
+                            match intermediates.x3_a {
+                                Some(v) => v.comma().to_string(),
+                                None => "NC".to_string(),
+                            },
+                            match intermediates.x3_b {
+                                Some(v) => v.comma().to_string(),
+                                None => "NC".to_string(),
+                            }
+                        )
                     }
-                );
+                    Localize::International => {
+                        format!("Codice stazione, Data, Regione, Idroecoregione, Area pertinenza, Bacino, NISECI, RQE NISECI, Stato ecologico, x1, x2, x3, x3_a, x3_b\n{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}",
+                            anagrafica.codice_stazione,
+                            anagrafica.date_string,
+                            anagrafica.posizione.regione,
+                            anagrafica.idro_eco_regione,
+                            anagrafica.area,
+                            anagrafica.corpo_idrico,
+                            niseci_str,
+                            rqe_niseci_str,
+                            stato_ecologico_str,
+                            intermediates.x1,
+                            match intermediates.x2 {
+                                Some(v) => format!("{v}"),
+                                None => "NC".to_string(),
+                            },
+                            intermediates.x3,
+                            match intermediates.x3_a {
+                                Some(v) => format!("{v}"),
+                                None => "NC".to_string(),
+                            },
+                            match intermediates.x3_b {
+                                Some(v) => format!("{v}"),
+                                None => "NC".to_string(),
+                            }
+                        )
+                    }
+                };
+                let write_result = writeln!(file, "{string_representation}");
+                match write_result {
+                    Ok(_) => println!("Successfully wrote to file."),
+                    Err(e) => eprintln!("Failed to write to file: {}", e),
+                }
             }
-            Localize::International => {
-                info!("Codice stazione, Data, Regione, Idroecoregione, Area pertinenza, Bacino, NISECI, RQE NISECI, Stato ecologico, x1, x2, x3, x3_a, x3_b\n{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}",
-                    anagrafica.codice_stazione,
-                    anagrafica.date_string,
-                    anagrafica.posizione.regione,
-                    anagrafica.idro_eco_regione,
-                    anagrafica.area,
-                    anagrafica.corpo_idrico,
-                    niseci_str,
-                    rqe_niseci_str,
-                    stato_ecologico_str,
-                    intermediates.x1,
-                    match intermediates.x2 {
-                        Some(v) => format!("{v}"),
-                        None => "NC".to_string(),
-                    },
-                    intermediates.x3,
-                    match intermediates.x3_a {
-                        Some(v) => format!("{v}"),
-                        None => "NC".to_string(),
-                    },
-                    match intermediates.x3_b {
-                        Some(v) => format!("{v}"),
-                        None => "NC".to_string(),
-                    }
-                );
+            Err(e) => {
+                eprintln!("Failed to open file: {}", e);
             }
         }
     }
@@ -343,12 +390,15 @@ impl OutputController {
         &self,
         locale: Localize,
         intermediates: &ValoriIntermediNISECI,
+        ref_filename: &PathBuf,
+        station_code: String,
     ) {
+        let name = gen_logfile_name(ref_filename, station_code, false);
         let log_file_path;
         if let Some(documents_dir) = document_dir() {
-            log_file_path = documents_dir.join("f_value").join("log_intermediates.csv");
+            log_file_path = documents_dir.join("f_value").join(name);
         } else {
-            log_file_path = PathBuf::from("./f_value/log_intermediates.csv");
+            log_file_path = PathBuf::from(format!("./f_value/{}", name));
         }
 
         let file_result = OpenOptions::new()
@@ -518,6 +568,15 @@ impl OutputController {
                         hfbi,
                         stato_ecologico_str,
                         &intermediates,
+                        &state
+                            .fileinput_model
+                            .get_campionamento_path()
+                            .expect("Failed initialising campionamento hfbi path"),
+                        state
+                            .data_model
+                            .get_anagrafica_hfbi()
+                            .expect("Failed initialising anagrafica hfbi")
+                            .codice_stazione,
                     );
 
                     //This logs to stdout
@@ -526,7 +585,19 @@ impl OutputController {
 
                     self.add_console_message(state, format!("{intermediates}"));
 
-                    self.log_hfbi_intermediates(locale, &intermediates);
+                    self.log_hfbi_intermediates(
+                        locale,
+                        &intermediates,
+                        &state
+                            .fileinput_model
+                            .get_campionamento_path()
+                            .expect("Failed initialising campionamento hfbi path"),
+                        state
+                            .data_model
+                            .get_anagrafica_hfbi()
+                            .expect("Failed initialising anagrafica hfbi")
+                            .codice_stazione,
+                    );
 
                     let risultato_hfbi = RisultatoHFBI::new(Some(hfbi), intermediates);
 
@@ -559,29 +630,56 @@ impl OutputController {
         hfbi: f32,
         stato_ecologico_str: String,
         intermediates: &ValoriIntermediHFBI,
+        samp_filename: &PathBuf,
+        station_code: String,
     ) {
-        match locale {
-            Localize::Italian => {
-                info!("Codice stazione; stagione; habitat vegetato; tipo laguna; MMI; HFBI; Stato ecologico\n{}; {}; {}; {}; {}; {}; {}",
-                        anagrafica.codice_stazione,
-                        anagrafica.stagione,
-                        anagrafica.habitat_vegetato,
-                        anagrafica.tipo_laguna,
-                        intermediates.mmi.comma(),
-                        hfbi.comma(),
-                        stato_ecologico_str
-                    );
+        let name = gen_logfile_name(samp_filename, station_code, true);
+        let log_file_path;
+        if let Some(documents_dir) = document_dir() {
+            log_file_path = documents_dir.join("f_value").join(name);
+        } else {
+            log_file_path = PathBuf::from(format!("./f_value/{}", name));
+        }
+        let file_result = OpenOptions::new()
+            .write(true)
+            .truncate(true)
+            .create(true)
+            .open(log_file_path);
+
+        match file_result {
+            Ok(mut file) => {
+                let string_representation = match locale {
+                    Localize::Italian => {
+                        format!("Codice stazione; stagione; habitat vegetato; tipo laguna; MMI; HFBI; Stato ecologico\n{}; {}; {}; {}; {}; {}; {}",
+                                anagrafica.codice_stazione,
+                                anagrafica.stagione,
+                                anagrafica.habitat_vegetato,
+                                anagrafica.tipo_laguna,
+                                intermediates.mmi.comma(),
+                                hfbi.comma(),
+                                stato_ecologico_str
+                            )
+                    }
+                    Localize::International => {
+                        format!("Codice stazione, stagione, habitat vegetato, tipo laguna, MMI, HFBI, Stato ecologico\n{}, {}, {}, {}, {}, {}, {}",
+                                anagrafica.codice_stazione,
+                                anagrafica.stagione,
+                                anagrafica.habitat_vegetato,
+                                anagrafica.tipo_laguna,
+                                intermediates.mmi,
+                                hfbi,
+                                stato_ecologico_str
+                            )
+                    }
+                };
+                let write_result = writeln!(file, "{string_representation}");
+                match write_result {
+                    Ok(_) => println!("Successfully wrote to file."),
+                    Err(e) => eprintln!("Failed to write to file: {}", e),
+                }
             }
-            Localize::International => {
-                info!("Codice stazione, stagione, habitat vegetato, tipo laguna, MMI, HFBI, Stato ecologico\n{}, {}, {}, {}, {}, {}, {}",
-                        anagrafica.codice_stazione,
-                        anagrafica.stagione,
-                        anagrafica.habitat_vegetato,
-                        anagrafica.tipo_laguna,
-                        intermediates.mmi,
-                        hfbi,
-                        stato_ecologico_str
-                    );
+            Err(e) => {
+                eprintln!("Failed to open file: {}", e);
             }
         }
     }
@@ -590,12 +688,15 @@ impl OutputController {
         &self,
         locale: Localize,
         intermediates: &ValoriIntermediHFBI,
+        samp_filename: &PathBuf,
+        station_code: String,
     ) {
+        let name = gen_logfile_name(samp_filename, station_code, false);
         let log_file_path;
         if let Some(documents_dir) = document_dir() {
-            log_file_path = documents_dir.join("f_value").join("log_intermediates.csv");
+            log_file_path = documents_dir.join("f_value").join(name);
         } else {
-            log_file_path = PathBuf::from("./f_value/log_intermediates.csv");
+            log_file_path = PathBuf::from(format!("./f_value/{}", name));
         }
 
         let file_result = OpenOptions::new()

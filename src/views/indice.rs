@@ -16,9 +16,9 @@
 */
 use crate::app::core::{Action, Action::*};
 use crate::app::model::Model;
-use esox::domain::index::Indice;
 use crate::views::{propheight, propwidth, rrect, View};
 use crate::MainState;
+use esox::domain::index::Indice;
 use raylib::drawing::RaylibDrawHandle;
 use raylib::prelude::*;
 use raylib::RaylibThread;
