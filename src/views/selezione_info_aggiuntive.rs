@@ -16,6 +16,8 @@
 */
 use crate::app::core::{Action, Action::*};
 use crate::app::model::Model;
+use crate::views::{propheight, propwidth, rrect, View};
+use crate::MainState;
 use esox::domain::{
     hfbi::{AnagraficaHFBIDraft, HabitatHFBI, StagioneHFBI, TipoLagunaCostieraHFBI},
     index::Indice,
@@ -24,8 +26,6 @@ use esox::domain::{
         AnagraficaNISECIDraft, AreaNISECI, ComunitaNISECI, IdroEcoRegioneNISECI, TipoComunitaNISECI,
     },
 };
-use crate::views::{propheight, propwidth, rrect, View};
-use crate::MainState;
 use raylib::consts::GuiIconName::ICON_OK_TICK;
 use raylib::consts::GuiState::{STATE_DISABLED, STATE_NORMAL};
 use raylib::drawing::RaylibDrawHandle;

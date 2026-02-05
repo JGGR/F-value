@@ -5,6 +5,12 @@
 - Refactor `app` module to use `MainAction`
 - Renamed crate to `f_value`
 - Extract core logic to `esox` lib crate
+- Rename log files using `DATE_INPUTFILE_STATIONCODE_XYZ.csv`
+  - `DATE` is current date in `DDMMYYYY` format
+  - `INPUTFILE` is the reference file name for NISECI, or the sample file name for HFBI
+  - `STATIONCODE` is the station code for the current calc
+  - `XYZ` is `log` for the main log file and `intermediates` for the secondary
+- Drop `log`, `flexi_logger` deps
 
 ## [0.1.0] - 2025-12-17
 
