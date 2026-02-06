@@ -7,7 +7,7 @@ Name "F-value"
 OutFile "F-value-installer.exe"
 InstallDir "$PROGRAMFILES\F_value"
 RequestExecutionLevel admin
-VIProductVersion "0.1.0.0"
+VIProductVersion "0.1.1.0"
 VIAddVersionKey "CompanyName"     "GtoR"
 Icon "../assets/icon.ico"
 UninstallIcon "../assets/icon.ico"
