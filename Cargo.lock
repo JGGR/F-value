@@ -698,9 +698,9 @@ dependencies = [
 
 [[package]]
 name = "esox"
-version = "0.1.1"
+version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7ba3ecb734de0d60d3845549d802c1e49b3f12860f511b936c0e49f5a0778035"
+checksum = "17ee554aa82138e3014f8753d683cb79c49df0c0a37cf1000cb3c36ae5a29c8b"
 dependencies = [
  "chrono",
  "csv",
