@@ -1,4 +1,4 @@
-## [0.1.1] - Unreleased
+## [0.1.1] - 2026-02-06
 
 ### Changed
 
@@ -11,6 +11,7 @@
   - `STATIONCODE` is the station code for the current calc
   - `XYZ` is `log` for the main log file and `intermediates` for the secondary
 - Drop `log`, `flexi_logger` deps
+- Update copyright
 
 ## [0.1.0] - 2025-12-17
 
