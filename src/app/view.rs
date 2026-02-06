@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 /*
-    Copyright (C) 2024-2025 jgabaut, gioninjo
+    Copyright (C) 2024-2026 jgabaut, gioninjo
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -196,7 +196,7 @@ pub(crate) fn draw_info_box(
         //let proj_name_str1_y = proj_info_str_y + (proj_info_txt_bounds.y as i32 * 2);
         //let proj_name_str2_y = proj_name_str1_y + proj_name_str1_txt_bounds.y as i32;
 
-        let copyright_display_link = "Copyright (C) 2024-2025 jgabaut, gioninjo";
+        let copyright_display_link = "Copyright (C) 2024-2026 jgabaut, gioninjo";
         let copyright_actual_link = "https://spdx.org/licenses/GPL-3.0-only.html";
 
         let copyright_display_link_txt_bounds = font.measure_text(
