@@ -15,10 +15,10 @@ default = ["embed-icon"]
 embed-icon = []
 
 [build-dependencies]
-chrono = "0.4.39"
+chrono = "0.4.43"
 
 [dependencies]
-chrono = "0.4.39"
+chrono = "0.4.43"
 dirs = "6.0.0"
 esox = "0.1.2"
 image = "0.25.9"
