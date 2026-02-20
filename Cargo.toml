@@ -29,4 +29,4 @@ raylib = { git = "https://github.com/raylib-rs/raylib-rs.git", features = [
     "raygui",
 ] }
 rfd = "0.15.4"
-uuid = { version = "1.18.1", features = ["v4"] }
+uuid = { version = "1.21.0", features = ["v4"] }
