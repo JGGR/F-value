@@ -28,5 +28,5 @@ pdf-writer = "0.14.0"
 raylib = { git = "https://github.com/raylib-rs/raylib-rs.git", features = [
     "raygui",
 ] }
-rfd = "0.15.4"
+rfd = "0.17.2"
 uuid = { version = "1.18.1", features = ["v4"] }
