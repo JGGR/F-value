@@ -104,12 +104,13 @@ impl View for SelezioneInfoAggiuntiveView {
             rrect(submit_x, submit_y, submit_width, submit_height),
             confirm_itext.as_str(),
         ) {
-            let regione = match <RegioneItaliana as TryFrom<i32>>::try_from(self.listview_regione_value) {
-                Ok(r) => r,
-                Err(_) => {
-                    panic!("Unexpected regione_string in SelezioneInfoAggiuntiveView::draw()");
-                }
-            };
+            let regione =
+                match <RegioneItaliana as TryFrom<i32>>::try_from(self.listview_regione_value) {
+                    Ok(r) => r,
+                    Err(_) => {
+                        panic!("Unexpected regione_string in SelezioneInfoAggiuntiveView::draw()");
+                    }
+                };
             let regione_string = regione.to_string();
 
             let provincia_string = String::from(&self.textbox_provincia_buffer);

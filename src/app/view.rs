@@ -16,8 +16,7 @@
 */
 
 use super::core::{
-    propheight, propwidth, CurrentView, MainAction, MainAction::*, MainState,
-    GuiTheme, Localize
+    propheight, propwidth, CurrentView, GuiTheme, Localize, MainAction, MainAction::*, MainState,
 };
 use crate::core::{
     rrect, AUTHOR_GIONINJO, AUTHOR_GIONINJO_LINK, AUTHOR_JGABAUT, AUTHOR_JGABAUT_LINK,
