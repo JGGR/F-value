@@ -7,7 +7,7 @@ Name "F-value"
 OutFile "F-value-installer.exe"
 InstallDir "$PROGRAMFILES\F_value"
 RequestExecutionLevel admin
-VIProductVersion "0.1.1.0"
+VIProductVersion "0.1.2.0"
 VIAddVersionKey "CompanyName"     "GtoR"
 Icon "../assets/icon.ico"
 UninstallIcon "../assets/icon.ico"
@@ -51,7 +51,7 @@ Section "Install"
   ; Add uninstall entry to Windows
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\F-value" "DisplayName" "F-value"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\F-value" "Publisher" "GtoR"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\F-value" "DisplayVersion" "0.1.1"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\F-value" "DisplayVersion" "0.1.2"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\F-value" "UninstallString" "$INSTDIR\uninstall.exe"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\F-value" "InstallLocation" "$INSTDIR"
 

@@ -54,6 +54,10 @@ pub(crate) fn update_main(
             MainAction::CloseLicense => {
                 main_state.showing_license_box = false;
             }
+            MainAction::Reset => {
+                main_state.showing_reset_win = false;
+                main_state.should_reset = true;
+            }
             MainAction::ShowReset => {
                 main_state.showing_reset_win = true;
             }
