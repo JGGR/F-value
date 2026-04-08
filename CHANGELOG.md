@@ -1,5 +1,9 @@
 ## [0.1.2] - Unreleased
 
+### Added
+
+- New `rfd-gtk3`, `rfd-xdg-portal` features to select `rfd` backend
+
 ### Changed
 
 - Fix reset button

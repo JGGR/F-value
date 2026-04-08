@@ -11,8 +11,10 @@ exclude = [
 ]
 
 [features]
-default = ["embed-icon"]
+default = ["embed-icon", "rfd-xdg-portal"]
 embed-icon = []
+rfd-gtk3 = [ "rfd/gtk3" ]
+rfd-xdg-portal = [ "rfd/xdg-portal" ]
 
 [build-dependencies]
 chrono = "0.4.39"
@@ -28,5 +30,5 @@ png = "0.18.1"
 raylib = { git = "https://github.com/raylib-rs/raylib-rs.git", features = [
     "raygui",
 ] }
-rfd = { version = "0.15.4", default-features = false, features = [ "gtk3" ] }
+rfd = { version = "0.17.2", default-features = false }
 uuid = { version = "1.18.1", features = ["v4"] }
