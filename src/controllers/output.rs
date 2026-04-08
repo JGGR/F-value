@@ -30,7 +30,7 @@ use esox::engines::niseci::full::{
     calculate_niseci, calculate_rqe_niseci, calculate_stato_ecologico_niseci,
 };
 use raylib::RaylibHandle;
-use std::fs::OpenOptions;
+use std::fs::{OpenOptions, create_dir};
 use std::io::Write;
 use std::path::PathBuf;
 
@@ -306,9 +306,23 @@ impl OutputController {
         let name = gen_logfile_name(ref_filename, station_code, true);
         let log_file_path;
         if let Some(documents_dir) = document_dir() {
-            log_file_path = documents_dir.join("f_value").join(name);
+            let dir = documents_dir.join("f_value");
+            if let Err(e) = create_dir(&dir) {
+                if e.kind() != std::io::ErrorKind::AlreadyExists {
+                    eprintln!("Failed to create dir: {}, {}", dir.display(), e);
+                    return;
+                }
+            };
+            log_file_path = dir.join(name);
         } else {
-            log_file_path = PathBuf::from(format!("./f_value/{}", name));
+            let dir = PathBuf::from("./f_value");
+            if let Err(e) = create_dir(&dir) {
+                if e.kind() != std::io::ErrorKind::AlreadyExists {
+                    eprintln!("Failed to create dir: {}, {}", dir.display(), e);
+                    return;
+                }
+            };
+            log_file_path = dir.join(name);
         }
         let file_result = OpenOptions::new()
             .write(true)
@@ -396,9 +410,23 @@ impl OutputController {
         let name = gen_logfile_name(ref_filename, station_code, false);
         let log_file_path;
         if let Some(documents_dir) = document_dir() {
-            log_file_path = documents_dir.join("f_value").join(name);
+            let dir = documents_dir.join("f_value");
+            if let Err(e) = create_dir(&dir) {
+                if e.kind() != std::io::ErrorKind::AlreadyExists {
+                    eprintln!("Failed to create dir: {}, {}", dir.display(), e);
+                    return;
+                }
+            };
+            log_file_path = dir.join(name);
         } else {
-            log_file_path = PathBuf::from(format!("./f_value/{}", name));
+            let dir = PathBuf::from("./f_value");
+            if let Err(e) = create_dir(&dir) {
+                if e.kind() != std::io::ErrorKind::AlreadyExists {
+                    eprintln!("Failed to create dir: {}, {}", dir.display(), e);
+                    return;
+                }
+            };
+            log_file_path = dir.join(name);
         }
 
         let file_result = OpenOptions::new()
@@ -636,9 +664,23 @@ impl OutputController {
         let name = gen_logfile_name(samp_filename, station_code, true);
         let log_file_path;
         if let Some(documents_dir) = document_dir() {
-            log_file_path = documents_dir.join("f_value").join(name);
+            let dir = documents_dir.join("f_value");
+            if let Err(e) = create_dir(&dir) {
+                if e.kind() != std::io::ErrorKind::AlreadyExists {
+                    eprintln!("Failed to create dir: {}, {}", dir.display(), e);
+                    return;
+                }
+            };
+            log_file_path = dir.join(name);
         } else {
-            log_file_path = PathBuf::from(format!("./f_value/{}", name));
+            let dir = PathBuf::from("./f_value");
+            if let Err(e) = create_dir(&dir) {
+                if e.kind() != std::io::ErrorKind::AlreadyExists {
+                    eprintln!("Failed to create dir: {}, {}", dir.display(), e);
+                    return;
+                }
+            };
+            log_file_path = dir.join(name);
         }
         let file_result = OpenOptions::new()
             .write(true)
@@ -694,9 +736,23 @@ impl OutputController {
         let name = gen_logfile_name(samp_filename, station_code, false);
         let log_file_path;
         if let Some(documents_dir) = document_dir() {
-            log_file_path = documents_dir.join("f_value").join(name);
+            let dir = documents_dir.join("f_value");
+            if let Err(e) = create_dir(&dir) {
+                if e.kind() != std::io::ErrorKind::AlreadyExists {
+                    eprintln!("Failed to create dir: {}, {}", dir.display(), e);
+                    return;
+                }
+            };
+            log_file_path = dir.join(name);
         } else {
-            log_file_path = PathBuf::from(format!("./f_value/{}", name));
+            let dir = PathBuf::from("./f_value");
+            if let Err(e) = create_dir(&dir) {
+                if e.kind() != std::io::ErrorKind::AlreadyExists {
+                    eprintln!("Failed to create dir: {}, {}", dir.display(), e);
+                    return;
+                }
+            };
+            log_file_path = dir.join(name);
         }
 
         let file_result = OpenOptions::new()
