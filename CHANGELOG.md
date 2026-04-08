@@ -4,6 +4,7 @@
 
 - Fix reset button
 - Drop `image` dep to use `png` directly
+- Slim `rfd` dep
 
 ## [0.1.1] - 2026-02-06
 

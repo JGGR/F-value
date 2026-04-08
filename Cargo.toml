@@ -28,5 +28,5 @@ png = "0.18.1"
 raylib = { git = "https://github.com/raylib-rs/raylib-rs.git", features = [
     "raygui",
 ] }
-rfd = "0.15.4"
+rfd = { version = "0.15.4", default-features = false, features = [ "gtk3" ] }
 uuid = { version = "1.18.1", features = ["v4"] }
