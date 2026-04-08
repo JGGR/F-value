@@ -3,6 +3,7 @@
 ### Changed
 
 - Fix reset button
+- Slim `image` dep
 
 ## [0.1.1] - 2026-02-06
 

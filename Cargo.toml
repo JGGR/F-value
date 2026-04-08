@@ -21,7 +21,7 @@ chrono = "0.4.39"
 chrono = "0.4.39"
 dirs = "6.0.0"
 esox = "0.1.2"
-image = "0.25.9"
+image = { version = "0.25.9", default-features = false, features = [ "png" ] }
 locale_config = "0.3.0"
 miniz_oxide = "0.8.9"
 pdf-writer = "0.14.0"
