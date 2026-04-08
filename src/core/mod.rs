@@ -50,7 +50,7 @@ pub(crate) const RFD_BACKEND: &str = env!("RFD_BACKEND");
 use chrono::Local;
 use raylib::math::Rectangle;
 use raylib::misc::AsF32;
-use std::path::PathBuf;
+use std::path::Path;
 
 /// A convenience function for making a new `Rectangle`.
 #[inline]
@@ -164,7 +164,7 @@ pub fn sanitize_filename(input: &str) -> String {
 }
 
 pub fn gen_logfile_name(
-    ref_samp_filename: &PathBuf,
+    ref_samp_filename: &Path,
     station_code: String,
     is_main_log: bool,
 ) -> String {
@@ -179,6 +179,5 @@ pub fn gen_logfile_name(
         "{}_{}_{}_{}.csv",
         date, ref_samp_filename_noext, station_code, tail
     );
-    let name = sanitize_filename(&unsafe_name);
-    name
+    sanitize_filename(&unsafe_name)
 }
