@@ -16,7 +16,7 @@
 */
 use crate::app::core::{Action, Action::*};
 use crate::app::model::Model;
-use crate::core::{SHORT_PROJECT_VERSION, RFD_BACKEND};
+use crate::core::{RFD_BACKEND, SHORT_PROJECT_VERSION};
 use crate::views::{propheight, propwidth, rrect, View};
 use crate::MainState;
 use raylib::color::Color;
@@ -106,7 +106,12 @@ impl View for HomeView {
         let labels_y = propheight(d, 50);
         let labels_height = propheight(d, 25);
 
-        let labels: Vec<String> = vec![label_name_txt, label_version_txt, label_target_txt, label_rfd_backend_txt];
+        let labels: Vec<String> = vec![
+            label_name_txt,
+            label_version_txt,
+            label_target_txt,
+            label_rfd_backend_txt,
+        ];
 
         for (i, label) in labels.iter().enumerate() {
             d.gui_label(
