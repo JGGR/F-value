@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-use crate::app::core::{Action, Action::*};
+use crate::app::core::{Action, Action::*, RegioneItaliana};
 use crate::app::model::Model;
 use crate::views::{propheight, propwidth, rrect, View};
 use crate::MainState;
@@ -104,33 +104,13 @@ impl View for SelezioneInfoAggiuntiveView {
             rrect(submit_x, submit_y, submit_width, submit_height),
             confirm_itext.as_str(),
         ) {
-            //TODO: impl TryInto<u32> for a new custom RegioneItaliana or smth ?
-            //But this was request as a free string originally...
-            let regione_string = match self.listview_regione_value {
-                0 => "Abruzzo".to_string(),
-                1 => "Basilicata".to_string(),
-                2 => "Calabria".to_string(),
-                3 => "Campania".to_string(),
-                4 => "Emilia-Romagna".to_string(),
-                5 => "Friuli-Venezia-Giulia".to_string(),
-                6 => "Lazio".to_string(),
-                7 => "Liguria".to_string(),
-                8 => "Lombardia".to_string(),
-                9 => "Marche".to_string(),
-                10 => "Molise".to_string(),
-                11 => "Piemonte".to_string(),
-                12 => "Puglia".to_string(),
-                13 => "Sardegna".to_string(),
-                14 => "Sicilia".to_string(),
-                15 => "Toscana".to_string(),
-                16 => "Trentino-Alto-Adige".to_string(),
-                17 => "Umbria".to_string(),
-                18 => "Valle d'Aosta".to_string(),
-                19 => "Veneto".to_string(),
-                _ => {
+            let regione = match <RegioneItaliana as TryFrom<i32>>::try_from(self.listview_regione_value) {
+                Ok(r) => r,
+                Err(_) => {
                     panic!("Unexpected regione_string in SelezioneInfoAggiuntiveView::draw()");
                 }
             };
+            let regione_string = regione.to_string();
 
             let provincia_string = String::from(&self.textbox_provincia_buffer);
             let posizione = Location {
@@ -411,10 +391,7 @@ impl View for SelezioneInfoAggiuntiveView {
                 column_1_boxes_width,
                 column_1_boxes_height * 3,
             ),
-            "Abruzzo;Basilicata;Calabria;Campania;Emilia-Romagna;\
-            Friuli-Venezia-Giulia;Lazio;Liguria;Lombardia;Marche;\
-            Molise;Piemonte;Puglia;Sardegna;Sicilia;Toscana;\
-            Trentino-Alto-Adige;Umbria;Valle d'Aosta;Veneto",
+            RegioneItaliana::COMBOBOX_STR,
             &mut self.listview_regione_scroll_value,
             &mut self.listview_regione_value,
         );

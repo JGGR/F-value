@@ -17,7 +17,7 @@
 
 use super::core::{
     propheight, propwidth, CurrentView, MainAction, MainAction::*, MainState,
-    GUI_THEME_COMBOBOX_STR, LOCALE_COMBOBOX_STR,
+    GuiTheme, Localize
 };
 use crate::core::{
     rrect, AUTHOR_GIONINJO, AUTHOR_GIONINJO_LINK, AUTHOR_JGABAUT, AUTHOR_JGABAUT_LINK,
@@ -477,7 +477,7 @@ pub(crate) fn draw_settings_box(
         let gui_theme_button_width = gui_theme_label_width;
         let gui_theme_button_height = gui_theme_label_height;
 
-        let gui_theme_str = GUI_THEME_COMBOBOX_STR;
+        let gui_theme_str = GuiTheme::COMBOBOX_STR;
         let mut current_theme = main_state.gui_theme_combobox_active;
         d.gui_combo_box(
             rrect(
@@ -511,7 +511,7 @@ pub(crate) fn draw_settings_box(
         let locale_button_width = locale_label_width;
         let locale_button_height = locale_label_height;
 
-        let locale_str = LOCALE_COMBOBOX_STR;
+        let locale_str = Localize::COMBOBOX_STR;
         let mut current_locale = main_state.locale_combobox_active;
         d.gui_combo_box(
             rrect(

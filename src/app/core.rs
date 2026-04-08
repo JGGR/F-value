@@ -177,82 +177,65 @@ impl fmt::Display for CurrentView {
     }
 }
 
-//TODO: add test to check if this string respects the discriminant ordering in GuiTheme
-pub(crate) const GUI_THEME_COMBOBOX_STR: &str =
-    "Light;Dark;Bluish;Candy;Cherry;Cyber;Jungle;Lavanda;Terminal;Ashes";
-
-//TODO: add test to check if this string respects the discriminant ordering in Localize
-pub(crate) const LOCALE_COMBOBOX_STR: &str = "Italian;International";
-
-#[derive(Copy, Clone)]
-pub(crate) enum GuiTheme {
-    Light,
-    Dark,
-    Bluish,
-    Candy,
-    Cherry,
-    Cyber,
-    Jungle,
-    Lavanda,
-    Terminal,
-    Ashes,
-}
-
-impl fmt::Display for GuiTheme {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let string_representation = match *self {
-            GuiTheme::Light => "Light",
-            GuiTheme::Dark => "Dark",
-            GuiTheme::Bluish => "Bluish",
-            GuiTheme::Candy => "Candy",
-            GuiTheme::Cherry => "Cherry",
-            GuiTheme::Cyber => "Cyber",
-            GuiTheme::Jungle => "Jungle",
-            GuiTheme::Lavanda => "Lavanda",
-            GuiTheme::Terminal => "Terminal",
-            GuiTheme::Ashes => "Ashes",
-        };
-        write!(f, "{}", string_representation)
-    }
-}
-
-impl TryFrom<i32> for GuiTheme {
-    type Error = ();
-
-    fn try_from(v: i32) -> Result<Self, Self::Error> {
-        match v {
-            x if x == GuiTheme::Light as i32 => Ok(GuiTheme::Light),
-            x if x == GuiTheme::Dark as i32 => Ok(GuiTheme::Dark),
-            x if x == GuiTheme::Bluish as i32 => Ok(GuiTheme::Bluish),
-            x if x == GuiTheme::Candy as i32 => Ok(GuiTheme::Candy),
-            x if x == GuiTheme::Cherry as i32 => Ok(GuiTheme::Cherry),
-            x if x == GuiTheme::Cyber as i32 => Ok(GuiTheme::Cyber),
-            x if x == GuiTheme::Jungle as i32 => Ok(GuiTheme::Jungle),
-            x if x == GuiTheme::Lavanda as i32 => Ok(GuiTheme::Lavanda),
-            x if x == GuiTheme::Terminal as i32 => Ok(GuiTheme::Terminal),
-            x if x == GuiTheme::Ashes as i32 => Ok(GuiTheme::Ashes),
-            _ => Err(()),
+macro_rules! define_enum_with_str {
+    (
+        $name:ident => [
+            $first:ident $(=> $first_str:expr)?
+            $(, $rest:ident $(=> $rest_str:expr)?)* $(,)?
+        ]
+    ) => {
+        #[derive(Debug, Copy, Clone, PartialEq, Eq)]
+        #[repr(i32)]
+        pub enum $name {
+            $first,
+            $($rest),*
         }
-    }
-}
 
-#[derive(Copy, Clone)]
-pub(crate) enum Localize {
-    Italian,
-    International,
-}
-
-impl TryFrom<i32> for Localize {
-    type Error = ();
-
-    fn try_from(v: i32) -> Result<Self, Self::Error> {
-        match v {
-            x if x == Localize::Italian as i32 => Ok(Localize::Italian),
-            x if x == Localize::International as i32 => Ok(Localize::International),
-            _ => Err(()),
+        impl $name {
+            pub const COMBOBOX_STR: &'static str = concat!(
+                define_enum_with_str!(@label $first $(=> $first_str)?)
+                $(, ";", define_enum_with_str!(@label $rest $(=> $rest_str)?))*
+            );
         }
-    }
+
+        impl std::fmt::Display for $name {
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                let s = match self {
+                    Self::$first => define_enum_with_str!(@label $first $(=> $first_str)?),
+                    $(Self::$rest => define_enum_with_str!(@label $rest $(=> $rest_str)?)),*
+                };
+                f.write_str(s)
+            }
+        }
+
+        impl std::convert::TryFrom<i32> for $name {
+            type Error = ();
+
+            fn try_from(v: i32) -> Result<Self, Self::Error> {
+                match v {
+                    x if x == Self::$first as i32 => Ok(Self::$first),
+                    $(x if x == Self::$rest as i32 => Ok(Self::$rest),)*
+                    _ => Err(()),
+                }
+            }
+        }
+    };
+
+    // helper: use explicit string if provided, otherwise stringify!(ident)
+    (@label $ident:ident => $label:expr) => { $label };
+    (@label $ident:ident) => { stringify!($ident) };
 }
+
+define_enum_with_str!(GuiTheme => [ Light, Dark, Bluish, Candy, Cherry, Cyber, Jungle, Lavanda, Terminal, Ashes ]);
+
+define_enum_with_str!(Localize => [ Italian, International ]);
+
+define_enum_with_str!(RegioneItaliana => [
+            Abruzzo, Basilicata, Calabria, Campania, EmiliaRomagna => "Emilia-Romagna",
+            FriuliVeneziaGiulia => "Friuli-Venezia-Giulia", Lazio, Liguria,Lombardia,Marche,
+            Molise,Piemonte,Puglia,Sardegna,Sicilia,Toscana,
+            TrentinoAltoAdige => "Trentino-Alto-Adige",Umbria,ValleDAosta => "Valle d'Aosta",Veneto
+]);
 
 pub(crate) struct MainState {
     pub(crate) frame_counter: u32,

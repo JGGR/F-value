@@ -3,6 +3,8 @@
 ### Added
 
 - New `rfd-gtk3`, `rfd-xdg-portal` `cargo` features to select `rfd` backend at build time (default: `rfd-xdg-portal`)
+- Add `RegioneItaliana`
+- Add `define_enum_with_str()` macro for `GuiTheme`, `Localize`, `RegioneItaliana`
 
 ### Changed
 
