@@ -2,7 +2,7 @@
 
 ### Added
 
-- New `rfd-gtk3`, `rfd-xdg-portal` features to select `rfd` backend
+- New `rfd-gtk3`, `rfd-xdg-portal` `cargo` features to select `rfd` backend at build time (default: `rfd-xdg-portal`)
 
 ### Changed
 
