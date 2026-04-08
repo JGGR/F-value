@@ -23,9 +23,9 @@ use esox::engines::hfbi::full::calculate_stato_ecologico_hfbi;
 use esox::engines::niseci::full::calculate_stato_ecologico_niseci;
 use miniz_oxide::deflate::{compress_to_vec_zlib, CompressionLevel};
 use pdf_writer::{Chunk, Content, Filter, Finish, Name, Pdf, Rect, Ref, Str};
-use std::path::PathBuf;
-use std::io::Cursor;
 use png::Decoder;
+use std::io::Cursor;
+use std::path::PathBuf;
 
 // Decode PNG into RGB and optional alpha mask
 fn decode_png(data: &[u8]) -> (Vec<u8>, Option<Vec<u8>>, u32, u32) {
@@ -34,7 +34,12 @@ fn decode_png(data: &[u8]) -> (Vec<u8>, Option<Vec<u8>>, u32, u32) {
     let decoder = Decoder::new(cursor);
     let mut reader = decoder.read_info().unwrap();
 
-    let mut buf = vec![0; reader.output_buffer_size().expect("PNG buffer size unknown")];
+    let mut buf = vec![
+        0;
+        reader
+            .output_buffer_size()
+            .expect("PNG buffer size unknown")
+    ];
     let info = reader.next_frame(&mut buf).unwrap();
 
     let mut rgb = Vec::with_capacity((info.width * info.height * 3) as usize);

@@ -58,7 +58,6 @@ fn is_working_tree_clean() -> bool {
 }
 
 fn main() {
-
     let use_rfd_gtk3 = std::env::var("CARGO_FEATURE_RFD_GTK3").is_ok();
     let use_rfd_xdg_portal = std::env::var("CARGO_FEATURE_RFD_XDG_PORTAL").is_ok();
 
