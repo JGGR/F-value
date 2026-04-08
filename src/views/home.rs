@@ -16,7 +16,7 @@
 */
 use crate::app::core::{Action, Action::*};
 use crate::app::model::Model;
-use crate::core::SHORT_PROJECT_VERSION;
+use crate::core::{SHORT_PROJECT_VERSION, RFD_BACKEND};
 use crate::views::{propheight, propwidth, rrect, View};
 use crate::MainState;
 use raylib::color::Color;
@@ -70,6 +70,7 @@ impl View for HomeView {
             std::env::consts::ARCH,
             std::env::consts::OS
         );
+        let label_rfd_backend_txt = format!("rfd backend:    {}", RFD_BACKEND);
         let label_name_txt_bounds = main_state.current_font.measure_text(
             &label_name_txt,
             main_state.current_font_height as f32,
@@ -85,19 +86,27 @@ impl View for HomeView {
             main_state.current_font_height as f32,
             main_state.default_txt_spacing as f32,
         );
+        let label_rfd_backend_txt_bounds = main_state.current_font.measure_text(
+            &label_rfd_backend_txt,
+            main_state.current_font_height as f32,
+            main_state.default_txt_spacing as f32,
+        );
         let labels_width = propwidth(d, 25)
             + max(
                 max(
-                    label_name_txt_bounds.x as i32,
-                    label_version_txt_bounds.x as i32,
+                    max(
+                        label_name_txt_bounds.x as i32,
+                        label_version_txt_bounds.x as i32,
+                    ),
+                    label_target_txt_bounds.x as i32,
                 ),
-                label_target_txt_bounds.x as i32,
+                label_rfd_backend_txt_bounds.x as i32,
             );
         let labels_x = propwidth(d, 50);
         let labels_y = propheight(d, 50);
         let labels_height = propheight(d, 25);
 
-        let labels: Vec<String> = vec![label_name_txt, label_version_txt, label_target_txt];
+        let labels: Vec<String> = vec![label_name_txt, label_version_txt, label_target_txt, label_rfd_backend_txt];
 
         for (i, label) in labels.iter().enumerate() {
             d.gui_label(
