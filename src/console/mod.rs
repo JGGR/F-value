@@ -178,8 +178,19 @@ impl Console {
                                 }
                                 self.add_message("}".to_string());
                             }
-                            "echo" | "clear" | "help" => {
-                                self.add_message(format!("help: TODO: help for {cmd}"));
+                            "clear" => {
+                                self.add_message("comando clear:\n  uso: clear".to_string());
+                            }
+                            "echo" => {
+                                self.add_message(
+                                    "comando echo:\n  uso: echo <args...>".to_string(),
+                                );
+                            }
+                            "help" => {
+                                self.add_message(
+                                    "comando help:\n  uso: help <command>\nComandi disponibili: {\n  echo\n  info\n  clear\n  help\n}"
+                                        .to_string(),
+                                );
                             }
                             _ => {
                                 self.add_message(format!("help: Comando sconosciuto: {cmd}"));

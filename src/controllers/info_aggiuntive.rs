@@ -372,14 +372,12 @@ impl InfoAggiuntiveController {
                 self.add_console_message(state, format!("InfoAggiuntiveController:  {e}"));
             }
 
-            if errors.is_empty() {
-                state.infoaggiuntive_model.set_valid(true);
-            } else {
-                //TODO: handle validation errors
-                //Will probably switch to ConsoleView using an errors_occurred flag like ValidazioneFileInput
+            if !errors.is_empty() {
                 state.infoaggiuntive_model.set_valid(false);
                 state.infoaggiuntive_model.set_errors_occurred(true);
+                return;
             }
+            state.infoaggiuntive_model.set_valid(true);
         } else {
             let err_msg = "InfoAggiuntiveController: valida_anagrafica_niseci() ha ricevuto uno stato spurio.";
             eprintln!("{}", err_msg);
@@ -498,14 +496,12 @@ impl InfoAggiuntiveController {
                 self.add_console_message(state, format!("InfoAggiuntiveController:  {e}"));
             }
 
-            if errors.is_empty() {
-                state.infoaggiuntive_model.set_valid(true);
-            } else {
-                //TODO: handle validation errors
-                //Will probably switch to ConsoleView using an errors_occurred flag like ValidazioneFileInput
+            if !errors.is_empty() {
                 state.infoaggiuntive_model.set_valid(false);
                 state.infoaggiuntive_model.set_errors_occurred(true);
+                return;
             }
+            state.infoaggiuntive_model.set_valid(true);
         } else {
             let err_msg =
                 "InfoAggiuntiveController: valida_anagrafica_hfbi() ha ricevuto uno stato spurio.";
