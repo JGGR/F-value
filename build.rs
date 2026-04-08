@@ -69,6 +69,12 @@ fn main() {
     if !use_rfd_gtk3 && !use_rfd_xdg_portal {
         panic!("You must enable at least one of `rfd-gtk3` or `rfd-xdg-portal`.");
     }
+    let rfd_backend = if use_rfd_xdg_portal {
+        "xdg-portal"
+    } else {
+        "gtk3"
+    };
+    println!("cargo:rustc-env=RFD_BACKEND={}", rfd_backend);
     let pkg_name = env!("CARGO_PKG_NAME");
     let pkg_version = env!("CARGO_PKG_VERSION");
     let branch_name = get_branch_name();
