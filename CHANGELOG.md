@@ -3,7 +3,7 @@
 ### Changed
 
 - Fix reset button
-- Slim `image` dep
+- Drop `image` dep to use `png` directly
 
 ## [0.1.1] - 2026-02-06
 
