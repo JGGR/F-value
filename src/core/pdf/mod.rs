@@ -21,10 +21,41 @@ use esox::domain::hfbi::{AnagraficaHFBI, RisultatoHFBI};
 use esox::domain::niseci::{AnagraficaNISECI, RiferimentoNISECI, RisultatoNISECI};
 use esox::engines::hfbi::full::calculate_stato_ecologico_hfbi;
 use esox::engines::niseci::full::calculate_stato_ecologico_niseci;
-use image::{ColorType, GenericImageView, ImageFormat};
 use miniz_oxide::deflate::{compress_to_vec_zlib, CompressionLevel};
 use pdf_writer::{Chunk, Content, Filter, Finish, Name, Pdf, Rect, Ref, Str};
 use std::path::PathBuf;
+use std::io::Cursor;
+use png::Decoder;
+
+// Decode PNG into RGB and optional alpha mask
+fn decode_png(data: &[u8]) -> (Vec<u8>, Option<Vec<u8>>, u32, u32) {
+    // Wrap the byte slice in a Cursor so it implements BufRead + Seek
+    let cursor = Cursor::new(data);
+    let decoder = Decoder::new(cursor);
+    let mut reader = decoder.read_info().unwrap();
+
+    let mut buf = vec![0; reader.output_buffer_size().expect("PNG buffer size unknown")];
+    let info = reader.next_frame(&mut buf).unwrap();
+
+    let mut rgb = Vec::with_capacity((info.width * info.height * 3) as usize);
+    let mut alpha = Vec::with_capacity((info.width * info.height) as usize);
+
+    match info.color_type {
+        png::ColorType::Rgb => {
+            rgb.extend_from_slice(&buf);
+        }
+        png::ColorType::Rgba => {
+            for chunk in buf.chunks_exact(4) {
+                rgb.extend_from_slice(&chunk[0..3]);
+                alpha.push(chunk[3]);
+            }
+        }
+        other => panic!("unsupported color type: {:?}", other),
+    }
+
+    let mask = if alpha.is_empty() { None } else { Some(alpha) };
+    (rgb, mask, info.width, info.height)
+}
 
 pub(crate) fn esporta_pdf_niseci(
     export_path: PathBuf,
@@ -87,70 +118,47 @@ pub(crate) fn esporta_pdf_niseci(
     let s_mask_id = alloc.bump();
 
     // Decode the image.
-    let format = image::guess_format(&ISPRA_LOGO_DATA).unwrap();
-    let dynamic = image::load_from_memory(&ISPRA_LOGO_DATA).unwrap();
 
-    let (filter, encoded, mask) = match format {
-        // A JPEG is already valid DCT-encoded data.
-        ImageFormat::Jpeg => {
-            assert!(dynamic.color() == ColorType::Rgb8);
-            (Filter::DctDecode, ISPRA_LOGO_DATA.to_vec(), None)
-        }
+    let (rgb, mask, width, height) = decode_png(ISPRA_LOGO_DATA);
 
-        // While PNGs uses deflate internally, we need to re-encode to get just
-        // the raw coded samples without metadata. Also, we need to encode the
-        // RGB and alpha data separately.
-        ImageFormat::Png => {
-            let level = CompressionLevel::DefaultLevel as u8;
-            let encoded = compress_to_vec_zlib(dynamic.to_rgb8().as_raw(), level);
+    let level = CompressionLevel::DefaultLevel as u8;
+    let encoded = compress_to_vec_zlib(&rgb, level);
+    let mask_encoded = mask.as_ref().map(|a| compress_to_vec_zlib(a, level));
 
-            // If there's an alpha channel, extract the pixel alpha values.
-            let mask = dynamic.color().has_alpha().then(|| {
-                let alphas: Vec<_> = dynamic.pixels().map(|p| (p.2).0[3]).collect();
-                compress_to_vec_zlib(&alphas, level)
-            });
+    let filter = Filter::FlateDecode; // PNGs always use FlateDecode
 
-            (Filter::FlateDecode, encoded, mask)
-        }
-
-        // You could handle other image formats similarly or just recode them to
-        // JPEG or PNG, whatever best fits your use case.
-        _ => panic!("unsupported image format"),
-    };
-
-    // Write the stream for the image we want to embed.
+    // Write the image stream
     {
         let mut image = pdf.image_xobject(image_id, &encoded);
         image.filter(filter);
-        image.width(dynamic.width() as i32);
-        image.height(dynamic.height() as i32);
+        image.width(width as i32);
+        image.height(height as i32);
         image.color_space().device_rgb();
         image.bits_per_component(8);
-        if mask.is_some() {
+        if mask_encoded.is_some() {
             image.s_mask(s_mask_id);
         }
         image.finish();
     }
 
-    {
-        // Add SMask if the image has transparency.
-        if let Some(encoded) = &mask {
-            let mut s_mask = pdf.image_xobject(s_mask_id, encoded);
-            s_mask.filter(filter);
-            s_mask.width(dynamic.width() as i32);
-            s_mask.height(dynamic.height() as i32);
-            s_mask.color_space().device_gray();
-            s_mask.bits_per_component(8);
-        }
+    // Add SMask if the image has transparency
+    if let Some(encoded) = &mask_encoded {
+        let mut s_mask = pdf.image_xobject(s_mask_id, encoded);
+        s_mask.filter(filter);
+        s_mask.width(width as i32);
+        s_mask.height(height as i32);
+        s_mask.color_space().device_gray();
+        s_mask.bits_per_component(8);
     }
+
     */
 
     let a4 = Rect::new(0.0, 0.0, 595.0, 842.0);
 
     /*
     // Size the image at 1pt per pixel.
-    let w = (dynamic.width() / 8) as f32;
-    let h = (dynamic.height() / 8) as f32;
+    let w = (width / 8) as f32;
+    let h = (height / 8) as f32;
     */
 
     // Center the image on the page.
@@ -162,67 +170,41 @@ pub(crate) fn esporta_pdf_niseci(
 
     let s_mask_id_2 = alloc.bump();
 
-    // Decode the image.
-    let format_2 = image::guess_format(CISBA_LOGO_DATA).unwrap();
-    let dynamic_2 = image::load_from_memory(CISBA_LOGO_DATA).unwrap();
+    let (rgb_2, mask_2, width_2, height_2) = decode_png(CISBA_LOGO_DATA);
 
-    let (filter_2, encoded_2, mask_2) = match format_2 {
-        // A JPEG is already valid DCT-encoded data.
-        ImageFormat::Jpeg => {
-            assert!(dynamic_2.color() == ColorType::Rgb8);
-            (Filter::DctDecode, CISBA_LOGO_DATA.to_vec(), None)
-        }
+    let level = CompressionLevel::DefaultLevel as u8;
+    let encoded_2 = compress_to_vec_zlib(&rgb_2, level);
+    let mask_encoded_2 = mask_2.as_ref().map(|a| compress_to_vec_zlib(a, level));
 
-        // While PNGs uses deflate internally, we need to re-encode to get just
-        // the raw coded samples without metadata. Also, we need to encode the
-        // RGB and alpha data separately.
-        ImageFormat::Png => {
-            let level = CompressionLevel::DefaultLevel as u8;
-            let encoded = compress_to_vec_zlib(dynamic_2.to_rgb8().as_raw(), level);
+    let filter_2 = Filter::FlateDecode; // PNGs always use FlateDecode
 
-            // If there's an alpha channel, extract the pixel alpha values.
-            let mask = dynamic_2.color().has_alpha().then(|| {
-                let alphas: Vec<_> = dynamic_2.pixels().map(|p| (p.2).0[3]).collect();
-                compress_to_vec_zlib(&alphas, level)
-            });
-
-            (Filter::FlateDecode, encoded, mask)
-        }
-
-        // You could handle other image formats similarly or just recode them to
-        // JPEG or PNG, whatever best fits your use case.
-        _ => panic!("unsupported image format"),
-    };
-
-    // Write the stream for the image we want to embed.
+    // Write the image stream
     {
         let mut image = pdf.image_xobject(image_id_2, &encoded_2);
         image.filter(filter_2);
-        image.width(dynamic_2.width() as i32);
-        image.height(dynamic_2.height() as i32);
+        image.width(width_2 as i32);
+        image.height(height_2 as i32);
         image.color_space().device_rgb();
         image.bits_per_component(8);
-        if mask_2.is_some() {
+        if mask_encoded_2.is_some() {
             image.s_mask(s_mask_id_2);
         }
         image.finish();
     }
 
-    {
-        // Add SMask if the image has transparency.
-        if let Some(encoded) = &mask_2 {
-            let mut s_mask = pdf.image_xobject(s_mask_id_2, encoded);
-            s_mask.filter(filter_2);
-            s_mask.width(dynamic_2.width() as i32);
-            s_mask.height(dynamic_2.height() as i32);
-            s_mask.color_space().device_gray();
-            s_mask.bits_per_component(8);
-        }
+    // Add SMask if the image has transparency
+    if let Some(encoded) = &mask_encoded_2 {
+        let mut s_mask = pdf.image_xobject(s_mask_id_2, encoded);
+        s_mask.filter(filter_2);
+        s_mask.width(width_2 as i32);
+        s_mask.height(height_2 as i32);
+        s_mask.color_space().device_gray();
+        s_mask.bits_per_component(8);
     }
 
-    // Size the image at 1pt per pixel.
-    let w_2 = (dynamic_2.width() / 6) as f32;
-    let h_2 = (dynamic_2.height() / 6) as f32;
+    // Size the image at 1pt per pixel
+    let w_2 = (width_2 / 6) as f32;
+    let h_2 = (height_2 / 6) as f32;
 
     // Center the image on the page.
     let x_2 = 205.0; // x + w + 20.0;
@@ -546,71 +528,46 @@ pub(crate) fn esporta_pdf_hfbi(
 
     let s_mask_id = alloc.bump();
 
-    // Decode the image.
-    let format = image::guess_format(&ISPRA_LOGO_DATA).unwrap();
-    let dynamic = image::load_from_memory(&ISPRA_LOGO_DATA).unwrap();
+    let (rgb, mask, width, height) = decode_png(ISPRA_LOGO_DATA);
 
-    let (filter, encoded, mask) = match format {
-        // A JPEG is already valid DCT-encoded data.
-        ImageFormat::Jpeg => {
-            assert!(dynamic.color() == ColorType::Rgb8);
-            (Filter::DctDecode, ISPRA_LOGO_DATA.to_vec(), None)
-        }
+    let level = CompressionLevel::DefaultLevel as u8;
+    let encoded = compress_to_vec_zlib(&rgb, level);
+    let mask_encoded = mask.as_ref().map(|a| compress_to_vec_zlib(a, level));
 
-        // While PNGs uses deflate internally, we need to re-encode to get just
-        // the raw coded samples without metadata. Also, we need to encode the
-        // RGB and alpha data separately.
-        ImageFormat::Png => {
-            let level = CompressionLevel::DefaultLevel as u8;
-            let encoded = compress_to_vec_zlib(dynamic.to_rgb8().as_raw(), level);
+    let filter = Filter::FlateDecode; // PNGs always use FlateDecode
 
-            // If there's an alpha channel, extract the pixel alpha values.
-            let mask = dynamic.color().has_alpha().then(|| {
-                let alphas: Vec<_> = dynamic.pixels().map(|p| (p.2).0[3]).collect();
-                compress_to_vec_zlib(&alphas, level)
-            });
-
-            (Filter::FlateDecode, encoded, mask)
-        }
-
-        // You could handle other image formats similarly or just recode them to
-        // JPEG or PNG, whatever best fits your use case.
-        _ => panic!("unsupported image format"),
-    };
-
-    // Write the stream for the image we want to embed.
+    // Write the image stream
     {
         let mut image = pdf.image_xobject(image_id, &encoded);
         image.filter(filter);
-        image.width(dynamic.width() as i32);
-        image.height(dynamic.height() as i32);
+        image.width(width as i32);
+        image.height(height as i32);
         image.color_space().device_rgb();
         image.bits_per_component(8);
-        if mask.is_some() {
+        if mask_encoded.is_some() {
             image.s_mask(s_mask_id);
         }
         image.finish();
     }
 
-    {
-        // Add SMask if the image has transparency.
-        if let Some(encoded) = &mask {
-            let mut s_mask = pdf.image_xobject(s_mask_id, encoded);
-            s_mask.filter(filter);
-            s_mask.width(dynamic.width() as i32);
-            s_mask.height(dynamic.height() as i32);
-            s_mask.color_space().device_gray();
-            s_mask.bits_per_component(8);
-        }
+    // Add SMask if the image has transparency
+    if let Some(encoded) = &mask_encoded {
+        let mut s_mask = pdf.image_xobject(s_mask_id, encoded);
+        s_mask.filter(filter);
+        s_mask.width(width as i32);
+        s_mask.height(height as i32);
+        s_mask.color_space().device_gray();
+        s_mask.bits_per_component(8);
     }
+
     */
 
     let a4 = Rect::new(0.0, 0.0, 595.0, 842.0);
 
     /*
     // Size the image at 1pt per pixel.
-    let w = (dynamic.width() / 8) as f32;
-    let h = (dynamic.height() / 8) as f32;
+    let w = (width / 8) as f32;
+    let h = (height / 8) as f32;
     */
 
     // Center the image on the page.
@@ -622,67 +579,41 @@ pub(crate) fn esporta_pdf_hfbi(
 
     let s_mask_id_2 = alloc.bump();
 
-    // Decode the image.
-    let format_2 = image::guess_format(CISBA_LOGO_DATA).unwrap();
-    let dynamic_2 = image::load_from_memory(CISBA_LOGO_DATA).unwrap();
+    let (rgb_2, mask_2, width_2, height_2) = decode_png(CISBA_LOGO_DATA);
 
-    let (filter_2, encoded_2, mask_2) = match format_2 {
-        // A JPEG is already valid DCT-encoded data.
-        ImageFormat::Jpeg => {
-            assert!(dynamic_2.color() == ColorType::Rgb8);
-            (Filter::DctDecode, CISBA_LOGO_DATA.to_vec(), None)
-        }
+    let level = CompressionLevel::DefaultLevel as u8;
+    let encoded_2 = compress_to_vec_zlib(&rgb_2, level);
+    let mask_encoded_2 = mask_2.as_ref().map(|a| compress_to_vec_zlib(a, level));
 
-        // While PNGs uses deflate internally, we need to re-encode to get just
-        // the raw coded samples without metadata. Also, we need to encode the
-        // RGB and alpha data separately.
-        ImageFormat::Png => {
-            let level = CompressionLevel::DefaultLevel as u8;
-            let encoded = compress_to_vec_zlib(dynamic_2.to_rgb8().as_raw(), level);
+    let filter_2 = Filter::FlateDecode; // PNGs always use FlateDecode
 
-            // If there's an alpha channel, extract the pixel alpha values.
-            let mask = dynamic_2.color().has_alpha().then(|| {
-                let alphas: Vec<_> = dynamic_2.pixels().map(|p| (p.2).0[3]).collect();
-                compress_to_vec_zlib(&alphas, level)
-            });
-
-            (Filter::FlateDecode, encoded, mask)
-        }
-
-        // You could handle other image formats similarly or just recode them to
-        // JPEG or PNG, whatever best fits your use case.
-        _ => panic!("unsupported image format"),
-    };
-
-    // Write the stream for the image we want to embed.
+    // Write the image stream
     {
         let mut image = pdf.image_xobject(image_id_2, &encoded_2);
         image.filter(filter_2);
-        image.width(dynamic_2.width() as i32);
-        image.height(dynamic_2.height() as i32);
+        image.width(width_2 as i32);
+        image.height(height_2 as i32);
         image.color_space().device_rgb();
         image.bits_per_component(8);
-        if mask_2.is_some() {
+        if mask_encoded_2.is_some() {
             image.s_mask(s_mask_id_2);
         }
         image.finish();
     }
 
-    {
-        // Add SMask if the image has transparency.
-        if let Some(encoded) = &mask_2 {
-            let mut s_mask = pdf.image_xobject(s_mask_id_2, encoded);
-            s_mask.filter(filter_2);
-            s_mask.width(dynamic_2.width() as i32);
-            s_mask.height(dynamic_2.height() as i32);
-            s_mask.color_space().device_gray();
-            s_mask.bits_per_component(8);
-        }
+    // Add SMask if the image has transparency
+    if let Some(encoded) = &mask_encoded_2 {
+        let mut s_mask = pdf.image_xobject(s_mask_id_2, encoded);
+        s_mask.filter(filter_2);
+        s_mask.width(width_2 as i32);
+        s_mask.height(height_2 as i32);
+        s_mask.color_space().device_gray();
+        s_mask.bits_per_component(8);
     }
 
-    // Size the image at 1pt per pixel.
-    let w_2 = (dynamic_2.width() / 6) as f32;
-    let h_2 = (dynamic_2.height() / 6) as f32;
+    // Size the image at 1pt per pixel
+    let w_2 = (width_2 / 6) as f32;
+    let h_2 = (height_2 / 6) as f32;
 
     // Center the image on the page.
     let x_2 = 205.0; // x + w + 20.0;
