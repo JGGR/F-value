@@ -55,7 +55,7 @@ pub(crate) fn draw_reset_win(
         if (result == 0) || (result == 2) {
             actions.push(CloseReset);
         } else if result == 1 {
-            actions.push(ResetSettings);
+            actions.push(Reset);
         }
     }
 }

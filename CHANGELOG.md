@@ -1,3 +1,9 @@
+## [0.1.2] - Unreleased
+
+### Changed
+
+- Fix reset button
+
 ## [0.1.1] - 2026-02-06
 
 ### Changed
