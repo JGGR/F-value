@@ -251,22 +251,17 @@ impl OutputController {
                         format!("Stato ecologico: {stato_ecologico_str}"),
                     );
 
+                    let risultato_niseci =
+                        RisultatoNISECI::new(niseci, rqe_niseci, intermediates.clone());
                     self.log_niseci_values(
                         locale,
                         &anagrafica,
-                        niseci_str,
-                        rqe_niseci_str,
-                        stato_ecologico_str,
+                        &risultato_niseci,
                         &intermediates,
                         &state
                             .fileinput_model
                             .get_riferimento_path()
                             .expect("Failed initialising riferimento niseci path"),
-                        state
-                            .data_model
-                            .get_anagrafica_niseci()
-                            .expect("Failed initialising anagrafica niseci")
-                            .codice_stazione,
                     );
 
                     //This logs to stdout
@@ -281,14 +276,8 @@ impl OutputController {
                             .fileinput_model
                             .get_riferimento_path()
                             .expect("Failed initialising riferimento niseci path"),
-                        state
-                            .data_model
-                            .get_anagrafica_niseci()
-                            .expect("Failed initialising anagrafica niseci")
-                            .codice_stazione,
+                        &anagrafica.codice_stazione,
                     );
-
-                    let risultato_niseci = RisultatoNISECI::new(niseci, rqe_niseci, intermediates);
 
                     self.set_data_risultato_niseci(state, risultato_niseci);
                     println!("OutputController: Finished NISECI calc");
@@ -314,18 +303,45 @@ impl OutputController {
         }
     }
 
+    /// TODO: Once RisultatoNISECI lets us get x3_a and x3_b, we can drop the intermediates arg
     pub(crate) fn log_niseci_values(
         &self,
         locale: Localize,
         anagrafica: &AnagraficaNISECI,
-        niseci_str: String,
-        rqe_niseci_str: String,
-        stato_ecologico_str: String,
+        risultato: &RisultatoNISECI,
         intermediates: &ValoriIntermediNISECI,
         ref_filename: &Path,
-        station_code: String,
     ) {
-        let name = gen_logfile_name(ref_filename, station_code, true);
+        let niseci = risultato.get_valore();
+        let niseci_str = match niseci {
+            Some(val) => match locale {
+                Localize::Italian => val.comma().to_string(),
+                Localize::International => {
+                    format!("{val}")
+                }
+            },
+            None => "NC".to_string(),
+        };
+
+        let rqe_niseci = calculate_rqe_niseci(niseci);
+        let rqe_niseci_str = match rqe_niseci {
+            Some(val) => match locale {
+                Localize::Italian => val.comma().to_string(),
+                Localize::International => {
+                    format!("{val}")
+                }
+            },
+            None => "NC".to_string(),
+        };
+
+        let stato_ecologico = calculate_stato_ecologico_niseci(niseci, &anagrafica.area);
+        let stato_ecologico_str = match stato_ecologico {
+            Some(val) => {
+                format!("{val}")
+            }
+            None => "NC".to_string(),
+        };
+        let name = gen_logfile_name(ref_filename, &anagrafica.codice_stazione, true);
         let log_file_path;
         if let Some(dir) = self.prep_logfile_dir() {
             log_file_path = dir.join(name);
@@ -413,7 +429,7 @@ impl OutputController {
         locale: Localize,
         intermediates: &ValoriIntermediNISECI,
         ref_filename: &Path,
-        station_code: String,
+        station_code: &str,
     ) {
         let name = gen_logfile_name(ref_filename, station_code, false);
         let log_file_path;
@@ -594,11 +610,6 @@ impl OutputController {
                             .fileinput_model
                             .get_campionamento_path()
                             .expect("Failed initialising campionamento hfbi path"),
-                        state
-                            .data_model
-                            .get_anagrafica_hfbi()
-                            .expect("Failed initialising anagrafica hfbi")
-                            .codice_stazione,
                     );
 
                     //This logs to stdout
@@ -614,11 +625,7 @@ impl OutputController {
                             .fileinput_model
                             .get_campionamento_path()
                             .expect("Failed initialising campionamento hfbi path"),
-                        state
-                            .data_model
-                            .get_anagrafica_hfbi()
-                            .expect("Failed initialising anagrafica hfbi")
-                            .codice_stazione,
+                        &anagrafica.codice_stazione,
                     );
 
                     let risultato_hfbi = RisultatoHFBI::new(Some(hfbi), intermediates);
@@ -653,9 +660,8 @@ impl OutputController {
         stato_ecologico_str: String,
         intermediates: &ValoriIntermediHFBI,
         samp_filename: &Path,
-        station_code: String,
     ) {
-        let name = gen_logfile_name(samp_filename, station_code, true);
+        let name = gen_logfile_name(samp_filename, &anagrafica.codice_stazione, true);
         let log_file_path;
         if let Some(dir) = self.prep_logfile_dir() {
             log_file_path = dir.join(name);
@@ -711,7 +717,7 @@ impl OutputController {
         locale: Localize,
         intermediates: &ValoriIntermediHFBI,
         samp_filename: &Path,
-        station_code: String,
+        station_code: &str,
     ) {
         let name = gen_logfile_name(samp_filename, station_code, false);
         let log_file_path;
