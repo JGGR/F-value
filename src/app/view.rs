@@ -19,11 +19,57 @@ use super::core::{
     propheight, propwidth, CurrentView, GuiTheme, Localize, MainAction, MainAction::*, MainState,
 };
 use crate::core::{
-    rrect, AUTHOR_GIONINJO, AUTHOR_GIONINJO_LINK, AUTHOR_JGABAUT, AUTHOR_JGABAUT_LINK,
+    is_holiday, rrect, AUTHOR_GIONINJO, AUTHOR_GIONINJO_LINK, AUTHOR_JGABAUT, AUTHOR_JGABAUT_LINK,
     COPYRIGHT_INFO, SHORT_PROJECT_VERSION,
 };
 use raylib::consts::GuiIconName::*;
 use raylib::prelude::*;
+
+struct Rainbow {
+    frame_counter: u32,
+    speed: f32,
+}
+
+impl Rainbow {
+    fn new(frame_counter: u32, speed: f32) -> Self {
+        Self {
+            frame_counter,
+            speed,
+        }
+    }
+    fn get_color(&self) -> Color {
+        let frame_counter = self.frame_counter;
+        let speed = self.speed;
+        let red = (0.5 * (1.0 + (frame_counter as f32 * speed).sin()) * 255.0) as u8;
+        let green = (0.5 * (1.0 + (frame_counter as f32 * speed + 2.0).sin()) * 255.0) as u8;
+        let blue = (0.5 * (1.0 + (frame_counter as f32 * speed + 4.0).sin()) * 255.0) as u8;
+        Color::new(red, green, blue, 255)
+    }
+    fn draw_text(
+        &self,
+        d: &mut RaylibDrawHandle,
+        pos: Vector2,
+        text: &str,
+        font: &WeakFont,
+        text_spacing: i32,
+        text_font_height: i32,
+    ) {
+        // Smaller speed = slower cycle
+        let rainbow_color = self.get_color();
+
+        //let text_bounds = font.measure_text(&text, text_font_height as f32, text_spacing as f32);
+        let text_x = pos.x; //- text_bounds.x as i32 / 2;
+        let text_y = pos.y; //- text_bounds.y as i32 / 2;
+        d.draw_text_ex(
+            font,
+            text,
+            Vector2::new(text_x, text_y),
+            text_font_height as f32,
+            text_spacing as f32,
+            rainbow_color,
+        );
+    }
+}
 
 pub(crate) fn draw_reset_win(
     d: &mut RaylibDrawHandle,
@@ -615,6 +661,20 @@ pub(crate) fn draw_main(d: &mut RaylibDrawHandle, main_state: &MainState) -> Vec
         main_state.colors.default_txt_color,
     );
 
+    if is_holiday() {
+        Rainbow::new(main_state.frame_counter, 0.05).draw_text(
+            d,
+            Vector2::new(
+                propwidth(d, 120) as f32,
+                (navbar_height - main_state.current_font_height) as f32 * 0.5,
+            ),
+            "F-value",
+            &main_state.current_font,
+            main_state.default_txt_spacing,
+            main_state.current_font_height,
+        );
+    }
+
     let info_button_width = core_button_width;
     let info_button_x = core_buttons_panel_x + core_buttons_x_padding;
     let info_button_height = core_button_heigth;
@@ -778,5 +838,6 @@ pub(crate) fn draw_main(d: &mut RaylibDrawHandle, main_state: &MainState) -> Vec
     if lock_gui {
         d.gui_unlock();
     }
+
     actions
 }
