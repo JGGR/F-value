@@ -23,6 +23,7 @@
 - Slim `rfd` dep
 - Drop contact info from `Home` view
 - Refactor pdf export functions
+- Improve submit button for info aggiuntive
 - Bump dependencies
 
 ## [0.1.1] - 2026-02-06
