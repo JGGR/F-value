@@ -91,153 +91,6 @@ impl View for SelezioneInfoAggiuntiveView {
             "Inserisci informazioni aggiuntive",
         );
 
-        let submit_width = propwidth(d, 100);
-        let groupbox_x_end = groupbox_x + groupbox_width;
-        let submit_x =
-            groupbox_x_end + (d.get_screen_width() - groupbox_x_end) / 2 - submit_width / 2;
-        let submit_height = propheight(d, 50);
-        let submit_y = d.get_screen_height() / 2 - submit_height / 2;
-
-        let confirm_itext = d.gui_icon_text(ICON_OK_TICK, "Conferma");
-        let mut actions = Vec::<Action>::new();
-        if d.gui_button(
-            rrect(submit_x, submit_y, submit_width, submit_height),
-            confirm_itext.as_str(),
-        ) {
-            let regione =
-                match <RegioneItaliana as TryFrom<i32>>::try_from(self.listview_regione_value) {
-                    Ok(r) => r,
-                    Err(_) => {
-                        panic!("Unexpected regione_string in SelezioneInfoAggiuntiveView::draw()");
-                    }
-                };
-            let regione_string = regione.to_string();
-
-            let provincia_string = String::from(&self.textbox_provincia_buffer);
-            let posizione = Location {
-                regione: regione_string,
-                provincia: provincia_string,
-            };
-
-            let larghezza_stazione_str = String::from(&self.textbox_larghezza_stazione_buffer);
-
-            let lunghezza_stazione_str = String::from(&self.textbox_lunghezza_stazione_buffer);
-
-            let codice_stazione = String::from(&self.textbox_codice_stazione_buffer);
-            let date_string = String::from(&self.textbox_data_buffer);
-
-            let corpo_idrico = String::from(&self.textbox_corpo_idrico_buffer);
-            match current_index {
-                Indice::Niseci => {
-                    let tipo_comunita = match <TipoComunitaNISECI as TryFrom<i32>>::try_from(
-                        self.dropdownbox_tipocomunit_niseci_value,
-                    ) {
-                        Ok(v) => v,
-                        _ => {
-                            panic!(
-                                "Unexpected tipo_comunita in SelezioneInfoAggiuntiveView::draw()"
-                            );
-                        }
-                    };
-                    let mut opt_fonte: Option<String> = None;
-                    let mut opt_num_protocollo: Option<String> = None;
-                    match tipo_comunita {
-                        TipoComunitaNISECI::Recuperata => {
-                            // Raylib has trouble handling the string downstream if we don't ensure to do this
-                            opt_fonte = Some(self.textbox_fontecomunit_niseci_buffer.clone());
-                        }
-                        TipoComunitaNISECI::AffinataDalMase => {
-                            // Raylib has trouble handling the string downstream if we don't ensure to do this
-                            opt_num_protocollo =
-                                Some(self.textbox_protocollocomunit_niseci_buffer.clone());
-                        }
-                        _ => {}
-                    }
-                    let comunita = ComunitaNISECI {
-                        tipo: tipo_comunita,
-                        fonte: opt_fonte,
-                        numero_protocollo: opt_num_protocollo,
-                    };
-                    let area = match <AreaNISECI as TryFrom<i32>>::try_from(
-                        self.combobox_area_niseci_value,
-                    ) {
-                        Ok(v) => v,
-                        _ => {
-                            panic!("Unexpected area_niseci in SelezioneInfoAggiuntiveView::draw()");
-                        }
-                    };
-
-                    let bacino_niseci = String::from(&self.textbox_bacino_niseci_buffer);
-
-                    let idro_ecoregione_niseci =
-                        match <IdroEcoRegioneNISECI as TryFrom<i32>>::try_from(
-                            self.listview_idroecoregione_niseci_value,
-                        ) {
-                            Ok(v) => v,
-                            _ => {
-                                panic!("Unexpected idroecoregione_niseci in SelezioneInfoAggiuntiveView::draw()");
-                            }
-                        };
-
-                    let anagrafica = AnagraficaNISECIDraft {
-                        comunita,
-                        codice_stazione,
-                        date_string,
-                        area,
-                        corpo_idrico,
-                        bacino_appartenenza: bacino_niseci,
-                        idro_eco_regione: idro_ecoregione_niseci,
-                        posizione,
-                        lunghezza_media_stazione: lunghezza_stazione_str,
-                        larghezza_media_stazione: larghezza_stazione_str,
-                    };
-
-                    actions.push(SubmitAnagraficaNISECI(anagrafica));
-                }
-                Indice::Hfbi => {
-                    let tipo_laguna_costiera =
-                        match <TipoLagunaCostieraHFBI as TryFrom<i32>>::try_from(
-                            self.dropdownbox_tipolaguna_hfbi_value,
-                        ) {
-                            Ok(v) => v,
-                            _ => {
-                                panic!(
-                                    "Unexpected tipo_laguna in SelezioneInfoAggiuntiveView::draw()"
-                                );
-                            }
-                        };
-                    let stagione = match <StagioneHFBI as TryFrom<i32>>::try_from(
-                        self.combobox_stagione_hfbi_value,
-                    ) {
-                        Ok(v) => v,
-                        _ => {
-                            panic!("Unexpected stagione in SelezioneInfoAggiuntiveView::draw()");
-                        }
-                    };
-                    let habitat_vegetato = match <HabitatHFBI as TryFrom<i32>>::try_from(
-                        self.combobox_habitat_vegetato_hfbi_value,
-                    ) {
-                        Ok(v) => v,
-                        _ => {
-                            panic!("Unexpected habitat in SelezioneInfoAggiuntiveView::draw()");
-                        }
-                    };
-                    let anagrafica = AnagraficaHFBIDraft {
-                        codice_stazione,
-                        corpo_idrico,
-                        posizione,
-                        date_string,
-                        tipo_laguna: tipo_laguna_costiera,
-                        stagione,
-                        habitat_vegetato,
-                        lunghezza_media_transetto: lunghezza_stazione_str,
-                        larghezza_media_transetto: larghezza_stazione_str,
-                    };
-                    actions.push(SubmitAnagraficaHFBI(anagrafica));
-                }
-            }
-        }
-
         let x_padding = groupbox_width / 20;
         let y_padding = groupbox_height / 15;
 
@@ -795,6 +648,152 @@ impl View for SelezioneInfoAggiuntiveView {
                 ) {
                     self.dropdownbox_tipolaguna_hfbi_edit_mode =
                         !self.dropdownbox_tipolaguna_hfbi_edit_mode;
+                }
+            }
+        }
+        let submit_width = propwidth(d, 120);
+        let groupbox_x_end = groupbox_x + groupbox_width;
+        let column_2_groupbox_x_end = column_2_x + column_width;
+        let submit_x = column_2_groupbox_x_end + (groupbox_x_end - column_2_groupbox_x_end) / 2;
+        let submit_height = propheight(d, 50);
+        let submit_y = d.get_screen_height() / 2 - submit_height / 2;
+
+        let confirm_itext = d.gui_icon_text(ICON_OK_TICK, "Conferma");
+        let mut actions = Vec::<Action>::new();
+        if d.gui_button(
+            rrect(submit_x, submit_y, submit_width, submit_height),
+            confirm_itext.as_str(),
+        ) {
+            let regione =
+                match <RegioneItaliana as TryFrom<i32>>::try_from(self.listview_regione_value) {
+                    Ok(r) => r,
+                    Err(_) => {
+                        panic!("Unexpected regione_string in SelezioneInfoAggiuntiveView::draw()");
+                    }
+                };
+            let regione_string = regione.to_string();
+
+            let provincia_string = String::from(&self.textbox_provincia_buffer);
+            let posizione = Location {
+                regione: regione_string,
+                provincia: provincia_string,
+            };
+
+            let larghezza_stazione_str = String::from(&self.textbox_larghezza_stazione_buffer);
+
+            let lunghezza_stazione_str = String::from(&self.textbox_lunghezza_stazione_buffer);
+
+            let codice_stazione = String::from(&self.textbox_codice_stazione_buffer);
+            let date_string = String::from(&self.textbox_data_buffer);
+
+            let corpo_idrico = String::from(&self.textbox_corpo_idrico_buffer);
+            match current_index {
+                Indice::Niseci => {
+                    let tipo_comunita = match <TipoComunitaNISECI as TryFrom<i32>>::try_from(
+                        self.dropdownbox_tipocomunit_niseci_value,
+                    ) {
+                        Ok(v) => v,
+                        _ => {
+                            panic!(
+                                "Unexpected tipo_comunita in SelezioneInfoAggiuntiveView::draw()"
+                            );
+                        }
+                    };
+                    let mut opt_fonte: Option<String> = None;
+                    let mut opt_num_protocollo: Option<String> = None;
+                    match tipo_comunita {
+                        TipoComunitaNISECI::Recuperata => {
+                            // Raylib has trouble handling the string downstream if we don't ensure to do this
+                            opt_fonte = Some(self.textbox_fontecomunit_niseci_buffer.clone());
+                        }
+                        TipoComunitaNISECI::AffinataDalMase => {
+                            // Raylib has trouble handling the string downstream if we don't ensure to do this
+                            opt_num_protocollo =
+                                Some(self.textbox_protocollocomunit_niseci_buffer.clone());
+                        }
+                        _ => {}
+                    }
+                    let comunita = ComunitaNISECI {
+                        tipo: tipo_comunita,
+                        fonte: opt_fonte,
+                        numero_protocollo: opt_num_protocollo,
+                    };
+                    let area = match <AreaNISECI as TryFrom<i32>>::try_from(
+                        self.combobox_area_niseci_value,
+                    ) {
+                        Ok(v) => v,
+                        _ => {
+                            panic!("Unexpected area_niseci in SelezioneInfoAggiuntiveView::draw()");
+                        }
+                    };
+
+                    let bacino_niseci = String::from(&self.textbox_bacino_niseci_buffer);
+
+                    let idro_ecoregione_niseci =
+                        match <IdroEcoRegioneNISECI as TryFrom<i32>>::try_from(
+                            self.listview_idroecoregione_niseci_value,
+                        ) {
+                            Ok(v) => v,
+                            _ => {
+                                panic!("Unexpected idroecoregione_niseci in SelezioneInfoAggiuntiveView::draw()");
+                            }
+                        };
+
+                    let anagrafica = AnagraficaNISECIDraft {
+                        comunita,
+                        codice_stazione,
+                        date_string,
+                        area,
+                        corpo_idrico,
+                        bacino_appartenenza: bacino_niseci,
+                        idro_eco_regione: idro_ecoregione_niseci,
+                        posizione,
+                        lunghezza_media_stazione: lunghezza_stazione_str,
+                        larghezza_media_stazione: larghezza_stazione_str,
+                    };
+
+                    actions.push(SubmitAnagraficaNISECI(anagrafica));
+                }
+                Indice::Hfbi => {
+                    let tipo_laguna_costiera =
+                        match <TipoLagunaCostieraHFBI as TryFrom<i32>>::try_from(
+                            self.dropdownbox_tipolaguna_hfbi_value,
+                        ) {
+                            Ok(v) => v,
+                            _ => {
+                                panic!(
+                                    "Unexpected tipo_laguna in SelezioneInfoAggiuntiveView::draw()"
+                                );
+                            }
+                        };
+                    let stagione = match <StagioneHFBI as TryFrom<i32>>::try_from(
+                        self.combobox_stagione_hfbi_value,
+                    ) {
+                        Ok(v) => v,
+                        _ => {
+                            panic!("Unexpected stagione in SelezioneInfoAggiuntiveView::draw()");
+                        }
+                    };
+                    let habitat_vegetato = match <HabitatHFBI as TryFrom<i32>>::try_from(
+                        self.combobox_habitat_vegetato_hfbi_value,
+                    ) {
+                        Ok(v) => v,
+                        _ => {
+                            panic!("Unexpected habitat in SelezioneInfoAggiuntiveView::draw()");
+                        }
+                    };
+                    let anagrafica = AnagraficaHFBIDraft {
+                        codice_stazione,
+                        corpo_idrico,
+                        posizione,
+                        date_string,
+                        tipo_laguna: tipo_laguna_costiera,
+                        stagione,
+                        habitat_vegetato,
+                        lunghezza_media_transetto: lunghezza_stazione_str,
+                        larghezza_media_transetto: larghezza_stazione_str,
+                    };
+                    actions.push(SubmitAnagraficaHFBI(anagrafica));
                 }
             }
         }
