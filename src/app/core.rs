@@ -19,6 +19,7 @@ use super::controller::update_main;
 use super::view::draw_main;
 use crate::app::model::Model;
 use crate::controllers::Controllers;
+use crate::core::SHORT_PROJECT_VERSION;
 use crate::views::Views;
 use esox::domain::hfbi::AnagraficaHFBIDraft;
 use esox::domain::index::Indice;
@@ -26,6 +27,12 @@ use esox::domain::niseci::AnagraficaNISECIDraft;
 use raylib::prelude::*;
 use std::fmt;
 use std::path::PathBuf;
+//use raylib::color::Color;
+use raylib::consts::GuiControl::DEFAULT;
+use raylib::consts::GuiControlProperty::TEXT_COLOR_NORMAL;
+use raylib::consts::GuiDefaultProperty::{BACKGROUND_COLOR, TEXT_SIZE, TEXT_SPACING};
+use raylib::consts::TraceLogLevel;
+use raylib::core::texture::Image;
 
 pub(crate) const EXIT_KEY: raylib::consts::KeyboardKey = raylib::consts::KeyboardKey::KEY_ESCAPE;
 pub(crate) const ESOX_SCREEN_WIDTH: i32 = 960;
@@ -265,7 +272,7 @@ pub(crate) struct MainState {
 }
 
 impl MainState {
-    pub(crate) fn new(
+    fn new(
         default_font_height: i32,
         current_font_height: i32,
         default_txt_spacing: i32,
@@ -383,4 +390,151 @@ pub(crate) fn get_locale() -> Localize {
         }
     }
     Localize::International
+}
+
+/// Application root.
+///
+/// ## Drop Order Invariant
+///
+/// Types like `Font` and `Texture` (used inside `Views`) are backed by GPU
+/// resources and require a valid OpenGL context to be destroyed safely.
+///
+/// `RaylibHandle` owns that context. If it is dropped first, any later
+/// destruction of GPU resources will cause a segfault inside raylib.
+///
+/// Rust drops struct fields in declaration order (top to bottom),
+/// so we ensure correct destruction order by placing `rl` last.
+///
+/// Dependency chain:
+/// Views → Font → Texture → OpenGL context (rl)
+///
+/// Therefore:
+/// - `views` must be dropped BEFORE `rl`
+/// - `rl` must be the LAST field in this struct
+pub(crate) struct App {
+    main_state: MainState,
+    model: Model,
+    controllers: Controllers,
+    views: Views,
+    rl: RaylibHandle,
+    thread: RaylibThread,
+}
+
+impl App {
+    pub(crate) fn new() -> App {
+        let window_title = format!("F-value v{SHORT_PROJECT_VERSION}");
+
+        let (mut rl, thread) = raylib::init()
+            .size(ESOX_SCREEN_WIDTH, ESOX_SCREEN_HEIGHT)
+            .title(&window_title)
+            .log_level(TraceLogLevel::LOG_ERROR) // Gets rid of raylib init text in the terminal
+            .resizable()
+            .build();
+
+        rl.set_window_min_size(ESOX_SCREEN_WIDTH, ESOX_SCREEN_HEIGHT);
+        rl.set_exit_key(None); // This allows capturing the exit key with a message box
+        rl.set_target_fps(30);
+        let img_load_res = Image::load_image_from_mem(".png", PROJECT_LOGO_DATA);
+
+        let mut logo_img = None;
+        match img_load_res {
+            Ok(img) => {
+                logo_img = Some(img);
+            }
+            Err(err) => {
+                println!("Error loading logo img: {err}");
+            }
+        }
+
+        let img_load_res = Image::load_image_from_mem(".png", PROJECT_LOGO_NAME_DATA);
+
+        let mut logo_name_img = None;
+        match img_load_res {
+            Ok(img) => {
+                logo_name_img = Some(img);
+            }
+            Err(err) => {
+                println!("Error loading logo name img: {err}");
+            }
+        }
+
+        let img_load_res = Image::load_image_from_mem(".png", PROJECT_BG_DATA);
+
+        let mut bg_img = None;
+        match img_load_res {
+            Ok(img) => {
+                bg_img = Some(img);
+            }
+            Err(err) => {
+                println!("Error loading bg img: {err}");
+            }
+        }
+
+        let mut logo_texture = None;
+        if let Some(img) = logo_img {
+            logo_texture = Some(rl.load_texture_from_image(&thread, &img).unwrap());
+            // Set the window icon
+            rl.set_window_icon(&img);
+        }
+
+        let mut logo_name_texture = None;
+        if let Some(img) = logo_name_img {
+            logo_name_texture = Some(rl.load_texture_from_image(&thread, &img).unwrap());
+        }
+
+        let mut bg_texture = None;
+        if let Some(img) = bg_img {
+            bg_texture = Some(rl.load_texture_from_image(&thread, &img).unwrap());
+        }
+
+        // 10 is way too small for the default font height
+        let gui_default_font_height: i32 = rl.gui_get_style(DEFAULT, TEXT_SIZE) * 2;
+        rl.gui_set_style(DEFAULT, TEXT_SIZE, gui_default_font_height);
+        let gui_current_font_height: i32 = gui_default_font_height;
+
+        let txt_color_int = rl.gui_get_style(DEFAULT, TEXT_COLOR_NORMAL);
+        let bg_color_int = rl.gui_get_style(DEFAULT, BACKGROUND_COLOR);
+        let txt_spacing = rl.gui_get_style(DEFAULT, TEXT_SPACING) * 2;
+        rl.gui_set_style(DEFAULT, TEXT_SPACING, txt_spacing);
+        let current_font = rl.gui_get_font();
+        let locale = get_locale();
+        let main_state = MainState::new(
+            gui_default_font_height,
+            gui_current_font_height,
+            txt_spacing,
+            current_font,
+            Color::get_color(txt_color_int as u32),
+            Color::get_color(bg_color_int as u32),
+            logo_texture,
+            logo_name_texture,
+            bg_texture,
+            locale,
+        );
+        let model = Model::new();
+        let controllers = Controllers::new();
+        let views = Views::new(
+            &mut rl,
+            &thread,
+            main_state.current_font_height,
+            main_state.default_txt_spacing,
+        );
+        Self {
+            main_state,
+            model,
+            controllers,
+            views,
+            rl,
+            thread,
+        }
+    }
+
+    pub(crate) fn run(&mut self) {
+        self.main_state.mainloop(
+            &mut self.rl,
+            &self.thread,
+            &mut self.model,
+            &self.controllers,
+            &mut self.views,
+        );
+    }
 }
