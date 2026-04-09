@@ -155,7 +155,7 @@ impl View for ProduzioneOutputView {
                     ),
                     main_state.current_font_height as f32,
                     main_state.default_txt_spacing as f32,
-                    main_state.default_txt_color,
+                    main_state.colors.default_txt_color,
                 );
                 let rqe_niseci_opt = state.data_model.get_rqe_niseci_value();
                 let rqe_niseci_str = match rqe_niseci_opt {
@@ -182,7 +182,7 @@ impl View for ProduzioneOutputView {
                     ),
                     main_state.current_font_height as f32,
                     main_state.default_txt_spacing as f32,
-                    main_state.default_txt_color,
+                    main_state.colors.default_txt_color,
                 );
                 let stato_eco_niseci_opt = state.data_model.get_stato_eco_niseci_value(state);
                 let stato_eco_niseci_str = match stato_eco_niseci_opt {
@@ -209,7 +209,7 @@ impl View for ProduzioneOutputView {
                     ),
                     main_state.current_font_height as f32,
                     main_state.default_txt_spacing as f32,
-                    main_state.default_txt_color,
+                    main_state.colors.default_txt_color,
                 );
 
                 let x1_opt = state.data_model.get_x1_value();
@@ -237,7 +237,7 @@ impl View for ProduzioneOutputView {
                     ),
                     main_state.current_font_height as f32,
                     main_state.default_txt_spacing as f32,
-                    main_state.default_txt_color,
+                    main_state.colors.default_txt_color,
                 );
 
                 let x2_opt = state.data_model.get_x2_value();
@@ -265,7 +265,7 @@ impl View for ProduzioneOutputView {
                     ),
                     main_state.current_font_height as f32,
                     main_state.default_txt_spacing as f32,
-                    main_state.default_txt_color,
+                    main_state.colors.default_txt_color,
                 );
 
                 let x3_opt = state.data_model.get_x3_value();
@@ -293,7 +293,7 @@ impl View for ProduzioneOutputView {
                     ),
                     main_state.current_font_height as f32,
                     main_state.default_txt_spacing as f32,
-                    main_state.default_txt_color,
+                    main_state.colors.default_txt_color,
                 );
             }
             Indice::Hfbi => {
@@ -324,7 +324,7 @@ impl View for ProduzioneOutputView {
                     ),
                     main_state.current_font_height as f32,
                     main_state.default_txt_spacing as f32,
-                    main_state.default_txt_color,
+                    main_state.colors.default_txt_color,
                 );
                 let data_res_opt = state.data_model.get_risultato_hfbi();
                 let mmi_str = match data_res_opt {
@@ -353,7 +353,7 @@ impl View for ProduzioneOutputView {
                     ),
                     main_state.current_font_height as f32,
                     main_state.default_txt_spacing as f32,
-                    main_state.default_txt_color,
+                    main_state.colors.default_txt_color,
                 );
                 let stato_eco_hfbi_opt = state.data_model.get_stato_eco_hfbi_value(state);
                 let stato_eco_hfbi_str = match stato_eco_hfbi_opt {
@@ -380,7 +380,7 @@ impl View for ProduzioneOutputView {
                     ),
                     main_state.current_font_height as f32,
                     main_state.default_txt_spacing as f32,
-                    main_state.default_txt_color,
+                    main_state.colors.default_txt_color,
                 );
             }
         }

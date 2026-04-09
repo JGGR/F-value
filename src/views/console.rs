@@ -36,10 +36,10 @@ impl View for ConsoleView {
         state: &Model,
         main_state: &MainState,
     ) -> Vec<Action> {
-        d.clear_background(main_state.default_bg_color);
+        d.clear_background(main_state.colors.default_bg_color);
         state.console_model.console.draw(
             d,
-            main_state.default_txt_color,
+            main_state.colors.default_txt_color,
             self.current_font_size,
             self.font_spacing,
             &self.font,

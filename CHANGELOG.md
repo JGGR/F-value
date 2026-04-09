@@ -4,6 +4,7 @@
 
 - Add `App::new()` to wrap `raylib` context, `MainState` init
 - Add `AppTextures`
+- Add `ColorState` to wrap `MainState::{default_txt_color, default_bg_color}`
 - New `rfd-gtk3`, `rfd-xdg-portal` `cargo` features to select `rfd` backend at build time (default: `rfd-xdg-portal`)
 - Add `RegioneItaliana`
 - Add `define_enum_with_str()` macro for `GuiTheme`, `Localize`, `RegioneItaliana`

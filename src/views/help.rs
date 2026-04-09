@@ -37,7 +37,7 @@ impl View for HelpView {
         _state: &Model,
         main_state: &MainState,
     ) -> Vec<Action> {
-        d.clear_background(main_state.default_bg_color);
+        d.clear_background(main_state.colors.default_bg_color);
 
         let txt =
 "Fish-Value è un software sviluppato per supportare i professionisti e i tecnici ambientali
@@ -68,7 +68,7 @@ l'ittiofauna, per la determinazione della qualità ecologica dei corpi idrici.
             Vector2::new(txt_x as f32, txt_y as f32),
             main_state.current_font_height as f32,
             main_state.default_txt_spacing as f32,
-            main_state.default_txt_color,
+            main_state.colors.default_txt_color,
         );
 
         let continue_width = propwidth(d, 150);
