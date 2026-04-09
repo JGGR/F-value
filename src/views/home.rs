@@ -38,10 +38,10 @@ impl View for HomeView {
     ) -> Vec<Action> {
         self.draw_background(d, main_state);
 
-        let logo_texture_target_width = propwidth(d, 205);
-        let logo_texture_target_height = propheight(d, 205);
+        let logo_texture_target_width = propwidth(d, 154);
+        let logo_texture_target_height = propheight(d, 154);
         let logo_texture_target_x = d.get_screen_width() / 2 - logo_texture_target_width / 2;
-        let logo_texture_target_y = propheight(d, 50);
+        let logo_texture_target_y = propheight(d, 100);
         if let Some(ref texture) = main_state.textures.logo_texture {
             d.draw_texture_pro(
                 texture,
@@ -64,8 +64,8 @@ impl View for HomeView {
         }
 
         // logo_name.png is 512 x 82
-        let logo_name_texture_target_width = propwidth(d, 256);
-        let logo_name_texture_target_height = propheight(d, 41);
+        let logo_name_texture_target_width = propwidth(d, 192);
+        let logo_name_texture_target_height = propheight(d, 31);
         let logo_name_texture_target_x =
             d.get_screen_width() / 2 - logo_name_texture_target_width / 2;
         let logo_name_texture_target_y =
