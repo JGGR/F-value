@@ -7,6 +7,7 @@
 - Add `define_enum_with_str()` macro for `GuiTheme`, `Localize`, `RegioneItaliana`
 - Add new logo, icon and background
 - Use program logo in pdf
+- Include intermediates in `HFBI` pdf
 
 ### Changed
 

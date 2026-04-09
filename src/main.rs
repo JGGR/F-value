@@ -26,7 +26,7 @@ mod views;
 
 use crate::app::core::{
     get_locale, MainState, ESOX_SCREEN_HEIGHT, ESOX_SCREEN_WIDTH, PROJECT_BG_DATA,
-    PROJECT_LOGO_DATA, PROJECT_LOGO_NAME_DATA
+    PROJECT_LOGO_DATA, PROJECT_LOGO_NAME_DATA,
 };
 use crate::app::model::Model;
 use crate::args::handle_args;
