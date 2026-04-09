@@ -24,120 +24,12 @@ mod controllers;
 mod core;
 mod views;
 
-use crate::app::core::{
-    get_locale, MainState, ESOX_SCREEN_HEIGHT, ESOX_SCREEN_WIDTH, PROJECT_BG_DATA,
-    PROJECT_LOGO_DATA, PROJECT_LOGO_NAME_DATA,
-};
-use crate::app::model::Model;
+use crate::app::core::{App, MainState};
 use crate::args::handle_args;
-use crate::controllers::Controllers;
-use crate::core::SHORT_PROJECT_VERSION;
-use crate::views::Views;
-use raylib::color::Color;
-use raylib::consts::GuiControl::DEFAULT;
-use raylib::consts::GuiControlProperty::TEXT_COLOR_NORMAL;
-use raylib::consts::GuiDefaultProperty::{BACKGROUND_COLOR, TEXT_SIZE, TEXT_SPACING};
-use raylib::consts::TraceLogLevel;
-use raylib::core::texture::Image;
 
 fn main() {
     handle_args();
 
-    let img_load_res = Image::load_image_from_mem(".png", PROJECT_LOGO_DATA);
-
-    let mut logo_img = None;
-    match img_load_res {
-        Ok(img) => {
-            logo_img = Some(img);
-        }
-        Err(err) => {
-            println!("Error loading logo img: {err}");
-        }
-    }
-
-    let img_load_res = Image::load_image_from_mem(".png", PROJECT_LOGO_NAME_DATA);
-
-    let mut logo_name_img = None;
-    match img_load_res {
-        Ok(img) => {
-            logo_name_img = Some(img);
-        }
-        Err(err) => {
-            println!("Error loading logo name img: {err}");
-        }
-    }
-
-    let img_load_res = Image::load_image_from_mem(".png", PROJECT_BG_DATA);
-
-    let mut bg_img = None;
-    match img_load_res {
-        Ok(img) => {
-            bg_img = Some(img);
-        }
-        Err(err) => {
-            println!("Error loading bg img: {err}");
-        }
-    }
-
-    let window_title = format!("F-value v{SHORT_PROJECT_VERSION}");
-
-    let (mut rl, thread) = raylib::init()
-        .size(ESOX_SCREEN_WIDTH, ESOX_SCREEN_HEIGHT)
-        .title(&window_title)
-        .log_level(TraceLogLevel::LOG_ERROR) // Gets rid of raylib init text in the terminal
-        .resizable()
-        .build();
-
-    rl.set_window_min_size(ESOX_SCREEN_WIDTH, ESOX_SCREEN_HEIGHT);
-    rl.set_exit_key(None); // This allows capturing the exit key with a message box
-    rl.set_target_fps(30);
-
-    let mut logo_texture = None;
-    if let Some(img) = logo_img {
-        logo_texture = Some(rl.load_texture_from_image(&thread, &img).unwrap());
-        // Set the window icon
-        rl.set_window_icon(&img);
-    }
-
-    let mut logo_name_texture = None;
-    if let Some(img) = logo_name_img {
-        logo_name_texture = Some(rl.load_texture_from_image(&thread, &img).unwrap());
-    }
-
-    let mut bg_texture = None;
-    if let Some(img) = bg_img {
-        bg_texture = Some(rl.load_texture_from_image(&thread, &img).unwrap());
-    }
-
-    // 10 is way too small for the default font height
-    let gui_default_font_height: i32 = rl.gui_get_style(DEFAULT, TEXT_SIZE) * 2;
-    rl.gui_set_style(DEFAULT, TEXT_SIZE, gui_default_font_height);
-    let gui_current_font_height: i32 = gui_default_font_height;
-
-    let txt_color_int = rl.gui_get_style(DEFAULT, TEXT_COLOR_NORMAL);
-    let bg_color_int = rl.gui_get_style(DEFAULT, BACKGROUND_COLOR);
-    let txt_spacing = rl.gui_get_style(DEFAULT, TEXT_SPACING) * 2;
-    rl.gui_set_style(DEFAULT, TEXT_SPACING, txt_spacing);
-    let current_font = rl.gui_get_font();
-    let locale = get_locale();
-    let mut main_state = MainState::new(
-        gui_default_font_height,
-        gui_current_font_height,
-        txt_spacing,
-        current_font,
-        Color::get_color(txt_color_int as u32),
-        Color::get_color(bg_color_int as u32),
-        logo_texture,
-        logo_name_texture,
-        bg_texture,
-        locale,
-    );
-
-    let mut model = Model::new();
-
-    let controllers = Controllers::new();
-
-    let mut views = Views::new(&mut rl, &thread, gui_current_font_height, txt_spacing);
-
-    main_state.mainloop(&mut rl, &thread, &mut model, &controllers, &mut views);
+    let mut app = App::new();
+    app.run();
 }
