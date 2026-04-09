@@ -70,7 +70,9 @@ pub(crate) fn update_main(
                 rl.gui_set_style(DEFAULT, TEXT_SIZE, main_state.current_font_height);
                 main_state.gui_theme_combobox_active = GuiTheme::Light as i32;
                 GuiTheme::load_and_set(&GuiTheme::Light, rl, main_state);
-                main_state.locale_combobox_active = get_locale() as i32;
+                let locale = get_locale();
+                main_state.locale_combobox_active = locale as i32;
+                main_state.locale = locale;
             }
             MainAction::ShowConsole => {
                 main_state.set_current_view(CurrentView::Console);
