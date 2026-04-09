@@ -5,6 +5,8 @@
 - New `rfd-gtk3`, `rfd-xdg-portal` `cargo` features to select `rfd` backend at build time (default: `rfd-xdg-portal`)
 - Add `RegioneItaliana`
 - Add `define_enum_with_str()` macro for `GuiTheme`, `Localize`, `RegioneItaliana`
+- Add new logo, icon and background
+- Use program logo in pdf
 
 ### Changed
 
@@ -13,6 +15,7 @@
 - Fix `f_value/` output directory creation
 - Drop `image` dep to use `png` directly
 - Slim `rfd` dep
+- Drop contact info from `Home` view
 - Bump dependencies
 
 ## [0.1.1] - 2026-02-06

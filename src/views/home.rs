@@ -36,7 +36,7 @@ impl View for HomeView {
         _state: &Model,
         main_state: &MainState,
     ) -> Vec<Action> {
-        d.clear_background(main_state.default_bg_color);
+        self.draw_background(d, main_state);
 
         let texture_target_width = propwidth(d, 205);
         let texture_target_height = propheight(d, 205);
@@ -102,8 +102,8 @@ impl View for HomeView {
                 ),
                 label_rfd_backend_txt_bounds.x as i32,
             );
-        let labels_x = propwidth(d, 50);
-        let labels_y = propheight(d, 50);
+        let labels_x = (d.get_screen_width() - labels_width) / 2;
+        let labels_y = (d.get_screen_height() as f32 * 0.6) as i32;
         let labels_height = propheight(d, 25);
 
         let labels: Vec<String> = vec![
@@ -125,160 +125,18 @@ impl View for HomeView {
             );
         }
 
-        let label_andrea_marchi_txt = "Dr. Andrea Marchi".to_string();
-        let label_hydrosynergy_txt = "Hydrosynergy Società Cooperativa".to_string();
-        let label_societ_txt =
-            "Società Spin-off accreditata dell'Alma Mater Studiorum - Università di Bologna"
-                .to_string();
-        let label_andrea_marchi_txt_bounds = main_state.current_font.measure_text(
-            &label_andrea_marchi_txt,
-            main_state.current_font_height as f32,
-            main_state.default_txt_spacing as f32,
-        );
-        let label_hydrosynergy_txt_bounds = main_state.current_font.measure_text(
-            &label_hydrosynergy_txt,
-            main_state.current_font_height as f32,
-            main_state.default_txt_spacing as f32,
-        );
-        let label_societ_txt_bounds = main_state.current_font.measure_text(
-            &label_societ_txt,
-            main_state.current_font_height as f32,
-            main_state.default_txt_spacing as f32,
-        );
-
-        let dr_andrea_labels_width = propwidth(d, 25)
-            + max(
-                max(
-                    label_andrea_marchi_txt_bounds.x as i32,
-                    label_hydrosynergy_txt_bounds.x as i32,
-                ),
-                label_societ_txt_bounds.x as i32,
-            );
-
-        let dr_andrea_labels: Vec<String> = vec![
-            label_andrea_marchi_txt,
-            label_hydrosynergy_txt,
-            label_societ_txt,
-        ];
-        let dr_andrea_labels_y = propheight(d, 200);
-
-        for (i, label) in dr_andrea_labels.iter().enumerate() {
-            d.gui_label(
-                rrect(
-                    labels_x,
-                    dr_andrea_labels_y + (i as i32 * labels_height),
-                    dr_andrea_labels_width,
-                    labels_height,
-                ),
-                label.as_str(),
-            );
-        }
-
-        let andrea_email = "a.marchi@hsbologna.it";
-        let andrea_mail_display_link = andrea_email;
-        let andrea_mail_actual_link = "mailto:".to_owned() + andrea_email;
-        let andrea_mail_link_str = andrea_mail_display_link;
-        let andrea_mail_link_x = labels_x;
-        let andrea_mail_link_y = dr_andrea_labels_y + dr_andrea_labels.len() as i32 * labels_height;
-        let andrea_mail_link_width = propwidth(d, 50);
-        let andrea_mail_link_height = labels_height;
-
-        if d.gui_label_button(
-            rrect(
-                andrea_mail_link_x,
-                andrea_mail_link_y,
-                andrea_mail_link_width,
-                andrea_mail_link_height,
-            ),
-            andrea_mail_link_str,
-        ) {
-            raylib::core::misc::open_url(&andrea_mail_actual_link);
-        }
-
-        let label_salvatore_de_bonis_txt = "Dr. Salvatore De Bonis".to_string();
-        let label_agenzia_txt =
-            "Agenzia Regionale per la Protezione Ambientale del Lazio".to_string();
-        let label_dipartimento_txt =
-            "Dipartimento Stato dell'Ambiente - Unità Risorse Idriche di Roma".to_string();
-        let label_salvatore_de_bonis_txt_bounds = main_state.current_font.measure_text(
-            &label_salvatore_de_bonis_txt,
-            main_state.current_font_height as f32,
-            main_state.default_txt_spacing as f32,
-        );
-        let label_agenzia_txt_bounds = main_state.current_font.measure_text(
-            &label_agenzia_txt,
-            main_state.current_font_height as f32,
-            main_state.default_txt_spacing as f32,
-        );
-        let label_dipartimento_txt_bounds = main_state.current_font.measure_text(
-            &label_dipartimento_txt,
-            main_state.current_font_height as f32,
-            main_state.default_txt_spacing as f32,
-        );
-
-        let dr_salvatore_labels: Vec<String> = vec![
-            label_salvatore_de_bonis_txt,
-            label_agenzia_txt,
-            label_dipartimento_txt,
-        ];
-
-        let dr_salvatore_labels_width = propwidth(d, 25)
-            + max(
-                max(
-                    label_salvatore_de_bonis_txt_bounds.x as i32,
-                    label_agenzia_txt_bounds.x as i32,
-                ),
-                label_dipartimento_txt_bounds.x as i32,
-            );
-
-        let dr_salvatore_labels_y =
-            dr_andrea_labels_y + (dr_andrea_labels.len() as i32 + 2) * labels_height;
-
-        for (i, label) in dr_salvatore_labels.iter().enumerate() {
-            d.gui_label(
-                rrect(
-                    labels_x,
-                    dr_salvatore_labels_y + (i as i32 * labels_height),
-                    dr_salvatore_labels_width,
-                    labels_height,
-                ),
-                label.as_str(),
-            );
-        }
-
-        let salvatore_email = "salvatore.debonis@arpalazio.it";
-        let salvatore_mail_display_link = salvatore_email;
-        let salvatore_mail_actual_link = "mailto:".to_owned() + salvatore_email;
-        let salvatore_mail_link_str = salvatore_mail_display_link;
-        let salvatore_mail_link_x = labels_x;
-        let salvatore_mail_link_y =
-            dr_salvatore_labels_y + dr_salvatore_labels.len() as i32 * labels_height;
-        let salvatore_mail_link_width = propwidth(d, 50);
-        let salvatore_mail_link_height = labels_height;
-
-        if d.gui_label_button(
-            rrect(
-                salvatore_mail_link_x,
-                salvatore_mail_link_y,
-                salvatore_mail_link_width,
-                salvatore_mail_link_height,
-            ),
-            salvatore_mail_link_str,
-        ) {
-            raylib::core::misc::open_url(&salvatore_mail_actual_link);
-        }
-
+        let buttons_offset = propwidth(d, 50);
         let continue_width = propwidth(d, 150);
-        let continue_x = d.get_screen_width() - continue_width - propwidth(d, 50);
+        let continue_x = d.get_screen_width() - continue_width - buttons_offset;
         let continue_height = propwidth(d, 50);
         let continue_y = d.get_screen_height() - propheight(d, 150);
 
         let continue_itext = d.gui_icon_text(ICON_PLAYER_NEXT, ": Continua");
 
         let info_width = continue_width;
-        let info_x = continue_x;
+        let info_x = buttons_offset;
         let info_height = continue_height;
-        let info_y = continue_y - continue_height * 2;
+        let info_y = continue_y;
 
         let info_itext = d.gui_icon_text(ICON_INFO, ": Info");
 

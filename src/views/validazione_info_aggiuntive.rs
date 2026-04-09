@@ -32,7 +32,7 @@ impl View for ValidazioneInfoAggiuntiveView {
         _state: &Model,
         main_state: &MainState,
     ) -> Vec<Action> {
-        d.clear_background(main_state.default_bg_color);
+        self.draw_background(d, main_state);
 
         let button_valida_width = propwidth(d, 200);
         let button_valida_x = d.get_screen_width() / 2 - button_valida_width / 2;

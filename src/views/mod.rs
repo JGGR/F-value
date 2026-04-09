@@ -118,6 +118,52 @@ pub(crate) trait View {
         state: &Model,
         main_state: &MainState,
     ) -> Vec<Action>;
+
+    fn draw_background(&mut self, d: &mut RaylibDrawHandle, main_state: &MainState) {
+        d.clear_background(main_state.default_bg_color);
+        let texture_target_width = d.get_screen_width();
+        let texture_target_height = d.get_screen_height();
+        let texture_target_x = 0;
+        let texture_target_y = 0;
+        if let Some(ref texture) = main_state.bg_texture {
+            d.draw_texture_pro(
+                texture,
+                Rectangle {
+                    x: 0.0,
+                    y: 0.0,
+                    width: texture.width() as f32,
+                    height: texture.height() as f32,
+                },
+                Rectangle {
+                    x: texture_target_x as f32,
+                    y: texture_target_y as f32,
+                    width: texture_target_width as f32,
+                    height: texture_target_height as f32,
+                },
+                Vector2::new(0.0, 0.0),
+                0.0,
+                Color::WHITE,
+            );
+        }
+        let panels_line_thickness = 1.0;
+        d.draw_rectangle(
+            propwidth(d, 100),
+            0,
+            d.get_screen_width() - propwidth(d, 200),
+            d.get_screen_height(),
+            main_state.default_bg_color,
+        );
+        d.draw_rectangle_lines_ex(
+            rrect(
+                propwidth(d, 100),
+                0,
+                d.get_screen_width() - propwidth(d, 200),
+                d.get_screen_height(),
+            ),
+            panels_line_thickness,
+            main_state.default_txt_color,
+        );
+    }
 }
 
 fn _rainbow_color_from_framecounter(frame_counter: u32, speed: f32) -> Color {

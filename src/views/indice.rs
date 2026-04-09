@@ -32,8 +32,7 @@ impl View for SelezioneIndiceView {
         _state: &Model,
         main_state: &MainState,
     ) -> Vec<Action> {
-        d.clear_background(main_state.default_bg_color);
-
+        self.draw_background(d, main_state);
         let button_niseci_width = propwidth(d, 200);
         let button_niseci_x = d.get_screen_width() / 2 - button_niseci_width / 2;
         let button_niseci_height = propwidth(d, 50);

@@ -15,7 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::app::core::CISBA_LOGO_DATA; //, ISPRA_LOGO_DATA};
+use crate::app::core::{CISBA_LOGO_DATA, PROJECT_LOGO_DATA};
 use crate::core::BUILD_DATE;
 use esox::domain::hfbi::{AnagraficaHFBI, RisultatoHFBI};
 use esox::domain::niseci::{AnagraficaNISECI, RiferimentoNISECI, RisultatoNISECI};
@@ -115,8 +115,6 @@ pub(crate) fn esporta_pdf_niseci(
 
     let mut page_ids = vec![];
 
-    // UNCOMMENT THIS LATER
-    /*
     let image_id = alloc.bump();
     let image_name = Name(b"I1");
 
@@ -124,7 +122,7 @@ pub(crate) fn esporta_pdf_niseci(
 
     // Decode the image.
 
-    let (rgb, mask, width, height) = decode_png(ISPRA_LOGO_DATA);
+    let (rgb, mask, width, height) = decode_png(PROJECT_LOGO_DATA);
 
     let level = CompressionLevel::DefaultLevel as u8;
     let encoded = compress_to_vec_zlib(&rgb, level);
@@ -156,18 +154,14 @@ pub(crate) fn esporta_pdf_niseci(
         s_mask.bits_per_component(8);
     }
 
-    */
-
     let a4 = Rect::new(0.0, 0.0, 595.0, 842.0);
 
-    /*
     // Size the image at 1pt per pixel.
     let w = (width / 8) as f32;
     let h = (height / 8) as f32;
-    */
 
     // Center the image on the page.
-    let x = 205.0; //(a4.x2 - w) / 2.0;
+    let x = a4.x2 * 0.1;
     let y = 762.0; //(a4.y2 - h) / 2.0;
 
     let image_id_2 = alloc.bump();
@@ -212,8 +206,8 @@ pub(crate) fn esporta_pdf_niseci(
     let h_2 = (height_2 / 6) as f32;
 
     // Center the image on the page.
-    let x_2 = 205.0; // x + w + 20.0;
-    let y_2 = 762.0; // y;
+    let x_2 = (a4.x2 * 0.9) - w_2;
+    let y_2 = y;
 
     // Page 1
     let page_id = alloc.bump();
@@ -244,7 +238,7 @@ pub(crate) fn esporta_pdf_niseci(
             resources.fonts().pair(font_name, font_id);
             resources
                 .x_objects()
-                //.pair(image_name, image_id)
+                .pair(image_name, image_id)
                 .pair(image_name_2, image_id_2);
         }
 
@@ -347,12 +341,10 @@ pub(crate) fn esporta_pdf_niseci(
             content.stroke();
         }
 
-        /*
         content.save_state();
         content.transform([w, 0.0, 0.0, h, x, y]);
         content.x_object(image_name);
         content.restore_state();
-        */
 
         content.save_state();
         content.transform([w_2, 0.0, 0.0, h_2, x_2, y_2]);
@@ -526,14 +518,12 @@ pub(crate) fn esporta_pdf_hfbi(
 
     let mut page_ids = vec![];
 
-    // UNCOMMENT THIS LATER
-    /*
     let image_id = alloc.bump();
     let image_name = Name(b"I1");
 
     let s_mask_id = alloc.bump();
 
-    let (rgb, mask, width, height) = decode_png(ISPRA_LOGO_DATA);
+    let (rgb, mask, width, height) = decode_png(PROJECT_LOGO_DATA);
 
     let level = CompressionLevel::DefaultLevel as u8;
     let encoded = compress_to_vec_zlib(&rgb, level);
@@ -565,18 +555,14 @@ pub(crate) fn esporta_pdf_hfbi(
         s_mask.bits_per_component(8);
     }
 
-    */
-
     let a4 = Rect::new(0.0, 0.0, 595.0, 842.0);
 
-    /*
     // Size the image at 1pt per pixel.
     let w = (width / 8) as f32;
     let h = (height / 8) as f32;
-    */
 
     // Center the image on the page.
-    let x = 205.0; //(a4.x2 - w) / 2.0;
+    let x = a4.x2 * 0.1;
     let y = 762.0; //(a4.y2 - h) / 2.0;
 
     let image_id_2 = alloc.bump();
@@ -621,8 +607,8 @@ pub(crate) fn esporta_pdf_hfbi(
     let h_2 = (height_2 / 6) as f32;
 
     // Center the image on the page.
-    let x_2 = 205.0; // x + w + 20.0;
-    let y_2 = 762.0; // y;
+    let x_2 = (a4.x2 * 0.9) - w_2;
+    let y_2 = y;
 
     let font_id = alloc.bump();
     let font_name = Name(b"F1");
@@ -648,7 +634,7 @@ pub(crate) fn esporta_pdf_hfbi(
             resources.fonts().pair(font_name, font_id);
             resources
                 .x_objects()
-                //.pair(image_name, image_id)
+                .pair(image_name, image_id)
                 .pair(image_name_2, image_id_2);
         }
 
@@ -735,12 +721,10 @@ pub(crate) fn esporta_pdf_hfbi(
             content.stroke();
         }
 
-        /*
         content.save_state();
         content.transform([w, 0.0, 0.0, h, x, y]);
         content.x_object(image_name);
         content.restore_state();
-        */
 
         content.save_state();
         content.transform([w_2, 0.0, 0.0, h_2, x_2, y_2]);
