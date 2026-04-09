@@ -15,7 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::app::core::{CISBA_LOGO_DATA, PROJECT_LOGO_DATA};
+use crate::app::core::{CISBA_LOGO_DATA, PROJECT_LOGO_DATA, PROJECT_LOGO_NAME_DATA};
 use crate::core::BUILD_DATE;
 use esox::domain::hfbi::{AnagraficaHFBI, RisultatoHFBI};
 use esox::domain::niseci::{AnagraficaNISECI, RiferimentoNISECI, RisultatoNISECI};
@@ -209,6 +209,51 @@ pub(crate) fn esporta_pdf_niseci(
     let x_2 = (a4.x2 * 0.9) - w_2;
     let y_2 = y;
 
+    let image_id_3 = alloc.bump();
+    let image_name_3 = Name(b"I3");
+
+    let s_mask_id_3 = alloc.bump();
+
+    let (rgb_3, mask_3, width_3, height_3) = decode_png(PROJECT_LOGO_NAME_DATA);
+
+    let level = CompressionLevel::DefaultLevel as u8;
+    let encoded_3 = compress_to_vec_zlib(&rgb_3, level);
+    let mask_encoded_3 = mask_3.as_ref().map(|a| compress_to_vec_zlib(a, level));
+
+    let filter_3 = Filter::FlateDecode; // PNGs always use FlateDecode
+
+    // Write the image stream
+    {
+        let mut image = pdf.image_xobject(image_id_3, &encoded_3);
+        image.filter(filter_3);
+        image.width(width_3 as i32);
+        image.height(height_3 as i32);
+        image.color_space().device_rgb();
+        image.bits_per_component(8);
+        if mask_encoded_3.is_some() {
+            image.s_mask(s_mask_id_3);
+        }
+        image.finish();
+    }
+
+    // Add SMask if the image has transparency
+    if let Some(encoded) = &mask_encoded_3 {
+        let mut s_mask = pdf.image_xobject(s_mask_id_3, encoded);
+        s_mask.filter(filter_3);
+        s_mask.width(width_3 as i32);
+        s_mask.height(height_3 as i32);
+        s_mask.color_space().device_gray();
+        s_mask.bits_per_component(8);
+    }
+
+    // Size the image at 1pt per pixel
+    let w_3 = (width_3 / 6) as f32;
+    let h_3 = (height_3 / 6) as f32;
+
+    // Center the image on the page.
+    let x_3 = (a4.x2 - w_3) / 2.0;
+    let y_3 = y;
+
     // Page 1
     let page_id = alloc.bump();
     page_ids.push(page_id);
@@ -239,7 +284,8 @@ pub(crate) fn esporta_pdf_niseci(
             resources
                 .x_objects()
                 .pair(image_name, image_id)
-                .pair(image_name_2, image_id_2);
+                .pair(image_name_2, image_id_2)
+                .pair(image_name_3, image_id_3);
         }
 
         // Write a line of text, with the font specified in the resource list
@@ -349,6 +395,11 @@ pub(crate) fn esporta_pdf_niseci(
         content.save_state();
         content.transform([w_2, 0.0, 0.0, h_2, x_2, y_2]);
         content.x_object(image_name_2);
+        content.restore_state();
+
+        content.save_state();
+        content.transform([w_3, 0.0, 0.0, h_3, x_3, y_3]);
+        content.x_object(image_name_3);
         content.restore_state();
 
         content.move_to(x_start, y - 10.0);
@@ -610,6 +661,51 @@ pub(crate) fn esporta_pdf_hfbi(
     let x_2 = (a4.x2 * 0.9) - w_2;
     let y_2 = y;
 
+    let image_id_3 = alloc.bump();
+    let image_name_3 = Name(b"I3");
+
+    let s_mask_id_3 = alloc.bump();
+
+    let (rgb_3, mask_3, width_3, height_3) = decode_png(PROJECT_LOGO_NAME_DATA);
+
+    let level = CompressionLevel::DefaultLevel as u8;
+    let encoded_3 = compress_to_vec_zlib(&rgb_3, level);
+    let mask_encoded_3 = mask_3.as_ref().map(|a| compress_to_vec_zlib(a, level));
+
+    let filter_3 = Filter::FlateDecode; // PNGs always use FlateDecode
+
+    // Write the image stream
+    {
+        let mut image = pdf.image_xobject(image_id_3, &encoded_3);
+        image.filter(filter_3);
+        image.width(width_3 as i32);
+        image.height(height_3 as i32);
+        image.color_space().device_rgb();
+        image.bits_per_component(8);
+        if mask_encoded_3.is_some() {
+            image.s_mask(s_mask_id_3);
+        }
+        image.finish();
+    }
+
+    // Add SMask if the image has transparency
+    if let Some(encoded) = &mask_encoded_3 {
+        let mut s_mask = pdf.image_xobject(s_mask_id_3, encoded);
+        s_mask.filter(filter_3);
+        s_mask.width(width_3 as i32);
+        s_mask.height(height_3 as i32);
+        s_mask.color_space().device_gray();
+        s_mask.bits_per_component(8);
+    }
+
+    // Size the image at 1pt per pixel
+    let w_3 = (width_3 / 6) as f32;
+    let h_3 = (height_3 / 6) as f32;
+
+    // Center the image on the page.
+    let x_3 = (a4.x2 - w_3) / 2.0;
+    let y_3 = y;
+
     let font_id = alloc.bump();
     let font_name = Name(b"F1");
 
@@ -635,7 +731,8 @@ pub(crate) fn esporta_pdf_hfbi(
             resources
                 .x_objects()
                 .pair(image_name, image_id)
-                .pair(image_name_2, image_id_2);
+                .pair(image_name_2, image_id_2)
+                .pair(image_name_3, image_id_3);
         }
 
         // Content for page
@@ -729,6 +826,11 @@ pub(crate) fn esporta_pdf_hfbi(
         content.save_state();
         content.transform([w_2, 0.0, 0.0, h_2, x_2, y_2]);
         content.x_object(image_name_2);
+        content.restore_state();
+
+        content.save_state();
+        content.transform([w_3, 0.0, 0.0, h_3, x_3, y_3]);
+        content.x_object(image_name_3);
         content.restore_state();
 
         content.move_to(x_start, y - 10.0);
