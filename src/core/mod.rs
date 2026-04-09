@@ -47,14 +47,14 @@ pub(crate) const COMMIT_HASH_PLUS: &str = env!("COMMIT_HASH_PLUS");
 pub(crate) const BUILD_DATE: &str = env!("BUILD_DATE");
 pub(crate) const RFD_BACKEND: &str = env!("RFD_BACKEND");
 
-use chrono::Local;
+use chrono::{Datelike, Local};
 use raylib::math::Rectangle;
 use raylib::misc::AsF32;
 use std::path::Path;
 
 /// A convenience function for making a new `Rectangle`.
 #[inline]
-pub fn rrect<T1: AsF32, T2: AsF32, T3: AsF32, T4: AsF32>(
+pub(crate) fn rrect<T1: AsF32, T2: AsF32, T3: AsF32, T4: AsF32>(
     x: T1,
     y: T2,
     width: T3,
@@ -78,7 +78,7 @@ impl CommaFormat for f32 {
 }
 
 /// This function does not handle Unicode validation.
-pub fn sanitize_filename(input: &str) -> String {
+pub(crate) fn sanitize_filename(input: &str) -> String {
     // Empty input → single underscore
     if input.is_empty() {
         return "_".to_string();
@@ -163,7 +163,11 @@ pub fn sanitize_filename(input: &str) -> String {
     out
 }
 
-pub fn gen_logfile_name(ref_samp_filename: &Path, station_code: &str, is_main_log: bool) -> String {
+pub(crate) fn gen_logfile_name(
+    ref_samp_filename: &Path,
+    station_code: &str,
+    is_main_log: bool,
+) -> String {
     let date = Local::now().format("%d%m%Y").to_string();
     let ref_samp_filename_noext = ref_samp_filename
         .file_stem()
@@ -176,4 +180,11 @@ pub fn gen_logfile_name(ref_samp_filename: &Path, station_code: &str, is_main_lo
         date, ref_samp_filename_noext, station_code, tail
     );
     sanitize_filename(&unsafe_name)
+}
+
+pub(crate) fn is_holiday() -> bool {
+    let today = Local::now();
+    let m = today.month();
+    let d = today.day();
+    (m == 11 && d == 21) || (m == 12 && d == 17) || (m == 4 && d == 1)
 }

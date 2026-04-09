@@ -604,7 +604,6 @@ impl OutputController {
                         locale,
                         &anagrafica,
                         hfbi,
-                        stato_ecologico_str,
                         &intermediates,
                         &state
                             .fileinput_model
@@ -657,10 +656,16 @@ impl OutputController {
         locale: Localize,
         anagrafica: &AnagraficaHFBI,
         hfbi: f32,
-        stato_ecologico_str: String,
         intermediates: &ValoriIntermediHFBI,
         samp_filename: &Path,
     ) {
+        let stato_ecologico = calculate_stato_ecologico_hfbi(Some(hfbi));
+        let stato_ecologico_str = match stato_ecologico {
+            Some(val) => {
+                format!("{val}")
+            }
+            None => "NC".to_string(),
+        };
         let name = gen_logfile_name(samp_filename, &anagrafica.codice_stazione, true);
         let log_file_path;
         if let Some(dir) = self.prep_logfile_dir() {
