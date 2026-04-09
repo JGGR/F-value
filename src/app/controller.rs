@@ -114,10 +114,10 @@ pub(crate) fn update_main(
                 }
             }
             MainAction::Quit => {
-                eprintln!("MainController:  got action {}", a);
+                main_state.should_quit = true;
             }
             MainAction::CloseQuit => {
-                eprintln!("MainController:  got action {}", a);
+                main_state.showing_quit_win = false;
             }
         }
     }

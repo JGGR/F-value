@@ -17,6 +17,7 @@
 - Refactor `MainState::mainloop()` to `App::run()`
 - Fix reset button
 - Fix locale bug with reset setting button
+- Fix quit confirm window not working
 - Fix `f_value/` output directory creation
 - Drop `image` dep to use `png` directly
 - Slim `rfd` dep
