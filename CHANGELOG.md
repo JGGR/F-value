@@ -22,6 +22,7 @@
 - Drop `image` dep to use `png` directly
 - Slim `rfd` dep
 - Drop contact info from `Home` view
+- Refactor pdf export functions
 - Bump dependencies
 
 ## [0.1.1] - 2026-02-06
