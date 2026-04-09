@@ -252,7 +252,7 @@ pub(crate) fn esporta_pdf_niseci(
 
     // Center the image on the page.
     let x_3 = (a4.x2 - w_3) / 2.0;
-    let y_3 = y;
+    let y_3 = y + (h - h_3) / 2.0;
 
     // Page 1
     let page_id = alloc.bump();
@@ -545,7 +545,8 @@ pub(crate) fn esporta_pdf_hfbi(
         Some(v) => &format!("{}", v),
         None => "NC",
     };
-    let valore_mmi = risultato_hfbi.get_intermediates().mmi;
+    let intermediates = risultato_hfbi.get_intermediates();
+    let valore_mmi = intermediates.mmi;
     let stato_eco = match calculate_stato_ecologico_hfbi(risultato_hfbi.get_valore()) {
         Some(v) => &format!("{}", v),
         None => "NC",
@@ -704,7 +705,7 @@ pub(crate) fn esporta_pdf_hfbi(
 
     // Center the image on the page.
     let x_3 = (a4.x2 - w_3) / 2.0;
-    let y_3 = y;
+    let y_3 = y + (h - h_3) / 2.0;
 
     let font_id = alloc.bump();
     let font_name = Name(b"F1");
@@ -805,10 +806,22 @@ pub(crate) fn esporta_pdf_hfbi(
         content.show(Str(&format!("MMI: {}", valore_mmi).into_bytes()));
         content.next_line(0.0, -30.0);
         content.show(Str(&format!("Stato Ecologico: {}", stato_eco).into_bytes()));
+        content.next_line(0.0, -30.0);
+        content.show(Str(&format!("Bbent: {}", intermediates.bbent).into_bytes()));
+        content.next_line(0.0, -30.0);
+        content.show(Str(&format!("Bn: {}", intermediates.bn).into_bytes()));
+        content.next_line(0.0, -30.0);
+        content.show(Str(&format!("Dbent: {}", intermediates.dbent).into_bytes()));
+        content.next_line(0.0, -30.0);
+        content.show(Str(&format!("Ddom: {}", intermediates.ddom).into_bytes()));
+        content.next_line(0.0, -30.0);
+        content.show(Str(&format!("Dhzp: {}", intermediates.dhzp).into_bytes()));
+        content.next_line(0.0, -30.0);
+        content.show(Str(&format!("Dmig: {}", intermediates.dmig).into_bytes()));
         content.end_text();
 
         let cols = 2;
-        let rows = 12;
+        let rows = 18;
 
         // Horizontal lines
         for row in 0..=rows {

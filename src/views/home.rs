@@ -66,8 +66,10 @@ impl View for HomeView {
         // logo_name.png is 512 x 82
         let logo_name_texture_target_width = propwidth(d, 256);
         let logo_name_texture_target_height = propheight(d, 41);
-        let logo_name_texture_target_x = d.get_screen_width() / 2 - logo_name_texture_target_width / 2;
-        let logo_name_texture_target_y = logo_texture_target_y + logo_texture_target_height + propheight(d, 10);
+        let logo_name_texture_target_x =
+            d.get_screen_width() / 2 - logo_name_texture_target_width / 2;
+        let logo_name_texture_target_y =
+            logo_texture_target_y + logo_texture_target_height + propheight(d, 10);
         if let Some(ref texture) = main_state.logo_name_texture {
             d.draw_texture_pro(
                 texture,
@@ -115,19 +117,16 @@ impl View for HomeView {
             + max(
                 max(
                     label_version_txt_bounds.x as i32,
-                    label_target_txt_bounds.x as i32
+                    label_target_txt_bounds.x as i32,
                 ),
                 label_rfd_backend_txt_bounds.x as i32,
             );
         let labels_x = (d.get_screen_width() - labels_width) / 2;
-        let labels_y = logo_name_texture_target_y + logo_name_texture_target_height + propheight(d, 50);
+        let labels_y =
+            logo_name_texture_target_y + logo_name_texture_target_height + propheight(d, 50);
         let labels_height = propheight(d, 25);
 
-        let labels: Vec<String> = vec![
-            label_version_txt,
-            label_target_txt,
-            label_rfd_backend_txt,
-        ];
+        let labels: Vec<String> = vec![label_version_txt, label_target_txt, label_rfd_backend_txt];
 
         for (i, label) in labels.iter().enumerate() {
             d.gui_label(
