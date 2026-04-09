@@ -9,6 +9,7 @@
 ### Changed
 
 - Fix reset button
+- Fix locale bug with reset setting button
 - Fix `f_value/` output directory creation
 - Drop `image` dep to use `png` directly
 - Slim `rfd` dep
