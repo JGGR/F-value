@@ -34,7 +34,7 @@ impl View for ProduzioneOutputView {
         state: &Model,
         main_state: &MainState,
     ) -> Vec<Action> {
-        d.clear_background(main_state.default_bg_color);
+        self.draw_background(d, main_state);
 
         let current_index = match state.indice_model.get_selected_index() {
             Some(index) => index,

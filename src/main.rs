@@ -25,7 +25,8 @@ mod core;
 mod views;
 
 use crate::app::core::{
-    get_locale, MainState, ESOX_SCREEN_HEIGHT, ESOX_SCREEN_WIDTH, PROJECT_LOGO_DATA,
+    get_locale, MainState, ESOX_SCREEN_HEIGHT, ESOX_SCREEN_WIDTH, PROJECT_BG_DATA,
+    PROJECT_LOGO_DATA,
 };
 use crate::app::model::Model;
 use crate::args::handle_args;
@@ -54,6 +55,18 @@ fn main() {
         }
     }
 
+    let img_load_res = Image::load_image_from_mem(".png", PROJECT_BG_DATA);
+
+    let mut bg_img = None;
+    match img_load_res {
+        Ok(img) => {
+            bg_img = Some(img);
+        }
+        Err(err) => {
+            println!("Error loading bg img: {err}");
+        }
+    }
+
     let window_title = format!("F-value v{SHORT_PROJECT_VERSION}");
 
     let (mut rl, thread) = raylib::init()
@@ -72,6 +85,11 @@ fn main() {
         logo_texture = Some(rl.load_texture_from_image(&thread, &img).unwrap());
         // Set the window icon
         rl.set_window_icon(&img);
+    }
+
+    let mut bg_texture = None;
+    if let Some(img) = bg_img {
+        bg_texture = Some(rl.load_texture_from_image(&thread, &img).unwrap());
     }
 
     // 10 is way too small for the default font height
@@ -93,6 +111,7 @@ fn main() {
         Color::get_color(txt_color_int as u32),
         Color::get_color(bg_color_int as u32),
         logo_texture,
+        bg_texture,
         locale,
     );
 

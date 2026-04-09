@@ -34,7 +34,7 @@ impl View for ProduzionePDFView {
         state: &Model,
         main_state: &MainState,
     ) -> Vec<Action> {
-        d.clear_background(main_state.default_bg_color);
+        self.draw_background(d, main_state);
 
         let button_esporta_width = propwidth(d, 200);
         let button_esporta_x = d.get_screen_width() / 2 - button_esporta_width / 2;

@@ -589,6 +589,13 @@ pub(crate) fn draw_main(d: &mut RaylibDrawHandle, main_state: &MainState) -> Vec
         + ((1 + core_buttons_count) * core_buttons_x_padding);
     let core_buttons_panel_x = d.get_screen_width() - core_buttons_panel_width;
 
+    d.draw_rectangle(
+        navbar_x,
+        navbar_y,
+        navbar_width,
+        navbar_height,
+        main_state.default_bg_color,
+    );
     // When raylib-rs 5.5.x includes the fix to handle ""
     // in gui_panel() as per 5.0.x, we could go back to using gui_panel instead
     let panels_line_thickness = 1.0;
