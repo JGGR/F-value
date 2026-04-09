@@ -43,6 +43,7 @@ pub(crate) const TERMINAL_THEME_DATA: &[u8] =
 pub(crate) const ASHES_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_ashes.rgs");
 pub(crate) const CONSOLE_FONT_DATA: &[u8] = include_bytes!("../../assets/FreeMono.ttf");
 pub(crate) const PROJECT_LOGO_DATA: &[u8] = include_bytes!("../../assets/logo.png");
+pub(crate) const PROJECT_LOGO_NAME_DATA: &[u8] = include_bytes!("../../assets/logo_name.png");
 pub(crate) const PROJECT_BG_DATA: &[u8] = include_bytes!("../../assets/sfondo.png");
 pub(crate) const CISBA_LOGO_DATA: &[u8] = include_bytes!("../../assets/logo_cisba.png");
 
@@ -257,6 +258,7 @@ pub(crate) struct MainState {
     pub(crate) current_font: WeakFont,
     pub(crate) default_bg_color: Color,
     pub(crate) logo_texture: Option<Texture2D>,
+    pub(crate) logo_name_texture: Option<Texture2D>,
     pub(crate) bg_texture: Option<Texture2D>,
     pub(crate) locale: Localize,
     pub(crate) locale_combobox_active: i32,
@@ -271,6 +273,7 @@ impl MainState {
         default_txt_color: Color,
         default_bg_color: Color,
         logo_texture: Option<Texture2D>,
+        logo_name_texture: Option<Texture2D>,
         bg_texture: Option<Texture2D>,
         locale: Localize,
     ) -> Self {
@@ -294,6 +297,7 @@ impl MainState {
             current_font,
             default_bg_color,
             logo_texture,
+            logo_name_texture,
             bg_texture,
             locale,
             locale_combobox_active: locale as i32,

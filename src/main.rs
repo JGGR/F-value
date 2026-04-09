@@ -26,7 +26,7 @@ mod views;
 
 use crate::app::core::{
     get_locale, MainState, ESOX_SCREEN_HEIGHT, ESOX_SCREEN_WIDTH, PROJECT_BG_DATA,
-    PROJECT_LOGO_DATA,
+    PROJECT_LOGO_DATA, PROJECT_LOGO_NAME_DATA
 };
 use crate::app::model::Model;
 use crate::args::handle_args;
@@ -52,6 +52,18 @@ fn main() {
         }
         Err(err) => {
             println!("Error loading logo img: {err}");
+        }
+    }
+
+    let img_load_res = Image::load_image_from_mem(".png", PROJECT_LOGO_NAME_DATA);
+
+    let mut logo_name_img = None;
+    match img_load_res {
+        Ok(img) => {
+            logo_name_img = Some(img);
+        }
+        Err(err) => {
+            println!("Error loading logo name img: {err}");
         }
     }
 
@@ -87,6 +99,11 @@ fn main() {
         rl.set_window_icon(&img);
     }
 
+    let mut logo_name_texture = None;
+    if let Some(img) = logo_name_img {
+        logo_name_texture = Some(rl.load_texture_from_image(&thread, &img).unwrap());
+    }
+
     let mut bg_texture = None;
     if let Some(img) = bg_img {
         bg_texture = Some(rl.load_texture_from_image(&thread, &img).unwrap());
@@ -111,6 +128,7 @@ fn main() {
         Color::get_color(txt_color_int as u32),
         Color::get_color(bg_color_int as u32),
         logo_texture,
+        logo_name_texture,
         bg_texture,
         locale,
     );

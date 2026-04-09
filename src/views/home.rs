@@ -38,10 +38,10 @@ impl View for HomeView {
     ) -> Vec<Action> {
         self.draw_background(d, main_state);
 
-        let texture_target_width = propwidth(d, 205);
-        let texture_target_height = propheight(d, 205);
-        let texture_target_x = d.get_screen_width() / 2 - texture_target_width / 2;
-        let texture_target_y = propheight(d, 50);
+        let logo_texture_target_width = propwidth(d, 205);
+        let logo_texture_target_height = propheight(d, 205);
+        let logo_texture_target_x = d.get_screen_width() / 2 - logo_texture_target_width / 2;
+        let logo_texture_target_y = propheight(d, 50);
         if let Some(ref texture) = main_state.logo_texture {
             d.draw_texture_pro(
                 texture,
@@ -52,10 +52,10 @@ impl View for HomeView {
                     height: texture.height() as f32,
                 },
                 Rectangle {
-                    x: texture_target_x as f32,
-                    y: texture_target_y as f32,
-                    width: texture_target_width as f32,
-                    height: texture_target_height as f32,
+                    x: logo_texture_target_x as f32,
+                    y: logo_texture_target_y as f32,
+                    width: logo_texture_target_width as f32,
+                    height: logo_texture_target_height as f32,
                 },
                 Vector2::new(0.0, 0.0),
                 0.0,
@@ -63,7 +63,32 @@ impl View for HomeView {
             );
         }
 
-        let label_name_txt = "FISH-VALUE".to_string();
+        // logo_name.png is 512 x 82
+        let logo_name_texture_target_width = propwidth(d, 256);
+        let logo_name_texture_target_height = propheight(d, 41);
+        let logo_name_texture_target_x = d.get_screen_width() / 2 - logo_name_texture_target_width / 2;
+        let logo_name_texture_target_y = logo_texture_target_y + logo_texture_target_height + propheight(d, 10);
+        if let Some(ref texture) = main_state.logo_name_texture {
+            d.draw_texture_pro(
+                texture,
+                Rectangle {
+                    x: 0.0,
+                    y: 0.0,
+                    width: texture.width() as f32,
+                    height: texture.height() as f32,
+                },
+                Rectangle {
+                    x: logo_name_texture_target_x as f32,
+                    y: logo_name_texture_target_y as f32,
+                    width: logo_name_texture_target_width as f32,
+                    height: logo_name_texture_target_height as f32,
+                },
+                Vector2::new(0.0, 0.0),
+                0.0,
+                Color::WHITE,
+            );
+        }
+
         let label_version_txt = format!("Version:   {}", SHORT_PROJECT_VERSION);
         let label_target_txt = format!(
             "Target:    {}-{}",
@@ -71,11 +96,6 @@ impl View for HomeView {
             std::env::consts::OS
         );
         let label_rfd_backend_txt = format!("rfd backend:    {}", RFD_BACKEND);
-        let label_name_txt_bounds = main_state.current_font.measure_text(
-            &label_name_txt,
-            main_state.current_font_height as f32,
-            main_state.default_txt_spacing as f32,
-        );
         let label_version_txt_bounds = main_state.current_font.measure_text(
             &label_version_txt,
             main_state.current_font_height as f32,
@@ -94,20 +114,16 @@ impl View for HomeView {
         let labels_width = propwidth(d, 25)
             + max(
                 max(
-                    max(
-                        label_name_txt_bounds.x as i32,
-                        label_version_txt_bounds.x as i32,
-                    ),
-                    label_target_txt_bounds.x as i32,
+                    label_version_txt_bounds.x as i32,
+                    label_target_txt_bounds.x as i32
                 ),
                 label_rfd_backend_txt_bounds.x as i32,
             );
         let labels_x = (d.get_screen_width() - labels_width) / 2;
-        let labels_y = (d.get_screen_height() as f32 * 0.6) as i32;
+        let labels_y = logo_name_texture_target_y + logo_name_texture_target_height + propheight(d, 50);
         let labels_height = propheight(d, 25);
 
         let labels: Vec<String> = vec![
-            label_name_txt,
             label_version_txt,
             label_target_txt,
             label_rfd_backend_txt,
