@@ -226,8 +226,8 @@ impl GuiTheme {
         rl.gui_set_style(DEFAULT, TEXT_SPACING, main_state.default_txt_spacing);
         let txt_color_int = rl.gui_get_style(DEFAULT, TEXT_COLOR_NORMAL) as u32;
         let bg_color_int = rl.gui_get_style(DEFAULT, BACKGROUND_COLOR) as u32;
-        main_state.default_txt_color = Color::get_color(txt_color_int);
-        main_state.default_bg_color = Color::get_color(bg_color_int);
+        main_state.colors.default_txt_color = Color::get_color(txt_color_int);
+        main_state.colors.default_bg_color = Color::get_color(bg_color_int);
         main_state.current_font = rl.gui_get_font();
     }
 }

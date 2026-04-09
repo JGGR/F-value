@@ -245,6 +245,20 @@ define_enum_with_str!(RegioneItaliana => [
             TrentinoAltoAdige => "Trentino-Alto-Adige",Umbria,ValleDAosta => "Valle d'Aosta",Veneto
 ]);
 
+pub(crate) struct ColorState {
+    pub(crate) default_txt_color: Color,
+    pub(crate) default_bg_color: Color,
+}
+
+impl ColorState {
+    pub(crate) fn new(default_txt_color: Color, default_bg_color: Color) -> Self {
+        Self {
+            default_txt_color,
+            default_bg_color,
+        }
+    }
+}
+
 pub(crate) struct MainState {
     pub(crate) frame_counter: u32,
     pub(crate) showing_reset_win: bool,
@@ -261,9 +275,8 @@ pub(crate) struct MainState {
     pub(crate) default_font_height: i32,
     pub(crate) current_font_height: i32,
     pub(crate) default_txt_spacing: i32,
-    pub(crate) default_txt_color: Color,
+    pub(crate) colors: ColorState,
     pub(crate) current_font: WeakFont,
-    pub(crate) default_bg_color: Color,
     pub(crate) textures: AppTextures,
     pub(crate) locale: Localize,
     pub(crate) locale_combobox_active: i32,
@@ -275,8 +288,7 @@ impl MainState {
         current_font_height: i32,
         default_txt_spacing: i32,
         current_font: WeakFont,
-        default_txt_color: Color,
-        default_bg_color: Color,
+        colors: ColorState,
         textures: AppTextures,
         locale: Localize,
     ) -> Self {
@@ -296,9 +308,8 @@ impl MainState {
             default_font_height,
             current_font_height,
             default_txt_spacing,
-            default_txt_color,
+            colors,
             current_font,
-            default_bg_color,
             textures,
             locale,
             locale_combobox_active: locale as i32,
@@ -472,13 +483,16 @@ impl App {
         rl.gui_set_style(DEFAULT, TEXT_SPACING, txt_spacing);
         let current_font = rl.gui_get_font();
         let locale = get_locale();
+        let colors = ColorState::new(
+            Color::get_color(txt_color_int as u32),
+            Color::get_color(bg_color_int as u32),
+        );
         let main_state = MainState::new(
             gui_default_font_height,
             gui_current_font_height,
             txt_spacing,
             current_font,
-            Color::get_color(txt_color_int as u32),
-            Color::get_color(bg_color_int as u32),
+            colors,
             app_textures,
             locale,
         );

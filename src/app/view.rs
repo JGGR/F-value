@@ -594,7 +594,7 @@ pub(crate) fn draw_main(d: &mut RaylibDrawHandle, main_state: &MainState) -> Vec
         navbar_y,
         navbar_width,
         navbar_height,
-        main_state.default_bg_color,
+        main_state.colors.default_bg_color,
     );
     // When raylib-rs 5.5.x includes the fix to handle ""
     // in gui_panel() as per 5.0.x, we could go back to using gui_panel instead
@@ -602,7 +602,7 @@ pub(crate) fn draw_main(d: &mut RaylibDrawHandle, main_state: &MainState) -> Vec
     d.draw_rectangle_lines_ex(
         rrect(navbar_x, navbar_y, navbar_width, navbar_height),
         panels_line_thickness,
-        main_state.default_txt_color,
+        main_state.colors.default_txt_color,
     );
     d.draw_rectangle_lines_ex(
         rrect(
@@ -612,7 +612,7 @@ pub(crate) fn draw_main(d: &mut RaylibDrawHandle, main_state: &MainState) -> Vec
             core_buttons_panel_height,
         ),
         panels_line_thickness,
-        main_state.default_txt_color,
+        main_state.colors.default_txt_color,
     );
 
     let info_button_width = core_button_width;
@@ -733,7 +733,7 @@ pub(crate) fn draw_main(d: &mut RaylibDrawHandle, main_state: &MainState) -> Vec
         &showing_info_box,
         &main_state.current_font,
         main_state.default_txt_spacing,
-        main_state.default_txt_color,
+        main_state.colors.default_txt_color,
         main_state.current_font_height,
         &mut actions,
     );

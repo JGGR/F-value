@@ -120,7 +120,7 @@ pub(crate) trait View {
     ) -> Vec<Action>;
 
     fn draw_background(&mut self, d: &mut RaylibDrawHandle, main_state: &MainState) {
-        d.clear_background(main_state.default_bg_color);
+        d.clear_background(main_state.colors.default_bg_color);
         let texture_target_width = d.get_screen_width();
         let texture_target_height = d.get_screen_height();
         let texture_target_x = 0;
@@ -151,7 +151,7 @@ pub(crate) trait View {
             0,
             d.get_screen_width() - propwidth(d, 200),
             d.get_screen_height(),
-            main_state.default_bg_color,
+            main_state.colors.default_bg_color,
         );
         d.draw_rectangle_lines_ex(
             rrect(
@@ -161,7 +161,7 @@ pub(crate) trait View {
                 d.get_screen_height(),
             ),
             panels_line_thickness,
-            main_state.default_txt_color,
+            main_state.colors.default_txt_color,
         );
     }
 }
