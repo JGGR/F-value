@@ -125,7 +125,7 @@ pub(crate) trait View {
         let texture_target_height = d.get_screen_height();
         let texture_target_x = 0;
         let texture_target_y = 0;
-        if let Some(ref texture) = main_state.bg_texture {
+        if let Some(ref texture) = main_state.textures.bg_texture {
             d.draw_texture_pro(
                 texture,
                 Rectangle {

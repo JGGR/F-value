@@ -3,6 +3,7 @@
 ### Added
 
 - Add `App::new()` to wrap `raylib` context, `MainState` init
+- Add `AppTextures`
 - New `rfd-gtk3`, `rfd-xdg-portal` `cargo` features to select `rfd` backend at build time (default: `rfd-xdg-portal`)
 - Add `RegioneItaliana`
 - Add `define_enum_with_str()` macro for `GuiTheme`, `Localize`, `RegioneItaliana`
