@@ -163,11 +163,7 @@ pub fn sanitize_filename(input: &str) -> String {
     out
 }
 
-pub fn gen_logfile_name(
-    ref_samp_filename: &Path,
-    station_code: String,
-    is_main_log: bool,
-) -> String {
+pub fn gen_logfile_name(ref_samp_filename: &Path, station_code: &str, is_main_log: bool) -> String {
     let date = Local::now().format("%d%m%Y").to_string();
     let ref_samp_filename_noext = ref_samp_filename
         .file_stem()
