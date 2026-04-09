@@ -13,6 +13,7 @@
 
 ### Changed
 
+- Refactor `MainState::mainloop()` to `App::run()`
 - Fix reset button
 - Fix locale bug with reset setting button
 - Fix `f_value/` output directory creation

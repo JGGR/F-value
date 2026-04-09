@@ -317,44 +317,6 @@ impl MainState {
             || self.showing_settings_box
             || self.showing_license_box
     }
-
-    pub(crate) fn mainloop(
-        &mut self,
-        rl: &mut RaylibHandle,
-        thread: &RaylibThread,
-        state: &mut Model,
-        controllers: &Controllers,
-        views: &mut Views,
-    ) {
-        let mut actions = Vec::<Action>::new();
-        let mut main_actions = Vec::<MainAction>::new();
-        while !self.should_quit {
-            // Base update step
-            update_main(rl, &mut main_actions, self);
-
-            controllers.update(rl, state, &mut actions, self);
-
-            let mut d = rl.begin_drawing(thread);
-
-            let lock_view = self.get_gui_should_lock();
-
-            if lock_view {
-                d.gui_lock();
-            }
-
-            // Ask the view for render, passing the controller for state changes
-            // Current view draw step
-            actions = views.draw(&mut d, thread, state, self);
-
-            if lock_view {
-                d.gui_unlock();
-            }
-
-            // Base draw step
-            // Render stuff not depending on view
-            main_actions = draw_main(&mut d, self);
-        }
-    }
 }
 
 pub(crate) fn propwidth(d: &RaylibDrawHandle<'_>, to_scale: i32) -> i32 {
@@ -539,12 +501,40 @@ impl App {
     }
 
     pub(crate) fn run(&mut self) {
-        self.main_state.mainloop(
-            &mut self.rl,
-            &self.thread,
-            &mut self.model,
-            &self.controllers,
-            &mut self.views,
-        );
+        let mut actions = Vec::<Action>::new();
+        let mut main_actions = Vec::<MainAction>::new();
+        while !self.main_state.should_quit {
+            // Base update step
+            update_main(&mut self.rl, &mut main_actions, &mut self.main_state);
+
+            self.controllers.update(
+                &mut self.rl,
+                &mut self.model,
+                &mut actions,
+                &mut self.main_state,
+            );
+
+            let mut d = self.rl.begin_drawing(&self.thread);
+
+            let lock_view = self.main_state.get_gui_should_lock();
+
+            if lock_view {
+                d.gui_lock();
+            }
+
+            // Ask the view for render, passing the controller for state changes
+            // Current view draw step
+            actions = self
+                .views
+                .draw(&mut d, &self.thread, &self.model, &self.main_state);
+
+            if lock_view {
+                d.gui_unlock();
+            }
+
+            // Base draw step
+            // Render stuff not depending on view
+            main_actions = draw_main(&mut d, &self.main_state);
+        }
     }
 }
