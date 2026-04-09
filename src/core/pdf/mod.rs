@@ -62,6 +62,66 @@ fn decode_png(data: &[u8]) -> (Vec<u8>, Option<Vec<u8>>, u32, u32) {
     (rgb, mask, info.width, info.height)
 }
 
+struct PdfImage {
+    id: Ref,
+    name: &'static [u8],
+    width: i32,
+    height: i32,
+}
+
+fn prep_image(data: &[u8], alloc: &mut Ref, pdf: &mut Pdf, name: &'static [u8]) -> PdfImage {
+    let image_id = alloc.bump();
+    let s_mask_id = alloc.bump();
+
+    // Decode the image.
+
+    let (rgb, mask, width, height) = decode_png(data);
+
+    let level = CompressionLevel::DefaultLevel as u8;
+    let encoded = compress_to_vec_zlib(&rgb, level);
+    let mask_encoded = mask.as_ref().map(|a| compress_to_vec_zlib(a, level));
+
+    let filter = Filter::FlateDecode; // PNGs always use FlateDecode
+
+    // Write the image stream
+    {
+        let mut image = pdf.image_xobject(image_id, &encoded);
+        image.filter(filter);
+        image.width(width as i32);
+        image.height(height as i32);
+        image.color_space().device_rgb();
+        image.bits_per_component(8);
+        if mask_encoded.is_some() {
+            image.s_mask(s_mask_id);
+        }
+        image.finish();
+    }
+
+    // Add SMask if the image has transparency
+    if let Some(encoded) = &mask_encoded {
+        let mut s_mask = pdf.image_xobject(s_mask_id, encoded);
+        s_mask.filter(filter);
+        s_mask.width(width as i32);
+        s_mask.height(height as i32);
+        s_mask.color_space().device_gray();
+        s_mask.bits_per_component(8);
+    }
+
+    PdfImage {
+        id: image_id,
+        name,
+        width: width as i32,
+        height: height as i32,
+    }
+}
+
+fn draw_image(content: &mut Content, image: &PdfImage, x: f32, y: f32, w: f32, h: f32) {
+    content.save_state();
+    content.transform([w, 0.0, 0.0, h, x, y]);
+    content.x_object(Name(image.name));
+    content.restore_state();
+}
+
 pub(crate) fn esporta_pdf_niseci(
     export_path: PathBuf,
     _riferimento_niseci: RiferimentoNISECI,
@@ -115,142 +175,28 @@ pub(crate) fn esporta_pdf_niseci(
 
     let mut page_ids = vec![];
 
-    let image_id = alloc.bump();
-    let image_name = Name(b"I1");
-
-    let s_mask_id = alloc.bump();
-
-    // Decode the image.
-
-    let (rgb, mask, width, height) = decode_png(PROJECT_LOGO_DATA);
-
-    let level = CompressionLevel::DefaultLevel as u8;
-    let encoded = compress_to_vec_zlib(&rgb, level);
-    let mask_encoded = mask.as_ref().map(|a| compress_to_vec_zlib(a, level));
-
-    let filter = Filter::FlateDecode; // PNGs always use FlateDecode
-
-    // Write the image stream
-    {
-        let mut image = pdf.image_xobject(image_id, &encoded);
-        image.filter(filter);
-        image.width(width as i32);
-        image.height(height as i32);
-        image.color_space().device_rgb();
-        image.bits_per_component(8);
-        if mask_encoded.is_some() {
-            image.s_mask(s_mask_id);
-        }
-        image.finish();
-    }
-
-    // Add SMask if the image has transparency
-    if let Some(encoded) = &mask_encoded {
-        let mut s_mask = pdf.image_xobject(s_mask_id, encoded);
-        s_mask.filter(filter);
-        s_mask.width(width as i32);
-        s_mask.height(height as i32);
-        s_mask.color_space().device_gray();
-        s_mask.bits_per_component(8);
-    }
-
     let a4 = Rect::new(0.0, 0.0, 595.0, 842.0);
+    let image_1 = prep_image(PROJECT_LOGO_DATA, &mut alloc, &mut pdf, b"I1");
 
-    // Size the image at 1pt per pixel.
-    let w = (width / 8) as f32;
-    let h = (height / 8) as f32;
+    let w = (image_1.width / 8) as f32;
+    let h = (image_1.height / 8) as f32;
 
-    // Center the image on the page.
     let x = a4.x2 * 0.1;
     let y = 762.0; //(a4.y2 - h) / 2.0;
 
-    let image_id_2 = alloc.bump();
-    let image_name_2 = Name(b"I2");
+    let image_2 = prep_image(CISBA_LOGO_DATA, &mut alloc, &mut pdf, b"I2");
 
-    let s_mask_id_2 = alloc.bump();
+    let w_2 = (image_2.width / 6) as f32;
+    let h_2 = (image_2.height / 6) as f32;
 
-    let (rgb_2, mask_2, width_2, height_2) = decode_png(CISBA_LOGO_DATA);
-
-    let level = CompressionLevel::DefaultLevel as u8;
-    let encoded_2 = compress_to_vec_zlib(&rgb_2, level);
-    let mask_encoded_2 = mask_2.as_ref().map(|a| compress_to_vec_zlib(a, level));
-
-    let filter_2 = Filter::FlateDecode; // PNGs always use FlateDecode
-
-    // Write the image stream
-    {
-        let mut image = pdf.image_xobject(image_id_2, &encoded_2);
-        image.filter(filter_2);
-        image.width(width_2 as i32);
-        image.height(height_2 as i32);
-        image.color_space().device_rgb();
-        image.bits_per_component(8);
-        if mask_encoded_2.is_some() {
-            image.s_mask(s_mask_id_2);
-        }
-        image.finish();
-    }
-
-    // Add SMask if the image has transparency
-    if let Some(encoded) = &mask_encoded_2 {
-        let mut s_mask = pdf.image_xobject(s_mask_id_2, encoded);
-        s_mask.filter(filter_2);
-        s_mask.width(width_2 as i32);
-        s_mask.height(height_2 as i32);
-        s_mask.color_space().device_gray();
-        s_mask.bits_per_component(8);
-    }
-
-    // Size the image at 1pt per pixel
-    let w_2 = (width_2 / 6) as f32;
-    let h_2 = (height_2 / 6) as f32;
-
-    // Center the image on the page.
     let x_2 = (a4.x2 * 0.9) - w_2;
     let y_2 = y;
 
-    let image_id_3 = alloc.bump();
-    let image_name_3 = Name(b"I3");
+    let image_3 = prep_image(PROJECT_LOGO_NAME_DATA, &mut alloc, &mut pdf, b"I3");
 
-    let s_mask_id_3 = alloc.bump();
+    let w_3 = (image_3.width / 6) as f32;
+    let h_3 = (image_3.height / 6) as f32;
 
-    let (rgb_3, mask_3, width_3, height_3) = decode_png(PROJECT_LOGO_NAME_DATA);
-
-    let level = CompressionLevel::DefaultLevel as u8;
-    let encoded_3 = compress_to_vec_zlib(&rgb_3, level);
-    let mask_encoded_3 = mask_3.as_ref().map(|a| compress_to_vec_zlib(a, level));
-
-    let filter_3 = Filter::FlateDecode; // PNGs always use FlateDecode
-
-    // Write the image stream
-    {
-        let mut image = pdf.image_xobject(image_id_3, &encoded_3);
-        image.filter(filter_3);
-        image.width(width_3 as i32);
-        image.height(height_3 as i32);
-        image.color_space().device_rgb();
-        image.bits_per_component(8);
-        if mask_encoded_3.is_some() {
-            image.s_mask(s_mask_id_3);
-        }
-        image.finish();
-    }
-
-    // Add SMask if the image has transparency
-    if let Some(encoded) = &mask_encoded_3 {
-        let mut s_mask = pdf.image_xobject(s_mask_id_3, encoded);
-        s_mask.filter(filter_3);
-        s_mask.width(width_3 as i32);
-        s_mask.height(height_3 as i32);
-        s_mask.color_space().device_gray();
-        s_mask.bits_per_component(8);
-    }
-
-    // Size the image at 1pt per pixel
-    let w_3 = (width_3 / 6) as f32;
-    let h_3 = (height_3 / 6) as f32;
-
-    // Center the image on the page.
     let x_3 = (a4.x2 - w_3) / 2.0;
     let y_3 = y + (h - h_3) / 2.0;
 
@@ -283,9 +229,9 @@ pub(crate) fn esporta_pdf_niseci(
             resources.fonts().pair(font_name, font_id);
             resources
                 .x_objects()
-                .pair(image_name, image_id)
-                .pair(image_name_2, image_id_2)
-                .pair(image_name_3, image_id_3);
+                .pair(Name(image_1.name), image_1.id)
+                .pair(Name(image_2.name), image_2.id)
+                .pair(Name(image_3.name), image_3.id);
         }
 
         // Write a line of text, with the font specified in the resource list
@@ -387,20 +333,9 @@ pub(crate) fn esporta_pdf_niseci(
             content.stroke();
         }
 
-        content.save_state();
-        content.transform([w, 0.0, 0.0, h, x, y]);
-        content.x_object(image_name);
-        content.restore_state();
-
-        content.save_state();
-        content.transform([w_2, 0.0, 0.0, h_2, x_2, y_2]);
-        content.x_object(image_name_2);
-        content.restore_state();
-
-        content.save_state();
-        content.transform([w_3, 0.0, 0.0, h_3, x_3, y_3]);
-        content.x_object(image_name_3);
-        content.restore_state();
+        draw_image(&mut content, &image_1, x, y, w, h);
+        draw_image(&mut content, &image_2, x_2, y_2, w_2, h_2);
+        draw_image(&mut content, &image_3, x_3, y_3, w_3, h_3);
 
         content.move_to(x_start, y - 10.0);
         content.line_to(x_start + (cols as f32 * cell_width), y - 10.0);
@@ -570,140 +505,28 @@ pub(crate) fn esporta_pdf_hfbi(
 
     let mut page_ids = vec![];
 
-    let image_id = alloc.bump();
-    let image_name = Name(b"I1");
-
-    let s_mask_id = alloc.bump();
-
-    let (rgb, mask, width, height) = decode_png(PROJECT_LOGO_DATA);
-
-    let level = CompressionLevel::DefaultLevel as u8;
-    let encoded = compress_to_vec_zlib(&rgb, level);
-    let mask_encoded = mask.as_ref().map(|a| compress_to_vec_zlib(a, level));
-
-    let filter = Filter::FlateDecode; // PNGs always use FlateDecode
-
-    // Write the image stream
-    {
-        let mut image = pdf.image_xobject(image_id, &encoded);
-        image.filter(filter);
-        image.width(width as i32);
-        image.height(height as i32);
-        image.color_space().device_rgb();
-        image.bits_per_component(8);
-        if mask_encoded.is_some() {
-            image.s_mask(s_mask_id);
-        }
-        image.finish();
-    }
-
-    // Add SMask if the image has transparency
-    if let Some(encoded) = &mask_encoded {
-        let mut s_mask = pdf.image_xobject(s_mask_id, encoded);
-        s_mask.filter(filter);
-        s_mask.width(width as i32);
-        s_mask.height(height as i32);
-        s_mask.color_space().device_gray();
-        s_mask.bits_per_component(8);
-    }
-
     let a4 = Rect::new(0.0, 0.0, 595.0, 842.0);
+    let image_1 = prep_image(PROJECT_LOGO_DATA, &mut alloc, &mut pdf, b"I1");
 
-    // Size the image at 1pt per pixel.
-    let w = (width / 8) as f32;
-    let h = (height / 8) as f32;
+    let w = (image_1.width / 8) as f32;
+    let h = (image_1.height / 8) as f32;
 
-    // Center the image on the page.
     let x = a4.x2 * 0.1;
     let y = 762.0; //(a4.y2 - h) / 2.0;
 
-    let image_id_2 = alloc.bump();
-    let image_name_2 = Name(b"I2");
+    let image_2 = prep_image(CISBA_LOGO_DATA, &mut alloc, &mut pdf, b"I2");
 
-    let s_mask_id_2 = alloc.bump();
+    let w_2 = (image_2.width / 6) as f32;
+    let h_2 = (image_2.height / 6) as f32;
 
-    let (rgb_2, mask_2, width_2, height_2) = decode_png(CISBA_LOGO_DATA);
-
-    let level = CompressionLevel::DefaultLevel as u8;
-    let encoded_2 = compress_to_vec_zlib(&rgb_2, level);
-    let mask_encoded_2 = mask_2.as_ref().map(|a| compress_to_vec_zlib(a, level));
-
-    let filter_2 = Filter::FlateDecode; // PNGs always use FlateDecode
-
-    // Write the image stream
-    {
-        let mut image = pdf.image_xobject(image_id_2, &encoded_2);
-        image.filter(filter_2);
-        image.width(width_2 as i32);
-        image.height(height_2 as i32);
-        image.color_space().device_rgb();
-        image.bits_per_component(8);
-        if mask_encoded_2.is_some() {
-            image.s_mask(s_mask_id_2);
-        }
-        image.finish();
-    }
-
-    // Add SMask if the image has transparency
-    if let Some(encoded) = &mask_encoded_2 {
-        let mut s_mask = pdf.image_xobject(s_mask_id_2, encoded);
-        s_mask.filter(filter_2);
-        s_mask.width(width_2 as i32);
-        s_mask.height(height_2 as i32);
-        s_mask.color_space().device_gray();
-        s_mask.bits_per_component(8);
-    }
-
-    // Size the image at 1pt per pixel
-    let w_2 = (width_2 / 6) as f32;
-    let h_2 = (height_2 / 6) as f32;
-
-    // Center the image on the page.
     let x_2 = (a4.x2 * 0.9) - w_2;
     let y_2 = y;
 
-    let image_id_3 = alloc.bump();
-    let image_name_3 = Name(b"I3");
+    let image_3 = prep_image(PROJECT_LOGO_NAME_DATA, &mut alloc, &mut pdf, b"I3");
 
-    let s_mask_id_3 = alloc.bump();
+    let w_3 = (image_3.width / 6) as f32;
+    let h_3 = (image_3.height / 6) as f32;
 
-    let (rgb_3, mask_3, width_3, height_3) = decode_png(PROJECT_LOGO_NAME_DATA);
-
-    let level = CompressionLevel::DefaultLevel as u8;
-    let encoded_3 = compress_to_vec_zlib(&rgb_3, level);
-    let mask_encoded_3 = mask_3.as_ref().map(|a| compress_to_vec_zlib(a, level));
-
-    let filter_3 = Filter::FlateDecode; // PNGs always use FlateDecode
-
-    // Write the image stream
-    {
-        let mut image = pdf.image_xobject(image_id_3, &encoded_3);
-        image.filter(filter_3);
-        image.width(width_3 as i32);
-        image.height(height_3 as i32);
-        image.color_space().device_rgb();
-        image.bits_per_component(8);
-        if mask_encoded_3.is_some() {
-            image.s_mask(s_mask_id_3);
-        }
-        image.finish();
-    }
-
-    // Add SMask if the image has transparency
-    if let Some(encoded) = &mask_encoded_3 {
-        let mut s_mask = pdf.image_xobject(s_mask_id_3, encoded);
-        s_mask.filter(filter_3);
-        s_mask.width(width_3 as i32);
-        s_mask.height(height_3 as i32);
-        s_mask.color_space().device_gray();
-        s_mask.bits_per_component(8);
-    }
-
-    // Size the image at 1pt per pixel
-    let w_3 = (width_3 / 6) as f32;
-    let h_3 = (height_3 / 6) as f32;
-
-    // Center the image on the page.
     let x_3 = (a4.x2 - w_3) / 2.0;
     let y_3 = y + (h - h_3) / 2.0;
 
@@ -731,9 +554,9 @@ pub(crate) fn esporta_pdf_hfbi(
             resources.fonts().pair(font_name, font_id);
             resources
                 .x_objects()
-                .pair(image_name, image_id)
-                .pair(image_name_2, image_id_2)
-                .pair(image_name_3, image_id_3);
+                .pair(Name(image_1.name), image_1.id)
+                .pair(Name(image_2.name), image_2.id)
+                .pair(Name(image_3.name), image_3.id);
         }
 
         // Content for page
@@ -830,21 +653,9 @@ pub(crate) fn esporta_pdf_hfbi(
             content.line_to(x_start + (cols as f32 * cell_width), y);
             content.stroke();
         }
-
-        content.save_state();
-        content.transform([w, 0.0, 0.0, h, x, y]);
-        content.x_object(image_name);
-        content.restore_state();
-
-        content.save_state();
-        content.transform([w_2, 0.0, 0.0, h_2, x_2, y_2]);
-        content.x_object(image_name_2);
-        content.restore_state();
-
-        content.save_state();
-        content.transform([w_3, 0.0, 0.0, h_3, x_3, y_3]);
-        content.x_object(image_name_3);
-        content.restore_state();
+        draw_image(&mut content, &image_1, x, y, w, h);
+        draw_image(&mut content, &image_2, x_2, y_2, w_2, h_2);
+        draw_image(&mut content, &image_3, x_3, y_3, w_3, h_3);
 
         content.move_to(x_start, y - 10.0);
         content.line_to(x_start + (cols as f32 * cell_width), y - 10.0);
