@@ -42,7 +42,7 @@ impl View for HomeView {
         let logo_texture_target_height = propheight(d, 205);
         let logo_texture_target_x = d.get_screen_width() / 2 - logo_texture_target_width / 2;
         let logo_texture_target_y = propheight(d, 50);
-        if let Some(ref texture) = main_state.logo_texture {
+        if let Some(ref texture) = main_state.textures.logo_texture {
             d.draw_texture_pro(
                 texture,
                 Rectangle {
@@ -70,7 +70,7 @@ impl View for HomeView {
             d.get_screen_width() / 2 - logo_name_texture_target_width / 2;
         let logo_name_texture_target_y =
             logo_texture_target_y + logo_texture_target_height + propheight(d, 10);
-        if let Some(ref texture) = main_state.logo_name_texture {
+        if let Some(ref texture) = main_state.textures.logo_name_texture {
             d.draw_texture_pro(
                 texture,
                 Rectangle {

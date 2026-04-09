@@ -264,9 +264,7 @@ pub(crate) struct MainState {
     pub(crate) default_txt_color: Color,
     pub(crate) current_font: WeakFont,
     pub(crate) default_bg_color: Color,
-    pub(crate) logo_texture: Option<Texture2D>,
-    pub(crate) logo_name_texture: Option<Texture2D>,
-    pub(crate) bg_texture: Option<Texture2D>,
+    pub(crate) textures: AppTextures,
     pub(crate) locale: Localize,
     pub(crate) locale_combobox_active: i32,
 }
@@ -279,9 +277,7 @@ impl MainState {
         current_font: WeakFont,
         default_txt_color: Color,
         default_bg_color: Color,
-        logo_texture: Option<Texture2D>,
-        logo_name_texture: Option<Texture2D>,
-        bg_texture: Option<Texture2D>,
+        textures: AppTextures,
         locale: Localize,
     ) -> Self {
         Self {
@@ -303,9 +299,7 @@ impl MainState {
             default_txt_color,
             current_font,
             default_bg_color,
-            logo_texture,
-            logo_name_texture,
-            bg_texture,
+            textures,
             locale,
             locale_combobox_active: locale as i32,
         }
@@ -392,6 +386,74 @@ pub(crate) fn get_locale() -> Localize {
     Localize::International
 }
 
+pub(crate) struct AppTextures {
+    pub(crate) logo_texture: Option<Texture2D>,
+    pub(crate) logo_name_texture: Option<Texture2D>,
+    pub(crate) bg_texture: Option<Texture2D>,
+}
+
+impl AppTextures {
+    fn new(rl: &mut RaylibHandle, thread: &RaylibThread) -> Self {
+        let img_load_res = Image::load_image_from_mem(".png", PROJECT_LOGO_DATA);
+
+        let mut logo_img = None;
+        match img_load_res {
+            Ok(img) => {
+                logo_img = Some(img);
+            }
+            Err(err) => {
+                println!("Error loading logo img: {err}");
+            }
+        }
+
+        let img_load_res = Image::load_image_from_mem(".png", PROJECT_LOGO_NAME_DATA);
+
+        let mut logo_name_img = None;
+        match img_load_res {
+            Ok(img) => {
+                logo_name_img = Some(img);
+            }
+            Err(err) => {
+                println!("Error loading logo name img: {err}");
+            }
+        }
+
+        let img_load_res = Image::load_image_from_mem(".png", PROJECT_BG_DATA);
+
+        let mut bg_img = None;
+        match img_load_res {
+            Ok(img) => {
+                bg_img = Some(img);
+            }
+            Err(err) => {
+                println!("Error loading bg img: {err}");
+            }
+        }
+
+        let mut logo_texture = None;
+        if let Some(img) = logo_img {
+            logo_texture = Some(rl.load_texture_from_image(thread, &img).unwrap());
+            // Set the window icon
+            rl.set_window_icon(&img);
+        }
+
+        let mut logo_name_texture = None;
+        if let Some(img) = logo_name_img {
+            logo_name_texture = Some(rl.load_texture_from_image(thread, &img).unwrap());
+        }
+
+        let mut bg_texture = None;
+        if let Some(img) = bg_img {
+            bg_texture = Some(rl.load_texture_from_image(thread, &img).unwrap());
+        }
+        Self {
+            logo_texture,
+            logo_name_texture,
+            bg_texture,
+        }
+    }
+}
+
 /// Application root.
 ///
 /// ## Drop Order Invariant
@@ -434,58 +496,8 @@ impl App {
         rl.set_window_min_size(ESOX_SCREEN_WIDTH, ESOX_SCREEN_HEIGHT);
         rl.set_exit_key(None); // This allows capturing the exit key with a message box
         rl.set_target_fps(30);
-        let img_load_res = Image::load_image_from_mem(".png", PROJECT_LOGO_DATA);
 
-        let mut logo_img = None;
-        match img_load_res {
-            Ok(img) => {
-                logo_img = Some(img);
-            }
-            Err(err) => {
-                println!("Error loading logo img: {err}");
-            }
-        }
-
-        let img_load_res = Image::load_image_from_mem(".png", PROJECT_LOGO_NAME_DATA);
-
-        let mut logo_name_img = None;
-        match img_load_res {
-            Ok(img) => {
-                logo_name_img = Some(img);
-            }
-            Err(err) => {
-                println!("Error loading logo name img: {err}");
-            }
-        }
-
-        let img_load_res = Image::load_image_from_mem(".png", PROJECT_BG_DATA);
-
-        let mut bg_img = None;
-        match img_load_res {
-            Ok(img) => {
-                bg_img = Some(img);
-            }
-            Err(err) => {
-                println!("Error loading bg img: {err}");
-            }
-        }
-
-        let mut logo_texture = None;
-        if let Some(img) = logo_img {
-            logo_texture = Some(rl.load_texture_from_image(&thread, &img).unwrap());
-            // Set the window icon
-            rl.set_window_icon(&img);
-        }
-
-        let mut logo_name_texture = None;
-        if let Some(img) = logo_name_img {
-            logo_name_texture = Some(rl.load_texture_from_image(&thread, &img).unwrap());
-        }
-
-        let mut bg_texture = None;
-        if let Some(img) = bg_img {
-            bg_texture = Some(rl.load_texture_from_image(&thread, &img).unwrap());
-        }
+        let app_textures = AppTextures::new(&mut rl, &thread);
 
         // 10 is way too small for the default font height
         let gui_default_font_height: i32 = rl.gui_get_style(DEFAULT, TEXT_SIZE) * 2;
@@ -505,9 +517,7 @@ impl App {
             current_font,
             Color::get_color(txt_color_int as u32),
             Color::get_color(bg_color_int as u32),
-            logo_texture,
-            logo_name_texture,
-            bg_texture,
+            app_textures,
             locale,
         );
         let model = Model::new();
