@@ -843,7 +843,7 @@ checksum = "20675572f6f24e9e76ef639bc5552774ed45f1c30e2951e1e99c59888861c539"
 [[package]]
 name = "raylib"
 version = "5.7.0"
-source = "git+https://github.com/raylib-rs/raylib-rs.git#c7227f666187ab8c35be7162ced718205489aec2"
+source = "git+https://github.com/raylib-rs/raylib-rs.git#c574449e65d698d7bee1e7d623726f83947a2c13"
 dependencies = [
  "glam",
  "paste",
@@ -855,7 +855,7 @@ dependencies = [
 [[package]]
 name = "raylib-sys"
 version = "5.7.0"
-source = "git+https://github.com/raylib-rs/raylib-rs.git#c7227f666187ab8c35be7162ced718205489aec2"
+source = "git+https://github.com/raylib-rs/raylib-rs.git#c574449e65d698d7bee1e7d623726f83947a2c13"
 dependencies = [
  "bindgen",
  "cc",
