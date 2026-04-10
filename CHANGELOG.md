@@ -19,6 +19,7 @@
 - Fix locale bug with reset setting button
 - Fix quit confirm window not working
 - Fix `f_value/` output directory creation
+- Fix crash with `Mase` selection in `SelezioneInfoAggiuntiveView`
 - Drop `image` dep to use `png` directly
 - Slim `rfd` dep
 - Drop contact info from `Home` view
