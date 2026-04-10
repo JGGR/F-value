@@ -664,13 +664,17 @@ impl View for SelezioneInfoAggiuntiveView {
             rrect(submit_x, submit_y, submit_width, submit_height),
             confirm_itext.as_str(),
         ) {
-            let regione =
-                match <RegioneItaliana as TryFrom<i32>>::try_from(self.listview_regione_value) {
-                    Ok(r) => r,
-                    Err(_) => {
-                        panic!("Unexpected regione_string in SelezioneInfoAggiuntiveView::draw()");
-                    }
-                };
+            let regione = match <RegioneItaliana as TryFrom<i32>>::try_from(
+                self.listview_regione_value,
+            ) {
+                Ok(r) => r,
+                Err(_) => {
+                    eprintln!("Unexpected regione in SelezioneInfoAggiuntiveView::draw(): self.listview_regione_value {}", self.listview_regione_value);
+                    return actions; // TODO: Maybe go to console by pushing a new speficic action indicating error?
+                                    // Early return still aborts the submit so it's kinda ok for
+                                    // now
+                }
+            };
             let regione_string = regione.to_string();
 
             let provincia_string = String::from(&self.textbox_provincia_buffer);
@@ -694,9 +698,11 @@ impl View for SelezioneInfoAggiuntiveView {
                     ) {
                         Ok(v) => v,
                         _ => {
-                            panic!(
-                                "Unexpected tipo_comunita in SelezioneInfoAggiuntiveView::draw()"
+                            eprintln!(
+                                "Unexpected tipo_comunita in SelezioneInfoAggiuntiveView::draw(): self.dropdownbox_tipocomunit_niseci_value {}",
+                                self.dropdownbox_tipocomunit_niseci_value
                             );
+                            return actions; // See the TODO earlier
                         }
                     };
                     let mut opt_fonte: Option<String> = None;
@@ -723,7 +729,9 @@ impl View for SelezioneInfoAggiuntiveView {
                     ) {
                         Ok(v) => v,
                         _ => {
-                            panic!("Unexpected area_niseci in SelezioneInfoAggiuntiveView::draw()");
+                            eprintln!("Unexpected area_niseci in SelezioneInfoAggiuntiveView::draw(): self.combobox_area_niseci_value {}",
+                                self.combobox_area_niseci_value);
+                            return actions; // See the TODO earlier
                         }
                     };
 
@@ -735,7 +743,9 @@ impl View for SelezioneInfoAggiuntiveView {
                         ) {
                             Ok(v) => v,
                             _ => {
-                                panic!("Unexpected idroecoregione_niseci in SelezioneInfoAggiuntiveView::draw()");
+                                eprintln!("Unexpected idroecoregione_niseci in SelezioneInfoAggiuntiveView::draw(): self.listview_idroecoregione_niseci_value {}",
+                                    self.listview_idroecoregione_niseci_value);
+                                return actions; // See the TODO earlier
                             }
                         };
 
@@ -761,9 +771,11 @@ impl View for SelezioneInfoAggiuntiveView {
                         ) {
                             Ok(v) => v,
                             _ => {
-                                panic!(
-                                    "Unexpected tipo_laguna in SelezioneInfoAggiuntiveView::draw()"
+                                eprintln!(
+                                    "Unexpected tipo_laguna in SelezioneInfoAggiuntiveView::draw(): self.dropdownbox_tipolaguna_hfbi_value {}",
+                                    self.dropdownbox_tipolaguna_hfbi_value
                                 );
+                                return actions; // See the TODO earlier
                             }
                         };
                     let stagione = match <StagioneHFBI as TryFrom<i32>>::try_from(
@@ -771,7 +783,9 @@ impl View for SelezioneInfoAggiuntiveView {
                     ) {
                         Ok(v) => v,
                         _ => {
-                            panic!("Unexpected stagione in SelezioneInfoAggiuntiveView::draw()");
+                            eprintln!("Unexpected stagione in SelezioneInfoAggiuntiveView::draw(): self.combobox_stagione_hfbi_value {}",
+                                self.combobox_stagione_hfbi_value);
+                            return actions; // See the TODO earlier
                         }
                     };
                     let habitat_vegetato = match <HabitatHFBI as TryFrom<i32>>::try_from(
@@ -779,7 +793,9 @@ impl View for SelezioneInfoAggiuntiveView {
                     ) {
                         Ok(v) => v,
                         _ => {
-                            panic!("Unexpected habitat in SelezioneInfoAggiuntiveView::draw()");
+                            eprintln!("Unexpected habitat in SelezioneInfoAggiuntiveView::draw(): self.combobox_habitat_vegetato_hfbi_value {}",
+                                self.combobox_habitat_vegetato_hfbi_value);
+                            return actions; // See the TODO earlier
                         }
                     };
                     let anagrafica = AnagraficaHFBIDraft {
