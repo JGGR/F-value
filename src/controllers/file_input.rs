@@ -18,26 +18,14 @@ pub(crate) struct FileInputController;
 use crate::app::core::{Action, Localize, MainState};
 use crate::app::model::{Model, SubModel};
 use crate::controllers::{Controller, CurrentView, FileInputModel};
-use esox::csv::deser::{
-    hfbi::{
-        check_campionamento_hfbi_path, PlainRecordCsvCampionamentoHFBI,
-        VeryItalianRecordCsvCampionamentoHFBI,
-    },
-    niseci::{
-        check_campionamento_niseci_path, check_riferimento_niseci_path,
-        PlainRecordCsvCampionamentoNISECI, PlainRecordCsvRiferimentoNISECI,
-        VeryItalianRecordCsvCampionamentoNISECI, VeryItalianRecordCsvRiferimentoNISECI,
-    },
-    process_csv_errors,
+use esox::csv::deser::process_csv_errors;
+use esox::csv::load::hfbi::{load_campionamento_hfbi_from_path, CampionamentoHFBIError};
+use esox::csv::load::niseci::{
+    load_campionamento_niseci_from_path, load_riferimento_niseci_from_path,
+    CampionamentoNISECIError, RiferimentoNISECIError,
 };
-use esox::csv::parser::{
-    hfbi::check_records_campionamento_hfbi,
-    niseci::{check_records_campionamento_niseci, check_records_riferimento_niseci},
-};
-use esox::csv::{
-    RecordCsvCampionamentoHFBI, RecordCsvCampionamentoNISECI, RecordCsvRiferimentoNISECI,
-    TipoRecordCsv,
-};
+use esox::csv::load::InputFormat;
+use esox::csv::TipoRecordCsv;
 use esox::domain::hfbi::CampionamentoHFBI;
 use esox::domain::index::Indice;
 use esox::domain::niseci::{CampionamentoNISECI, RiferimentoNISECI};
@@ -86,12 +74,17 @@ impl Controller for FileInputController {
                 }
                 Action::ValidaRiferimentoPath(has_headers) => match main_state.locale {
                     Localize::Italian => {
-                        self.valida_riferimento_niseci_path::<VeryItalianRecordCsvRiferimentoNISECI>(state, has_headers);
-                    }
-                    Localize::International => {
-                        self.valida_riferimento_niseci_path::<PlainRecordCsvRiferimentoNISECI>(
+                        self.valida_riferimento_niseci_path(
                             state,
                             has_headers,
+                            InputFormat::Alternative,
+                        );
+                    }
+                    Localize::International => {
+                        self.valida_riferimento_niseci_path(
+                            state,
+                            has_headers,
+                            InputFormat::Standard,
                         );
                     }
                 },
@@ -100,18 +93,34 @@ impl Controller for FileInputController {
                         match idx {
                             Indice::Niseci => match main_state.locale {
                                 Localize::Italian => {
-                                    self.valida_campionamento_niseci_path::<VeryItalianRecordCsvCampionamentoNISECI>(state, has_headers);
+                                    self.valida_campionamento_niseci_path(
+                                        state,
+                                        has_headers,
+                                        InputFormat::Alternative,
+                                    );
                                 }
                                 Localize::International => {
-                                    self.valida_campionamento_niseci_path::<PlainRecordCsvCampionamentoNISECI>(state, has_headers);
+                                    self.valida_campionamento_niseci_path(
+                                        state,
+                                        has_headers,
+                                        InputFormat::Standard,
+                                    );
                                 }
                             },
                             Indice::Hfbi => match main_state.locale {
                                 Localize::Italian => {
-                                    self.valida_campionamento_hfbi_path::<VeryItalianRecordCsvCampionamentoHFBI>(state, has_headers);
+                                    self.valida_campionamento_hfbi_path(
+                                        state,
+                                        has_headers,
+                                        InputFormat::Alternative,
+                                    );
                                 }
                                 Localize::International => {
-                                    self.valida_campionamento_hfbi_path::<PlainRecordCsvCampionamentoHFBI>(state, has_headers);
+                                    self.valida_campionamento_hfbi_path(
+                                        state,
+                                        has_headers,
+                                        InputFormat::Standard,
+                                    );
                                 }
                             },
                         }
@@ -291,29 +300,44 @@ impl FileInputController {
         state.data_model.get_riferimento_niseci()
     }
 
-    pub(crate) fn valida_riferimento_niseci_path<T: RecordCsvRiferimentoNISECI + 'static>(
+    pub(crate) fn valida_riferimento_niseci_path(
         &self,
         state: &mut Model,
         has_headers: bool,
+        format: InputFormat,
     ) {
         if let Some(path) = self.get_riferimento_path(state) {
-            let csv_check = check_riferimento_niseci_path::<T>(path, has_headers);
+            let load = load_riferimento_niseci_from_path(path, has_headers, format);
 
-            match csv_check {
-                Ok(records) => {
-                    let records_check = check_records_riferimento_niseci(records);
-
-                    match records_check {
-                        Ok(species) => {
-                            self.add_console_message(
-                                state,
-                                "FileInputController:  Validazione RiferimentoNISECI completata!"
-                                    .to_string(),
-                            );
-                            let riferimento = RiferimentoNISECI::new(species);
-                            self.set_data_riferimento_niseci(state, riferimento);
+            match load {
+                Ok(species) => {
+                    self.add_console_message(
+                        state,
+                        "FileInputController:  Validazione RiferimentoNISECI completata!"
+                            .to_string(),
+                    );
+                    self.set_data_riferimento_niseci(state, species);
+                }
+                Err(ev) => {
+                    match ev {
+                        RiferimentoNISECIError::Csv(errors) => {
+                            // Csv errors
+                            /*
+                            for err in errors {
+                                eprintln!("FileInputController:  {err}");
+                            }
+                            */
+                            let processed_errors =
+                                process_csv_errors(&errors, TipoRecordCsv::RiferimentoNISECI);
+                            for e in processed_errors {
+                                self.add_console_message(
+                                    state,
+                                    format!("FileInputController:  {e}"),
+                                );
+                            }
+                            state.fileinput_model.set_errors_occurred(true);
                         }
-                        Err(errors) => {
+                        RiferimentoNISECIError::Value(errors) => {
                             // Value errors
                             for e in errors {
                                 self.add_console_message(
@@ -324,20 +348,6 @@ impl FileInputController {
                             state.fileinput_model.set_errors_occurred(true);
                         }
                     }
-                }
-                Err(errors) => {
-                    // Csv errors
-                    /*
-                    for err in errors {
-                        eprintln!("FileInputController:  {err}");
-                    }
-                    */
-                    let processed_errors =
-                        process_csv_errors(&errors, TipoRecordCsv::RiferimentoNISECI);
-                    for e in processed_errors {
-                        self.add_console_message(state, format!("FileInputController:  {e}"));
-                    }
-                    state.fileinput_model.set_errors_occurred(true);
                 }
             }
         }
@@ -397,41 +407,49 @@ impl FileInputController {
         state.data_model.get_campionamento_niseci()
     }
 
-    pub(crate) fn valida_campionamento_niseci_path<T: RecordCsvCampionamentoNISECI + 'static>(
+    pub(crate) fn valida_campionamento_niseci_path(
         &self,
         state: &mut Model,
         has_headers: bool,
+        format: InputFormat,
     ) {
         if let Some(path) = self.get_campionamento_path(state) {
-            let csv_check = check_campionamento_niseci_path::<T>(path, has_headers);
-
-            match csv_check {
-                Ok(records) => {
-                    let opt_riferimento_niseci = self.get_data_riferimento_niseci(state);
-                    //NOTE: no double locking is not allowed! If state is
-                    // still in scope, its lock has not been dropped yet.
-                    //A scope is mandatory to ensure the lock is dropped before calling any
-                    //method on self which would try to acquire a lock itself.
-                    //This is a valid example:
-                    //
-                    //{
-                    //    let mut state = GLOBAL_STATE.lock().unwrap();
-                    //    opt_riferimento_niseci = state.data_model.get_riferimento_niseci();
-                    //}
-                    //But instead we tuck the lock acquisition inside the
-                    //self.get_data_riferimento_niseci() and we chill.
-                    if let Some(riferimento_niseci) = opt_riferimento_niseci {
-                        let records_check = check_records_campionamento_niseci(
-                            records,
-                            riferimento_niseci.elenco_specie,
+            let opt_riferimento_niseci = self.get_data_riferimento_niseci(state);
+            if let Some(riferimento_niseci) = opt_riferimento_niseci {
+                let load = load_campionamento_niseci_from_path(
+                    path,
+                    has_headers,
+                    &riferimento_niseci,
+                    format,
+                );
+                match load {
+                    Ok(campioni) => {
+                        self.add_console_message(
+                            state,
+                            "FileInputController:  Validazione CampionamentoNISECI completata!"
+                                .to_string(),
                         );
-                        match records_check {
-                            Ok(campioni) => {
-                                self.add_console_message(state, "FileInputController:  Validazione CampionamentoNISECI completata!".to_string());
-                                let campionamento = CampionamentoNISECI::new(campioni);
-                                self.set_data_campionamento_niseci(state, campionamento);
+                        self.set_data_campionamento_niseci(state, campioni);
+                    }
+                    Err(ev) => {
+                        match ev {
+                            CampionamentoNISECIError::Csv(errors) => {
+                                // Csv errors
+                                /*
+                                for err in errors {
+                                    eprintln!("FileInputController:  {err}");
+                                }
+                                */
+                                let processed_errors =
+                                    process_csv_errors(&errors, TipoRecordCsv::CampionamentoNISECI);
+                                for e in processed_errors {
+                                    self.add_console_message(
+                                        state,
+                                        format!("FileInputController:  {e}"),
+                                    );
+                                }
                             }
-                            Err(errors) => {
+                            CampionamentoNISECIError::Value(errors) => {
                                 // Value errors
                                 for e in errors {
                                     self.add_console_message(
@@ -439,76 +457,61 @@ impl FileInputController {
                                         format!("FileInputController:  {e}"),
                                     );
                                 }
-                                state.fileinput_model.set_errors_occurred(true);
                             }
                         }
-                    } else {
-                        let error_msg =
-                            "Impossibile validare campionamento_niseci senza avere riferimento";
-                        eprintln!("{error_msg}");
-                        self.add_console_message(
-                            state,
-                            format!("FileInputController:  {error_msg}"),
-                        );
                         state.fileinput_model.set_errors_occurred(true);
                     }
                 }
-                Err(errors) => {
-                    // Csv errors
-                    /*
-                    for err in errors {
-                        eprintln!("FileInputController:  {err}");
-                    }
-                    */
-                    let processed_errors =
-                        process_csv_errors(&errors, TipoRecordCsv::CampionamentoNISECI);
-                    for e in processed_errors {
-                        self.add_console_message(state, format!("FileInputController:  {e}"));
-                    }
-                    state.fileinput_model.set_errors_occurred(true);
-                }
+            } else {
+                let error_msg = "Impossibile validare campionamento_niseci senza avere riferimento";
+                eprintln!("{error_msg}");
+                self.add_console_message(state, format!("FileInputController:  {error_msg}"));
+                state.fileinput_model.set_errors_occurred(true);
             }
         }
     }
-    pub(crate) fn valida_campionamento_hfbi_path<T: RecordCsvCampionamentoHFBI + 'static>(
+    pub(crate) fn valida_campionamento_hfbi_path(
         &self,
         state: &mut Model,
         has_headers: bool,
+        format: InputFormat,
     ) {
         if let Some(path) = self.get_campionamento_path(state) {
-            let csv_check = check_campionamento_hfbi_path::<T>(path, has_headers);
+            let load = load_campionamento_hfbi_from_path(path, has_headers, format);
 
-            match csv_check {
-                Ok(records) => {
-                    //NOTE: no double locking is not allowed! If state is
-                    // still in scope, its lock has not been dropped yet.
-                    //A scope is mandatory to ensure the lock is dropped before calling any
-                    //method on self which would try to acquire a lock itself.
-                    //This is a valid example:
-                    //
-                    //{
-                    //    let mut state = GLOBAL_STATE.lock().unwrap();
-                    //    opt_riferimento_niseci = state.data_model.get_riferimento_niseci();
-                    //}
-                    //But instead we tuck the lock acquisition inside the
-                    //self.get_data_riferimento_niseci() and we chill.
-                    let records_check = check_records_campionamento_hfbi(records);
-                    match records_check {
-                        Ok(mut campioni) => {
-                            self.add_console_message(
-                                state,
-                                "FileInputController:  Validazione CampionamentoHFBI completata!"
-                                    .to_string(),
-                            );
-                            campioni.sort_by(|a, b| {
-                                b.peso
-                                    .partial_cmp(&a.peso)
-                                    .unwrap_or(std::cmp::Ordering::Equal)
-                            });
-                            let campionamento = CampionamentoHFBI::new(campioni);
-                            self.set_data_campionamento_hfbi(state, campionamento);
+            match load {
+                Ok(mut campioni) => {
+                    self.add_console_message(
+                        state,
+                        "FileInputController:  Validazione CampionamentoHFBI completata!"
+                            .to_string(),
+                    );
+                    campioni.campionamento.sort_by(|a, b| {
+                        b.peso
+                            .partial_cmp(&a.peso)
+                            .unwrap_or(std::cmp::Ordering::Equal)
+                    });
+                    self.set_data_campionamento_hfbi(state, campioni);
+                }
+                Err(ev) => {
+                    match ev {
+                        CampionamentoHFBIError::Csv(errors) => {
+                            // Csv errors
+                            /*
+                            for err in errors {
+                                eprintln!("FileInputController:  {err}");
+                            }
+                            */
+                            let processed_errors =
+                                process_csv_errors(&errors, TipoRecordCsv::CampionamentoNISECI);
+                            for e in processed_errors {
+                                self.add_console_message(
+                                    state,
+                                    format!("FileInputController:  {e}"),
+                                );
+                            }
                         }
-                        Err(errors) => {
+                        CampionamentoHFBIError::Value(errors) => {
                             // Value errors
                             for e in errors {
                                 self.add_console_message(
@@ -516,21 +519,7 @@ impl FileInputController {
                                     format!("FileInputController:  {e}"),
                                 );
                             }
-                            state.fileinput_model.set_errors_occurred(true);
                         }
-                    }
-                }
-                Err(errors) => {
-                    // Csv errors
-                    /*
-                    for err in errors {
-                        eprintln!("FileInputController:  {err}");
-                    }
-                    */
-                    let processed_errors =
-                        process_csv_errors(&errors, TipoRecordCsv::CampionamentoNISECI);
-                    for e in processed_errors {
-                        self.add_console_message(state, format!("FileInputController:  {e}"));
                     }
                     state.fileinput_model.set_errors_occurred(true);
                 }
