@@ -194,13 +194,13 @@ macro_rules! define_enum_with_str {
     ) => {
         #[derive(Debug, Copy, Clone, PartialEq, Eq)]
         #[repr(i32)]
-        pub enum $name {
+        pub(crate) enum $name {
             $first,
             $($rest),*
         }
 
         impl $name {
-            pub const COMBOBOX_STR: &'static str = concat!(
+            pub(crate) const COMBOBOX_STR: &'static str = concat!(
                 define_enum_with_str!(@label $first $(=> $first_str)?)
                 $(, ";", define_enum_with_str!(@label $rest $(=> $rest_str)?))*
             );
