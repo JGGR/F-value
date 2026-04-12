@@ -17,25 +17,17 @@
 
 use crate::core::pdf::{esporta_pdf_hfbi, esporta_pdf_niseci};
 use crate::core::{COPYRIGHT_INFO, PROJECT_NAME, PROJECT_VERSION_FULL, SHORT_PROJECT_VERSION};
-use esox::csv::deser::{
-    check_path_is_file_ends_with_csv,
-    hfbi::{
-        check_anagrafica_hfbi_path, check_campionamento_hfbi_path,
-        VeryItalianRecordCsvAnagraficaHFBI, VeryItalianRecordCsvCampionamentoHFBI,
-    },
-    niseci::{
-        check_anagrafica_niseci_path, check_campionamento_niseci_path,
-        check_riferimento_niseci_path, VeryItalianRecordCsvAnagraficaNISECI,
-        VeryItalianRecordCsvCampionamentoNISECI, VeryItalianRecordCsvRiferimentoNISECI,
-    },
+use esox::csv::deser::check_path_is_file_ends_with_csv;
+use esox::csv::load::hfbi::{
+    load_anagrafica_hfbi_from_path, load_campionamento_hfbi_from_path, AnagraficaHFBIError,
+    CampionamentoHFBIError,
 };
-use esox::csv::parser::{
-    hfbi::{check_records_anagrafica_hfbi, check_records_campionamento_hfbi},
-    niseci::{
-        check_records_anagrafica_niseci, check_records_campionamento_niseci,
-        check_records_riferimento_niseci,
-    },
+use esox::csv::load::niseci::{
+    load_anagrafica_niseci_from_path, load_campionamento_niseci_from_path,
+    load_riferimento_niseci_from_path, AnagraficaNISECIError, CampionamentoNISECIError,
+    RiferimentoNISECIError,
 };
+use esox::csv::load::InputFormat;
 use esox::domain::hfbi::{
     AnagraficaHFBI, CampionamentoHFBI, HabitatHFBI, RisultatoHFBI, StagioneHFBI,
     TipoLagunaCostieraHFBI,
@@ -156,26 +148,26 @@ pub(crate) fn run_headless(do_niseci: bool, has_headers: bool, args: &[String]) 
         let mut riferimento_csv_failed = false;
         let mut riferimento_valueparse_failed = false;
         // Using italian deser for now
-        let riferimento_csv_check_res = check_riferimento_niseci_path::<
-            VeryItalianRecordCsvRiferimentoNISECI,
-        >(riferimento_path, has_headers);
-        let mut riferimento_specie = Vec::new(); // Holds parsed SpecieNISECI
-        match riferimento_csv_check_res {
-            Ok(csv_recs) => {
-                /* TODO: handle verbosity
-                println!("Riferimento csv result: {{");
-                for r in &csv_recs {
-                    println!("  {r}");
-                }
-                println!("}}");
-                */
-                let riferimento_records_check_res = check_records_riferimento_niseci(csv_recs);
-                match riferimento_records_check_res {
-                    Ok(recs_specie) => {
-                        riferimento_specie = recs_specie;
+        let riferimento_load_res = load_riferimento_niseci_from_path(
+            riferimento_path,
+            has_headers,
+            InputFormat::Alternative,
+        );
+        let mut riferimento = RiferimentoNISECI {
+            elenco_specie: Vec::new(),
+        };
+        match riferimento_load_res {
+            Ok(recs_specie) => {
+                riferimento = recs_specie;
+            }
+            Err(ev) => {
+                // Assuming they were printed before this point
+                match ev {
+                    RiferimentoNISECIError::Csv(_errors) => {
+                        riferimento_csv_failed = true;
                     }
-                    Err(_value_errors) => {
-                        /* Assuming they were printed before this point
+                    RiferimentoNISECIError::Value(_value_errors) => {
+                        /*
                         eprintln!("Riferimento value errors in run_headless(): {{");
                         for e in value_errors {
                             let error_txt;
@@ -189,19 +181,8 @@ pub(crate) fn run_headless(do_niseci: bool, has_headers: bool, args: &[String]) 
                         eprintln!("}}");
                         */
                         riferimento_valueparse_failed = true;
-                        //return; We keep running to check the other file
                     }
                 }
-            }
-            Err(_csv_errs) => {
-                /* Assuming they were printed before this point
-                eprintln!("Riferimento errors in run_headless(): {{");
-                for e in errs {
-                    eprintln!("  {e}");
-                }
-                eprintln!("}}");
-                */
-                riferimento_csv_failed = true;
                 //return; We keep running to check the other file
             }
         }
@@ -214,27 +195,27 @@ pub(crate) fn run_headless(do_niseci: bool, has_headers: bool, args: &[String]) 
         let mut campionamento_csv_failed = false;
         let mut campionamento_valueparse_failed = false;
         // Using italian deser for now
-        let campionamento_csv_check_res = check_campionamento_niseci_path::<
-            VeryItalianRecordCsvCampionamentoNISECI,
-        >(campionamento_path, has_headers);
-        let mut campionamento_specie = Vec::new(); // Holds parsed RecordNISECI
-        match campionamento_csv_check_res {
-            Ok(csv_recs) => {
-                /* TODO: handle verbosity
-                println!("Campionamento result: {{");
-                for r in &csv_recs {
-                    println!("  {r}");
-                }
-                println!("}}");
-                */
-                let campionamento_records_check_res =
-                    check_records_campionamento_niseci(csv_recs, riferimento_specie.clone());
-                match campionamento_records_check_res {
-                    Ok(campioni) => {
-                        campionamento_specie = campioni;
+        let campionamento_load_res = load_campionamento_niseci_from_path(
+            campionamento_path,
+            has_headers,
+            &riferimento,
+            InputFormat::Alternative,
+        );
+        let mut campionamento = CampionamentoNISECI {
+            campionamento: Vec::new(),
+        };
+        match campionamento_load_res {
+            Ok(campioni) => {
+                campionamento = campioni;
+            }
+            Err(ev) => {
+                // Assuming they were printed before this point
+                match ev {
+                    CampionamentoNISECIError::Csv(_errors) => {
+                        campionamento_csv_failed = true;
                     }
-                    Err(_value_errors) => {
-                        /* Assuming they were printed before this point
+                    CampionamentoNISECIError::Value(_errors) => {
+                        /*
                         eprintln!("Campionamento value errors in run_headless(): {{");
                         for e in value_errors {
                             let error_txt;
@@ -248,19 +229,8 @@ pub(crate) fn run_headless(do_niseci: bool, has_headers: bool, args: &[String]) 
                         eprintln!("}}");
                         */
                         campionamento_valueparse_failed = true;
-                        //return; We keep running and return later
                     }
                 }
-            }
-            Err(_errs) => {
-                /* Assuming they were printed before this point
-                eprintln!("Campionamento errors in run_headless(): {{");
-                for e in errs {
-                    eprintln!("  {e}");
-                }
-                eprintln!("}}");
-                */
-                campionamento_csv_failed = true;
                 //return; We keep running and return later
             }
         }
@@ -309,8 +279,7 @@ pub(crate) fn run_headless(do_niseci: bool, has_headers: bool, args: &[String]) 
         let had_failures = (riferimento_csv_failed || campionamento_csv_failed)
             || (riferimento_valueparse_failed || campionamento_valueparse_failed);
 
-        let mut anagrafica_csv_failed = false;
-        let mut anagrafica_valueparse_failed = false;
+        let mut anagrafica_failed = false;
         let mut anagrafica = AnagraficaNISECI {
             comunita: ComunitaNISECI {
                 tipo: TipoComunitaNISECI::Redatta,
@@ -340,25 +309,21 @@ pub(crate) fn run_headless(do_niseci: bool, has_headers: bool, args: &[String]) 
             }
             */
             // Using italian deser for now
-            let anagrafica_csv_check_res = check_anagrafica_niseci_path::<
-                VeryItalianRecordCsvAnagraficaNISECI,
-            >(anagrafica_path, has_headers);
-            match anagrafica_csv_check_res {
-                Ok(csv_recs) => {
-                    /* TODO: handle verbosity
-                    println!("Anagrafica result: {{");
-                    for r in &csv_recs {
-                        println!("  {r}");
-                    }
-                    println!("}}");
-                    */
-                    let anagrafica_records_check_res = check_records_anagrafica_niseci(csv_recs);
-                    match anagrafica_records_check_res {
-                        Ok(a) => {
-                            anagrafica = a;
-                        }
-                        Err(_value_errs) => {
-                            /* Assuming they were printed before this point
+            let anagrafica_load_res = load_anagrafica_niseci_from_path(
+                anagrafica_path,
+                has_headers,
+                InputFormat::Alternative,
+            );
+            match anagrafica_load_res {
+                Ok(a) => {
+                    anagrafica = a;
+                }
+                Err(ev) => {
+                    // Assuming they were printed before this point
+                    match ev {
+                        AnagraficaNISECIError::Csv(_errors) => {}
+                        AnagraficaNISECIError::Value(_value_errors) => {
+                            /*
                             eprintln!("Anagrafica value errors in run_headless(): {{");
                             for e in value_errors {
                                 let error_txt;
@@ -371,35 +336,17 @@ pub(crate) fn run_headless(do_niseci: bool, has_headers: bool, args: &[String]) 
                             }
                             eprintln!("}}");
                             */
-                            anagrafica_valueparse_failed = true;
-                            //return; We keep running and return later
                         }
                     }
-                }
-                Err(_errs) => {
-                    /* Assuming they were printed before this point
-                    eprintln!("Anagrafica errors in run_headless(): {{");
-                    for e in errs {
-                        eprintln!("  {e}");
-                    }
-                    eprintln!("}}");
-                    */
-                    anagrafica_csv_failed = true;
-                    //return; We keep running and return later
+                    anagrafica_failed = true;
                 }
             }
         }
 
-        let had_failures = had_failures || (anagrafica_csv_failed || anagrafica_valueparse_failed);
+        let had_failures = had_failures || anagrafica_failed;
 
         let mut niseci_calc_failed = false;
         if !had_failures {
-            let campionamento = CampionamentoNISECI {
-                campionamento: campionamento_specie,
-            };
-            let riferimento = RiferimentoNISECI {
-                elenco_specie: riferimento_specie,
-            };
             match calculate_niseci(&campionamento, &riferimento, &anagrafica) {
                 Ok((niseci, intermediates)) => {
                     let rqe_niseci = calculate_rqe_niseci(niseci);
@@ -458,26 +405,25 @@ pub(crate) fn run_headless(do_niseci: bool, has_headers: bool, args: &[String]) 
     } else {
         let mut campionamento_csv_failed = false;
         let mut campionamento_valueparse_failed = false;
-        let campionamento_check_res = check_campionamento_hfbi_path::<
-            VeryItalianRecordCsvCampionamentoHFBI,
-        >(campionamento_path, has_headers);
-        let mut campionamento_specie = Vec::new(); // Holds parsed RecordHFBI
-        match campionamento_check_res {
-            Ok(csv_recs) => {
-                /* TODO: handle verbosity
-                println!("Campionamento result: {{");
-                for r in &csv_recs {
-                    println!("  {r}");
-                }
-                println!("}}");
-                */
-                let campionamento_records_check_res = check_records_campionamento_hfbi(csv_recs);
-                match campionamento_records_check_res {
-                    Ok(campioni) => {
-                        campionamento_specie = campioni;
+        let campionamento_load_res = load_campionamento_hfbi_from_path(
+            campionamento_path,
+            has_headers,
+            InputFormat::Alternative,
+        );
+        let mut campionamento = CampionamentoHFBI {
+            campionamento: Vec::new(),
+        };
+        match campionamento_load_res {
+            Ok(campioni) => {
+                campionamento = campioni;
+            }
+            Err(ev) => {
+                match ev {
+                    CampionamentoHFBIError::Csv(_errors) => {
+                        campionamento_csv_failed = true;
                     }
-                    Err(_value_errors) => {
-                        /* Assuming they were printed before this point
+                    CampionamentoHFBIError::Value(_errors) => {
+                        /*
                         eprintln!("Campionamento value errors in run_headless(): {{");
                         for e in value_errors {
                             let error_txt;
@@ -491,19 +437,8 @@ pub(crate) fn run_headless(do_niseci: bool, has_headers: bool, args: &[String]) 
                         eprintln!("}}");
                         */
                         campionamento_valueparse_failed = true;
-                        //return; We keep running and return later
                     }
                 }
-            }
-            Err(_errs) => {
-                /* Assuming they were printed before this point
-                eprintln!("Campionamento errors in run_headless(): {{");
-                for e in errs {
-                    eprintln!("  {e}");
-                }
-                eprintln!("}}");
-                */
-                campionamento_csv_failed = true;
                 //return; We keep running and return later
             }
         }
@@ -554,25 +489,22 @@ pub(crate) fn run_headless(do_niseci: bool, has_headers: bool, args: &[String]) 
             }
             */
             // Using italian deser for now
-            let anagrafica_csv_check_res = check_anagrafica_hfbi_path::<
-                VeryItalianRecordCsvAnagraficaHFBI,
-            >(anagrafica_path, has_headers);
-            match anagrafica_csv_check_res {
-                Ok(csv_recs) => {
-                    /* TODO: handle verbosity
-                    println!("Anagrafica result: {{");
-                    for r in &csv_recs {
-                        println!("  {r}");
-                    }
-                    println!("}}");
-                    */
-                    let anagrafica_records_check_res = check_records_anagrafica_hfbi(csv_recs);
-                    match anagrafica_records_check_res {
-                        Ok(a) => {
-                            anagrafica = a;
+            let anagrafica_load_res = load_anagrafica_hfbi_from_path(
+                anagrafica_path,
+                has_headers,
+                InputFormat::Alternative,
+            );
+            match anagrafica_load_res {
+                Ok(a) => {
+                    anagrafica = a;
+                }
+                Err(ev) => {
+                    match ev {
+                        AnagraficaHFBIError::Csv(_errors) => {
+                            anagrafica_csv_failed = true;
                         }
-                        Err(_value_errs) => {
-                            /* Assuming they were printed before this point
+                        AnagraficaHFBIError::Value(_errors) => {
+                            /*
                             eprintln!("Anagrafica value errors in run_headless(): {{");
                             for e in value_errors {
                                 let error_txt;
@@ -586,19 +518,8 @@ pub(crate) fn run_headless(do_niseci: bool, has_headers: bool, args: &[String]) 
                             eprintln!("}}");
                             */
                             anagrafica_valueparse_failed = true;
-                            //return; We keep running and return later
                         }
                     }
-                }
-                Err(_errs) => {
-                    /* Assuming they were printed before this point
-                    eprintln!("Anagrafica errors in run_headless(): {{");
-                    for e in errs {
-                        eprintln!("  {e}");
-                    }
-                    eprintln!("}}");
-                    */
-                    anagrafica_csv_failed = true;
                     //return; We keep running and return later
                 }
             }
@@ -608,9 +529,6 @@ pub(crate) fn run_headless(do_niseci: bool, has_headers: bool, args: &[String]) 
 
         let mut hfbi_calc_failed = false;
         if !had_failures {
-            let campionamento = CampionamentoHFBI {
-                campionamento: campionamento_specie,
-            };
             match calculate_hfbi(&campionamento, &anagrafica) {
                 Ok((hfbi, intermediates)) => {
                     intermediates.log();

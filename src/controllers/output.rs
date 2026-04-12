@@ -257,7 +257,6 @@ impl OutputController {
                         locale,
                         &anagrafica,
                         &risultato_niseci,
-                        &intermediates,
                         &state
                             .fileinput_model
                             .get_riferimento_path()
@@ -303,44 +302,13 @@ impl OutputController {
         }
     }
 
-    /// TODO: Once RisultatoNISECI lets us get x3_a and x3_b, we can drop the intermediates arg
     pub(crate) fn log_niseci_values(
         &self,
         locale: Localize,
         anagrafica: &AnagraficaNISECI,
         risultato: &RisultatoNISECI,
-        intermediates: &ValoriIntermediNISECI,
         ref_filename: &Path,
     ) {
-        let niseci = risultato.get_valore();
-        let niseci_str = match niseci {
-            Some(val) => match locale {
-                Localize::Italian => val.comma().to_string(),
-                Localize::International => {
-                    format!("{val}")
-                }
-            },
-            None => "NC".to_string(),
-        };
-
-        let rqe_niseci = calculate_rqe_niseci(niseci);
-        let rqe_niseci_str = match rqe_niseci {
-            Some(val) => match locale {
-                Localize::Italian => val.comma().to_string(),
-                Localize::International => {
-                    format!("{val}")
-                }
-            },
-            None => "NC".to_string(),
-        };
-
-        let stato_ecologico = calculate_stato_ecologico_niseci(niseci, &anagrafica.area);
-        let stato_ecologico_str = match stato_ecologico {
-            Some(val) => {
-                format!("{val}")
-            }
-            None => "NC".to_string(),
-        };
         let name = gen_logfile_name(ref_filename, &anagrafica.codice_stazione, true);
         let log_file_path;
         if let Some(dir) = self.prep_logfile_dir() {
@@ -356,62 +324,11 @@ impl OutputController {
 
         match file_result {
             Ok(mut file) => {
-                let string_representation = match locale {
-                    Localize::Italian => {
-                        format!("Codice stazione; Data; Regione; Idroecoregione; Area pertinenza; Bacino; NISECI; RQE NISECI; Stato ecologico; x1; x2; x3; x3_a; x3_b\n{}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}",
-                            anagrafica.codice_stazione,
-                            anagrafica.date_string,
-                            anagrafica.posizione.regione,
-                            anagrafica.idro_eco_regione,
-                            anagrafica.area,
-                            anagrafica.corpo_idrico,
-                            niseci_str,
-                            rqe_niseci_str,
-                            stato_ecologico_str,
-                            intermediates.x1.comma(),
-                            match intermediates.x2 {
-                                Some(v) => v.comma().to_string(),
-                                None => "NC".to_string(),
-                            },
-                            intermediates.x3.comma(),
-                            match intermediates.x3_a {
-                                Some(v) => v.comma().to_string(),
-                                None => "NC".to_string(),
-                            },
-                            match intermediates.x3_b {
-                                Some(v) => v.comma().to_string(),
-                                None => "NC".to_string(),
-                            }
-                        )
-                    }
-                    Localize::International => {
-                        format!("Codice stazione, Data, Regione, Idroecoregione, Area pertinenza, Bacino, NISECI, RQE NISECI, Stato ecologico, x1, x2, x3, x3_a, x3_b\n{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}",
-                            anagrafica.codice_stazione,
-                            anagrafica.date_string,
-                            anagrafica.posizione.regione,
-                            anagrafica.idro_eco_regione,
-                            anagrafica.area,
-                            anagrafica.corpo_idrico,
-                            niseci_str,
-                            rqe_niseci_str,
-                            stato_ecologico_str,
-                            intermediates.x1,
-                            match intermediates.x2 {
-                                Some(v) => format!("{v}"),
-                                None => "NC".to_string(),
-                            },
-                            intermediates.x3,
-                            match intermediates.x3_a {
-                                Some(v) => format!("{v}"),
-                                None => "NC".to_string(),
-                            },
-                            match intermediates.x3_b {
-                                Some(v) => format!("{v}"),
-                                None => "NC".to_string(),
-                            }
-                        )
-                    }
+                let comma_csv_separator = match locale {
+                    Localize::Italian => false,
+                    Localize::International => true,
                 };
+                let string_representation = risultato.to_csv(anagrafica, comma_csv_separator);
                 let write_result = writeln!(file, "{string_representation}");
                 match write_result {
                     Ok(_) => println!("Successfully wrote to file."),
@@ -447,74 +364,11 @@ impl OutputController {
 
         match file_result {
             Ok(mut file) => {
-                let mut string_representation = match locale {
-                    Localize::Italian => {
-                        "specie; nome latino; tipo autoctono; tipo alloctono; specie attesa; cl1; cl2; cl3; cl4; cl5; densita stimata; quantita stimata; x2b; rapporto ad/juv; x2a_a; x2a_b".to_string()
-                    }
-                    Localize::International => {
-                        "specie, nome latino, tipo autoctono, tipo alloctono, specie attesa, cl1, cl2, cl3, cl4, cl5, densita stimata, quantita stimata, x2b, rapporto ad/juv, x2a_a, x2a_b".to_string()
-                    }
+                let comma_csv_separator = match locale {
+                    Localize::Italian => false,
+                    Localize::International => true,
                 };
-                for (_k, v) in intermediates.specie_specifici.iter() {
-                    let rapporto_ad_juv_str = match v.rapporto_ad_juv {
-                        Some(v) => match locale {
-                            Localize::Italian => v.comma().to_string(),
-                            Localize::International => format!("{v}"),
-                        },
-                        None => "NC".to_string(),
-                    };
-                    let specie_attesa_str = if v.classi_eta.specie.specie_attesa {
-                        "SI".to_string()
-                    } else {
-                        "NO".to_string()
-                    };
-                    string_representation = match locale {
-                        Localize::Italian => {
-                            format!(
-                                "{}\n{}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}",
-                                string_representation,
-                                v.classi_eta.specie.id,
-                                v.classi_eta.specie.nome,
-                                v.classi_eta.specie.tipo_autoctono,
-                                v.classi_eta.specie.tipo_alloctono,
-                                specie_attesa_str,
-                                v.classi_eta.cl1,
-                                v.classi_eta.cl2,
-                                v.classi_eta.cl3,
-                                v.classi_eta.cl4,
-                                v.classi_eta.cl5,
-                                v.densita_stimata.comma(),
-                                v.quantita_stimata,
-                                v.x2_b,
-                                rapporto_ad_juv_str,
-                                v.x2_a_a,
-                                v.x2_a_b
-                            )
-                        }
-                        Localize::International => {
-                            format!(
-                                "{}\n{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}",
-                                string_representation,
-                                v.classi_eta.specie.id,
-                                v.classi_eta.specie.nome,
-                                v.classi_eta.specie.tipo_autoctono,
-                                v.classi_eta.specie.tipo_alloctono,
-                                specie_attesa_str,
-                                v.classi_eta.cl1,
-                                v.classi_eta.cl2,
-                                v.classi_eta.cl3,
-                                v.classi_eta.cl4,
-                                v.classi_eta.cl5,
-                                v.densita_stimata,
-                                v.quantita_stimata,
-                                v.x2_b,
-                                rapporto_ad_juv_str,
-                                v.x2_a_a,
-                                v.x2_a_b
-                            )
-                        }
-                    }
-                }
+                let string_representation = intermediates.to_csv(comma_csv_separator);
                 let write_result = writeln!(file, "{string_representation}");
                 match write_result {
                     Ok(_) => println!("Successfully wrote to file."),
@@ -600,11 +454,12 @@ impl OutputController {
                         format!("Stato ecologico: {stato_ecologico_str}"),
                     );
 
+                    let risultato_hfbi = RisultatoHFBI::new(Some(hfbi), intermediates.clone());
+
                     self.log_hfbi_values(
                         locale,
                         &anagrafica,
-                        hfbi,
-                        &intermediates,
+                        &risultato_hfbi,
                         &state
                             .fileinput_model
                             .get_campionamento_path()
@@ -626,8 +481,6 @@ impl OutputController {
                             .expect("Failed initialising campionamento hfbi path"),
                         &anagrafica.codice_stazione,
                     );
-
-                    let risultato_hfbi = RisultatoHFBI::new(Some(hfbi), intermediates);
 
                     self.set_data_risultato_hfbi(state, risultato_hfbi);
                     println!("OutputController: Finished HFBI calc");
@@ -655,17 +508,9 @@ impl OutputController {
         &self,
         locale: Localize,
         anagrafica: &AnagraficaHFBI,
-        hfbi: f32,
-        intermediates: &ValoriIntermediHFBI,
+        risultato: &RisultatoHFBI,
         samp_filename: &Path,
     ) {
-        let stato_ecologico = calculate_stato_ecologico_hfbi(Some(hfbi));
-        let stato_ecologico_str = match stato_ecologico {
-            Some(val) => {
-                format!("{val}")
-            }
-            None => "NC".to_string(),
-        };
         let name = gen_logfile_name(samp_filename, &anagrafica.codice_stazione, true);
         let log_file_path;
         if let Some(dir) = self.prep_logfile_dir() {
@@ -681,30 +526,11 @@ impl OutputController {
 
         match file_result {
             Ok(mut file) => {
-                let string_representation = match locale {
-                    Localize::Italian => {
-                        format!("Codice stazione; stagione; habitat vegetato; tipo laguna; MMI; HFBI; Stato ecologico\n{}; {}; {}; {}; {}; {}; {}",
-                                anagrafica.codice_stazione,
-                                anagrafica.stagione,
-                                anagrafica.habitat_vegetato,
-                                anagrafica.tipo_laguna,
-                                intermediates.mmi.comma(),
-                                hfbi.comma(),
-                                stato_ecologico_str
-                            )
-                    }
-                    Localize::International => {
-                        format!("Codice stazione, stagione, habitat vegetato, tipo laguna, MMI, HFBI, Stato ecologico\n{}, {}, {}, {}, {}, {}, {}",
-                                anagrafica.codice_stazione,
-                                anagrafica.stagione,
-                                anagrafica.habitat_vegetato,
-                                anagrafica.tipo_laguna,
-                                intermediates.mmi,
-                                hfbi,
-                                stato_ecologico_str
-                            )
-                    }
+                let comma_csv_separator = match locale {
+                    Localize::Italian => false,
+                    Localize::International => true,
                 };
+                let string_representation = risultato.to_csv(anagrafica, comma_csv_separator);
                 let write_result = writeln!(file, "{string_representation}");
                 match write_result {
                     Ok(_) => println!("Successfully wrote to file."),
@@ -739,30 +565,11 @@ impl OutputController {
 
         match file_result {
             Ok(mut file) => {
-                let string_representation = match locale {
-                    Localize::Italian => {
-                        format!(
-                            "bbent; bn; dbent; ddom; dhzp; dmig\n{}; {}; {}; {}; {}; {}",
-                            intermediates.bbent.comma(),
-                            intermediates.bn.comma(),
-                            intermediates.dbent.comma(),
-                            intermediates.ddom.comma(),
-                            intermediates.dhzp.comma(),
-                            intermediates.dmig.comma()
-                        )
-                    }
-                    Localize::International => {
-                        format!(
-                            "bbent, bn, dbent, ddom, dhzp, dmig\n{}, {}, {}, {}, {}, {}",
-                            intermediates.bbent,
-                            intermediates.bn,
-                            intermediates.dbent,
-                            intermediates.ddom,
-                            intermediates.dhzp,
-                            intermediates.dmig
-                        )
-                    }
+                let comma_csv_separator = match locale {
+                    Localize::Italian => false,
+                    Localize::International => true,
                 };
+                let string_representation = intermediates.to_csv(comma_csv_separator);
                 let write_result = writeln!(file, "{string_representation}");
                 match write_result {
                     Ok(_) => println!("Successfully wrote to file."),

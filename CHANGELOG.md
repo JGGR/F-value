@@ -1,3 +1,13 @@
+## [0.1.3] - Unreleased
+
+### Changed
+
+- Use `esox::csv::load` methods in `core::cli`, `controllers::file_input`
+- Use `to_csv()` methods in `controllers::output`
+- Drop `intermediates` arg for `log_niseci_values()`, `log_hfbi_values()`
+- Refactor `log_hfbi_values()` to expect `RisultatoHFBI` instead of `f32`
+- Bump `esox` to `0.1.3`
+
 ## [0.1.2] - 2026-04-10
 
 ### Added
