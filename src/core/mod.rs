@@ -92,7 +92,7 @@ pub(crate) fn sanitize_filename(input: &str) -> String {
 
             c if c.is_whitespace() => false,
 
-            // path separators
+            // path delimiter
             '/' => false,
             '\\' if cfg!(windows) => false,
 

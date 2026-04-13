@@ -324,11 +324,11 @@ impl OutputController {
 
         match file_result {
             Ok(mut file) => {
-                let comma_csv_separator = match locale {
+                let comma_csv_delimiter = match locale {
                     Localize::Italian => false,
                     Localize::International => true,
                 };
-                let string_representation = risultato.to_csv(anagrafica, comma_csv_separator);
+                let string_representation = risultato.to_csv(anagrafica, comma_csv_delimiter);
                 let write_result = writeln!(file, "{string_representation}");
                 match write_result {
                     Ok(_) => println!("Successfully wrote to file."),
@@ -364,11 +364,11 @@ impl OutputController {
 
         match file_result {
             Ok(mut file) => {
-                let comma_csv_separator = match locale {
+                let comma_csv_delimiter = match locale {
                     Localize::Italian => false,
                     Localize::International => true,
                 };
-                let string_representation = intermediates.to_csv(comma_csv_separator);
+                let string_representation = intermediates.to_csv(comma_csv_delimiter);
                 let write_result = writeln!(file, "{string_representation}");
                 match write_result {
                     Ok(_) => println!("Successfully wrote to file."),
@@ -526,11 +526,11 @@ impl OutputController {
 
         match file_result {
             Ok(mut file) => {
-                let comma_csv_separator = match locale {
+                let comma_csv_delimiter = match locale {
                     Localize::Italian => false,
                     Localize::International => true,
                 };
-                let string_representation = risultato.to_csv(anagrafica, comma_csv_separator);
+                let string_representation = risultato.to_csv(anagrafica, comma_csv_delimiter);
                 let write_result = writeln!(file, "{string_representation}");
                 match write_result {
                     Ok(_) => println!("Successfully wrote to file."),
@@ -565,11 +565,11 @@ impl OutputController {
 
         match file_result {
             Ok(mut file) => {
-                let comma_csv_separator = match locale {
+                let comma_csv_delimiter = match locale {
                     Localize::Italian => false,
                     Localize::International => true,
                 };
-                let string_representation = intermediates.to_csv(comma_csv_separator);
+                let string_representation = intermediates.to_csv(comma_csv_delimiter);
                 let write_result = writeln!(file, "{string_representation}");
                 match write_result {
                     Ok(_) => println!("Successfully wrote to file."),
