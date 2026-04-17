@@ -480,17 +480,12 @@ impl FileInputController {
             let load = load_campionamento_hfbi_from_path(path, has_headers, format);
 
             match load {
-                Ok(mut campioni) => {
+                Ok(campioni) => {
                     self.add_console_message(
                         state,
                         "FileInputController:  Validazione CampionamentoHFBI completata!"
                             .to_string(),
                     );
-                    campioni.campionamento.sort_by(|a, b| {
-                        b.peso
-                            .partial_cmp(&a.peso)
-                            .unwrap_or(std::cmp::Ordering::Equal)
-                    });
                     self.set_data_campionamento_hfbi(state, campioni);
                 }
                 Err(ev) => {

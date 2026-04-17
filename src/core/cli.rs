@@ -153,9 +153,7 @@ pub(crate) fn run_headless(do_niseci: bool, has_headers: bool, args: &[String]) 
             has_headers,
             InputFormat::Alternative,
         );
-        let mut riferimento = RiferimentoNISECI {
-            elenco_specie: Vec::new(),
-        };
+        let mut riferimento = RiferimentoNISECI::new(vec![]);
         match riferimento_load_res {
             Ok(recs_specie) => {
                 riferimento = recs_specie;
@@ -201,9 +199,7 @@ pub(crate) fn run_headless(do_niseci: bool, has_headers: bool, args: &[String]) 
             &riferimento,
             InputFormat::Alternative,
         );
-        let mut campionamento = CampionamentoNISECI {
-            campionamento: Vec::new(),
-        };
+        let mut campionamento = CampionamentoNISECI::new(vec![]);
         match campionamento_load_res {
             Ok(campioni) => {
                 campionamento = campioni;
@@ -410,9 +406,7 @@ pub(crate) fn run_headless(do_niseci: bool, has_headers: bool, args: &[String]) 
             has_headers,
             InputFormat::Alternative,
         );
-        let mut campionamento = CampionamentoHFBI {
-            campionamento: Vec::new(),
-        };
+        let mut campionamento = CampionamentoHFBI::new(vec![]);
         match campionamento_load_res {
             Ok(campioni) => {
                 campionamento = campioni;
