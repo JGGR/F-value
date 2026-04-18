@@ -295,13 +295,13 @@ pub(crate) fn esporta_pdf_niseci(
         content.next_line(0.0, -30.0);
         content.show(Str(&format!(
             "Lunghezza stazione: {}",
-            anagrafica_niseci.lunghezza_media_stazione
+            anagrafica_niseci.get_lunghezza_media()
         )
         .into_bytes()));
         content.next_line(0.0, -30.0);
         content.show(Str(&format!(
             "Larghezza stazione: {}",
-            anagrafica_niseci.larghezza_media_stazione
+            anagrafica_niseci.get_larghezza_media()
         )
         .into_bytes()));
         content.next_line(0.0, -30.0);
@@ -614,13 +614,13 @@ pub(crate) fn esporta_pdf_hfbi(
         content.next_line(0.0, -30.0);
         content.show(Str(&format!(
             "Lunghezza stazione: {}",
-            anagrafica_hfbi.lunghezza_media_transetto
+            anagrafica_hfbi.get_lunghezza_media()
         )
         .into_bytes()));
         content.next_line(0.0, -30.0);
         content.show(Str(&format!(
             "Larghezza stazione: {}",
-            anagrafica_hfbi.larghezza_media_transetto
+            anagrafica_hfbi.get_larghezza_media()
         )
         .into_bytes()));
         content.next_line(0.0, -30.0);
