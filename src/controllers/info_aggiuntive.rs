@@ -24,6 +24,7 @@ use esox::csv::parser::parse_date;
 use esox::domain::hfbi::AnagraficaHFBI;
 use esox::domain::index::Indice;
 use esox::domain::niseci::{AnagraficaNISECI, TipoComunitaNISECI};
+use esox::domain::posf32::PositiveF32;
 use raylib::RaylibHandle;
 
 impl Controller for InfoAggiuntiveController {
@@ -80,18 +81,18 @@ impl Controller for InfoAggiuntiveController {
                             return; // We change view in the failed check maybe?
                         }
                     };
-                    let anagrafica = AnagraficaNISECI {
-                        comunita: anagrafica_draft.comunita,
-                        codice_stazione: anagrafica_draft.codice_stazione,
-                        date_string: anagrafica_draft.date_string,
-                        area: anagrafica_draft.area,
-                        corpo_idrico: anagrafica_draft.corpo_idrico,
-                        bacino_appartenenza: anagrafica_draft.bacino_appartenenza,
-                        idro_eco_regione: anagrafica_draft.idro_eco_regione,
-                        posizione: anagrafica_draft.posizione,
-                        lunghezza_media_stazione: lunghezza_stazione,
-                        larghezza_media_stazione: larghezza_stazione,
-                    };
+                    let anagrafica = AnagraficaNISECI::new(
+                        anagrafica_draft.comunita,
+                        anagrafica_draft.codice_stazione,
+                        anagrafica_draft.date_string,
+                        anagrafica_draft.area,
+                        anagrafica_draft.corpo_idrico,
+                        anagrafica_draft.bacino_appartenenza,
+                        anagrafica_draft.idro_eco_regione,
+                        anagrafica_draft.posizione,
+                        lunghezza_stazione,
+                        larghezza_stazione,
+                    );
                     self.submit_anagrafica_niseci(state, anagrafica);
                 }
                 Action::SubmitAnagraficaHFBI(anagrafica_draft) => {
@@ -113,17 +114,17 @@ impl Controller for InfoAggiuntiveController {
                             return; // We change view in the failed check maybe?
                         }
                     };
-                    let anagrafica = AnagraficaHFBI {
-                        codice_stazione: anagrafica_draft.codice_stazione,
-                        corpo_idrico: anagrafica_draft.corpo_idrico,
-                        posizione: anagrafica_draft.posizione,
-                        date_string: anagrafica_draft.date_string,
-                        tipo_laguna: anagrafica_draft.tipo_laguna,
-                        stagione: anagrafica_draft.stagione,
-                        habitat_vegetato: anagrafica_draft.habitat_vegetato,
-                        lunghezza_media_transetto: lunghezza_transetto,
-                        larghezza_media_transetto: larghezza_transetto,
-                    };
+                    let anagrafica = AnagraficaHFBI::new(
+                        anagrafica_draft.codice_stazione,
+                        anagrafica_draft.corpo_idrico,
+                        anagrafica_draft.posizione,
+                        anagrafica_draft.date_string,
+                        anagrafica_draft.tipo_laguna,
+                        anagrafica_draft.stagione,
+                        anagrafica_draft.habitat_vegetato,
+                        lunghezza_transetto,
+                        larghezza_transetto,
+                    );
                     self.submit_anagrafica_hfbi(state, anagrafica);
                 }
                 Action::CheckAnagrafica => {
@@ -224,10 +225,19 @@ impl InfoAggiuntiveController {
         &self,
         state: &mut Model,
         larghezza: &str,
-    ) -> Result<f32, String> {
+    ) -> Result<PositiveF32, String> {
         let s = larghezza.replace(',', "."); // Replace comma with dot
         match s.parse::<f32>() {
-            Ok(value) => Ok(value),
+            Ok(value) => PositiveF32::new(value).map_err(|_| {
+                let err_msg = "Errore larghezza: non positivo finito".to_string();
+
+                self.add_console_message(state, format!("InfoAggiuntiveController: {err_msg}"));
+                state.data_model.set_anagrafica_niseci(None);
+                state.infoaggiuntive_model.set_done_editing(false);
+                state.infoaggiuntive_model.set_valid(false);
+                state.infoaggiuntive_model.set_errors_occurred(true);
+                err_msg
+            }),
             Err(e) => {
                 let mut err_msg = format!("Errore nella conversione larghezza stazione: {}", e);
                 if err_msg.contains("invalid float literal") {
@@ -248,10 +258,19 @@ impl InfoAggiuntiveController {
         &self,
         state: &mut Model,
         lunghezza: &str,
-    ) -> Result<f32, String> {
+    ) -> Result<PositiveF32, String> {
         let s = lunghezza.replace(',', "."); // Replace comma with dot
         match s.parse::<f32>() {
-            Ok(value) => Ok(value),
+            Ok(value) => PositiveF32::new(value).map_err(|_| {
+                let err_msg = "Errore lunghezza: non positivo finito".to_string();
+
+                self.add_console_message(state, format!("InfoAggiuntiveController: {err_msg}"));
+                state.data_model.set_anagrafica_niseci(None);
+                state.infoaggiuntive_model.set_done_editing(false);
+                state.infoaggiuntive_model.set_valid(false);
+                state.infoaggiuntive_model.set_errors_occurred(true);
+                err_msg
+            }),
             Err(e) => {
                 let mut err_msg = format!("Errore nella conversione lunghezza stazione: {}", e);
                 if err_msg.contains("invalid float literal") {

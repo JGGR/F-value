@@ -37,6 +37,7 @@ use esox::domain::niseci::{
     AnagraficaNISECI, AreaNISECI, CampionamentoNISECI, ComunitaNISECI, IdroEcoRegioneNISECI,
     RiferimentoNISECI, RisultatoNISECI, TipoComunitaNISECI,
 };
+use esox::domain::posf32::PositiveF32;
 use esox::engines::hfbi::full::{calculate_hfbi, calculate_stato_ecologico_hfbi};
 use esox::engines::niseci::full::{
     calculate_niseci, calculate_rqe_niseci, calculate_stato_ecologico_niseci,
@@ -276,25 +277,25 @@ pub(crate) fn run_headless(do_niseci: bool, has_headers: bool, args: &[String]) 
             || (riferimento_valueparse_failed || campionamento_valueparse_failed);
 
         let mut anagrafica_failed = false;
-        let mut anagrafica = AnagraficaNISECI {
-            comunita: ComunitaNISECI {
+        let mut anagrafica = AnagraficaNISECI::new(
+            ComunitaNISECI {
                 tipo: TipoComunitaNISECI::Redatta,
                 fonte: None,
                 numero_protocollo: None,
             },
-            codice_stazione: "foo".to_string(),
-            date_string: "foo".to_string(),
-            area: AreaNISECI::Alpina,
-            corpo_idrico: "foo".to_string(),
-            bacino_appartenenza: "foo".to_string(),
-            idro_eco_regione: IdroEcoRegioneNISECI::Toscana,
-            posizione: Location {
+            "foo".to_string(),
+            "foo".to_string(),
+            AreaNISECI::Alpina,
+            "foo".to_string(),
+            "foo".to_string(),
+            IdroEcoRegioneNISECI::Toscana,
+            Location {
                 regione: "foo".to_string(),
                 provincia: "foo".to_string(),
             },
-            lunghezza_media_stazione: 0.0,
-            larghezza_media_stazione: 0.0,
-        };
+            PositiveF32::new(1.0).expect("1.0 should be a valid positive finite f32"),
+            PositiveF32::new(1.0).expect("1.0 should be a valid positive finite f32"),
+        );
         if !had_failures {
             /* TODO: handle verbosity
             for s in &riferimento_specie {
@@ -462,20 +463,20 @@ pub(crate) fn run_headless(do_niseci: bool, has_headers: bool, args: &[String]) 
 
         let mut anagrafica_csv_failed = false;
         let mut anagrafica_valueparse_failed = false;
-        let mut anagrafica = AnagraficaHFBI {
-            codice_stazione: "foo".to_string(),
-            date_string: "foo".to_string(),
-            corpo_idrico: "foo".to_string(),
-            posizione: Location {
+        let mut anagrafica = AnagraficaHFBI::new(
+            "foo".to_string(),
+            "foo".to_string(),
+            Location {
                 regione: "foo".to_string(),
                 provincia: "foo".to_string(),
             },
-            lunghezza_media_transetto: 0.0,
-            larghezza_media_transetto: 0.0,
-            stagione: StagioneHFBI::Primavera,
-            habitat_vegetato: HabitatHFBI::Vegetato,
-            tipo_laguna: TipoLagunaCostieraHFBI::MAt1,
-        };
+            "foo".to_string(),
+            TipoLagunaCostieraHFBI::MAt1,
+            StagioneHFBI::Primavera,
+            HabitatHFBI::Vegetato,
+            PositiveF32::new(1.0).expect("1.0 should be a valid positive finite f32"),
+            PositiveF32::new(1.0).expect("1.0 should be a valid positive finite f32"),
+        );
         if !had_failures {
             /* TODO: handle verbosity
             for c in &campionamento_specie {
