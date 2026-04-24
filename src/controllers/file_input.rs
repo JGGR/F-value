@@ -25,7 +25,7 @@ use esox::csv::load::niseci::{
     CampionamentoNISECIError, RiferimentoNISECIError,
 };
 use esox::csv::load::InputFormat;
-use esox::csv::TipoRecordCsv;
+use esox::deser::TipoRecord;
 use esox::domain::hfbi::CampionamentoHFBI;
 use esox::domain::index::Indice;
 use esox::domain::niseci::{CampionamentoNISECI, RiferimentoNISECI};
@@ -328,7 +328,7 @@ impl FileInputController {
                             }
                             */
                             let processed_errors =
-                                process_csv_errors(&errors, TipoRecordCsv::RiferimentoNISECI);
+                                process_csv_errors(&errors, TipoRecord::RiferimentoNISECI);
                             for e in processed_errors {
                                 self.add_console_message(
                                     state,
@@ -441,7 +441,7 @@ impl FileInputController {
                                 }
                                 */
                                 let processed_errors =
-                                    process_csv_errors(&errors, TipoRecordCsv::CampionamentoNISECI);
+                                    process_csv_errors(&errors, TipoRecord::CampionamentoNISECI);
                                 for e in processed_errors {
                                     self.add_console_message(
                                         state,
@@ -498,7 +498,7 @@ impl FileInputController {
                             }
                             */
                             let processed_errors =
-                                process_csv_errors(&errors, TipoRecordCsv::CampionamentoNISECI);
+                                process_csv_errors(&errors, TipoRecord::CampionamentoNISECI);
                             for e in processed_errors {
                                 self.add_console_message(
                                     state,
