@@ -31,4 +31,4 @@ raylib = { git = "https://github.com/raylib-rs/raylib-rs.git", features = [
     "raygui",
 ] }
 rfd = { version = "0.17.2", default-features = false }
-uuid = { version = "1.23.0", features = ["v4"] }
+uuid = { version = "1.23.1", features = ["v4"] }
