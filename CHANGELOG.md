@@ -2,6 +2,10 @@
 
 ### Changed
 
+- Drop `FileInputController` sorting of `CampionamentoHFBI` after parsing
+- Avoid direct usage of `RiferimentoNISECI`, `Campionamento{NISECI,HFBI}` fields
+- Avoid direct usage of `Anagrafica{NISECI,HFBI}` fields
+- Refuse infinities, NaN for `Anagrafica{NISECI,HFBI}` length/width fields
 - Use `esox::csv::load` methods in `core::cli`, `controllers::file_input`
 - Use `to_csv()` methods in `controllers::output`
 - Drop `intermediates` arg for `log_niseci_values()`, `log_hfbi_values()`
