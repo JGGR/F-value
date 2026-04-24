@@ -11,6 +11,7 @@
 - Drop `intermediates` arg for `log_niseci_values()`, `log_hfbi_values()`
 - Refactor `log_hfbi_values()` to expect `RisultatoHFBI` instead of `f32`
 - Bump `esox` to `0.1.3`
+- Bump `uuid` to `1.23.1`
 
 ## [0.1.2] - 2026-04-10
 
