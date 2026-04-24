@@ -20,11 +20,11 @@ use crate::app::model::{Model, SubModel};
 use crate::controllers::{Controller, CurrentView, InfoAggiuntiveModel};
 use crate::MainState;
 use chrono::format::ParseErrorKind;
-use esox::csv::parser::parse_date;
 use esox::domain::hfbi::AnagraficaHFBI;
 use esox::domain::index::Indice;
 use esox::domain::niseci::{AnagraficaNISECI, TipoComunitaNISECI};
 use esox::domain::posf32::PositiveF32;
+use esox::parser::parse_date;
 use raylib::RaylibHandle;
 
 impl Controller for InfoAggiuntiveController {

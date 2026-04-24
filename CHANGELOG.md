@@ -1,3 +1,11 @@
+## [0.1.4] - Unreleased
+
+### Changed
+
+- Avoid usage of deprecated reexports
+  - `esox::csv::TipoRecordCsv` -> `esox::deser::TipoRecord`
+  - `esox::csv::parser::parse_date` -> `esox::parser::parse_date`;
+
 ## [0.1.3] - 2026-04-24
 
 ### Changed
