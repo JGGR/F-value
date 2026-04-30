@@ -1,4 +1,4 @@
-## [0.1.4] - Unreleased
+## [0.1.4] - 2026-04-30
 
 ### Changed
 
@@ -7,6 +7,7 @@
   - `esox::csv::parser::parse_date` -> `esox::parser::parse_date`
 - Avoid usage of deprecated methods
   - `esox::csv::deser::process_csv_errors` -> `esox::csv::stanis::giorgio::format_csv_errors`
+  - Minor differences in error messages
 - Bump `esox` to `0.1.5`
 
 ## [0.1.3] - 2026-04-24
