@@ -18,13 +18,13 @@ pub(crate) struct FileInputController;
 use crate::app::core::{Action, Localize, MainState};
 use crate::app::model::{Model, SubModel};
 use crate::controllers::{Controller, CurrentView, FileInputModel};
-use esox::csv::deser::process_csv_errors;
 use esox::csv::load::hfbi::{load_campionamento_hfbi_from_path, CampionamentoHFBIError};
 use esox::csv::load::niseci::{
     load_campionamento_niseci_from_path, load_riferimento_niseci_from_path,
     CampionamentoNISECIError, RiferimentoNISECIError,
 };
 use esox::csv::load::InputFormat;
+use esox::csv::stanis::giorgio::format_csv_errors;
 use esox::deser::TipoRecord;
 use esox::domain::hfbi::CampionamentoHFBI;
 use esox::domain::index::Indice;
@@ -328,7 +328,7 @@ impl FileInputController {
                             }
                             */
                             let processed_errors =
-                                process_csv_errors(&errors, TipoRecord::RiferimentoNISECI);
+                                format_csv_errors(&errors, TipoRecord::RiferimentoNISECI);
                             for e in processed_errors {
                                 self.add_console_message(
                                     state,
@@ -441,7 +441,7 @@ impl FileInputController {
                                 }
                                 */
                                 let processed_errors =
-                                    process_csv_errors(&errors, TipoRecord::CampionamentoNISECI);
+                                    format_csv_errors(&errors, TipoRecord::CampionamentoNISECI);
                                 for e in processed_errors {
                                     self.add_console_message(
                                         state,
@@ -498,7 +498,7 @@ impl FileInputController {
                             }
                             */
                             let processed_errors =
-                                process_csv_errors(&errors, TipoRecord::CampionamentoNISECI);
+                                format_csv_errors(&errors, TipoRecord::CampionamentoNISECI);
                             for e in processed_errors {
                                 self.add_console_message(
                                     state,
