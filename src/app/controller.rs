@@ -131,40 +131,20 @@ pub(crate) fn update_main(
     }
 }
 
-/*
-fn write_temp_style_file(data: &[u8]) -> Result<(String, PathBuf), Box<dyn std::error::Error>> {
-    // We employ a UUID to randomise the filename, as required
-    // to avoid insecure temporary files vulnerabilities
-    // See: https://doc.rust-lang.org/nightly/std/env/fn.temp_dir.html
-    let mut temp_path = std::env::temp_dir();
-    let id = Uuid::new_v4();
-    temp_path.push(format!("{}.rgs", id));
-
-    let mut file = File::create(&temp_path)?;
-    file.write_all(data)?;
-
-    let string = String::from(temp_path.to_string_lossy());
-    Ok((string, temp_path))
-}
-*/
-
 fn load_style_from_memory(rl: &mut RaylibHandle, data: &[u8]) {
     /*
-    // Al momento, raylib-rs non espone una funzione gui_load_style_from_memory().
-    // Qui simuliamo la disponibilità runtime di un file .rgs, partendo dai byte
-    // di include_bytes!(). Non la migliore idea, ma sembra funzionare.
-
-    // At this time, raylib-rs does not expose fn gui_load_style_from_memory().
+    // At the original time of writing this, raylib-rs does not expose
+    // pub fn gui_load_style_from_memory().
     // Here we simulate runtime availability of a binary .rgs file, starting from
     // bytes here provided with include_bytes!(). Not the best idea, but it seems to work.
-
+    //
     // Write the data to a temporary file
     let (temp_file_cstring, temp_file_path) =
         write_temp_style_file(data).expect("Failed to write temp style file");
-
+    //
     // Load the style
     rl.gui_load_style(temp_file_cstring.as_str());
-
+    //
     // Remove the temp file after loading the style
     std::fs::remove_file(temp_file_path).expect("Failed to delete temp style file");
     */
