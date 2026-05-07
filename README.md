@@ -1,5 +1,6 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/JGGR/F-value/master/assets/logo.png" alt="F-Value" width="240">
+  <img src="https://raw.githubusercontent.com/JGGR/F-value/master/assets/logo.png" alt="F-Value" width="240" align="middle" />&nbsp;&nbsp;&nbsp;
+  <img src="https://raw.githubusercontent.com/JGGR/F-value/master/assets/logo_name.png" alt="" align="middle" />
 </p>
 
 # F-value
