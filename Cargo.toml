@@ -27,7 +27,7 @@ locale_config = "0.3.0"
 miniz_oxide = "0.9.1"
 pdf-writer = "0.14.0"
 png = "0.18.1"
-raylib = { git = "https://github.com/raylib-rs/raylib-rs.git", features = [
+raylib = { git = "https://github.com/jgabaut/raylib-rs.git", features = [
     "raygui",
 ] }
 rfd = { version = "0.17.2", default-features = false }
