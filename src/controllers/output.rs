@@ -24,7 +24,9 @@ use crate::MainState;
 use dirs::document_dir;
 use esox::domain::hfbi::{AnagraficaHFBI, RisultatoHFBI, ValoriIntermediHFBI};
 use esox::domain::index::Indice;
-use esox::domain::niseci::{AnagraficaNISECI, RisultatoNISECI, ValoriIntermediNISECI};
+use esox::domain::niseci::{
+    AnagraficaNISECI, RiferimentoNISECI, RisultatoNISECI, ValoriIntermediNISECI,
+};
 use esox::engines::hfbi::full::{calculate_hfbi, calculate_stato_ecologico_hfbi};
 use esox::engines::niseci::full::{
     calculate_niseci, calculate_rqe_niseci, calculate_stato_ecologico_niseci,
@@ -264,13 +266,14 @@ impl OutputController {
                     );
 
                     //This logs to stdout
-                    intermediates.log();
+                    println!("{}", intermediates);
 
                     self.add_console_message(state, format!("{intermediates}"));
 
                     self.log_niseci_intermediates(
                         locale,
                         &intermediates,
+                        &riferimento,
                         &state
                             .fileinput_model
                             .get_riferimento_path()
@@ -345,6 +348,7 @@ impl OutputController {
         &self,
         locale: Localize,
         intermediates: &ValoriIntermediNISECI,
+        riferimento: &RiferimentoNISECI,
         ref_filename: &Path,
         station_code: &str,
     ) {
@@ -368,7 +372,8 @@ impl OutputController {
                     Localize::Italian => false,
                     Localize::International => true,
                 };
-                let string_representation = intermediates.to_csv(comma_csv_delimiter);
+                let string_representation =
+                    intermediates.to_csv_joined(riferimento, comma_csv_delimiter);
                 let write_result = writeln!(file, "{string_representation}");
                 match write_result {
                     Ok(_) => println!("Successfully wrote to file."),

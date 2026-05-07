@@ -350,7 +350,7 @@ pub(crate) fn run_headless(do_niseci: bool, has_headers: bool, args: &[String]) 
                     let stato_eco_niseci =
                         calculate_stato_ecologico_niseci(niseci, &anagrafica.area);
 
-                    intermediates.log();
+                    println!("{}", intermediates);
                     match niseci {
                         Some(val) => {
                             println!("NISECI: {val}");
