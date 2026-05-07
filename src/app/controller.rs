@@ -26,10 +26,6 @@ use raylib::consts::GuiControlProperty::TEXT_COLOR_NORMAL;
 use raylib::consts::GuiDefaultProperty::{BACKGROUND_COLOR, TEXT_SIZE, TEXT_SPACING};
 use raylib::consts::KeyboardKey::*;
 use raylib::RaylibHandle;
-use std::fs::File;
-use std::io::Write;
-use std::path::PathBuf;
-use uuid::Uuid;
 
 pub(crate) fn update_main(
     rl: &mut RaylibHandle,
@@ -135,6 +131,7 @@ pub(crate) fn update_main(
     }
 }
 
+/*
 fn write_temp_style_file(data: &[u8]) -> Result<(String, PathBuf), Box<dyn std::error::Error>> {
     // We employ a UUID to randomise the filename, as required
     // to avoid insecure temporary files vulnerabilities
@@ -149,11 +146,17 @@ fn write_temp_style_file(data: &[u8]) -> Result<(String, PathBuf), Box<dyn std::
     let string = String::from(temp_path.to_string_lossy());
     Ok((string, temp_path))
 }
+*/
 
 fn load_style_from_memory(rl: &mut RaylibHandle, data: &[u8]) {
+    /*
     // Al momento, raylib-rs non espone una funzione gui_load_style_from_memory().
     // Qui simuliamo la disponibilità runtime di un file .rgs, partendo dai byte
     // di include_bytes!(). Non la migliore idea, ma sembra funzionare.
+
+    // At this time, raylib-rs does not expose fn gui_load_style_from_memory().
+    // Here we simulate runtime availability of a binary .rgs file, starting from
+    // bytes here provided with include_bytes!(). Not the best idea, but it seems to work.
 
     // Write the data to a temporary file
     let (temp_file_cstring, temp_file_path) =
@@ -164,6 +167,12 @@ fn load_style_from_memory(rl: &mut RaylibHandle, data: &[u8]) {
 
     // Remove the temp file after loading the style
     std::fs::remove_file(temp_file_path).expect("Failed to delete temp style file");
+    */
+
+    // Load the style
+    // This API is not currently exposed by raygui, but
+    // gui_load_style() still reaches the same code under the ffi.
+    rl.gui_load_style_from_memory(data);
 }
 
 impl GuiTheme {

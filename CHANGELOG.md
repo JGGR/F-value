@@ -1,3 +1,13 @@
+## Unreleased
+
+### Changed
+
+- Try forked `raylib-rs` in `Cargo.toml`:
+  - `repo = git@github.com/jgabaut/raylib-rs.git`
+  - `branch = work/gui_load_style_from_memory`
+  - Allows proper usage of embedded styles
+- Drop `uuid` dep
+
 ## [0.1.4] - 2026-04-30
 
 ### Changed
