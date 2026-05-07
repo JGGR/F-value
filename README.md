@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/JGGR/F-value/master/assets/logo.png" alt="F-Value" width="240">
+</p>
+
 # F-value
 
 ## Tool for NISECI and HFBI calc
