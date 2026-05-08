@@ -5,6 +5,8 @@
 - Avoid usage of deprecated reexports
   - `esox::domani::niseci::ValoriIntermediNISECI::to_csv` -> `esox::domani::niseci::ValoriIntermediNISECI::to_csv_joined`
   - `esox::domani::niseci::ValoriIntermediNISECI::log`
+- Avoid usage of deprecated fields
+  - `esox::domani::niseci::ComunitaNISECI`
 - Bump `esox` to `0.1.6`
 
 ## [0.1.4] - 2026-04-30
