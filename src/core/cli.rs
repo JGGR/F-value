@@ -278,11 +278,11 @@ pub(crate) fn run_headless(do_niseci: bool, has_headers: bool, args: &[String]) 
 
         let mut anagrafica_failed = false;
         let mut anagrafica = AnagraficaNISECI::new(
-            ComunitaNISECI {
-                tipo: TipoComunitaNISECI::Redatta,
-                fonte: None,
-                numero_protocollo: None,
-            },
+            ComunitaNISECI::new(
+                TipoComunitaNISECI::Redatta,
+                None,
+                None,
+            ),
             "foo".to_string(),
             "foo".to_string(),
             AreaNISECI::Alpina,

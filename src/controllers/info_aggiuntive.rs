@@ -361,9 +361,9 @@ impl InfoAggiuntiveController {
                 ));
             }
 
-            match anagrafica.comunita.tipo {
+            match anagrafica.comunita.tipo() {
                 TipoComunitaNISECI::Recuperata => {
-                    if let Some(fonte) = anagrafica.comunita.fonte {
+                    if let Some(fonte) = anagrafica.comunita.fonte() {
                         if fonte.is_empty() {
                             errors.push("Fonte troppo corta".to_string());
                         }
@@ -372,7 +372,7 @@ impl InfoAggiuntiveController {
                     }
                 }
                 TipoComunitaNISECI::AffinataDalMase => {
-                    if let Some(num_proto) = anagrafica.comunita.numero_protocollo {
+                    if let Some(num_proto) = anagrafica.comunita.num_protocollo() {
                         if num_proto.is_empty() {
                             errors.push("Numero protocollo troppo corto".to_string());
                         }
