@@ -19,11 +19,20 @@ use crate::console::Console;
 use crate::core::SHORT_PROJECT_VERSION;
 use esox::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI, RisultatoHFBI, StatoEcologicoHFBI};
 use esox::domain::index::Indice;
-use esox::domain::niseci::{
-    AnagraficaNISECI, CampionamentoNISECI, RiferimentoNISECI, RisultatoNISECI, StatoEcologicoNISECI,
+use esox::domain::niseci::{AnagraficaNISECI, RiferimentoNISECI, StatoEcologicoNISECI};
+#[cfg(not(feature = "lessclone"))]
+use esox::{
+    domain::niseci::{CampionamentoNISECI, RisultatoNISECI},
+    engines::niseci::full::calculate_stato_ecologico_niseci,
 };
+
+#[cfg(feature = "lessclone")]
+use esox::{
+    domain::niseci::lessclone::{CampionamentoNISECI, RisultatoNISECI},
+    engines::niseci::full::lessclone::calculate_stato_ecologico_niseci,
+};
+
 use esox::engines::hfbi::full::calculate_stato_ecologico_hfbi;
-use esox::engines::niseci::full::calculate_stato_ecologico_niseci;
 use std::collections::HashMap;
 use std::path::PathBuf;
 

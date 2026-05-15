@@ -34,14 +34,28 @@ use esox::domain::hfbi::{
 };
 use esox::domain::location::Location;
 use esox::domain::niseci::{
-    AnagraficaNISECI, AreaNISECI, CampionamentoNISECI, ComunitaNISECI, IdroEcoRegioneNISECI,
-    RiferimentoNISECI, RisultatoNISECI, TipoComunitaNISECI,
+    AnagraficaNISECI, AreaNISECI, ComunitaNISECI, IdroEcoRegioneNISECI, RiferimentoNISECI,
+    TipoComunitaNISECI,
 };
+
+#[cfg(not(feature = "lessclone"))]
+use esox::{
+    domain::niseci::{CampionamentoNISECI, RisultatoNISECI},
+    engines::niseci::full::{
+        calculate_niseci, calculate_rqe_niseci, calculate_stato_ecologico_niseci,
+    },
+};
+
+#[cfg(feature = "lessclone")]
+use esox::{
+    domain::niseci::lessclone::{CampionamentoNISECI, RisultatoNISECI},
+    engines::niseci::full::lessclone::{
+        calculate_niseci, calculate_rqe_niseci, calculate_stato_ecologico_niseci,
+    },
+};
+
 use esox::domain::posf32::PositiveF32;
 use esox::engines::hfbi::full::{calculate_hfbi, calculate_stato_ecologico_hfbi};
-use esox::engines::niseci::full::{
-    calculate_niseci, calculate_rqe_niseci, calculate_stato_ecologico_niseci,
-};
 use std::path::PathBuf;
 
 pub(crate) fn f_value_usage() {
@@ -278,11 +292,7 @@ pub(crate) fn run_headless(do_niseci: bool, has_headers: bool, args: &[String]) 
 
         let mut anagrafica_failed = false;
         let mut anagrafica = AnagraficaNISECI::new(
-            ComunitaNISECI::new(
-                TipoComunitaNISECI::Redatta,
-                None,
-                None,
-            ),
+            ComunitaNISECI::new(TipoComunitaNISECI::Redatta, None, None),
             "foo".to_string(),
             "foo".to_string(),
             AreaNISECI::Alpina,

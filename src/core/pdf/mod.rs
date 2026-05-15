@@ -18,9 +18,19 @@
 use crate::app::core::{CISBA_LOGO_DATA, PROJECT_LOGO_DATA, PROJECT_LOGO_NAME_DATA};
 use crate::core::BUILD_DATE;
 use esox::domain::hfbi::{AnagraficaHFBI, RisultatoHFBI};
-use esox::domain::niseci::{AnagraficaNISECI, RiferimentoNISECI, RisultatoNISECI};
+use esox::domain::niseci::{AnagraficaNISECI, RiferimentoNISECI};
+
+#[cfg(feature = "lessclone")]
+use esox::{
+    domain::niseci::lessclone::RisultatoNISECI,
+    engines::niseci::full::lessclone::calculate_stato_ecologico_niseci,
+};
+#[cfg(not(feature = "lessclone"))]
+use esox::{
+    domain::niseci::RisultatoNISECI, engines::niseci::full::calculate_stato_ecologico_niseci,
+};
+
 use esox::engines::hfbi::full::calculate_stato_ecologico_hfbi;
-use esox::engines::niseci::full::calculate_stato_ecologico_niseci;
 use miniz_oxide::deflate::{compress_to_vec_zlib, CompressionLevel};
 use pdf_writer::{Chunk, Content, Filter, Finish, Name, Pdf, Rect, Ref, Str};
 use png::Decoder;
