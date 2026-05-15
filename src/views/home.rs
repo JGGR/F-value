@@ -16,7 +16,7 @@
 */
 use crate::app::core::{Action, Action::*};
 use crate::app::model::Model;
-use crate::core::{RFD_BACKEND, SHORT_PROJECT_VERSION};
+use crate::core::{ESOX_LESSCLONE_BACKEND, RFD_BACKEND, SHORT_PROJECT_VERSION};
 use crate::views::{propheight, propwidth, rrect, View};
 use crate::MainState;
 use raylib::color::Color;
@@ -98,6 +98,12 @@ impl View for HomeView {
             std::env::consts::OS
         );
         let label_rfd_backend_txt = format!("rfd backend:    {}", RFD_BACKEND);
+        let label_esox_backend_txt = format!(
+            "Using esox v{}, backend: {}",
+            esox::meta::version(),
+            ESOX_LESSCLONE_BACKEND
+        );
+
         let label_version_txt_bounds = main_state.current_font.measure_text(
             &label_version_txt,
             main_state.current_font_height as f32,
@@ -113,20 +119,33 @@ impl View for HomeView {
             main_state.current_font_height as f32,
             main_state.default_txt_spacing as f32,
         );
+        let label_esox_backend_txt_bounds = main_state.current_font.measure_text(
+            &label_esox_backend_txt,
+            main_state.current_font_height as f32,
+            main_state.default_txt_spacing as f32,
+        );
         let labels_width = propwidth(d, 25)
             + max(
                 max(
-                    label_version_txt_bounds.x as i32,
-                    label_target_txt_bounds.x as i32,
+                    max(
+                        label_version_txt_bounds.x as i32,
+                        label_target_txt_bounds.x as i32,
+                    ),
+                    label_rfd_backend_txt_bounds.x as i32,
                 ),
-                label_rfd_backend_txt_bounds.x as i32,
+                label_esox_backend_txt_bounds.x as i32,
             );
         let labels_x = (d.get_screen_width() - labels_width) / 2;
         let labels_y =
             logo_name_texture_target_y + logo_name_texture_target_height + propheight(d, 50);
         let labels_height = propheight(d, 25);
 
-        let labels: Vec<String> = vec![label_version_txt, label_target_txt, label_rfd_backend_txt];
+        let labels: Vec<String> = vec![
+            label_version_txt,
+            label_target_txt,
+            label_rfd_backend_txt,
+            label_esox_backend_txt,
+        ];
 
         for (i, label) in labels.iter().enumerate() {
             d.gui_label(

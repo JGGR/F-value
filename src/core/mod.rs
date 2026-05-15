@@ -46,6 +46,7 @@ pub(crate) const _COMMIT_HASH: &str = env!("COMMIT_HASH");
 pub(crate) const COMMIT_HASH_PLUS: &str = env!("COMMIT_HASH_PLUS");
 pub(crate) const BUILD_DATE: &str = env!("BUILD_DATE");
 pub(crate) const RFD_BACKEND: &str = env!("RFD_BACKEND");
+pub(crate) const ESOX_LESSCLONE_BACKEND: &str = env!("ESOX_LESSCLONE_BACKEND");
 
 use chrono::{Datelike, Local};
 use raylib::math::Rectangle;

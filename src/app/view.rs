@@ -222,12 +222,6 @@ pub(crate) fn draw_info_box(
             default_txt_spacing as f32,
         );
         //let proj_info_str_y = propheight(&d, 100) - current_font_height / 2;
-        let esox_info_str = format!("Using esox {}", esox::meta::version());
-        let esox_info_txt_bounds = font.measure_text(
-            &esox_info_str,
-            current_font_height as f32,
-            default_txt_spacing as f32,
-        );
 
         // No multiline text.
         let proj_name_str1 = "Strumento per il calcolo".to_string();
@@ -260,7 +254,6 @@ pub(crate) fn draw_info_box(
 
         let infobox_height = propheight(d, 200)
             + proj_info_txt_bounds.y as i32
-            + esox_info_txt_bounds.y as i32
             + proj_name_str1_txt_bounds.y as i32
             + proj_name_str2_txt_bounds.y as i32;
         let infobox_y = d.get_screen_height() / 2 - infobox_height / 2;
@@ -275,10 +268,8 @@ pub(crate) fn draw_info_box(
         let text_x_spacing = propwidth(d, 120);
         let proj_info_str_y = infobox_y + bar_height + text_y_spacing;
         let proj_info_str_x = infobox_x + text_x_spacing;
-        let esox_info_str_y = proj_info_str_y + proj_info_txt_bounds.y as i32;
-        let esox_info_str_x = proj_info_str_x;
-        let proj_name_str1_y = esox_info_str_y + (esox_info_txt_bounds.y as i32 * 2);
-        let proj_name_str1_x = esox_info_str_x;
+        let proj_name_str1_y = proj_info_str_y + proj_info_txt_bounds.y as i32;
+        let proj_name_str1_x = proj_info_str_x;
         let proj_name_str2_y = proj_name_str1_y + proj_name_str1_txt_bounds.y as i32;
         let proj_name_str2_x = proj_name_str1_x;
 
@@ -286,15 +277,6 @@ pub(crate) fn draw_info_box(
             font,
             &proj_info_str,
             Vector2::new(proj_info_str_x as f32, proj_info_str_y as f32),
-            current_font_height as f32,
-            default_txt_spacing as f32,
-            default_txt_color,
-        );
-
-        d.draw_text_ex(
-            font,
-            &esox_info_str,
-            Vector2::new(esox_info_str_x as f32, esox_info_str_y as f32),
             current_font_height as f32,
             default_txt_spacing as f32,
             default_txt_color,
@@ -359,14 +341,39 @@ pub(crate) fn draw_info_box(
             raylib::core::misc::open_url(actual_link);
         }
 
+        let using_esox_display_link = &format!("esox v{}", esox::meta::version());
+        let using_esox_actual_link = "https://github.com/JGGR/esox";
+        let esox_link_str = using_esox_display_link;
+        let esox_link_x = link_x;
+        let esox_link_y = link_y + link_height;
+        let esox_link_width = link_width;
+        let esox_link_height = link_height;
+
+        d.gui_label(
+            rrect(
+                infobox_x + propwidth(d, 10),
+                esox_link_y,
+                text_x_spacing,
+                esox_link_height,
+            ),
+            "Using:",
+        );
+
+        if d.gui_label_button(
+            rrect(esox_link_x, esox_link_y, esox_link_width, esox_link_height),
+            esox_link_str,
+        ) {
+            raylib::core::misc::open_url(using_esox_actual_link);
+        }
+
         let support_email = "a.marchi@hsbologna.it";
         let mail_display_link = support_email.to_owned();
         let mail_actual_link = "mailto:".to_owned() + support_email;
         let mail_link_str = mail_display_link;
-        let mail_link_x = link_x;
-        let mail_link_y = link_y + link_height;
-        let mail_link_width = link_width;
-        let mail_link_height = link_height;
+        let mail_link_x = esox_link_x;
+        let mail_link_y = esox_link_y + esox_link_height;
+        let mail_link_width = esox_link_width;
+        let mail_link_height = esox_link_height;
 
         d.gui_label(
             rrect(
