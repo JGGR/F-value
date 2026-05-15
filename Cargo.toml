@@ -11,10 +11,11 @@ exclude = [
 ]
 
 [features]
-default = ["embed-icon", "rfd-xdg-portal"]
+default = ["embed-icon", "lessclone", "rfd-xdg-portal"]
 embed-icon = []
-rfd-gtk3 = [ "rfd/gtk3" ]
-rfd-xdg-portal = [ "rfd/xdg-portal" ]
+lessclone = ["esox/lessclone"]
+rfd-gtk3 = ["rfd/gtk3"]
+rfd-xdg-portal = ["rfd/xdg-portal"]
 
 [build-dependencies]
 chrono = "0.4.39"

@@ -1,4 +1,9 @@
-## [0.1.5] - Unreleased
+## [0.1.5] - 2026-05-15
+
+### Added
+
+- Add `lessclone` feature, enabled by default
+  - Improves performance significantly
 
 ### Changed
 
@@ -8,6 +13,9 @@
 - Avoid usage of deprecated fields
   - `esox::domani::niseci::ComunitaNISECI`
 - Bump `esox` to `0.1.6`
+  - Improves performance for all builds
+  - More improvements when building with `lessclone` feature
+  - Changelog: [link](https://github.com/JGGR/esox/releases/tag/0.1.6)
 
 ## [0.1.4] - 2026-04-30
 

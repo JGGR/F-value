@@ -719,11 +719,8 @@ impl View for SelezioneInfoAggiuntiveView {
                         }
                         _ => {}
                     }
-                    let comunita = ComunitaNISECI::new(
-                        tipo_comunita,
-                        opt_fonte,
-                        opt_num_protocollo,
-                    );
+                    let comunita =
+                        ComunitaNISECI::new(tipo_comunita, opt_fonte, opt_num_protocollo);
                     let area = match <AreaNISECI as TryFrom<i32>>::try_from(
                         self.combobox_area_niseci_value,
                     ) {
