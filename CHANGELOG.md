@@ -2,8 +2,11 @@
 
 ### Changed
 
+- Drop `app::controller::{write_temp_style_file, load_style_from_memory}`
+  - Use `raylib::prelude::RaylibGuiState::gui_load_style_from_memory`
 - Bump `raylib` to `6.0.0`
 - Bump `pdf-writer` to `0.15.0`
+- Drop `uuid` dep
 
 ## [0.1.5] - 2026-05-15
 

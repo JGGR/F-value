@@ -25,18 +25,15 @@ use raylib::consts::GuiControl::DEFAULT;
 use raylib::consts::GuiControlProperty::TEXT_COLOR_NORMAL;
 use raylib::consts::GuiDefaultProperty::{BACKGROUND_COLOR, TEXT_SIZE, TEXT_SPACING};
 use raylib::consts::KeyboardKey::*;
+use raylib::error::LoadStyleFromMemoryError;
 use raylib::prelude::RaylibGuiState;
 use raylib::RaylibHandle;
-use std::fs::File;
-use std::io::Write;
-use std::path::PathBuf;
-use uuid::Uuid;
 
 pub(crate) fn update_main(
     rl: &mut RaylibHandle,
     actions: &mut Vec<MainAction>,
     main_state: &mut MainState,
-) {
+) -> Result<(), LoadStyleFromMemoryError> {
     main_state.should_quit = rl.window_should_close();
 
     main_state.frame_counter += 1;
@@ -70,7 +67,7 @@ pub(crate) fn update_main(
                 main_state.current_font_height = main_state.default_font_height;
                 rl.gui_set_style(DEFAULT, TEXT_SIZE, main_state.current_font_height);
                 main_state.gui_theme_combobox_active = GuiTheme::Light as i32;
-                GuiTheme::load_and_set(&GuiTheme::Light, rl, main_state);
+                GuiTheme::load_and_set(&GuiTheme::Light, rl, main_state)?;
                 let locale = get_locale();
                 main_state.locale_combobox_active = locale as i32;
                 main_state.locale = locale;
@@ -108,7 +105,7 @@ pub(crate) fn update_main(
                     match <GuiTheme as TryFrom<i32>>::try_from(theme_idx) {
                         Ok(t) => {
                             main_state.gui_theme_combobox_active = theme_idx;
-                            t.load_and_set(rl, main_state);
+                            t.load_and_set(rl, main_state)?;
                         }
                         Err(_) => eprintln!("unknown number in current theme check"),
                     }
@@ -134,76 +131,50 @@ pub(crate) fn update_main(
     if rl.is_key_pressed(KEY_F7) {
         main_state.showing_info_box = true;
     }
-}
-
-fn write_temp_style_file(data: &[u8]) -> Result<(String, PathBuf), Box<dyn std::error::Error>> {
-    // We employ a UUID to randomise the filename, as required
-    // to avoid insecure temporary files vulnerabilities
-    // See: https://doc.rust-lang.org/nightly/std/env/fn.temp_dir.html
-    let mut temp_path = std::env::temp_dir();
-    let id = Uuid::new_v4();
-    temp_path.push(format!("{}.rgs", id));
-
-    let mut file = File::create(&temp_path)?;
-    file.write_all(data)?;
-
-    let string = String::from(temp_path.to_string_lossy());
-    Ok((string, temp_path))
-}
-
-fn load_style_from_memory(rl: &mut RaylibHandle, data: &[u8]) {
-    // Al momento, raylib-rs non espone una funzione gui_load_style_from_memory().
-    // Qui simuliamo la disponibilità runtime di un file .rgs, partendo dai byte
-    // di include_bytes!(). Non la migliore idea, ma sembra funzionare.
-
-    // Write the data to a temporary file
-    let (temp_file_cstring, temp_file_path) =
-        write_temp_style_file(data).expect("Failed to write temp style file");
-
-    // Load the style
-    rl.gui_load_style(temp_file_cstring.as_str());
-
-    // Remove the temp file after loading the style
-    std::fs::remove_file(temp_file_path).expect("Failed to delete temp style file");
+    Ok(())
 }
 
 impl GuiTheme {
-    fn load_and_set(&self, rl: &mut RaylibHandle, main_state: &mut MainState) {
+    fn load_and_set(
+        &self,
+        rl: &mut RaylibHandle,
+        main_state: &mut MainState,
+    ) -> Result<(), LoadStyleFromMemoryError> {
         match self {
             GuiTheme::Dark => {
-                load_style_from_memory(rl, DARK_THEME_DATA);
+                rl.gui_load_style_from_memory(DARK_THEME_DATA)?;
                 main_state.theme = GuiTheme::Dark;
             }
             GuiTheme::Bluish => {
-                load_style_from_memory(rl, BLUISH_THEME_DATA);
+                rl.gui_load_style_from_memory(BLUISH_THEME_DATA)?;
                 main_state.theme = GuiTheme::Bluish;
             }
             GuiTheme::Candy => {
-                load_style_from_memory(rl, CANDY_THEME_DATA);
+                rl.gui_load_style_from_memory(CANDY_THEME_DATA)?;
                 main_state.theme = GuiTheme::Candy;
             }
             GuiTheme::Cherry => {
-                load_style_from_memory(rl, CHERRY_THEME_DATA);
+                rl.gui_load_style_from_memory(CHERRY_THEME_DATA)?;
                 main_state.theme = GuiTheme::Cherry;
             }
             GuiTheme::Cyber => {
-                load_style_from_memory(rl, CYBER_THEME_DATA);
+                rl.gui_load_style_from_memory(CYBER_THEME_DATA)?;
                 main_state.theme = GuiTheme::Cyber;
             }
             GuiTheme::Jungle => {
-                load_style_from_memory(rl, JUNGLE_THEME_DATA);
+                rl.gui_load_style_from_memory(JUNGLE_THEME_DATA)?;
                 main_state.theme = GuiTheme::Jungle;
             }
             GuiTheme::Lavanda => {
-                load_style_from_memory(rl, LAVANDA_THEME_DATA);
+                rl.gui_load_style_from_memory(LAVANDA_THEME_DATA)?;
                 main_state.theme = GuiTheme::Lavanda;
             }
             GuiTheme::Terminal => {
-                load_style_from_memory(rl, TERMINAL_THEME_DATA);
+                rl.gui_load_style_from_memory(TERMINAL_THEME_DATA)?;
                 main_state.theme = GuiTheme::Terminal;
             }
             GuiTheme::Ashes => {
-                load_style_from_memory(rl, ASHES_THEME_DATA);
+                rl.gui_load_style_from_memory(ASHES_THEME_DATA)?;
                 main_state.theme = GuiTheme::Ashes;
             }
             GuiTheme::Light => {
@@ -230,5 +201,6 @@ impl GuiTheme {
         main_state.colors.default_txt_color = Color::get_color(txt_color_int);
         main_state.colors.default_bg_color = Color::get_color(bg_color_int);
         main_state.current_font = rl.gui_get_font();
+        Ok(())
     }
 }
