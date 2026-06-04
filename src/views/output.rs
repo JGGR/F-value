@@ -121,7 +121,10 @@ impl View for ProduzioneOutputView {
             d.gui_unlock();
         }
 
-        d.gui_panel(rrect(panel_x, panel_y, panel_width, panel_height), "Output");
+        d.gui_panel(
+            rrect(panel_x, panel_y, panel_width, panel_height),
+            Some("Output"),
+        );
 
         let y_spacing = main_state.current_font_height + propwidth(d, 5);
         let output_start_y = panel_y + propwidth(d, 15);
