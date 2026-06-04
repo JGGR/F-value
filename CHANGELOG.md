@@ -1,3 +1,9 @@
+## [0.1.6-rc.1] - Unreleased
+
+### Changed
+
+- Bump `raylib` to `6.0.0`
+
 ## [0.1.5] - 2026-05-15
 
 ### Added

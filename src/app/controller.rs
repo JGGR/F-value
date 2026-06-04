@@ -25,6 +25,7 @@ use raylib::consts::GuiControl::DEFAULT;
 use raylib::consts::GuiControlProperty::TEXT_COLOR_NORMAL;
 use raylib::consts::GuiDefaultProperty::{BACKGROUND_COLOR, TEXT_SIZE, TEXT_SPACING};
 use raylib::consts::KeyboardKey::*;
+use raylib::prelude::RaylibGuiState;
 use raylib::RaylibHandle;
 use std::fs::File;
 use std::io::Write;

@@ -1,6 +1,6 @@
 [package]
 name = "f_value"
-version = "0.1.5"
+version = "0.1.6"
 edition = "2021"
 description = "Tool for NISECI and HFBI calc"
 license = "GPL-3.0-only"
@@ -28,7 +28,7 @@ locale_config = "0.3.0"
 miniz_oxide = "0.9.1"
 pdf-writer = "0.14.0"
 png = "0.18.1"
-raylib = { git = "https://github.com/raylib-rs/raylib-rs.git", features = [
+raylib = { version = "6.0.0", features = [
     "raygui",
 ] }
 rfd = { version = "0.17.2", default-features = false }
