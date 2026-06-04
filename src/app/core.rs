@@ -519,7 +519,12 @@ impl App {
         let mut main_actions = Vec::<MainAction>::new();
         while !self.main_state.should_quit {
             // Base update step
-            update_main(&mut self.rl, &mut main_actions, &mut self.main_state);
+            if let Err(load_style_error) =
+                update_main(&mut self.rl, &mut main_actions, &mut self.main_state)
+            {
+                eprintln!("Error while loading theme: {load_style_error}");
+                // TODO: print error in GUI console too and put user there?
+            }
 
             self.controllers.update(
                 &mut self.rl,

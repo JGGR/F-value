@@ -32,4 +32,3 @@ raylib = { version = "6.0.0", features = [
     "raygui",
 ] }
 rfd = { version = "0.17.2", default-features = false }
-uuid = { version = "1.23.1", features = ["v4"] }
