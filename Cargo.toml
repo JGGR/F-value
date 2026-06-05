@@ -18,10 +18,10 @@ rfd-gtk3 = ["rfd/gtk3"]
 rfd-xdg-portal = ["rfd/xdg-portal"]
 
 [build-dependencies]
-chrono = "0.4.39"
+chrono = "0.4.45"
 
 [dependencies]
-chrono = "0.4.44"
+chrono = "0.4.45"
 dirs = "6.0.0"
 esox = "0.1.6"
 locale_config = "0.3.0"
