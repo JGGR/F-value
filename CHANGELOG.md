@@ -6,6 +6,7 @@
   - Use `raylib::prelude::RaylibGuiState::gui_load_style_from_memory`
 - Bump `raylib` to `6.0.0`
 - Bump `pdf-writer` to `0.15.0`
+- Bump `chrono` to `0.4.45`
 - Drop `uuid` dep
 
 ## [0.1.5] - 2026-05-15
