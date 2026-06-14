@@ -8,6 +8,7 @@ include = [
     "src/*",
     "LICENSE",
     "assets",
+    "build.rs",
 ]
 
 [features]
