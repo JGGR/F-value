@@ -53,10 +53,10 @@ jobs:
     needs: build-debug
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Cache cargo
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             target
@@ -70,7 +70,7 @@ jobs:
         run: cargo build --release
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: f_value-release-linux
           path: target/release/f_value
@@ -84,10 +84,10 @@ jobs:
     needs: build-debug
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Cache cargo
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             target
@@ -101,7 +101,7 @@ jobs:
         run: cargo build --target x86_64-pc-windows-gnu
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: f_value-debug-windows
           path: target/x86_64-pc-windows-gnu/debug/f_value.exe
@@ -115,10 +115,10 @@ jobs:
     needs: crossbuild-debug
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Cache cargo
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             target
@@ -132,7 +132,7 @@ jobs:
         run: cargo build --target x86_64-pc-windows-gnu --release
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: f_value-release-windows
           path: target/x86_64-pc-windows-gnu/release/f_value.exe
