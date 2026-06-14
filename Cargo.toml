@@ -4,10 +4,10 @@ version = "0.1.6"
 edition = "2021"
 description = "Tool for NISECI and HFBI calc"
 license = "GPL-3.0-only"
-exclude = [
-    ".github/**",
+include = [
+    "src/*",
+    "LICENSE",
     "assets",
-    "templates",
 ]
 
 [features]
