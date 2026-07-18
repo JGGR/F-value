@@ -253,9 +253,9 @@ checksum = "877a4ace8713b0bcf2a4e7eec82529c029f1d0619886d18145fea96c3ffe5c0f"
 
 [[package]]
 name = "esox"
-version = "0.1.6"
+version = "0.1.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c2a264c149e5fa15ac77b008f27f03fd8aed6a7f9eb2c029d8007dd9626fe9ca"
+checksum = "fd84567aac8ad94e9e0c3a2d12fd9f04f62c4e6ef3185094b0a92e2d4d7b32b2"
 dependencies = [
  "chrono",
  "csv",
@@ -265,7 +265,7 @@ dependencies = [
 
 [[package]]
 name = "f_value"
-version = "0.1.6"
+version = "0.1.7"
 dependencies = [
  "chrono",
  "dirs",
