@@ -17,7 +17,6 @@
 use crate::app::core::{Action, Action::*, RegioneItaliana};
 use crate::app::model::Model;
 use crate::views::{propheight, propwidth, rrect, View};
-use crate::MainState;
 use esox::domain::{
     hfbi::{AnagraficaHFBIDraft, HabitatHFBI, StagioneHFBI, TipoLagunaCostieraHFBI},
     index::Indice,
@@ -69,9 +68,8 @@ impl View for SelezioneInfoAggiuntiveView {
         d: &mut RaylibDrawHandle,
         _thread: &RaylibThread,
         state: &Model,
-        main_state: &MainState,
     ) -> Vec<Action> {
-        self.draw_background(d, main_state);
+        self.draw_background(d, &state.app_model);
 
         let current_index = match state.indice_model.get_selected_index() {
             Some(index) => index,

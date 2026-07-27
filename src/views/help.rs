@@ -17,7 +17,6 @@
 use crate::app::core::{Action, Action::*};
 use crate::app::model::Model;
 use crate::views::{propheight, propwidth, rrect, View};
-use crate::MainState;
 use raylib::consts::GuiIconName::ICON_PLAYER_NEXT;
 use raylib::drawing::RaylibDrawHandle;
 use raylib::math::Vector2;
@@ -34,10 +33,9 @@ impl View for HelpView {
         &mut self,
         d: &mut RaylibDrawHandle,
         _thread: &RaylibThread,
-        _state: &Model,
-        main_state: &MainState,
+        state: &Model,
     ) -> Vec<Action> {
-        d.clear_background(main_state.colors.default_bg_color);
+        d.clear_background(state.app_model.colors.default_bg_color);
 
         let txt =
 "Fish-Value è un software sviluppato per supportare i professionisti e i tecnici ambientali
@@ -61,14 +59,14 @@ l'ittiofauna, per la determinazione della qualità ecologica dei corpi idrici.
         let txt_y = propheight(d, 70);
 
         d.draw_text_ex(
-            &main_state.current_font,
+            &state.app_model.current_font,
             &txt,
             // We use propwidth/height for the text starting position:
             // this is not the bound
             Vector2::new(txt_x as f32, txt_y as f32),
-            main_state.current_font_height as f32,
-            main_state.default_txt_spacing as f32,
-            main_state.colors.default_txt_color,
+            state.app_model.current_font_height as f32,
+            state.app_model.default_txt_spacing as f32,
+            state.app_model.colors.default_txt_color,
         );
 
         let continue_width = propwidth(d, 150);

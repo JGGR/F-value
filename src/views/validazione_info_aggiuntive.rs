@@ -17,7 +17,6 @@
 use crate::app::core::{Action, Action::*};
 use crate::app::model::Model;
 use crate::views::{propheight, propwidth, rrect, View};
-use crate::MainState;
 use raylib::consts::GuiIconName::ICON_CROSS;
 use raylib::drawing::RaylibDrawHandle;
 use raylib::prelude::*;
@@ -29,10 +28,9 @@ impl View for ValidazioneInfoAggiuntiveView {
         &mut self,
         d: &mut RaylibDrawHandle,
         _thread: &RaylibThread,
-        _state: &Model,
-        main_state: &MainState,
+        state: &Model,
     ) -> Vec<Action> {
-        self.draw_background(d, main_state);
+        self.draw_background(d, &state.app_model);
 
         let button_valida_width = propwidth(d, 200);
         let button_valida_x = d.get_screen_width() / 2 - button_valida_width / 2;

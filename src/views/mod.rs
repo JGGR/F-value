@@ -15,11 +15,13 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::app::core::{propheight, propwidth, Action, CurrentView, MainState};
-use crate::app::model::Model;
+use crate::app::core::{propheight, propwidth, Action, CurrentView};
+use crate::app::model::{AppModel, Model};
 use crate::core::rrect;
 use raylib::prelude::*;
 
+pub(crate) mod chrome;
+use chrome::ChromeView;
 pub(crate) mod home;
 use home::HomeView;
 pub(crate) mod help;
@@ -42,6 +44,7 @@ pub(crate) mod console;
 use console::ConsoleView;
 
 pub(crate) struct Views {
+    chrome_view: ChromeView,
     home_view: HomeView,
     help_view: HelpView,
     selezione_indice_view: SelezioneIndiceView,
@@ -62,6 +65,7 @@ impl Views {
         txt_spacing: i32,
     ) -> Self {
         Self {
+            chrome_view: ChromeView::new(),
             home_view: HomeView::new(),
             help_view: HelpView::new(),
             selezione_indice_view: SelezioneIndiceView::new(),
@@ -79,34 +83,29 @@ impl Views {
         d: &mut RaylibDrawHandle,
         thread: &RaylibThread,
         state: &Model,
-        main_state: &MainState,
     ) -> Vec<Action> {
-        match main_state.current_view {
-            CurrentView::Home => self.home_view.draw(d, thread, state, main_state),
-            CurrentView::Help => self.help_view.draw(d, thread, state, main_state),
-            CurrentView::SelezioneIndice => self
-                .selezione_indice_view
-                .draw(d, thread, state, main_state),
-            CurrentView::SelezioneFileInput => self
-                .selezione_fileinput_view
-                .draw(d, thread, state, main_state),
-            CurrentView::ValidazioneFileInput => self
-                .validazione_fileinput_view
-                .draw(d, thread, state, main_state),
-            CurrentView::SelezioneInfoAggiuntive => self
-                .selezione_infoaggiuntive_view
-                .draw(d, thread, state, main_state),
-            CurrentView::ValidazioneInfoAggiuntive => self
-                .validazione_infoaggiuntive_view
-                .draw(d, thread, state, main_state),
-            CurrentView::ProduzioneOutput => self
-                .produzione_output_view
-                .draw(d, thread, state, main_state),
-            CurrentView::ProduzionePDF => {
-                self.produzione_pdf_view.draw(d, thread, state, main_state)
+        let mut actions = match state.app_model.current_view {
+            CurrentView::Home => self.home_view.draw(d, thread, state),
+            CurrentView::Help => self.help_view.draw(d, thread, state),
+            CurrentView::SelezioneIndice => self.selezione_indice_view.draw(d, thread, state),
+            CurrentView::SelezioneFileInput => self.selezione_fileinput_view.draw(d, thread, state),
+            CurrentView::ValidazioneFileInput => {
+                self.validazione_fileinput_view.draw(d, thread, state)
             }
-            CurrentView::Console => self.console_view.draw(d, thread, state, main_state),
-        }
+            CurrentView::SelezioneInfoAggiuntive => {
+                self.selezione_infoaggiuntive_view.draw(d, thread, state)
+            }
+            CurrentView::ValidazioneInfoAggiuntive => {
+                self.validazione_infoaggiuntive_view.draw(d, thread, state)
+            }
+            CurrentView::ProduzioneOutput => self.produzione_output_view.draw(d, thread, state),
+            CurrentView::ProduzionePDF => self.produzione_pdf_view.draw(d, thread, state),
+            CurrentView::Console => self.console_view.draw(d, thread, state),
+        };
+        // Base draw step
+        // Render stuff not depending on view
+        actions.append(&mut self.chrome_view.draw(d, thread, state));
+        actions
     }
 }
 
@@ -116,10 +115,9 @@ pub(crate) trait View {
         d: &mut RaylibDrawHandle,
         _thread: &RaylibThread,
         state: &Model,
-        main_state: &MainState,
     ) -> Vec<Action>;
 
-    fn draw_background(&mut self, d: &mut RaylibDrawHandle, main_state: &MainState) {
+    fn draw_background(&mut self, d: &mut RaylibDrawHandle, main_state: &AppModel) {
         d.clear_background(main_state.colors.default_bg_color);
         let texture_target_width = d.get_screen_width();
         let texture_target_height = d.get_screen_height();

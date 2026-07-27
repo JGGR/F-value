@@ -20,7 +20,6 @@ use crate::app::model::{Model, SubModel};
 use crate::controllers::{Controller, CurrentView, OutputModel};
 use crate::core::pdf::{esporta_pdf_hfbi, esporta_pdf_niseci};
 use crate::core::{gen_logfile_name, CommaFormat};
-use crate::MainState;
 use dirs::document_dir;
 use esox::domain::hfbi::{AnagraficaHFBI, RisultatoHFBI, ValoriIntermediHFBI};
 use esox::domain::index::Indice;
@@ -51,23 +50,17 @@ use std::path::{Path, PathBuf};
 impl Controller for OutputController {
     type SubModel = OutputModel;
 
-    fn update(
-        &self,
-        _rl: &mut RaylibHandle,
-        state: &mut Model,
-        actions: &mut Vec<Action>,
-        main_state: &mut MainState,
-    ) {
+    fn update(&self, _rl: &mut RaylibHandle, state: &mut Model, actions: &mut Vec<Action>) {
         state.output_model.increment_frame_counter();
 
         if state.output_model.get_should_reset() {
-            main_state.showing_reset_win = true;
+            state.app_model.showing_reset_win = true;
             state.output_model.set_should_reset(false);
             return;
         }
-        if main_state.should_reset {
+        if state.app_model.should_reset {
             eprintln!("OutputController: Resetting");
-            main_state.should_reset = false;
+            state.app_model.should_reset = false;
             state.home_model.reset();
             state.second_model.reset();
             state.indice_model.reset();
@@ -76,73 +69,80 @@ impl Controller for OutputController {
             state.data_model.reset();
             state.output_model.reset();
             state.console_model.reset();
-            main_state.set_current_view(CurrentView::Home);
+            state.app_model.set_current_view(CurrentView::Home);
             return;
         }
 
         if state.data_model.get_errors_occurred() {
             eprintln!("OutputController:  Errors occurred");
             eprintln!("OutputController:  Let's update current view and go to CONSOLE.");
-            main_state.set_current_view(CurrentView::Console);
+            state.app_model.set_current_view(CurrentView::Console);
             eprintln!("OutputController:  Clearing error state");
             state.data_model.set_errors_occurred(false);
         }
 
-        for a in actions.drain(..) {
+        actions.retain(|a| {
             match a {
                 Action::RunCalc => {
                     if let Some(idx) = state.indice_model.get_selected_index() {
                         match idx {
                             Indice::Niseci => {
-                                self.calc_niseci(state, main_state.locale);
+                                self.calc_niseci(state, state.app_model.locale);
                             }
                             Indice::Hfbi => {
-                                self.calc_hfbi(state, main_state.locale);
+                                self.calc_hfbi(state, state.app_model.locale);
                             }
                         }
+                        false
                     } else {
                         eprintln!(
                             "OutputController:  Can't handle action {} without a selected index",
                             a
                         );
+                        true
                     }
                 }
                 Action::ConfirmCalc => {
                     self.user_confirm_calc(state);
+                    false
                 }
                 Action::ExportPdf(path) => {
                     if let Some(idx) = state.indice_model.get_selected_index() {
                         match idx {
                             Indice::Niseci => {
-                                self.esporta_pdf_niseci(state, path);
+                                self.esporta_pdf_niseci(state, path.to_path_buf());
                             }
                             Indice::Hfbi => {
-                                self.esporta_pdf_hfbi(state, path);
+                                self.esporta_pdf_hfbi(state, path.to_path_buf());
                             }
                         }
+                        false
                     } else {
                         eprintln!(
                             "OutputController:  Can't handle action pdf export without a selected index"
 
                         );
+                        true
                     }
                 }
                 Action::Reset => {
                     self.prompt_reset(state);
+                    false
                 }
                 _ => {
                     println!("OutputController:  Got action {}", a);
+                    true
                 }
             }
-        }
-        match main_state.current_view {
+        });
+        match state.app_model.current_view {
             CurrentView::ProduzioneOutput => {
                 if state.output_model.is_done_user_confirm() {
                     eprintln!("OutputController:  User confirmed");
                     eprintln!(
                         "OutputController:  Let's update current view and go to ProduzionePDF."
                     );
-                    main_state.set_current_view(CurrentView::ProduzionePDF);
+                    state.app_model.set_current_view(CurrentView::ProduzionePDF);
                 }
             }
             CurrentView::ProduzionePDF => {}

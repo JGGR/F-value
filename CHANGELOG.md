@@ -1,3 +1,9 @@
+## [0.1.8] - Unreleased
+
+### Added
+
+- Handle style load error by going to `Console` view
+
 ## [0.1.7] - 2026-07-18
 
 ### Changed

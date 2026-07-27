@@ -17,7 +17,6 @@
 use crate::app::core::{Action, Action::*};
 use crate::app::model::Model;
 use crate::views::{propheight, propwidth, rrect, View};
-use crate::MainState;
 use esox::domain::index::Indice;
 use raylib::consts::GuiIconName::{ICON_BIN, ICON_FILE_OPEN};
 use raylib::drawing::RaylibDrawHandle;
@@ -32,9 +31,8 @@ impl View for SelezioneFileInputView {
         d: &mut RaylibDrawHandle,
         _thread: &RaylibThread,
         state: &Model,
-        main_state: &MainState,
     ) -> Vec<Action> {
-        self.draw_background(d, main_state);
+        self.draw_background(d, &state.app_model);
 
         let current_index = match state.indice_model.get_selected_index() {
             Some(index) => index,

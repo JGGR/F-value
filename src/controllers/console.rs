@@ -18,23 +18,16 @@ pub(crate) struct ConsoleController;
 use crate::app::core::Action;
 use crate::app::model::{Model, SubModel};
 use crate::controllers::{ConsoleModel, Controller, CurrentView};
-use crate::MainState;
 use raylib::consts::KeyboardKey::*;
 use raylib::RaylibHandle;
 
 impl Controller for ConsoleController {
     type SubModel = ConsoleModel;
 
-    fn update(
-        &self,
-        rl: &mut RaylibHandle,
-        state: &mut Model,
-        actions: &mut Vec<Action>,
-        main_state: &mut MainState,
-    ) {
-        if main_state.should_reset {
+    fn update(&self, rl: &mut RaylibHandle, state: &mut Model, actions: &mut Vec<Action>) {
+        if state.app_model.should_reset {
             eprintln!("ConsoleController: Resetting");
-            main_state.should_reset = false;
+            state.app_model.should_reset = false;
             state.home_model.reset();
             state.second_model.reset();
             state.indice_model.reset();
@@ -43,27 +36,27 @@ impl Controller for ConsoleController {
             state.data_model.reset();
             state.output_model.reset();
             state.console_model.reset();
-            main_state.set_current_view(CurrentView::Home);
+            state.app_model.set_current_view(CurrentView::Home);
             return;
         }
 
         if state.console_model.should_backout() {
             state.console_model.set_should_backout(false);
-            let prev = main_state.previous_view;
-            main_state.set_current_view(prev);
+            let prev = state.app_model.previous_view;
+            state.app_model.set_current_view(prev);
             return;
         }
 
-        for a in actions.drain(..) {
-            match a {
-                Action::ConsoleBackout => {
-                    self.backout(state);
-                }
-                _ => {
-                    println!("ConsoleController: Got action {}", a);
-                }
+        actions.retain(|a| match a {
+            Action::ConsoleBackout => {
+                self.backout(state);
+                false
             }
-        }
+            _ => {
+                println!("ConsoleController: Got action {}", a);
+                true
+            }
+        });
 
         // Handle input
 

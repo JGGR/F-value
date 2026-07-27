@@ -18,7 +18,6 @@ use crate::app::core::{Action, Action::*};
 use crate::app::model::Model;
 use crate::core::{ESOX_LESSCLONE_BACKEND, RFD_BACKEND, SHORT_PROJECT_VERSION};
 use crate::views::{propheight, propwidth, rrect, View};
-use crate::MainState;
 use raylib::color::Color;
 use raylib::consts::GuiIconName::{ICON_INFO, ICON_PLAYER_NEXT};
 use raylib::drawing::RaylibDrawHandle;
@@ -33,16 +32,15 @@ impl View for HomeView {
         &mut self,
         d: &mut RaylibDrawHandle,
         _thread: &RaylibThread,
-        _state: &Model,
-        main_state: &MainState,
+        state: &Model,
     ) -> Vec<Action> {
-        self.draw_background(d, main_state);
+        self.draw_background(d, &state.app_model);
 
         let logo_texture_target_width = propwidth(d, 154);
         let logo_texture_target_height = propheight(d, 154);
         let logo_texture_target_x = d.get_screen_width() / 2 - logo_texture_target_width / 2;
         let logo_texture_target_y = propheight(d, 100);
-        if let Some(ref texture) = main_state.textures.logo_texture {
+        if let Some(ref texture) = state.app_model.textures.logo_texture {
             d.draw_texture_pro(
                 texture,
                 Rectangle {
@@ -70,7 +68,7 @@ impl View for HomeView {
             d.get_screen_width() / 2 - logo_name_texture_target_width / 2;
         let logo_name_texture_target_y =
             logo_texture_target_y + logo_texture_target_height + propheight(d, 10);
-        if let Some(ref texture) = main_state.textures.logo_name_texture {
+        if let Some(ref texture) = state.app_model.textures.logo_name_texture {
             d.draw_texture_pro(
                 texture,
                 Rectangle {
@@ -104,25 +102,25 @@ impl View for HomeView {
             ESOX_LESSCLONE_BACKEND
         );
 
-        let label_version_txt_bounds = main_state.current_font.measure_text(
+        let label_version_txt_bounds = state.app_model.current_font.measure_text(
             &label_version_txt,
-            main_state.current_font_height as f32,
-            main_state.default_txt_spacing as f32,
+            state.app_model.current_font_height as f32,
+            state.app_model.default_txt_spacing as f32,
         );
-        let label_target_txt_bounds = main_state.current_font.measure_text(
+        let label_target_txt_bounds = state.app_model.current_font.measure_text(
             &label_target_txt,
-            main_state.current_font_height as f32,
-            main_state.default_txt_spacing as f32,
+            state.app_model.current_font_height as f32,
+            state.app_model.default_txt_spacing as f32,
         );
-        let label_rfd_backend_txt_bounds = main_state.current_font.measure_text(
+        let label_rfd_backend_txt_bounds = state.app_model.current_font.measure_text(
             &label_rfd_backend_txt,
-            main_state.current_font_height as f32,
-            main_state.default_txt_spacing as f32,
+            state.app_model.current_font_height as f32,
+            state.app_model.default_txt_spacing as f32,
         );
-        let label_esox_backend_txt_bounds = main_state.current_font.measure_text(
+        let label_esox_backend_txt_bounds = state.app_model.current_font.measure_text(
             &label_esox_backend_txt,
-            main_state.current_font_height as f32,
-            main_state.default_txt_spacing as f32,
+            state.app_model.current_font_height as f32,
+            state.app_model.default_txt_spacing as f32,
         );
         let labels_width = propwidth(d, 25)
             + max(

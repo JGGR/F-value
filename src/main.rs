@@ -24,7 +24,7 @@ mod controllers;
 mod core;
 mod views;
 
-use crate::app::core::{App, MainState};
+use crate::app::core::App;
 use crate::args::handle_args;
 
 fn main() {

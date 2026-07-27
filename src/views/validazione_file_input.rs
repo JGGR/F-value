@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-use crate::app::core::{Action, Action::*, MainState};
+use crate::app::core::{Action, Action::*};
 use crate::app::model::Model;
 use crate::views::{propheight, propwidth, rrect, View};
 use esox::domain::index::Indice;
@@ -31,9 +31,8 @@ impl View for ValidazioneFileInputView {
         d: &mut RaylibDrawHandle,
         _thread: &RaylibThread,
         state: &Model,
-        main_state: &MainState,
     ) -> Vec<Action> {
-        self.draw_background(d, main_state);
+        self.draw_background(d, &state.app_model);
 
         let current_index = match state.indice_model.get_selected_index() {
             Some(index) => index,

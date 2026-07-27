@@ -15,13 +15,13 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use super::core::{
-    propheight, propwidth, Action, Action::*, CurrentView, GuiTheme, Localize, MainState,
-};
+use crate::app::core::{propheight, propwidth, Action, Action::*, CurrentView, GuiTheme, Localize};
+use crate::app::model::{AppModel, Model};
 use crate::core::{
     is_holiday, rrect, AUTHOR_GIONINJO, AUTHOR_GIONINJO_LINK, AUTHOR_JGABAUT, AUTHOR_JGABAUT_LINK,
     COPYRIGHT_INFO, SHORT_PROJECT_VERSION,
 };
+use crate::views::View;
 use raylib::consts::GuiIconName::*;
 use raylib::prelude::*;
 
@@ -459,7 +459,7 @@ pub(crate) fn draw_info_box(
 
 pub(crate) fn draw_settings_box(
     d: &mut RaylibDrawHandle,
-    main_state: &MainState,
+    main_state: &AppModel,
     actions: &mut Vec<Action>,
 ) {
     if main_state.showing_settings_box {
@@ -617,252 +617,267 @@ pub(crate) fn draw_settings_box(
     }
 }
 
-pub(crate) fn draw_main(d: &mut RaylibDrawHandle, main_state: &MainState) -> Vec<Action> {
-    let mut actions = Vec::<Action>::new();
-    let lock_gui = main_state.get_gui_should_lock();
+pub(crate) struct ChromeView;
 
-    if lock_gui {
-        d.gui_lock();
-    }
+impl View for ChromeView {
+    fn draw(
+        &mut self,
+        d: &mut RaylibDrawHandle,
+        _thread: &RaylibThread,
+        state: &Model,
+    ) -> Vec<Action> {
+        let mut actions = Vec::<Action>::new();
+        let lock_gui = state.app_model.get_gui_should_lock();
 
-    let status_bar_height = propheight(d, 35);
-    let status_bar_width = d.get_screen_width();
-    let status_bar_x = 0;
-    let status_bar_y = d.get_screen_height() - status_bar_height;
+        if lock_gui {
+            d.gui_lock();
+        }
 
-    let current_view_name = main_state.current_view.to_string();
+        let status_bar_height = propheight(d, 35);
+        let status_bar_width = d.get_screen_width();
+        let status_bar_x = 0;
+        let status_bar_y = d.get_screen_height() - status_bar_height;
 
-    let status_bar_txt = current_view_name;
+        let current_view_name = state.app_model.current_view.to_string();
 
-    d.gui_status_bar(
-        rrect(
-            status_bar_x,
-            status_bar_y,
-            status_bar_width,
-            status_bar_height,
-        ),
-        status_bar_txt.as_str(),
-    );
+        let status_bar_txt = current_view_name;
 
-    let navbar_height = status_bar_height;
-    let navbar_width = status_bar_width;
-    let navbar_x = 0;
-    let navbar_y = 0;
-
-    let core_button_width = propwidth(d, 25);
-    let core_button_heigth = core_button_width;
-    let core_buttons_count = 5;
-    let core_buttons_x_padding = propwidth(d, 5);
-    let core_buttons_y_padding = core_buttons_x_padding;
-    let core_buttons_panel_height = navbar_height;
-    let core_buttons_panel_y = navbar_y;
-    let core_buttons_panel_width = (core_buttons_count * core_button_width)
-        + ((1 + core_buttons_count) * core_buttons_x_padding);
-    let core_buttons_panel_x = d.get_screen_width() - core_buttons_panel_width;
-
-    d.draw_rectangle(
-        navbar_x,
-        navbar_y,
-        navbar_width,
-        navbar_height,
-        main_state.colors.default_bg_color,
-    );
-    // When raylib-rs 5.5.x includes the fix to handle ""
-    // in gui_panel() as per 5.0.x, we could go back to using gui_panel instead
-    let panels_line_thickness = 1.0;
-    d.draw_rectangle_lines_ex(
-        rrect(navbar_x, navbar_y, navbar_width, navbar_height),
-        panels_line_thickness,
-        main_state.colors.default_txt_color,
-    );
-    d.draw_rectangle_lines_ex(
-        rrect(
-            core_buttons_panel_x,
-            core_buttons_panel_y,
-            core_buttons_panel_width,
-            core_buttons_panel_height,
-        ),
-        panels_line_thickness,
-        main_state.colors.default_txt_color,
-    );
-
-    if is_holiday() {
-        Rainbow::new(main_state.frame_counter, 0.05).draw_text(
-            d,
-            Vector2::new(
-                propwidth(d, 120) as f32,
-                (navbar_height - main_state.current_font_height) as f32 * 0.5,
+        d.gui_status_bar(
+            rrect(
+                status_bar_x,
+                status_bar_y,
+                status_bar_width,
+                status_bar_height,
             ),
-            "F-value",
-            &main_state.current_font,
-            main_state.default_txt_spacing,
-            main_state.current_font_height,
+            status_bar_txt.as_str(),
         );
-    }
 
-    let info_button_width = core_button_width;
-    let info_button_x = core_buttons_panel_x + core_buttons_x_padding;
-    let info_button_height = core_button_heigth;
-    let info_button_y = core_buttons_panel_y + core_buttons_y_padding;
+        let navbar_height = status_bar_height;
+        let navbar_width = status_bar_width;
+        let navbar_x = 0;
+        let navbar_y = 0;
 
-    // Info button
-    let itext = d.gui_icon_text(ICON_INFO, "");
-    if d.gui_button(
-        rrect(
-            info_button_x,
-            info_button_y,
-            info_button_width,
-            info_button_height,
-        ),
-        itext.as_str(),
-    ) {
-        actions.push(ShowInfo);
-    }
+        let core_button_width = propwidth(d, 25);
+        let core_button_heigth = core_button_width;
+        let core_buttons_count = 5;
+        let core_buttons_x_padding = propwidth(d, 5);
+        let core_buttons_y_padding = core_buttons_x_padding;
+        let core_buttons_panel_height = navbar_height;
+        let core_buttons_panel_y = navbar_y;
+        let core_buttons_panel_width = (core_buttons_count * core_button_width)
+            + ((1 + core_buttons_count) * core_buttons_x_padding);
+        let core_buttons_panel_x = d.get_screen_width() - core_buttons_panel_width;
 
-    let reset_button_width = core_button_width;
-    let reset_button_x = info_button_x + info_button_width + core_buttons_x_padding;
-    let reset_button_height = info_button_height;
-    let reset_button_y = info_button_y;
+        d.draw_rectangle(
+            navbar_x,
+            navbar_y,
+            navbar_width,
+            navbar_height,
+            state.app_model.colors.default_bg_color,
+        );
+        // When raylib-rs 5.5.x includes the fix to handle ""
+        // in gui_panel() as per 5.0.x, we could go back to using gui_panel instead
+        let panels_line_thickness = 1.0;
+        d.draw_rectangle_lines_ex(
+            rrect(navbar_x, navbar_y, navbar_width, navbar_height),
+            panels_line_thickness,
+            state.app_model.colors.default_txt_color,
+        );
+        d.draw_rectangle_lines_ex(
+            rrect(
+                core_buttons_panel_x,
+                core_buttons_panel_y,
+                core_buttons_panel_width,
+                core_buttons_panel_height,
+            ),
+            panels_line_thickness,
+            state.app_model.colors.default_txt_color,
+        );
 
-    // Reset button
-    let itext = d.gui_icon_text(ICON_RESTART, "");
-    if d.gui_button(
-        rrect(
-            reset_button_x,
-            reset_button_y,
-            reset_button_width,
-            reset_button_height,
-        ),
-        itext.as_str(),
-    ) {
-        actions.push(ShowReset);
-    }
+        if is_holiday() {
+            Rainbow::new(state.app_model.frame_counter, 0.05).draw_text(
+                d,
+                Vector2::new(
+                    propwidth(d, 120) as f32,
+                    (navbar_height - state.app_model.current_font_height) as f32 * 0.5,
+                ),
+                "F-value",
+                &state.app_model.current_font,
+                state.app_model.default_txt_spacing,
+                state.app_model.current_font_height,
+            );
+        }
 
-    // License button
-    let license_button_width = reset_button_width;
-    let license_button_x = reset_button_x + reset_button_width + core_buttons_x_padding;
-    let license_button_height = reset_button_height;
-    let license_button_y = reset_button_y;
-    let itext = d.gui_icon_text(ICON_TEXT_NOTES, "");
-    if d.gui_button(
-        rrect(
-            license_button_x,
-            license_button_y,
-            license_button_width,
-            license_button_height,
-        ),
-        itext.as_str(),
-    ) {
-        actions.push(ShowLicense);
-    }
+        let info_button_width = core_button_width;
+        let info_button_x = core_buttons_panel_x + core_buttons_x_padding;
+        let info_button_height = core_button_heigth;
+        let info_button_y = core_buttons_panel_y + core_buttons_y_padding;
 
-    let settings_button_width = license_button_width;
-    let settings_button_x = license_button_x + license_button_width + core_buttons_x_padding;
-    let settings_button_height = license_button_height;
-    let settings_button_y = license_button_y;
+        // Info button
+        let itext = d.gui_icon_text(ICON_INFO, "");
+        if d.gui_button(
+            rrect(
+                info_button_x,
+                info_button_y,
+                info_button_width,
+                info_button_height,
+            ),
+            itext.as_str(),
+        ) {
+            actions.push(ShowInfo);
+        }
 
-    // Settings button
-    let itext = d.gui_icon_text(ICON_GEAR, "");
-    if d.gui_button(
-        rrect(
-            settings_button_x,
-            settings_button_y,
-            settings_button_width,
-            settings_button_height,
-        ),
-        itext.as_str(),
-    ) {
-        actions.push(OpenSettings);
-    }
+        let reset_button_width = core_button_width;
+        let reset_button_x = info_button_x + info_button_width + core_buttons_x_padding;
+        let reset_button_height = info_button_height;
+        let reset_button_y = info_button_y;
 
-    let console_button_width = settings_button_width;
-    let console_button_x = settings_button_x + settings_button_width + core_buttons_x_padding;
-    let console_button_height = settings_button_height;
-    let console_button_y = settings_button_y;
+        // Reset button
+        let itext = d.gui_icon_text(ICON_RESTART, "");
+        if d.gui_button(
+            rrect(
+                reset_button_x,
+                reset_button_y,
+                reset_button_width,
+                reset_button_height,
+            ),
+            itext.as_str(),
+        ) {
+            actions.push(ShowReset);
+        }
 
-    // "Console view" button
-    let itext = d.gui_icon_text(ICON_MONITOR, "");
-    if d.gui_button(
-        rrect(
-            console_button_x,
-            console_button_y,
-            console_button_width,
-            console_button_height,
-        ),
-        itext.as_str(),
-    ) {
-        match main_state.current_view {
-            CurrentView::Console => {
-                actions.push(CloseConsole);
-            }
-            _ => {
-                actions.push(ShowConsole);
+        // License button
+        let license_button_width = reset_button_width;
+        let license_button_x = reset_button_x + reset_button_width + core_buttons_x_padding;
+        let license_button_height = reset_button_height;
+        let license_button_y = reset_button_y;
+        let itext = d.gui_icon_text(ICON_TEXT_NOTES, "");
+        if d.gui_button(
+            rrect(
+                license_button_x,
+                license_button_y,
+                license_button_width,
+                license_button_height,
+            ),
+            itext.as_str(),
+        ) {
+            actions.push(ShowLicense);
+        }
+
+        let settings_button_width = license_button_width;
+        let settings_button_x = license_button_x + license_button_width + core_buttons_x_padding;
+        let settings_button_height = license_button_height;
+        let settings_button_y = license_button_y;
+
+        // Settings button
+        let itext = d.gui_icon_text(ICON_GEAR, "");
+        if d.gui_button(
+            rrect(
+                settings_button_x,
+                settings_button_y,
+                settings_button_width,
+                settings_button_height,
+            ),
+            itext.as_str(),
+        ) {
+            actions.push(OpenSettings);
+        }
+
+        let console_button_width = settings_button_width;
+        let console_button_x = settings_button_x + settings_button_width + core_buttons_x_padding;
+        let console_button_height = settings_button_height;
+        let console_button_y = settings_button_y;
+
+        // "Console view" button
+        let itext = d.gui_icon_text(ICON_MONITOR, "");
+        if d.gui_button(
+            rrect(
+                console_button_x,
+                console_button_y,
+                console_button_width,
+                console_button_height,
+            ),
+            itext.as_str(),
+        ) {
+            match state.app_model.current_view {
+                CurrentView::Console => {
+                    actions.push(CloseConsole);
+                }
+                _ => {
+                    actions.push(ShowConsole);
+                }
             }
         }
-    }
 
-    if lock_gui && main_state.showing_settings_box {
-        d.gui_unlock();
-    }
-    draw_settings_box(d, main_state, &mut actions);
-    if lock_gui && main_state.showing_settings_box {
-        d.gui_lock();
-    }
+        if lock_gui && state.app_model.showing_settings_box {
+            d.gui_unlock();
+        }
+        draw_settings_box(d, &state.app_model, &mut actions);
+        if lock_gui && state.app_model.showing_settings_box {
+            d.gui_lock();
+        }
 
-    if lock_gui && main_state.showing_info_box {
-        d.gui_unlock();
-    }
-    let showing_info_box = main_state.showing_info_box;
-    draw_info_box(
-        d,
-        &showing_info_box,
-        &main_state.current_font,
-        main_state.default_txt_spacing,
-        main_state.colors.default_txt_color,
-        main_state.current_font_height,
-        &mut actions,
-    );
-    if lock_gui && main_state.showing_info_box {
-        d.gui_lock();
-    }
+        if lock_gui && state.app_model.showing_info_box {
+            d.gui_unlock();
+        }
+        let showing_info_box = state.app_model.showing_info_box;
+        draw_info_box(
+            d,
+            &showing_info_box,
+            &state.app_model.current_font,
+            state.app_model.default_txt_spacing,
+            state.app_model.colors.default_txt_color,
+            state.app_model.current_font_height,
+            &mut actions,
+        );
+        if lock_gui && state.app_model.showing_info_box {
+            d.gui_lock();
+        }
 
-    if lock_gui && main_state.showing_license_box {
-        d.gui_unlock();
-    }
-    let showing_license_box = main_state.showing_license_box;
-    draw_license_box(
-        d,
-        &showing_license_box,
-        &main_state.current_font,
-        main_state.default_txt_spacing,
-        main_state.current_font_height,
-        &mut actions,
-    );
-    if lock_gui && main_state.showing_license_box {
-        d.gui_lock();
-    }
+        if lock_gui && state.app_model.showing_license_box {
+            d.gui_unlock();
+        }
+        let showing_license_box = state.app_model.showing_license_box;
+        draw_license_box(
+            d,
+            &showing_license_box,
+            &state.app_model.current_font,
+            state.app_model.default_txt_spacing,
+            state.app_model.current_font_height,
+            &mut actions,
+        );
+        if lock_gui && state.app_model.showing_license_box {
+            d.gui_lock();
+        }
 
-    if lock_gui && main_state.showing_quit_win {
-        d.gui_unlock();
-    }
-    let showing_quit_win = main_state.showing_quit_win;
-    draw_quit_win(d, &showing_quit_win, &mut actions);
-    if lock_gui && main_state.showing_quit_win {
-        d.gui_lock();
-    }
+        if lock_gui && state.app_model.showing_quit_win {
+            d.gui_unlock();
+        }
+        let showing_quit_win = state.app_model.showing_quit_win;
+        draw_quit_win(d, &showing_quit_win, &mut actions);
+        if lock_gui && state.app_model.showing_quit_win {
+            d.gui_lock();
+        }
 
-    if lock_gui && main_state.showing_reset_win {
-        d.gui_unlock();
-    }
-    let showing_reset_win = main_state.showing_reset_win;
-    draw_reset_win(d, &showing_reset_win, &mut actions);
-    if lock_gui && main_state.showing_reset_win {
-        d.gui_lock();
-    }
+        if lock_gui && state.app_model.showing_reset_win {
+            d.gui_unlock();
+        }
+        let showing_reset_win = state.app_model.showing_reset_win;
+        draw_reset_win(d, &showing_reset_win, &mut actions);
+        if lock_gui && state.app_model.showing_reset_win {
+            d.gui_lock();
+        }
 
-    if lock_gui {
-        d.gui_unlock();
-    }
+        if lock_gui {
+            d.gui_unlock();
+        }
 
-    actions
+        actions
+    }
+}
+
+impl ChromeView {
+    pub(crate) fn new() -> Self {
+        Self {}
+    }
 }

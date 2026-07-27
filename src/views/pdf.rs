@@ -18,7 +18,6 @@ use crate::app::core::{Action, Action::*};
 use crate::app::model::Model;
 use crate::views::GuiIconName::ICON_RESTART;
 use crate::views::{propheight, propwidth, rrect, View};
-use crate::MainState;
 use raylib::consts::GuiState::{STATE_DISABLED, STATE_NORMAL};
 use raylib::drawing::RaylibDrawHandle;
 use raylib::prelude::*;
@@ -32,9 +31,8 @@ impl View for ProduzionePDFView {
         d: &mut RaylibDrawHandle,
         _thread: &RaylibThread,
         state: &Model,
-        main_state: &MainState,
     ) -> Vec<Action> {
-        self.draw_background(d, main_state);
+        self.draw_background(d, &state.app_model);
 
         let button_esporta_width = propwidth(d, 200);
         let button_esporta_x = d.get_screen_width() / 2 - button_esporta_width / 2;

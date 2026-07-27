@@ -17,7 +17,6 @@
 use crate::app::core::{Action, Action::*};
 use crate::app::model::Model;
 use crate::views::{propheight, propwidth, rrect, View};
-use crate::MainState;
 use esox::domain::index::Indice;
 use raylib::drawing::RaylibDrawHandle;
 use raylib::prelude::*;
@@ -29,10 +28,9 @@ impl View for SelezioneIndiceView {
         &mut self,
         d: &mut RaylibDrawHandle,
         _thread: &RaylibThread,
-        _state: &Model,
-        main_state: &MainState,
+        state: &Model,
     ) -> Vec<Action> {
-        self.draw_background(d, main_state);
+        self.draw_background(d, &state.app_model);
         let button_niseci_width = propwidth(d, 200);
         let button_niseci_x = d.get_screen_width() / 2 - button_niseci_width / 2;
         let button_niseci_height = propwidth(d, 50);
