@@ -17,7 +17,6 @@
 use crate::app::core::{Action, Action::*};
 use crate::app::model::Model;
 use crate::views::{propheight, propwidth, rrect, View};
-use crate::MainState;
 use esox::domain::index::Indice;
 use raylib::consts::GuiIconName::ICON_OK_TICK;
 use raylib::consts::GuiState::{STATE_DISABLED, STATE_NORMAL};
@@ -32,9 +31,8 @@ impl View for ProduzioneOutputView {
         d: &mut RaylibDrawHandle,
         _thread: &RaylibThread,
         state: &Model,
-        main_state: &MainState,
     ) -> Vec<Action> {
-        self.draw_background(d, main_state);
+        self.draw_background(d, &state.app_model);
 
         let current_index = match state.indice_model.get_selected_index() {
             Some(index) => index,
@@ -126,7 +124,7 @@ impl View for ProduzioneOutputView {
             Some("Output"),
         );
 
-        let y_spacing = main_state.current_font_height + propwidth(d, 5);
+        let y_spacing = state.app_model.current_font_height + propwidth(d, 5);
         let output_start_y = panel_y + propwidth(d, 15);
 
         match current_index {
@@ -148,7 +146,7 @@ impl View for ProduzioneOutputView {
                 };
                 let niseci_line = format!("NISECI: {}", niseci_str);
                 d.draw_text_ex(
-                    &main_state.current_font,
+                    &state.app_model.current_font,
                     &niseci_line,
                     // We use propwidth/height for the text starting position:
                     // this is not the bound
@@ -156,9 +154,9 @@ impl View for ProduzioneOutputView {
                         (panel_x + propwidth(d, 25)) as f32,
                         (output_start_y + (y_spacing)) as f32,
                     ),
-                    main_state.current_font_height as f32,
-                    main_state.default_txt_spacing as f32,
-                    main_state.colors.default_txt_color,
+                    state.app_model.current_font_height as f32,
+                    state.app_model.default_txt_spacing as f32,
+                    state.app_model.colors.default_txt_color,
                 );
                 let rqe_niseci_opt = state.data_model.get_rqe_niseci_value();
                 let rqe_niseci_str = match rqe_niseci_opt {
@@ -175,7 +173,7 @@ impl View for ProduzioneOutputView {
                 };
                 let rqe_line = format!("RQE NISECI: {}", rqe_niseci_str);
                 d.draw_text_ex(
-                    &main_state.current_font,
+                    &state.app_model.current_font,
                     &rqe_line,
                     // We use propwidth/height for the text starting position:
                     // this is not the bound
@@ -183,9 +181,9 @@ impl View for ProduzioneOutputView {
                         (panel_x + propwidth(d, 25)) as f32,
                         (output_start_y + (y_spacing * 2)) as f32,
                     ),
-                    main_state.current_font_height as f32,
-                    main_state.default_txt_spacing as f32,
-                    main_state.colors.default_txt_color,
+                    state.app_model.current_font_height as f32,
+                    state.app_model.default_txt_spacing as f32,
+                    state.app_model.colors.default_txt_color,
                 );
                 let stato_eco_niseci_opt = state.data_model.get_stato_eco_niseci_value(state);
                 let stato_eco_niseci_str = match stato_eco_niseci_opt {
@@ -202,7 +200,7 @@ impl View for ProduzioneOutputView {
                 };
                 let stato_eco_line = format!("STATO ECOLOGICO NISECI: {}", stato_eco_niseci_str);
                 d.draw_text_ex(
-                    &main_state.current_font,
+                    &state.app_model.current_font,
                     &stato_eco_line,
                     // We use propwidth/height for the text starting position:
                     // this is not the bound
@@ -210,9 +208,9 @@ impl View for ProduzioneOutputView {
                         (panel_x + propwidth(d, 25)) as f32,
                         (output_start_y + (y_spacing * 3)) as f32,
                     ),
-                    main_state.current_font_height as f32,
-                    main_state.default_txt_spacing as f32,
-                    main_state.colors.default_txt_color,
+                    state.app_model.current_font_height as f32,
+                    state.app_model.default_txt_spacing as f32,
+                    state.app_model.colors.default_txt_color,
                 );
 
                 let x1_opt = state.data_model.get_x1_value();
@@ -230,7 +228,7 @@ impl View for ProduzioneOutputView {
                 };
                 let x1_line = format!("X1: {}", x1_str);
                 d.draw_text_ex(
-                    &main_state.current_font,
+                    &state.app_model.current_font,
                     &x1_line,
                     // We use propwidth/height for the text starting position:
                     // this is not the bound
@@ -238,9 +236,9 @@ impl View for ProduzioneOutputView {
                         (panel_x + propwidth(d, 25)) as f32,
                         (output_start_y + (y_spacing * 4)) as f32,
                     ),
-                    main_state.current_font_height as f32,
-                    main_state.default_txt_spacing as f32,
-                    main_state.colors.default_txt_color,
+                    state.app_model.current_font_height as f32,
+                    state.app_model.default_txt_spacing as f32,
+                    state.app_model.colors.default_txt_color,
                 );
 
                 let x2_opt = state.data_model.get_x2_value();
@@ -258,7 +256,7 @@ impl View for ProduzioneOutputView {
                 };
                 let x2_line = format!("X2: {}", x2_str);
                 d.draw_text_ex(
-                    &main_state.current_font,
+                    &state.app_model.current_font,
                     &x2_line,
                     // We use propwidth/height for the text starting position:
                     // this is not the bound
@@ -266,9 +264,9 @@ impl View for ProduzioneOutputView {
                         (panel_x + propwidth(d, 25)) as f32,
                         (output_start_y + (y_spacing * 5)) as f32,
                     ),
-                    main_state.current_font_height as f32,
-                    main_state.default_txt_spacing as f32,
-                    main_state.colors.default_txt_color,
+                    state.app_model.current_font_height as f32,
+                    state.app_model.default_txt_spacing as f32,
+                    state.app_model.colors.default_txt_color,
                 );
 
                 let x3_opt = state.data_model.get_x3_value();
@@ -286,7 +284,7 @@ impl View for ProduzioneOutputView {
                 };
                 let x3_line = format!("X3: {}", x3_str);
                 d.draw_text_ex(
-                    &main_state.current_font,
+                    &state.app_model.current_font,
                     &x3_line,
                     // We use propwidth/height for the text starting position:
                     // this is not the bound
@@ -294,9 +292,9 @@ impl View for ProduzioneOutputView {
                         (panel_x + propwidth(d, 25)) as f32,
                         (output_start_y + (y_spacing * 6)) as f32,
                     ),
-                    main_state.current_font_height as f32,
-                    main_state.default_txt_spacing as f32,
-                    main_state.colors.default_txt_color,
+                    state.app_model.current_font_height as f32,
+                    state.app_model.default_txt_spacing as f32,
+                    state.app_model.colors.default_txt_color,
                 );
             }
             Indice::Hfbi => {
@@ -317,7 +315,7 @@ impl View for ProduzioneOutputView {
                 };
                 let hfbi_line = format!("HFBI: {}", hfbi_str);
                 d.draw_text_ex(
-                    &main_state.current_font,
+                    &state.app_model.current_font,
                     &hfbi_line,
                     // We use propwidth/height for the text starting position:
                     // this is not the bound
@@ -325,9 +323,9 @@ impl View for ProduzioneOutputView {
                         (panel_x + propwidth(d, 25)) as f32,
                         (output_start_y + (y_spacing)) as f32,
                     ),
-                    main_state.current_font_height as f32,
-                    main_state.default_txt_spacing as f32,
-                    main_state.colors.default_txt_color,
+                    state.app_model.current_font_height as f32,
+                    state.app_model.default_txt_spacing as f32,
+                    state.app_model.colors.default_txt_color,
                 );
                 let data_res_opt = state.data_model.get_risultato_hfbi();
                 let mmi_str = match data_res_opt {
@@ -346,7 +344,7 @@ impl View for ProduzioneOutputView {
                 };
                 let mmi_line = format!("MMI: {}", mmi_str);
                 d.draw_text_ex(
-                    &main_state.current_font,
+                    &state.app_model.current_font,
                     &mmi_line,
                     // We use propwidth/height for the text starting position:
                     // this is not the bound
@@ -354,9 +352,9 @@ impl View for ProduzioneOutputView {
                         (panel_x + propwidth(d, 25)) as f32,
                         (output_start_y + (y_spacing * 2)) as f32,
                     ),
-                    main_state.current_font_height as f32,
-                    main_state.default_txt_spacing as f32,
-                    main_state.colors.default_txt_color,
+                    state.app_model.current_font_height as f32,
+                    state.app_model.default_txt_spacing as f32,
+                    state.app_model.colors.default_txt_color,
                 );
                 let stato_eco_hfbi_opt = state.data_model.get_stato_eco_hfbi_value(state);
                 let stato_eco_hfbi_str = match stato_eco_hfbi_opt {
@@ -373,7 +371,7 @@ impl View for ProduzioneOutputView {
                 };
                 let stato_eco_line = format!("STATO ECOLOGICO HFBI: {}", stato_eco_hfbi_str);
                 d.draw_text_ex(
-                    &main_state.current_font,
+                    &state.app_model.current_font,
                     &stato_eco_line,
                     // We use propwidth/height for the text starting position:
                     // this is not the bound
@@ -381,9 +379,9 @@ impl View for ProduzioneOutputView {
                         (panel_x + propwidth(d, 25)) as f32,
                         (output_start_y + (y_spacing * 3)) as f32,
                     ),
-                    main_state.current_font_height as f32,
-                    main_state.default_txt_spacing as f32,
-                    main_state.colors.default_txt_color,
+                    state.app_model.current_font_height as f32,
+                    state.app_model.default_txt_spacing as f32,
+                    state.app_model.colors.default_txt_color,
                 );
             }
         }

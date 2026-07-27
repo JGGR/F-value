@@ -18,7 +18,6 @@ pub(crate) struct InfoAggiuntiveController;
 use crate::app::core::Action;
 use crate::app::model::{Model, SubModel};
 use crate::controllers::{Controller, CurrentView, InfoAggiuntiveModel};
-use crate::MainState;
 use chrono::format::ParseErrorKind;
 use esox::domain::hfbi::AnagraficaHFBI;
 use esox::domain::index::Indice;
@@ -30,37 +29,31 @@ use raylib::RaylibHandle;
 impl Controller for InfoAggiuntiveController {
     type SubModel = InfoAggiuntiveModel;
 
-    fn update(
-        &self,
-        _rl: &mut RaylibHandle,
-        state: &mut Model,
-        actions: &mut Vec<Action>,
-        main_state: &mut MainState,
-    ) {
+    fn update(&self, _rl: &mut RaylibHandle, state: &mut Model, actions: &mut Vec<Action>) {
         state.infoaggiuntive_model.increment_frame_counter();
 
-        if main_state.should_reset {
+        if state.app_model.should_reset {
             eprintln!("InfoAggiuntiveController: Resetting");
-            main_state.should_reset = false;
+            state.app_model.should_reset = false;
             state.home_model.reset();
             state.second_model.reset();
             state.indice_model.reset();
             state.fileinput_model.reset();
             state.infoaggiuntive_model.reset();
             state.console_model.reset();
-            main_state.set_current_view(CurrentView::Home);
+            state.app_model.set_current_view(CurrentView::Home);
             return;
         }
 
         if state.infoaggiuntive_model.get_errors_occurred() {
             eprintln!("InfoAggiuntiveController:  Errors occurred");
             eprintln!("InfoAggiuntiveController:  Let's update current view and go to CONSOLE.");
-            main_state.set_current_view(CurrentView::Console);
+            state.app_model.set_current_view(CurrentView::Console);
             eprintln!("InfoAggiuntiveController:  Clearing error state");
             state.infoaggiuntive_model.set_errors_occurred(false);
         }
 
-        for a in actions.drain(..) {
+        actions.retain(|a| {
             match a {
                 Action::SubmitAnagraficaNISECI(anagrafica_draft) => {
                     let larghezza_stazione = match self.check_larghezza_stazione_string(
@@ -69,7 +62,7 @@ impl Controller for InfoAggiuntiveController {
                     ) {
                         Ok(v) => v,
                         Err(_e) => {
-                            return; // We change view in the failed check maybe?
+                            return false; // We change view in the failed check maybe?
                         }
                     };
                     let lunghezza_stazione = match self.check_lunghezza_stazione_string(
@@ -78,22 +71,23 @@ impl Controller for InfoAggiuntiveController {
                     ) {
                         Ok(v) => v,
                         Err(_e) => {
-                            return; // We change view in the failed check maybe?
+                            return false; // We change view in the failed check maybe?
                         }
                     };
                     let anagrafica = AnagraficaNISECI::new(
-                        anagrafica_draft.comunita,
-                        anagrafica_draft.codice_stazione,
-                        anagrafica_draft.date_string,
-                        anagrafica_draft.area,
-                        anagrafica_draft.corpo_idrico,
-                        anagrafica_draft.bacino_appartenenza,
-                        anagrafica_draft.idro_eco_regione,
-                        anagrafica_draft.posizione,
+                        anagrafica_draft.comunita.clone(),
+                        anagrafica_draft.codice_stazione.clone(),
+                        anagrafica_draft.date_string.clone(),
+                        anagrafica_draft.area.clone(),
+                        anagrafica_draft.corpo_idrico.clone(),
+                        anagrafica_draft.bacino_appartenenza.clone(),
+                        anagrafica_draft.idro_eco_regione.clone(),
+                        anagrafica_draft.posizione.clone(),
                         lunghezza_stazione,
                         larghezza_stazione,
                     );
                     self.submit_anagrafica_niseci(state, anagrafica);
+                    false
                 }
                 Action::SubmitAnagraficaHFBI(anagrafica_draft) => {
                     let larghezza_transetto = match self.check_larghezza_stazione_string(
@@ -102,7 +96,7 @@ impl Controller for InfoAggiuntiveController {
                     ) {
                         Ok(v) => v,
                         Err(_e) => {
-                            return; // We change view in the failed check maybe?
+                            return true; // We change view in the failed check maybe?
                         }
                     };
                     let lunghezza_transetto = match self.check_lunghezza_stazione_string(
@@ -111,21 +105,22 @@ impl Controller for InfoAggiuntiveController {
                     ) {
                         Ok(v) => v,
                         Err(_e) => {
-                            return; // We change view in the failed check maybe?
+                            return true; // We change view in the failed check maybe?
                         }
                     };
                     let anagrafica = AnagraficaHFBI::new(
-                        anagrafica_draft.codice_stazione,
-                        anagrafica_draft.corpo_idrico,
-                        anagrafica_draft.posizione,
-                        anagrafica_draft.date_string,
-                        anagrafica_draft.tipo_laguna,
-                        anagrafica_draft.stagione,
-                        anagrafica_draft.habitat_vegetato,
+                        anagrafica_draft.codice_stazione.clone(),
+                        anagrafica_draft.corpo_idrico.clone(),
+                        anagrafica_draft.posizione.clone(),
+                        anagrafica_draft.date_string.clone(),
+                        anagrafica_draft.tipo_laguna.clone(),
+                        anagrafica_draft.stagione.clone(),
+                        anagrafica_draft.habitat_vegetato.clone(),
                         lunghezza_transetto,
                         larghezza_transetto,
                     );
                     self.submit_anagrafica_hfbi(state, anagrafica);
+                    false
                 }
                 Action::CheckAnagrafica => {
                     if let Some(idx) = state.indice_model.get_selected_index() {
@@ -137,8 +132,10 @@ impl Controller for InfoAggiuntiveController {
                                 self.valida_anagrafica_hfbi(state);
                             }
                         }
+                        false
                     } else {
                         eprintln!("InfoAggiuntiveController:  Can't handle action {} without a selected index", a);
+                        true
                     }
                 }
                 Action::BackoutAnagrafica => {
@@ -151,15 +148,18 @@ impl Controller for InfoAggiuntiveController {
                                 self.backout_anagrafica_hfbi(state);
                             }
                         }
+                        false
                     } else {
                         eprintln!("InfoAggiuntiveController:  Can't process action {} without a selected index", a);
+                        true
                     }
                 }
                 _ => {
                     println!("InfoAggiuntiveController:  Got action {}", a);
+                    true
                 }
             }
-        }
+        });
 
         let current_indice;
         if let Some(idx) = state.indice_model.get_selected_index() {
@@ -167,15 +167,19 @@ impl Controller for InfoAggiuntiveController {
         } else {
             eprintln!("InfoAggiuntiveController:  User did not select an index");
             eprintln!("InfoAggiuntiveController:  Let's update current view and go back to SelezioneIndice.");
-            main_state.set_current_view(CurrentView::SelezioneIndice);
+            state
+                .app_model
+                .set_current_view(CurrentView::SelezioneIndice);
             return;
         }
-        match main_state.current_view {
+        match state.app_model.current_view {
             CurrentView::SelezioneInfoAggiuntive => match current_indice {
                 Indice::Niseci | Indice::Hfbi => {
                     if state.infoaggiuntive_model.is_done_editing() {
                         eprintln!("InfoAggiuntiveController:  Let's update current view and go to ValidaInfoAggiuntive");
-                        main_state.set_current_view(CurrentView::ValidazioneInfoAggiuntive);
+                        state
+                            .app_model
+                            .set_current_view(CurrentView::ValidazioneInfoAggiuntive);
                     }
                 }
             },
@@ -183,11 +187,15 @@ impl Controller for InfoAggiuntiveController {
                 Indice::Niseci | Indice::Hfbi => {
                     if !state.infoaggiuntive_model.is_done_editing() {
                         eprintln!("InfoAggiuntiveController:  Let's update current view and go back to SelezionaInfoAggiuntive");
-                        main_state.set_current_view(CurrentView::SelezioneInfoAggiuntive);
+                        state
+                            .app_model
+                            .set_current_view(CurrentView::SelezioneInfoAggiuntive);
                     }
                     if state.infoaggiuntive_model.is_valid() {
                         eprintln!("InfoAggiuntiveController:  Let's update current view and go to ProduzioneOutput");
-                        main_state.set_current_view(CurrentView::ProduzioneOutput);
+                        state
+                            .app_model
+                            .set_current_view(CurrentView::ProduzioneOutput);
                     }
                 }
             },

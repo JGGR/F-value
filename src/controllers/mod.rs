@@ -15,13 +15,15 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::app::core::{Action, CurrentView, MainState};
+use crate::app::core::{Action, CurrentView};
 use crate::app::model::{
     ConsoleModel, FileInputModel, HelpModel, HomeModel, IndiceModel, InfoAggiuntiveModel, Model,
     OutputModel, SubModel,
 };
 use raylib::RaylibHandle;
 
+pub(crate) mod chrome;
+use chrome::ChromeController;
 pub(crate) mod home;
 use home::HomeController;
 pub(crate) mod help;
@@ -38,6 +40,7 @@ pub(crate) mod console;
 use console::ConsoleController;
 
 pub(crate) struct Controllers {
+    pub(crate) chrome_controller: ChromeController,
     pub(crate) home_controller: HomeController,
     pub(crate) help_controller: HelpController,
     pub(crate) indice_controller: IndiceController,
@@ -50,6 +53,7 @@ pub(crate) struct Controllers {
 impl Controllers {
     pub(crate) fn new() -> Self {
         Self {
+            chrome_controller: ChromeController::new(),
             home_controller: HomeController::new(),
             help_controller: HelpController::new(),
             indice_controller: IndiceController::new(),
@@ -64,35 +68,31 @@ impl Controllers {
         rl: &mut RaylibHandle,
         state: &mut Model,
         actions: &mut Vec<Action>,
-        main_state: &mut MainState,
     ) {
+        // Base update step
+        self.chrome_controller.update(rl, state, actions);
         // Current view update step
-        match main_state.current_view {
+        match state.app_model.current_view {
             CurrentView::Home => {
-                self.home_controller.update(rl, state, actions, main_state);
+                self.home_controller.update(rl, state, actions);
             }
             CurrentView::Help => {
-                self.help_controller.update(rl, state, actions, main_state);
+                self.help_controller.update(rl, state, actions);
             }
             CurrentView::SelezioneIndice => {
-                self.indice_controller
-                    .update(rl, state, actions, main_state);
+                self.indice_controller.update(rl, state, actions);
             }
             CurrentView::SelezioneFileInput | CurrentView::ValidazioneFileInput => {
-                self.fileinput_controller
-                    .update(rl, state, actions, main_state);
+                self.fileinput_controller.update(rl, state, actions);
             }
             CurrentView::SelezioneInfoAggiuntive | CurrentView::ValidazioneInfoAggiuntive => {
-                self.infoaggiuntive_controller
-                    .update(rl, state, actions, main_state);
+                self.infoaggiuntive_controller.update(rl, state, actions);
             }
             CurrentView::ProduzioneOutput | CurrentView::ProduzionePDF => {
-                self.output_controller
-                    .update(rl, state, actions, main_state);
+                self.output_controller.update(rl, state, actions);
             }
             CurrentView::Console => {
-                self.console_controller
-                    .update(rl, state, actions, main_state);
+                self.console_controller.update(rl, state, actions);
             }
         }
     }
@@ -100,13 +100,7 @@ impl Controllers {
 
 pub(crate) trait Controller {
     type SubModel: SubModel; // Associated type for controller substate
-    fn update(
-        &self,
-        rl: &mut RaylibHandle,
-        state: &mut Model,
-        actions: &mut Vec<Action>,
-        main_state: &mut MainState,
-    );
+    fn update(&self, rl: &mut RaylibHandle, state: &mut Model, actions: &mut Vec<Action>);
     fn add_console_message(&self, state: &mut Model, msg: String) {
         state.console_model.console.add_message(msg);
     }

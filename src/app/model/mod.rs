@@ -17,6 +17,8 @@
 
 use crate::console::Console;
 use crate::core::SHORT_PROJECT_VERSION;
+
+use crate::app::core::{AppTextures, ColorState, CurrentView, GuiTheme, Localize};
 use esox::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI, RisultatoHFBI, StatoEcologicoHFBI};
 use esox::domain::index::Indice;
 use esox::domain::niseci::{AnagraficaNISECI, RiferimentoNISECI, StatoEcologicoNISECI};
@@ -25,6 +27,7 @@ use esox::{
     domain::niseci::{CampionamentoNISECI, RisultatoNISECI},
     engines::niseci::full::calculate_stato_ecologico_niseci,
 };
+use raylib::core::text::WeakFont;
 
 #[cfg(feature = "lessclone")]
 use esox::{
@@ -40,6 +43,57 @@ pub(crate) trait SubModel {
     fn _get_frame_counter(&self) -> u32;
     fn increment_frame_counter(&mut self);
     fn reset(&mut self);
+}
+
+// State struct holding non-`Copy` types
+pub(crate) struct AppModel {
+    pub(crate) frame_counter: u32,
+    pub(crate) showing_reset_win: bool,
+    pub(crate) should_reset: bool,
+    pub(crate) showing_quit_win: bool,
+    pub(crate) should_quit: bool,
+    pub(crate) showing_info_box: bool,
+    pub(crate) showing_license_box: bool,
+    pub(crate) showing_settings_box: bool,
+    pub(crate) current_view: CurrentView,
+    pub(crate) previous_view: CurrentView,
+    pub(crate) theme: GuiTheme,
+    pub(crate) gui_theme_combobox_active: i32,
+    pub(crate) default_font_height: i32,
+    pub(crate) current_font_height: i32,
+    pub(crate) default_txt_spacing: i32,
+    pub(crate) colors: ColorState,
+    pub(crate) current_font: WeakFont,
+    pub(crate) textures: AppTextures,
+    pub(crate) locale: Localize,
+    pub(crate) locale_combobox_active: i32,
+}
+
+impl SubModel for AppModel {
+    fn _get_frame_counter(&self) -> u32 {
+        self.frame_counter
+    }
+    fn increment_frame_counter(&mut self) {
+        self.frame_counter += 1;
+    }
+    fn reset(&mut self) {
+        self.frame_counter = 0;
+    }
+}
+
+impl AppModel {
+    pub(crate) fn set_current_view(&mut self, view: CurrentView) {
+        self.previous_view = self.current_view;
+        self.current_view = view;
+    }
+
+    pub(crate) fn get_gui_should_lock(&self) -> bool {
+        self.showing_reset_win
+            || self.showing_quit_win
+            || self.showing_info_box
+            || self.showing_settings_box
+            || self.showing_license_box
+    }
 }
 
 // State struct holding non-`Copy` types
@@ -535,8 +589,8 @@ impl DataModel {
     }
 }
 
-#[derive(Clone)]
 pub(crate) struct Model {
+    pub(crate) app_model: AppModel,
     pub(crate) home_model: HomeModel,
     pub(crate) second_model: HelpModel,
     pub(crate) indice_model: IndiceModel,
@@ -548,8 +602,38 @@ pub(crate) struct Model {
 }
 
 impl Model {
-    pub(crate) fn new() -> Self {
+    pub(crate) fn new(
+        default_font_height: i32,
+        current_font_height: i32,
+        default_txt_spacing: i32,
+        current_font: WeakFont,
+        colors: ColorState,
+        textures: AppTextures,
+        locale: Localize,
+    ) -> Self {
         Self {
+            app_model: AppModel {
+                frame_counter: 0,
+                showing_reset_win: false,
+                should_reset: false,
+                showing_quit_win: false,
+                should_quit: false,
+                showing_info_box: false,
+                showing_license_box: false,
+                showing_settings_box: false,
+                current_view: CurrentView::Home,
+                previous_view: CurrentView::Home,
+                theme: GuiTheme::Light,
+                gui_theme_combobox_active: GuiTheme::Light as i32,
+                default_font_height,
+                current_font_height,
+                default_txt_spacing,
+                colors,
+                current_font,
+                textures,
+                locale,
+                locale_combobox_active: locale as i32,
+            },
             home_model: HomeModel {
                 frame_counter: 0,
                 user_continued: false,

@@ -19,45 +19,40 @@
 use super::{Controller, CurrentView, HelpModel};
 use crate::app::core::Action;
 use crate::app::model::{Model, SubModel};
-use crate::MainState;
 use raylib::RaylibHandle;
 
 pub(crate) struct HelpController;
 
 impl Controller for HelpController {
     type SubModel = HelpModel;
-    fn update(
-        &self,
-        _rl: &mut RaylibHandle,
-        state: &mut Model,
-        actions: &mut Vec<Action>,
-        main_state: &mut MainState,
-    ) {
+    fn update(&self, _rl: &mut RaylibHandle, state: &mut Model, actions: &mut Vec<Action>) {
         state.second_model.increment_frame_counter();
         if state.second_model.get_user_continued() {
             eprintln!("HelpController:  L'utente ha premuto Continua");
             eprintln!("HelpController:  Let's update current view and go to SelezioneIndice.");
-            main_state.set_current_view(CurrentView::SelezioneIndice)
+            state
+                .app_model
+                .set_current_view(CurrentView::SelezioneIndice)
         }
-        if main_state.should_reset {
+        if state.app_model.should_reset {
             eprintln!("HelpController: Resetting");
-            main_state.should_reset = false;
+            state.app_model.should_reset = false;
             state.home_model.reset();
             state.second_model.reset();
             state.console_model.reset();
-            main_state.set_current_view(CurrentView::Home);
+            state.app_model.set_current_view(CurrentView::Home);
         }
 
-        for a in actions.drain(..) {
-            match a {
-                Action::UserContinued => {
-                    self.set_user_continued(state, true);
-                }
-                _ => {
-                    println!("HelpController:  Got action {}", a);
-                }
+        actions.retain(|a| match a {
+            Action::UserContinued => {
+                self.set_user_continued(state, true);
+                false
             }
-        }
+            _ => {
+                println!("HelpController:  Got action {}", a);
+                true
+            }
+        });
     }
 }
 

@@ -19,47 +19,42 @@ pub(crate) struct IndiceController;
 use crate::app::core::Action;
 use crate::app::model::{Model, SubModel};
 use crate::controllers::{Controller, CurrentView, IndiceModel};
-use crate::MainState;
 use esox::domain::index::Indice;
 use raylib::RaylibHandle;
 
 impl Controller for IndiceController {
     type SubModel = IndiceModel;
 
-    fn update(
-        &self,
-        _rl: &mut RaylibHandle,
-        state: &mut Model,
-        actions: &mut Vec<Action>,
-        main_state: &mut MainState,
-    ) {
+    fn update(&self, _rl: &mut RaylibHandle, state: &mut Model, actions: &mut Vec<Action>) {
         state.indice_model.increment_frame_counter();
 
         if let Some(index) = state.indice_model.get_selected_index() {
             eprintln!("IndiceController:  L'utente ha selezionato indice {index}");
             eprintln!("IndiceController:  Let's update current view and go to SelezioneFileInput.");
-            main_state.set_current_view(CurrentView::SelezioneFileInput)
+            state
+                .app_model
+                .set_current_view(CurrentView::SelezioneFileInput)
         }
-        if main_state.should_reset {
+        if state.app_model.should_reset {
             eprintln!("IndiceController: Resetting");
-            main_state.should_reset = false;
+            state.app_model.should_reset = false;
             state.home_model.reset();
             state.second_model.reset();
             state.indice_model.reset();
             state.console_model.reset();
-            main_state.set_current_view(CurrentView::Home);
+            state.app_model.set_current_view(CurrentView::Home);
         }
 
-        for a in actions.drain(..) {
-            match a {
-                Action::PickIndice(indice) => {
-                    self.set_indice_corrente(state, indice);
-                }
-                _ => {
-                    println!("IndiceController:  Got action {}", a);
-                }
+        actions.retain(|a| match a {
+            Action::PickIndice(indice) => {
+                self.set_indice_corrente(state, *indice);
+                false
             }
-        }
+            _ => {
+                println!("IndiceController:  Got action {}", a);
+                true
+            }
+        });
     }
 }
 

@@ -15,7 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 pub(crate) struct FileInputController;
-use crate::app::core::{Action, Localize, MainState};
+use crate::app::core::{Action, Localize};
 use crate::app::model::{Model, SubModel};
 use crate::controllers::{Controller, CurrentView, FileInputModel};
 use esox::csv::load::hfbi::{load_campionamento_hfbi_from_path, CampionamentoHFBIError};
@@ -41,107 +41,105 @@ use std::path::PathBuf;
 impl Controller for FileInputController {
     type SubModel = FileInputModel;
 
-    fn update(
-        &self,
-        _rl: &mut RaylibHandle,
-        state: &mut Model,
-        actions: &mut Vec<Action>,
-        main_state: &mut MainState,
-    ) {
+    fn update(&self, _rl: &mut RaylibHandle, state: &mut Model, actions: &mut Vec<Action>) {
         state.fileinput_model.increment_frame_counter();
 
-        if main_state.should_reset {
+        if state.app_model.should_reset {
             eprintln!("FileInputController: Resetting");
-            main_state.should_reset = false;
+            state.app_model.should_reset = false;
             state.home_model.reset();
             state.second_model.reset();
             state.indice_model.reset();
             state.fileinput_model.reset();
             state.console_model.reset();
-            main_state.set_current_view(CurrentView::Home);
+            state.app_model.set_current_view(CurrentView::Home);
             return;
         }
 
         if state.fileinput_model.get_errors_occurred() {
             eprintln!("FileInputController:  Errors occurred");
             eprintln!("FileInputController:  Let's update current view and go to CONSOLE.");
-            main_state.set_current_view(CurrentView::Console);
+            state.app_model.set_current_view(CurrentView::Console);
             eprintln!("FileInputController:  Clearing error state");
             state.fileinput_model.set_errors_occurred(false);
         }
 
-        for a in actions.drain(..) {
-            match a {
-                Action::PickRiferimentoPath(path) => {
-                    self.set_riferimento_path(state, path);
+        actions.retain(|a| match a {
+            Action::PickRiferimentoPath(path) => {
+                self.set_riferimento_path(state, path.clone());
+                false
+            }
+            Action::PickCampionamentoPath(path) => {
+                self.set_campionamento_path(state, path.clone());
+                false
+            }
+            Action::ValidaRiferimentoPath(has_headers) => match state.app_model.locale {
+                Localize::Italian => {
+                    self.valida_riferimento_niseci_path(
+                        state,
+                        *has_headers,
+                        InputFormat::Alternative,
+                    );
+                    false
                 }
-                Action::PickCampionamentoPath(path) => {
-                    self.set_campionamento_path(state, path);
+                Localize::International => {
+                    self.valida_riferimento_niseci_path(state, *has_headers, InputFormat::Standard);
+                    false
                 }
-                Action::ValidaRiferimentoPath(has_headers) => match main_state.locale {
-                    Localize::Italian => {
-                        self.valida_riferimento_niseci_path(
-                            state,
-                            has_headers,
-                            InputFormat::Alternative,
-                        );
+            },
+            Action::ValidaCampionamentoPath(has_headers) => {
+                if let Some(idx) = state.indice_model.get_selected_index() {
+                    match idx {
+                        Indice::Niseci => match state.app_model.locale {
+                            Localize::Italian => {
+                                self.valida_campionamento_niseci_path(
+                                    state,
+                                    *has_headers,
+                                    InputFormat::Alternative,
+                                );
+                                false
+                            }
+                            Localize::International => {
+                                self.valida_campionamento_niseci_path(
+                                    state,
+                                    *has_headers,
+                                    InputFormat::Standard,
+                                );
+                                false
+                            }
+                        },
+                        Indice::Hfbi => match state.app_model.locale {
+                            Localize::Italian => {
+                                self.valida_campionamento_hfbi_path(
+                                    state,
+                                    *has_headers,
+                                    InputFormat::Alternative,
+                                );
+                                false
+                            }
+                            Localize::International => {
+                                self.valida_campionamento_hfbi_path(
+                                    state,
+                                    *has_headers,
+                                    InputFormat::Standard,
+                                );
+                                false
+                            }
+                        },
                     }
-                    Localize::International => {
-                        self.valida_riferimento_niseci_path(
-                            state,
-                            has_headers,
-                            InputFormat::Standard,
-                        );
-                    }
-                },
-                Action::ValidaCampionamentoPath(has_headers) => {
-                    if let Some(idx) = state.indice_model.get_selected_index() {
-                        match idx {
-                            Indice::Niseci => match main_state.locale {
-                                Localize::Italian => {
-                                    self.valida_campionamento_niseci_path(
-                                        state,
-                                        has_headers,
-                                        InputFormat::Alternative,
-                                    );
-                                }
-                                Localize::International => {
-                                    self.valida_campionamento_niseci_path(
-                                        state,
-                                        has_headers,
-                                        InputFormat::Standard,
-                                    );
-                                }
-                            },
-                            Indice::Hfbi => match main_state.locale {
-                                Localize::Italian => {
-                                    self.valida_campionamento_hfbi_path(
-                                        state,
-                                        has_headers,
-                                        InputFormat::Alternative,
-                                    );
-                                }
-                                Localize::International => {
-                                    self.valida_campionamento_hfbi_path(
-                                        state,
-                                        has_headers,
-                                        InputFormat::Standard,
-                                    );
-                                }
-                            },
-                        }
-                    } else {
-                        eprintln!(
-                            "FileInputController:  Can't handle action {} without a selected index",
-                            a
-                        );
-                    }
-                }
-                _ => {
-                    println!("FileInputController:  Got action {}", a);
+                } else {
+                    eprintln!(
+                        "FileInputController:  Can't handle action {} without a selected index",
+                        a
+                    );
+                    true
                 }
             }
-        }
+            _ => {
+                println!("FileInputController:  Got action {}", a);
+                true
+            }
+        });
 
         let current_indice;
         if let Some(idx) = state.indice_model.get_selected_index() {
@@ -151,10 +149,12 @@ impl Controller for FileInputController {
             eprintln!(
                 "FileInputController:  Let's update current view and go back to SelezioneIndice."
             );
-            main_state.set_current_view(CurrentView::SelezioneIndice);
+            state
+                .app_model
+                .set_current_view(CurrentView::SelezioneIndice);
             return;
         }
-        match main_state.current_view {
+        match state.app_model.current_view {
             CurrentView::SelezioneFileInput => {
                 match current_indice {
                     Indice::Niseci => {
@@ -175,7 +175,9 @@ impl Controller for FileInputController {
                         if riferimento_ready && campionamento_ready {
                             eprintln!("FileInputController:  NISECI - L'utente ha fornito riferimento e campionamento");
                             eprintln!("FileInputController:  Let's update current view and go to ValidazioneFileInput.");
-                            main_state.set_current_view(CurrentView::ValidazioneFileInput);
+                            state
+                                .app_model
+                                .set_current_view(CurrentView::ValidazioneFileInput);
                         }
                     }
                     Indice::Hfbi => {
@@ -192,7 +194,9 @@ impl Controller for FileInputController {
                                 "FileInputController:  HFBI - L'utente ha fornito campionamento"
                             );
                             eprintln!("FileInputController:  Let's update current view and go to ValidazioneFileInput.");
-                            main_state.set_current_view(CurrentView::ValidazioneFileInput);
+                            state
+                                .app_model
+                                .set_current_view(CurrentView::ValidazioneFileInput);
                         }
                     }
                 }
@@ -205,7 +209,9 @@ impl Controller for FileInputController {
                         } else {
                             eprintln!("FileInputController:  User did not select a riferimento niseci path");
                             eprintln!("FileInputController:  Let's update current view and go back to SelezioneFileInput.");
-                            main_state.set_current_view(CurrentView::SelezioneFileInput);
+                            state
+                                .app_model
+                                .set_current_view(CurrentView::SelezioneFileInput);
                             return;
                         }
 
@@ -216,7 +222,9 @@ impl Controller for FileInputController {
                         } else {
                             eprintln!("FileInputController:  User did not select a campionamento niseci path");
                             eprintln!("FileInputController:  Let's update current view and go back to SelezioneFileInput.");
-                            main_state.set_current_view(CurrentView::SelezioneFileInput);
+                            state
+                                .app_model
+                                .set_current_view(CurrentView::SelezioneFileInput);
                             return;
                         }
 
@@ -228,7 +236,9 @@ impl Controller for FileInputController {
                             eprintln!("FileInputController:  NISECI - L'utente ha validato riferimento e campionamento");
                             eprintln!("FileInputController:  Let's update current view and go to SelezioneInfoAggiuntive.");
                             //self.add_console_message(format!("FileInputController:  NISECI - L'utente ha validato riferimento e campionamento"));
-                            main_state.set_current_view(CurrentView::SelezioneInfoAggiuntive);
+                            state
+                                .app_model
+                                .set_current_view(CurrentView::SelezioneInfoAggiuntive);
                         }
                     }
                     Indice::Hfbi => {
@@ -239,7 +249,9 @@ impl Controller for FileInputController {
                         } else {
                             eprintln!("FileInputController:  User did not select a campionamento hfbi path");
                             eprintln!("FileInputController:  Let's update current view and go back to SelezioneFileInput.");
-                            main_state.set_current_view(CurrentView::SelezioneFileInput);
+                            state
+                                .app_model
+                                .set_current_view(CurrentView::SelezioneFileInput);
                             return;
                         }
                         let campionamento_valid =
@@ -251,7 +263,9 @@ impl Controller for FileInputController {
                             );
                             eprintln!("FileInputController:  Let's update current view and go to SelezioneInfoAggiuntive.");
                             //self.add_console_message("FileInputController:  HFBI - L'utente ha validato campionamento".to_string());
-                            main_state.set_current_view(CurrentView::SelezioneInfoAggiuntive);
+                            state
+                                .app_model
+                                .set_current_view(CurrentView::SelezioneInfoAggiuntive);
                         }
                     }
                 }

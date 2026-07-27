@@ -15,8 +15,6 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use super::controller::update_main;
-use super::view::draw_main;
 use crate::app::model::Model;
 use crate::controllers::Controllers;
 use crate::core::SHORT_PROJECT_VERSION;
@@ -245,77 +243,6 @@ impl ColorState {
     }
 }
 
-pub(crate) struct MainState {
-    pub(crate) frame_counter: u32,
-    pub(crate) showing_reset_win: bool,
-    pub(crate) should_reset: bool,
-    pub(crate) showing_quit_win: bool,
-    pub(crate) should_quit: bool,
-    pub(crate) showing_info_box: bool,
-    pub(crate) showing_license_box: bool,
-    pub(crate) showing_settings_box: bool,
-    pub(crate) current_view: CurrentView,
-    pub(crate) previous_view: CurrentView,
-    pub(crate) theme: GuiTheme,
-    pub(crate) gui_theme_combobox_active: i32,
-    pub(crate) default_font_height: i32,
-    pub(crate) current_font_height: i32,
-    pub(crate) default_txt_spacing: i32,
-    pub(crate) colors: ColorState,
-    pub(crate) current_font: WeakFont,
-    pub(crate) textures: AppTextures,
-    pub(crate) locale: Localize,
-    pub(crate) locale_combobox_active: i32,
-}
-
-impl MainState {
-    fn new(
-        default_font_height: i32,
-        current_font_height: i32,
-        default_txt_spacing: i32,
-        current_font: WeakFont,
-        colors: ColorState,
-        textures: AppTextures,
-        locale: Localize,
-    ) -> Self {
-        Self {
-            frame_counter: 0,
-            showing_reset_win: false,
-            should_reset: false,
-            showing_quit_win: false,
-            should_quit: false,
-            showing_info_box: false,
-            showing_license_box: false,
-            showing_settings_box: false,
-            current_view: CurrentView::Home,
-            previous_view: CurrentView::Home,
-            theme: GuiTheme::Light,
-            gui_theme_combobox_active: GuiTheme::Light as i32,
-            default_font_height,
-            current_font_height,
-            default_txt_spacing,
-            colors,
-            current_font,
-            textures,
-            locale,
-            locale_combobox_active: locale as i32,
-        }
-    }
-
-    pub(crate) fn set_current_view(&mut self, view: CurrentView) {
-        self.previous_view = self.current_view;
-        self.current_view = view;
-    }
-
-    pub(crate) fn get_gui_should_lock(&self) -> bool {
-        self.showing_reset_win
-            || self.showing_quit_win
-            || self.showing_info_box
-            || self.showing_settings_box
-            || self.showing_license_box
-    }
-}
-
 pub(crate) fn propwidth(d: &RaylibDrawHandle<'_>, to_scale: i32) -> i32 {
     if !(0..=ESOX_SCREEN_WIDTH).contains(&to_scale) {
         panic!("propw():  invalid to_scale value received: {to_scale}");
@@ -433,7 +360,6 @@ impl AppTextures {
 /// - `views` must be dropped BEFORE `rl`
 /// - `rl` must be the LAST field in this struct
 pub(crate) struct App {
-    main_state: MainState,
     model: Model,
     controllers: Controllers,
     views: Views,
@@ -473,7 +399,7 @@ impl App {
             Color::get_color(txt_color_int as u32),
             Color::get_color(bg_color_int as u32),
         );
-        let main_state = MainState::new(
+        let model = Model::new(
             gui_default_font_height,
             gui_current_font_height,
             txt_spacing,
@@ -482,16 +408,14 @@ impl App {
             app_textures,
             locale,
         );
-        let model = Model::new();
         let controllers = Controllers::new();
         let views = Views::new(
             &mut rl,
             &thread,
-            main_state.current_font_height,
-            main_state.default_txt_spacing,
+            model.app_model.current_font_height,
+            model.app_model.default_txt_spacing,
         );
         Self {
-            main_state,
             model,
             controllers,
             views,
@@ -502,44 +426,23 @@ impl App {
 
     pub(crate) fn run(&mut self) {
         let mut actions = Vec::<Action>::new();
-        let mut main_actions = Vec::<Action>::new();
-        while !self.main_state.should_quit {
-            // Base update step
-            if let Err(load_style_error) =
-                update_main(&mut self.rl, &mut main_actions, &mut self.main_state)
-            {
-                eprintln!("Error while loading theme: {load_style_error}");
-                // TODO: print error in GUI console too and put user there?
-            }
-
-            self.controllers.update(
-                &mut self.rl,
-                &mut self.model,
-                &mut actions,
-                &mut self.main_state,
-            );
+        while !self.model.app_model.should_quit {
+            self.controllers
+                .update(&mut self.rl, &mut self.model, &mut actions);
 
             let mut d = self.rl.begin_drawing(&self.thread);
 
-            let lock_view = self.main_state.get_gui_should_lock();
+            let lock_view = self.model.app_model.get_gui_should_lock();
 
             if lock_view {
                 d.gui_lock();
             }
 
-            // Ask the view for render, passing the controller for state changes
-            // Current view draw step
-            actions = self
-                .views
-                .draw(&mut d, &self.thread, &self.model, &self.main_state);
+            actions = self.views.draw(&mut d, &self.thread, &self.model);
 
             if lock_view {
                 d.gui_unlock();
             }
-
-            // Base draw step
-            // Render stuff not depending on view
-            main_actions = draw_main(&mut d, &self.main_state);
         }
     }
 }

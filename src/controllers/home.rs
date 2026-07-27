@@ -20,51 +20,47 @@ pub(crate) struct HomeController;
 use super::{Controller, CurrentView, HomeModel};
 use crate::app::core::Action;
 use crate::app::model::{Model, SubModel};
-use crate::MainState;
 use raylib::RaylibHandle;
 
 impl Controller for HomeController {
     type SubModel = HomeModel;
 
-    fn update(
-        &self,
-        _rl: &mut RaylibHandle,
-        state: &mut Model,
-        actions: &mut Vec<Action>,
-        main_state: &mut MainState,
-    ) {
+    fn update(&self, _rl: &mut RaylibHandle, state: &mut Model, actions: &mut Vec<Action>) {
         state.home_model.increment_frame_counter();
         if state.home_model.get_user_continued() {
             eprintln!("HomeController:  L'utente ha premuto Continua");
             eprintln!("HomeController:  Let's update current view and go to SelezioneIndice.");
-            main_state.set_current_view(CurrentView::SelezioneIndice)
+            state
+                .app_model
+                .set_current_view(CurrentView::SelezioneIndice)
         }
         if state.home_model.get_user_wants_info() {
             eprintln!("HomeController:  L'utente ha premuto Info");
             eprintln!("HomeController:  Let's update current view and go to Help.");
-            main_state.set_current_view(CurrentView::Help)
+            state.app_model.set_current_view(CurrentView::Help)
         }
 
-        if main_state.should_reset {
+        if state.app_model.should_reset {
             eprintln!("HomeController: Resetting");
-            main_state.should_reset = false;
+            state.app_model.should_reset = false;
             state.home_model.reset();
             state.console_model.reset();
         }
 
-        for a in actions.drain(..) {
-            match a {
-                Action::UserContinued => {
-                    self.set_user_continued(state, true);
-                }
-                Action::UserWantsInfo => {
-                    self.set_user_wants_info(state, true);
-                }
-                _ => {
-                    println!("HomeController:  Got action {}", a);
-                }
+        actions.retain(|a| match a {
+            Action::UserContinued => {
+                self.set_user_continued(state, true);
+                false
             }
-        }
+            Action::UserWantsInfo => {
+                self.set_user_wants_info(state, true);
+                false
+            }
+            _ => {
+                println!("HomeController:  Got action {}", a);
+                true
+            }
+        });
     }
 }
 
