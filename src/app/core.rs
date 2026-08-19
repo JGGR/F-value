@@ -64,52 +64,6 @@ pub(crate) const SUPPORT_HEADLESS: bool = false; // This is due to windows_subsy
 pub(crate) const SUPPORT_HEADLESS: bool = true;
 
 #[derive(Clone)]
-pub(crate) enum MainAction {
-    SetFontHeight(i32),
-    SetTheme(i32),
-    SetLocale(i32),
-    ResetSettings,
-    CloseSettings,
-    OpenSettings,
-    ShowInfo,
-    CloseInfo,
-    ShowLicense,
-    CloseLicense,
-    Reset,
-    ShowReset,
-    CloseReset,
-    ShowConsole,
-    CloseConsole,
-    CloseQuit,
-    Quit,
-}
-
-impl fmt::Display for MainAction {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let string_representation = match self {
-            MainAction::SetFontHeight(_h) => "SetFontHeight",
-            MainAction::SetTheme(_ti) => "SetTheme",
-            MainAction::SetLocale(_li) => "SetLocale",
-            MainAction::ResetSettings => "ResetSettings",
-            MainAction::CloseSettings => "CloseSettings",
-            MainAction::OpenSettings => "OpenSettings",
-            MainAction::ShowInfo => "ShowInfo",
-            MainAction::CloseInfo => "CloseInfo",
-            MainAction::ShowLicense => "ShowLicense",
-            MainAction::CloseLicense => "CloseLicense",
-            MainAction::Reset => "Reset",
-            MainAction::ShowReset => "ShowReset",
-            MainAction::CloseReset => "CloseReset",
-            MainAction::ShowConsole => "ShowConsole",
-            MainAction::CloseConsole => "CloseConsole",
-            MainAction::Quit => "Quit",
-            MainAction::CloseQuit => "CloseQuit",
-        };
-        write!(f, "{}", string_representation)
-    }
-}
-
-#[derive(Clone)]
 pub(crate) enum Action {
     ConsoleBackout,
     UserContinued,
@@ -127,6 +81,22 @@ pub(crate) enum Action {
     ConfirmCalc,
     ExportPdf(PathBuf),
     Reset,
+    SetFontHeight(i32),
+    SetTheme(i32),
+    SetLocale(i32),
+    ResetSettings,
+    CloseSettings,
+    OpenSettings,
+    ShowInfo,
+    CloseInfo,
+    ShowLicense,
+    CloseLicense,
+    ShowReset,
+    CloseReset,
+    ShowConsole,
+    CloseConsole,
+    CloseQuit,
+    Quit,
 }
 
 impl fmt::Display for Action {
@@ -148,6 +118,22 @@ impl fmt::Display for Action {
             Action::ConfirmCalc => "ConfirmCalc",
             Action::ExportPdf(_path) => "ExportPdf",
             Action::Reset => "Reset",
+            Action::SetFontHeight(_h) => "SetFontHeight",
+            Action::SetTheme(_ti) => "SetTheme",
+            Action::SetLocale(_li) => "SetLocale",
+            Action::ResetSettings => "ResetSettings",
+            Action::CloseSettings => "CloseSettings",
+            Action::OpenSettings => "OpenSettings",
+            Action::ShowInfo => "ShowInfo",
+            Action::CloseInfo => "CloseInfo",
+            Action::ShowLicense => "ShowLicense",
+            Action::CloseLicense => "CloseLicense",
+            Action::ShowReset => "ShowReset",
+            Action::CloseReset => "CloseReset",
+            Action::ShowConsole => "ShowConsole",
+            Action::CloseConsole => "CloseConsole",
+            Action::Quit => "Quit",
+            Action::CloseQuit => "CloseQuit",
         };
         write!(f, "{}", string_representation)
     }
@@ -516,7 +502,7 @@ impl App {
 
     pub(crate) fn run(&mut self) {
         let mut actions = Vec::<Action>::new();
-        let mut main_actions = Vec::<MainAction>::new();
+        let mut main_actions = Vec::<Action>::new();
         while !self.main_state.should_quit {
             // Base update step
             if let Err(load_style_error) =
