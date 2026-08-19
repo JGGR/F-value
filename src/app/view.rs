@@ -16,7 +16,7 @@
 */
 
 use super::core::{
-    propheight, propwidth, CurrentView, GuiTheme, Localize, MainAction, MainAction::*, MainState,
+    propheight, propwidth, Action, Action::*, CurrentView, GuiTheme, Localize, MainState,
 };
 use crate::core::{
     is_holiday, rrect, AUTHOR_GIONINJO, AUTHOR_GIONINJO_LINK, AUTHOR_JGABAUT, AUTHOR_JGABAUT_LINK,
@@ -74,7 +74,7 @@ impl Rainbow {
 pub(crate) fn draw_reset_win(
     d: &mut RaylibDrawHandle,
     showing_reset_win: &bool,
-    actions: &mut Vec<MainAction>,
+    actions: &mut Vec<Action>,
 ) {
     if *showing_reset_win {
         d.draw_rectangle(
@@ -108,7 +108,7 @@ pub(crate) fn draw_reset_win(
 pub(crate) fn draw_quit_win(
     d: &mut RaylibDrawHandle,
     showing_quit_win: &bool,
-    actions: &mut Vec<MainAction>,
+    actions: &mut Vec<Action>,
 ) {
     if *showing_quit_win {
         d.draw_rectangle(
@@ -145,7 +145,7 @@ pub(crate) fn draw_license_box(
     font: &WeakFont,
     default_txt_spacing: i32,
     current_font_height: i32,
-    actions: &mut Vec<MainAction>,
+    actions: &mut Vec<Action>,
 ) {
     if *showing_license_box {
         let x_padding = propwidth(d, 50);
@@ -200,7 +200,7 @@ pub(crate) fn draw_info_box(
     default_txt_spacing: i32,
     default_txt_color: Color,
     current_font_height: i32,
-    actions: &mut Vec<MainAction>,
+    actions: &mut Vec<Action>,
 ) {
     if *showing_info_box {
         d.draw_rectangle(
@@ -460,7 +460,7 @@ pub(crate) fn draw_info_box(
 pub(crate) fn draw_settings_box(
     d: &mut RaylibDrawHandle,
     main_state: &MainState,
-    actions: &mut Vec<MainAction>,
+    actions: &mut Vec<Action>,
 ) {
     if main_state.showing_settings_box {
         d.draw_rectangle(
@@ -617,8 +617,8 @@ pub(crate) fn draw_settings_box(
     }
 }
 
-pub(crate) fn draw_main(d: &mut RaylibDrawHandle, main_state: &MainState) -> Vec<MainAction> {
-    let mut actions = Vec::<MainAction>::new();
+pub(crate) fn draw_main(d: &mut RaylibDrawHandle, main_state: &MainState) -> Vec<Action> {
+    let mut actions = Vec::<Action>::new();
     let lock_gui = main_state.get_gui_should_lock();
 
     if lock_gui {
