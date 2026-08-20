@@ -675,7 +675,14 @@ impl Model {
                     1000, // Max messages
                     17,   // Max messages shown at a time
                     HashMap::<String, String>::from([
-                        ("version".to_string(), SHORT_PROJECT_VERSION.to_string()),
+                        (
+                            "version".to_string(),
+                            format!(
+                                "{}, using esox v{}",
+                                SHORT_PROJECT_VERSION,
+                                esox::meta::version()
+                            ),
+                        ),
                         ("riferimento_niseci".to_string(), "Vuoto".to_string()),
                         ("campionamento_niseci".to_string(), "Vuoto".to_string()),
                         ("anagrafica_niseci".to_string(), "Vuoto".to_string()),

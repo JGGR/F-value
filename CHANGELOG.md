@@ -10,6 +10,7 @@
   - `app::controller` to `controllers::ChromeController`
   - `app::view` to `views::ChromeView`
   - `app::core::MainState` to `app::model::AppModel`
+- Console `info version` also prints `esox` version
 
 ## [0.1.7] - 2026-07-18
 
