@@ -1,8 +1,15 @@
-## [0.1.8] - Unreleased
+## [0.1.8] - 2026-08-20
 
 ### Added
 
 - Handle style load error by going to `Console` view
+
+### Changed
+
+- Refactor:
+  - `app::controller` to `controllers::ChromeController`
+  - `app::view` to `views::ChromeView`
+  - `app::core::MainState` to `app::model::AppModel`
 
 ## [0.1.7] - 2026-07-18
 
