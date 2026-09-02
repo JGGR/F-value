@@ -1,6 +1,6 @@
 [package]
 name = "f_value"
-version = "0.1.8"
+version = "0.2.0"
 edition = "2021"
 description = "Tool for NISECI and HFBI calc"
 license = "GPL-3.0-only"
@@ -13,9 +13,8 @@ include = [
 ]
 
 [features]
-default = ["embed-icon", "lessclone", "rfd-xdg-portal"]
+default = ["embed-icon", "rfd-xdg-portal"]
 embed-icon = []
-lessclone = ["esox/lessclone"]
 rfd-gtk3 = ["rfd/gtk3"]
 rfd-xdg-portal = ["rfd/xdg-portal"]
 
@@ -25,7 +24,7 @@ chrono = "0.4.45"
 [dependencies]
 chrono = "0.4.45"
 dirs = "6.0.0"
-esox = "0.1.7"
+esox = "0.2.0"
 locale_config = "0.3.0"
 miniz_oxide = "0.9.1"
 pdf-writer = "0.15.0"

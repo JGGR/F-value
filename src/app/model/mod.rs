@@ -22,18 +22,11 @@ use crate::app::core::{AppTextures, ColorState, CurrentView, GuiTheme, Localize}
 use esox::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI, RisultatoHFBI, StatoEcologicoHFBI};
 use esox::domain::index::Indice;
 use esox::domain::niseci::{AnagraficaNISECI, RiferimentoNISECI, StatoEcologicoNISECI};
-#[cfg(not(feature = "lessclone"))]
 use esox::{
     domain::niseci::{CampionamentoNISECI, RisultatoNISECI},
     engines::niseci::full::calculate_stato_ecologico_niseci,
 };
 use raylib::core::text::WeakFont;
-
-#[cfg(feature = "lessclone")]
-use esox::{
-    domain::niseci::lessclone::{CampionamentoNISECI, RisultatoNISECI},
-    engines::niseci::full::lessclone::calculate_stato_ecologico_niseci,
-};
 
 use esox::engines::hfbi::full::calculate_stato_ecologico_hfbi;
 use std::collections::HashMap;
