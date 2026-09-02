@@ -75,17 +75,6 @@ fn main() {
     };
     println!("cargo:rustc-env=RFD_BACKEND={}", rfd_backend);
 
-    let use_lessclone = std::env::var("CARGO_FEATURE_LESSCLONE").is_ok();
-    let esox_lessclone_backend = if use_lessclone {
-        "v0.2-dev (lessclone)"
-    } else {
-        "v0.1"
-    };
-    println!(
-        "cargo:rustc-env=ESOX_LESSCLONE_BACKEND={}",
-        esox_lessclone_backend
-    );
-
     let pkg_name = env!("CARGO_PKG_NAME");
     let pkg_version = env!("CARGO_PKG_VERSION");
     let branch_name = get_branch_name();
