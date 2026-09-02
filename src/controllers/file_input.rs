@@ -28,12 +28,8 @@ use esox::csv::stanis::giorgio::format_csv_errors;
 use esox::deser::TipoRecord;
 use esox::domain::hfbi::CampionamentoHFBI;
 use esox::domain::index::Indice;
-use esox::domain::niseci::RiferimentoNISECI;
-
-#[cfg(feature = "lessclone")]
-use esox::domain::niseci::lessclone::CampionamentoNISECI;
-#[cfg(not(feature = "lessclone"))]
 use esox::domain::niseci::CampionamentoNISECI;
+use esox::domain::niseci::RiferimentoNISECI;
 
 use raylib::RaylibHandle;
 use std::path::PathBuf;

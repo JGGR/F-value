@@ -20,12 +20,6 @@ use crate::core::BUILD_DATE;
 use esox::domain::hfbi::{AnagraficaHFBI, RisultatoHFBI};
 use esox::domain::niseci::{AnagraficaNISECI, RiferimentoNISECI};
 
-#[cfg(feature = "lessclone")]
-use esox::{
-    domain::niseci::lessclone::RisultatoNISECI,
-    engines::niseci::full::lessclone::calculate_stato_ecologico_niseci,
-};
-#[cfg(not(feature = "lessclone"))]
 use esox::{
     domain::niseci::RisultatoNISECI, engines::niseci::full::calculate_stato_ecologico_niseci,
 };

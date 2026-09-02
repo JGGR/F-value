@@ -38,18 +38,9 @@ use esox::domain::niseci::{
     TipoComunitaNISECI,
 };
 
-#[cfg(not(feature = "lessclone"))]
 use esox::{
     domain::niseci::{CampionamentoNISECI, RisultatoNISECI},
     engines::niseci::full::{
-        calculate_niseci, calculate_rqe_niseci, calculate_stato_ecologico_niseci,
-    },
-};
-
-#[cfg(feature = "lessclone")]
-use esox::{
-    domain::niseci::lessclone::{CampionamentoNISECI, RisultatoNISECI},
-    engines::niseci::full::lessclone::{
         calculate_niseci, calculate_rqe_niseci, calculate_stato_ecologico_niseci,
     },
 };

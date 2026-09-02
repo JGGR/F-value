@@ -25,18 +25,9 @@ use esox::domain::hfbi::{AnagraficaHFBI, RisultatoHFBI, ValoriIntermediHFBI};
 use esox::domain::index::Indice;
 use esox::domain::niseci::{AnagraficaNISECI, RiferimentoNISECI};
 
-#[cfg(not(feature = "lessclone"))]
 use esox::{
     domain::niseci::{RisultatoNISECI, ValoriIntermediNISECI},
     engines::niseci::full::{
-        calculate_niseci, calculate_rqe_niseci, calculate_stato_ecologico_niseci,
-    },
-};
-
-#[cfg(feature = "lessclone")]
-use esox::{
-    domain::niseci::lessclone::{RisultatoNISECI, ValoriIntermediNISECI},
-    engines::niseci::full::lessclone::{
         calculate_niseci, calculate_rqe_niseci, calculate_stato_ecologico_niseci,
     },
 };
