@@ -16,7 +16,7 @@
 */
 use crate::app::core::{Action, Action::*};
 use crate::app::model::Model;
-use crate::core::{ESOX_LESSCLONE_BACKEND, RFD_BACKEND, SHORT_PROJECT_VERSION};
+use crate::core::{RFD_BACKEND, SHORT_PROJECT_VERSION};
 use crate::views::{propheight, propwidth, rrect, View};
 use raylib::color::Color;
 use raylib::consts::GuiIconName::{ICON_INFO, ICON_PLAYER_NEXT};
@@ -96,11 +96,7 @@ impl View for HomeView {
             std::env::consts::OS
         );
         let label_rfd_backend_txt = format!("rfd backend:    {}", RFD_BACKEND);
-        let label_esox_backend_txt = format!(
-            "Using esox v{}, backend: {}",
-            esox::meta::version(),
-            ESOX_LESSCLONE_BACKEND
-        );
+        let label_esox_backend_txt = format!("Using esox v{}", esox::meta::version(),);
 
         let label_version_txt_bounds = state.app_model.current_font.measure_text(
             &label_version_txt,
