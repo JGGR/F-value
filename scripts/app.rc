@@ -3,8 +3,8 @@
 IDI_ICON1 ICON "assets/icon.ico"
 
 1 VERSIONINFO
-FILEVERSION     0,1,8,0
-PRODUCTVERSION  0,1,8,0
+FILEVERSION     0,2,0,0
+PRODUCTVERSION  0,2,0,0
 FILEOS          0x40004
 FILETYPE        0x1
 
@@ -15,9 +15,9 @@ BEGIN
         BEGIN
             VALUE "CompanyName",      "GtoR\0"
             VALUE "FileDescription",  "Tool to calc NISECI/HFBI\0"
-            VALUE "FileVersion",      "0.1.8\0"
+            VALUE "FileVersion",      "0.2.0\0"
             VALUE "ProductName",      "F-value\0"
-            VALUE "ProductVersion",   "0.1.8\0"
+            VALUE "ProductVersion",   "0.2.0\0"
             VALUE "OriginalFilename", "f_value.exe\0"
         END
     END
