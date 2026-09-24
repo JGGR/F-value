@@ -1,3 +1,12 @@
+## [0.2.1] - Unreleased
+
+### Changed
+
+- Bump `dirs` to `7.0.0`
+- Add `clap` dep
+- Refactor `handle_args()`
+- Refactor `run_headless()`
+
 ## [0.2.0] - 2026-09-05
 
 ### Changed

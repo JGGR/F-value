@@ -53,6 +53,7 @@ pub(crate) fn f_value_usage() {
     println!("{PROJECT_NAME} v{SHORT_PROJECT_VERSION}");
     println!("Usage: {PROJECT_NAME} [--headless] <campionamento.csv> <riferimento.csv> <anagrafica.csv> [pdf_export_path]");
     println!("       {PROJECT_NAME} [--headless] --hfbi <campionamento.csv> <anagrafica.csv> [pdf_export_path]");
+    /*
     println!(
         "Flags:
   --headless               Run without GUI
@@ -62,6 +63,7 @@ pub(crate) fn f_value_usage() {
   --info                   Print debug info and quit
   --help, -h               Print this message and quit"
     );
+    */
 }
 
 pub(crate) fn print_warranty_info() {
@@ -82,58 +84,15 @@ pub(crate) fn print_copyright_splash() {
     println!("{splash}\n");
 }
 
-pub(crate) fn run_headless(do_niseci: bool, has_headers: bool, args: &[String]) -> bool {
-    let mut arg_i = 0;
-    let mut campionamento_path_str = "";
-    let mut riferimento_path_str = "";
-    let mut anagrafica_path_str = "";
-    let mut pdf_export_path_str = ".";
-    let mut passed_pdf_export_path = false;
-    for arg in &args[1..] {
-        arg_i += 1;
-        match arg_i {
-            1 => {
-                campionamento_path_str = arg;
-            }
-            2 => {
-                if do_niseci {
-                    riferimento_path_str = arg;
-                } else {
-                    // Doing HFBI so we don't have a riferimento
-                    anagrafica_path_str = arg;
-                }
-            }
-            3 => {
-                if do_niseci {
-                    anagrafica_path_str = arg;
-                } else {
-                    // Doing HFBI so we don't have a riferimento
-                    pdf_export_path_str = arg;
-                    passed_pdf_export_path = true;
-                }
-            }
-            4 => {
-                if do_niseci {
-                    pdf_export_path_str = arg;
-                    passed_pdf_export_path = true;
-                } else {
-                    eprintln!("Error: Unexpected arg: {arg}");
-                    f_value_usage();
-                    return false;
-                }
-            }
-            _ => {
-                eprintln!("Error: Unexpected arg: {arg}");
-                f_value_usage();
-                return false;
-            }
-        }
-    }
-
-    let campionamento_path = PathBuf::from(campionamento_path_str);
-    let riferimento_path = PathBuf::from(riferimento_path_str);
-    let anagrafica_path = PathBuf::from(anagrafica_path_str);
-    let pdf_export_path = PathBuf::from(pdf_export_path_str);
+pub(crate) fn run_headless(
+    do_niseci: bool,
+    has_headers: bool,
+    campionamento_path: PathBuf,
+    riferimento_path: Option<PathBuf>,
+    anagrafica_path: PathBuf,
+    pdf_export_path: Option<PathBuf>,
+) -> bool {
+    let passed_pdf_export_path = pdf_export_path.is_some();
 
     if !check_path_is_file_ends_with_csv(&campionamento_path) {
         eprintln!(
@@ -144,21 +103,20 @@ pub(crate) fn run_headless(do_niseci: bool, has_headers: bool, args: &[String]) 
     }
 
     if do_niseci {
-        if !check_path_is_file_ends_with_csv(&riferimento_path) {
-            eprintln!(
-                "Fallito controllo path riferimento: {}",
-                riferimento_path.display()
-            );
+        if riferimento_path.is_none() {
+            eprintln!("Missing riferimento path for NISECI calc");
+            return false;
+        }
+        let rif_path = riferimento_path.unwrap();
+        if !check_path_is_file_ends_with_csv(&rif_path) {
+            eprintln!("Fallito controllo path riferimento: {}", rif_path.display());
             return false;
         }
         let mut riferimento_csv_failed = false;
         let mut riferimento_valueparse_failed = false;
         // Using italian deser for now
-        let riferimento_load_res = load_riferimento_niseci_from_path(
-            riferimento_path,
-            has_headers,
-            InputFormat::Alternative,
-        );
+        let riferimento_load_res =
+            load_riferimento_niseci_from_path(rif_path, has_headers, InputFormat::Alternative);
         let mut riferimento = RiferimentoNISECI::new(vec![]);
         match riferimento_load_res {
             Ok(recs_specie) => {
@@ -380,13 +338,9 @@ pub(crate) fn run_headless(do_niseci: bool, has_headers: bool, args: &[String]) 
                     let risultato_niseci = RisultatoNISECI::new(niseci, rqe_niseci, intermediates);
 
                     if passed_pdf_export_path {
-                        println!("Esportato pdf in {}", pdf_export_path.display());
-                        esporta_pdf_niseci(
-                            pdf_export_path,
-                            riferimento,
-                            anagrafica,
-                            risultato_niseci,
-                        );
+                        let pdf_out_path = pdf_export_path.unwrap();
+                        println!("Esportato pdf in {}", pdf_out_path.display());
+                        esporta_pdf_niseci(pdf_out_path, riferimento, anagrafica, risultato_niseci);
                     }
                 }
                 Err(_errors) => {
@@ -542,8 +496,9 @@ pub(crate) fn run_headless(do_niseci: bool, has_headers: bool, args: &[String]) 
                     println!("Stato ecologico: {stato_ecologico_str}");
 
                     if passed_pdf_export_path {
-                        println!("Esportato pdf in {}", pdf_export_path.display());
-                        esporta_pdf_hfbi(pdf_export_path, anagrafica, risultato_hfbi);
+                        let pdf_out_path = pdf_export_path.unwrap();
+                        println!("Esportato pdf in {}", pdf_out_path.display());
+                        esporta_pdf_hfbi(pdf_out_path, anagrafica, risultato_hfbi);
                     }
                 }
                 Err(_errors) => {
