@@ -18,6 +18,10 @@
 
 This is a tool for calculating the NISECI and/or HFBI index for a dataset.
 
+The methods of calculations follow ISPRA's [specifications](#references).
+
+It supports working with CSV representations of the input.
+
 ## Input templates <a name = "input_templates"></a>
 
 You can find templates for the input files in the `templates` folder.
