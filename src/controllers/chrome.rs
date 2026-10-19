@@ -15,18 +15,24 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+use crate::app::core::{get_locale, Action, CurrentView, Localize, EXIT_KEY};
+#[cfg(feature = "embed-themes")]
 use crate::app::core::{
-    get_locale, Action, CurrentView, GuiTheme, Localize, ASHES_THEME_DATA, BLUISH_THEME_DATA,
-    CANDY_THEME_DATA, CHERRY_THEME_DATA, CYBER_THEME_DATA, DARK_THEME_DATA, EXIT_KEY,
-    JUNGLE_THEME_DATA, LAVANDA_THEME_DATA, TERMINAL_THEME_DATA,
+    GuiTheme, ASHES_THEME_DATA, BLUISH_THEME_DATA, CANDY_THEME_DATA, CHERRY_THEME_DATA,
+    CYBER_THEME_DATA, DARK_THEME_DATA, JUNGLE_THEME_DATA, LAVANDA_THEME_DATA, TERMINAL_THEME_DATA,
 };
 use crate::app::model::{AppModel, Model};
 use crate::controllers::Controller;
+#[cfg(feature = "embed-themes")]
 use raylib::color::Color;
 use raylib::consts::GuiControl::DEFAULT;
+#[cfg(feature = "embed-themes")]
 use raylib::consts::GuiControlProperty::TEXT_COLOR_NORMAL;
-use raylib::consts::GuiDefaultProperty::{BACKGROUND_COLOR, TEXT_SIZE, TEXT_SPACING};
+use raylib::consts::GuiDefaultProperty::TEXT_SIZE;
+#[cfg(feature = "embed-themes")]
+use raylib::consts::GuiDefaultProperty::{BACKGROUND_COLOR, TEXT_SPACING};
 use raylib::consts::KeyboardKey::*;
+#[cfg(feature = "embed-themes")]
 use raylib::error::LoadStyleFromMemoryError;
 use raylib::prelude::RaylibGuiState;
 use raylib::RaylibHandle;
@@ -75,15 +81,18 @@ impl Controller for ChromeController {
                 Action::ResetSettings => {
                     state.app_model.showing_reset_win = false;
                     state.app_model.current_font_height = state.app_model.default_font_height;
-                    rl.gui_set_style(DEFAULT, TEXT_SIZE, state.app_model.current_font_height);
-                    state.app_model.gui_theme_combobox_active = GuiTheme::Light as i32;
-                    if let Err(load_err) =
-                        GuiTheme::load_and_set(&GuiTheme::Light, rl, &mut state.app_model)
+                    #[cfg(feature = "embed-themes")]
                     {
-                        let error_msg = format!("Error while loading theme: {load_err}");
-                        self.add_console_message(state, error_msg);
-                        state.app_model.set_current_view(CurrentView::Console);
-                    };
+                        rl.gui_set_style(DEFAULT, TEXT_SIZE, state.app_model.current_font_height);
+                        state.app_model.gui_theme_combobox_active = GuiTheme::Light as i32;
+                        if let Err(load_err) =
+                            GuiTheme::load_and_set(&GuiTheme::Light, rl, &mut state.app_model)
+                        {
+                            let error_msg = format!("Error while loading theme: {load_err}");
+                            self.add_console_message(state, error_msg);
+                            state.app_model.set_current_view(CurrentView::Console);
+                        };
+                    }
                     let locale = get_locale();
                     state.app_model.locale_combobox_active = locale as i32;
                     state.app_model.locale = locale;
@@ -123,6 +132,7 @@ impl Controller for ChromeController {
                     rl.gui_set_style(DEFAULT, TEXT_SIZE, state.app_model.current_font_height);
                     false
                 }
+                #[cfg(feature = "embed-themes")]
                 Action::SetTheme(theme_idx) => {
                     if *theme_idx != state.app_model.theme as i32 {
                         match <GuiTheme as TryFrom<i32>>::try_from(*theme_idx) {
@@ -172,6 +182,7 @@ impl ChromeController {
     }
 }
 
+#[cfg(feature = "embed-themes")]
 impl GuiTheme {
     fn load_and_set(
         &self,

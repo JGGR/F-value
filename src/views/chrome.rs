@@ -15,7 +15,9 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::app::core::{propheight, propwidth, Action, Action::*, CurrentView, GuiTheme, Localize};
+#[cfg(feature = "embed-themes")]
+use crate::app::core::GuiTheme;
+use crate::app::core::{propheight, propwidth, Action, Action::*, CurrentView, Localize};
 use crate::app::model::{AppModel, Model};
 use crate::core::{
     is_holiday, rrect, AUTHOR_GIONINJO, AUTHOR_GIONINJO_LINK, AUTHOR_JGABAUT, AUTHOR_JGABAUT_LINK,
@@ -533,40 +535,54 @@ pub(crate) fn draw_settings_box(
         let gui_theme_label_x = fontsize_label_x;
         let gui_theme_label_height = fontsize_label_height;
         let gui_theme_label_y = fontsize_label_y + y_spacing * 2;
+        #[cfg(feature = "embed-themes")]
+        {
+            d.gui_label(
+                rrect(
+                    gui_theme_label_x,
+                    gui_theme_label_y,
+                    gui_theme_label_width,
+                    gui_theme_label_height,
+                ),
+                "Tema",
+            );
+            let gui_theme_button_x = gui_theme_label_x + gui_theme_label_width + x_spacing;
+            let gui_theme_button_y = gui_theme_label_y;
+            let gui_theme_button_width = gui_theme_label_width;
+            let gui_theme_button_height = gui_theme_label_height;
+
+            let gui_theme_str = GuiTheme::COMBOBOX_STR;
+            let mut current_theme = main_state.gui_theme_combobox_active;
+            d.gui_combo_box(
+                rrect(
+                    gui_theme_button_x,
+                    gui_theme_button_y,
+                    gui_theme_button_width,
+                    gui_theme_button_height,
+                ),
+                gui_theme_str,
+                &mut current_theme,
+            );
+            if current_theme != main_state.gui_theme_combobox_active {
+                actions.push(SetTheme(current_theme));
+            }
+        }
+        #[cfg(not(feature = "embed-themes"))]
         d.gui_label(
             rrect(
                 gui_theme_label_x,
                 gui_theme_label_y,
-                gui_theme_label_width,
+                settingsbox_width,
                 gui_theme_label_height,
             ),
-            "Tema",
+            "This build does not support themes",
         );
-        let gui_theme_button_x = gui_theme_label_x + gui_theme_label_width + x_spacing;
-        let gui_theme_button_y = gui_theme_label_y;
-        let gui_theme_button_width = gui_theme_label_width;
-        let gui_theme_button_height = gui_theme_label_height;
-
-        let gui_theme_str = GuiTheme::COMBOBOX_STR;
-        let mut current_theme = main_state.gui_theme_combobox_active;
-        d.gui_combo_box(
-            rrect(
-                gui_theme_button_x,
-                gui_theme_button_y,
-                gui_theme_button_width,
-                gui_theme_button_height,
-            ),
-            gui_theme_str,
-            &mut current_theme,
-        );
-        if current_theme != main_state.gui_theme_combobox_active {
-            actions.push(SetTheme(current_theme));
-        }
 
         let locale_label_width = gui_theme_label_width;
         let locale_label_x = gui_theme_label_x;
         let locale_label_height = gui_theme_label_height;
         let locale_label_y = gui_theme_label_y + y_spacing * 2;
+
         d.gui_label(
             rrect(
                 locale_label_x,

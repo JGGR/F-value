@@ -1,5 +1,10 @@
 ## [0.2.1] - Unreleased
 
+### Added
+
+- Add `embed-themes` feature gate
+  - Allows building without theme support
+
 ### Changed
 
 - Bump `esox` to `0.2.1`

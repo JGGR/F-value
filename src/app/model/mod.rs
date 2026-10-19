@@ -18,7 +18,9 @@
 use crate::console::Console;
 use crate::core::SHORT_PROJECT_VERSION;
 
-use crate::app::core::{AppTextures, ColorState, CurrentView, GuiTheme, Localize};
+#[cfg(feature = "embed-themes")]
+use crate::app::core::GuiTheme;
+use crate::app::core::{AppTextures, ColorState, CurrentView, Localize};
 use esox::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI, RisultatoHFBI, StatoEcologicoHFBI};
 use esox::domain::index::Indice;
 use esox::domain::niseci::{AnagraficaNISECI, RiferimentoNISECI, StatoEcologicoNISECI};
@@ -50,7 +52,9 @@ pub(crate) struct AppModel {
     pub(crate) showing_settings_box: bool,
     pub(crate) current_view: CurrentView,
     pub(crate) previous_view: CurrentView,
+    #[cfg(feature = "embed-themes")]
     pub(crate) theme: GuiTheme,
+    #[cfg(feature = "embed-themes")]
     pub(crate) gui_theme_combobox_active: i32,
     pub(crate) default_font_height: i32,
     pub(crate) current_font_height: i32,
@@ -616,7 +620,9 @@ impl Model {
                 showing_settings_box: false,
                 current_view: CurrentView::Home,
                 previous_view: CurrentView::Home,
+                #[cfg(feature = "embed-themes")]
                 theme: GuiTheme::Light,
+                #[cfg(feature = "embed-themes")]
                 gui_theme_combobox_active: GuiTheme::Light as i32,
                 default_font_height,
                 current_font_height,

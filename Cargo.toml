@@ -13,8 +13,9 @@ include = [
 ]
 
 [features]
-default = ["embed-icon", "rfd-xdg-portal"]
+default = ["embed-icon", "rfd-xdg-portal", "embed-themes"]
 embed-icon = []
+embed-themes = []
 rfd-gtk3 = ["rfd/gtk3"]
 rfd-xdg-portal = ["rfd/xdg-portal"]
 
