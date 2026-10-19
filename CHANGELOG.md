@@ -1,3 +1,9 @@
+## [0.2.2] - 2026-10-19
+
+### Changed
+
+- Fix `handle_args()` failing too eagerly
+
 ## [0.2.1] - 2026-10-19
 
 ### Added
