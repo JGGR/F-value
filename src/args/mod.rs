@@ -48,12 +48,7 @@ struct Args {
     #[arg(long)]
     info: bool,
     /// Run without the graphical interface.
-    #[arg(
-        long,
-        requires = "riferimento",
-        requires = "campionamento",
-        requires = "anagrafica"
-    )]
+    #[arg(long)]
     headless: bool,
     /// Use HFBI instead of NISECI.
     #[arg(long)]
@@ -79,7 +74,6 @@ struct Args {
     #[arg(
         long,
         value_name = "PATH",
-        required_unless_present = "hfbi",
         conflicts_with = "hfbi",
         conflicts_with = "info",
         conflicts_with = "help",
@@ -100,6 +94,23 @@ struct Args {
     /// Optional PDF export path.
     #[arg(long, value_name = "PATH")]
     pdf_export_path: Option<PathBuf>,
+}
+
+impl Args {
+    fn validate(&self) -> Result<(), String> {
+        if self.headless {
+            if self.campionamento.is_none() {
+                return Err("--headless requires --campionamento".into());
+            }
+            if self.anagrafica.is_none() {
+                return Err("--headless requires --anagrafica".into());
+            }
+            if !self.hfbi && self.riferimento.is_none() {
+                return Err("--headless requires --riferimento".into());
+            }
+        }
+        Ok(())
+    }
 }
 
 pub(crate) fn print_info() {
@@ -165,6 +176,11 @@ pub(crate) fn print_info() {
 
 pub(crate) fn handle_args() {
     let args = Args::parse();
+
+    if let Err(e) = args.validate() {
+        eprintln!("{e}");
+        return;
+    }
 
     if args.version {
         println!("{PROJECT_NAME} v{PROJECT_VERSION}-{COMMIT_HASH_PLUS} ({PROJECT_BUILD_TYPE})");
