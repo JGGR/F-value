@@ -35,16 +35,25 @@ use raylib::core::texture::Image;
 pub(crate) const EXIT_KEY: raylib::consts::KeyboardKey = raylib::consts::KeyboardKey::KEY_ESCAPE;
 pub(crate) const ESOX_SCREEN_WIDTH: i32 = 960;
 pub(crate) const ESOX_SCREEN_HEIGHT: i32 = 540;
+#[cfg(feature = "embed-themes")]
 pub(crate) const DARK_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_dark.rgs");
+#[cfg(feature = "embed-themes")]
 pub(crate) const BLUISH_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_bluish.rgs");
+#[cfg(feature = "embed-themes")]
 pub(crate) const CANDY_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_candy.rgs");
+#[cfg(feature = "embed-themes")]
 pub(crate) const CHERRY_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_cherry.rgs");
+#[cfg(feature = "embed-themes")]
 pub(crate) const CYBER_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_cyber.rgs");
+#[cfg(feature = "embed-themes")]
 pub(crate) const JUNGLE_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_jungle.rgs");
+#[cfg(feature = "embed-themes")]
 pub(crate) const LAVANDA_THEME_DATA: &[u8] =
     include_bytes!("../../assets/styles/style_lavanda.rgs");
+#[cfg(feature = "embed-themes")]
 pub(crate) const TERMINAL_THEME_DATA: &[u8] =
     include_bytes!("../../assets/styles/style_terminal.rgs");
+#[cfg(feature = "embed-themes")]
 pub(crate) const ASHES_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_ashes.rgs");
 pub(crate) const CONSOLE_FONT_DATA: &[u8] = include_bytes!("../../assets/FreeMono.ttf");
 pub(crate) const PROJECT_LOGO_DATA: &[u8] = include_bytes!("../../assets/logo.png");
@@ -80,6 +89,7 @@ pub(crate) enum Action {
     ExportPdf(PathBuf),
     Reset,
     SetFontHeight(i32),
+    #[cfg(feature = "embed-themes")]
     SetTheme(i32),
     SetLocale(i32),
     ResetSettings,
@@ -117,6 +127,7 @@ impl fmt::Display for Action {
             Action::ExportPdf(_path) => "ExportPdf",
             Action::Reset => "Reset",
             Action::SetFontHeight(_h) => "SetFontHeight",
+            #[cfg(feature = "embed-themes")]
             Action::SetTheme(_ti) => "SetTheme",
             Action::SetLocale(_li) => "SetLocale",
             Action::ResetSettings => "ResetSettings",
@@ -218,6 +229,7 @@ macro_rules! define_enum_with_str {
     (@label $ident:ident) => { stringify!($ident) };
 }
 
+#[cfg(feature = "embed-themes")]
 define_enum_with_str!(GuiTheme => [ Light, Dark, Bluish, Candy, Cherry, Cyber, Jungle, Lavanda, Terminal, Ashes ]);
 
 define_enum_with_str!(Localize => [ Italian, International ]);

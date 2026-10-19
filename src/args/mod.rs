@@ -64,9 +64,6 @@ struct Args {
     #[arg(
         long,
         value_name = "PATH",
-        required_unless_present = "info",
-        required_unless_present = "help",
-        required_unless_present = "version",
         conflicts_with = "info",
         conflicts_with = "help",
         conflicts_with = "version"
@@ -77,10 +74,6 @@ struct Args {
     #[arg(
         long,
         value_name = "PATH",
-        required_unless_present = "hfbi",
-        required_unless_present = "info",
-        required_unless_present = "help",
-        required_unless_present = "version",
         conflicts_with = "hfbi",
         conflicts_with = "info",
         conflicts_with = "help",
@@ -92,12 +85,9 @@ struct Args {
     #[arg(
         long,
         value_name = "PATH",
-        required_unless_present = "info",
-        required_unless_present = "help",
-        required_unless_present = "version",
         conflicts_with = "info",
         conflicts_with = "help",
-        conflicts_with = "version",
+        conflicts_with = "version"
     )]
     anagrafica: Option<PathBuf>,
 
@@ -199,14 +189,22 @@ pub(crate) fn handle_args() {
     print_copyright_splash();
 
     if args.headless {
+        if args.campionamento.is_none() {
+            eprintln!("Missing campionamento path");
+            return;
+        }
+        if args.anagrafica.is_none() {
+            eprintln!("Missing anagrafica path");
+            return;
+        }
         let res = run_headless(
             !args.hfbi,
             !args.no_headers,
             args.campionamento
-                .expect("Campionamento path is required outside of info mode"),
+                .expect("Campionamento path is_none() was checked before"),
             args.riferimento,
             args.anagrafica
-                .expect("Anagrafica path is required outside of info mode"),
+                .expect("Anagrafica path is_none() was checked before"),
             args.pdf_export_path,
         );
 

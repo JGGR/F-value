@@ -54,16 +54,16 @@ pub(crate) fn f_value_usage() {
     println!("Usage: {PROJECT_NAME} [--headless] <campionamento.csv> <riferimento.csv> <anagrafica.csv> [pdf_export_path]");
     println!("       {PROJECT_NAME} [--headless] --hfbi <campionamento.csv> <anagrafica.csv> [pdf_export_path]");
     /*
-    println!(
-        "Flags:
-  --headless               Run without GUI
-  --hfbi                   Run with HFBI
-  --no-headers             Expect no headers in input files
-  --version, -v            Print version and quit
-  --info                   Print debug info and quit
-  --help, -h               Print this message and quit"
-    );
-    */
+      println!(
+          "Flags:
+    --headless               Run without GUI
+    --hfbi                   Run with HFBI
+    --no-headers             Expect no headers in input files
+    --version, -v            Print version and quit
+    --info                   Print debug info and quit
+    --help, -h               Print this message and quit"
+      );
+      */
 }
 
 pub(crate) fn print_warranty_info() {
