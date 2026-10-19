@@ -48,7 +48,12 @@ struct Args {
     #[arg(long)]
     info: bool,
     /// Run without the graphical interface.
-    #[arg(long)]
+    #[arg(
+        long,
+        requires = "riferimento",
+        requires = "campionamento",
+        requires = "anagrafica"
+    )]
     headless: bool,
     /// Use HFBI instead of NISECI.
     #[arg(long)]
@@ -74,6 +79,7 @@ struct Args {
     #[arg(
         long,
         value_name = "PATH",
+        required_unless_present = "hfbi",
         conflicts_with = "hfbi",
         conflicts_with = "info",
         conflicts_with = "help",
