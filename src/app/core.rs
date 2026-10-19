@@ -33,8 +33,8 @@ use raylib::consts::TraceLogLevel;
 use raylib::core::texture::Image;
 
 pub(crate) const EXIT_KEY: raylib::consts::KeyboardKey = raylib::consts::KeyboardKey::KEY_ESCAPE;
-pub(crate) const ESOX_SCREEN_WIDTH: i32 = 960;
-pub(crate) const ESOX_SCREEN_HEIGHT: i32 = 540;
+pub(crate) const F_VALUE_SCREEN_WIDTH: i32 = 960;
+pub(crate) const F_VALUE_SCREEN_HEIGHT: i32 = 540;
 #[cfg(feature = "embed-themes")]
 pub(crate) const DARK_THEME_DATA: &[u8] = include_bytes!("../../assets/styles/style_dark.rgs");
 #[cfg(feature = "embed-themes")]
@@ -256,19 +256,19 @@ impl ColorState {
 }
 
 pub(crate) fn propwidth(d: &RaylibDrawHandle<'_>, to_scale: i32) -> i32 {
-    if !(0..=ESOX_SCREEN_WIDTH).contains(&to_scale) {
+    if !(0..=F_VALUE_SCREEN_WIDTH).contains(&to_scale) {
         panic!("propw():  invalid to_scale value received: {to_scale}");
     }
     let current_screen_width = d.get_screen_width();
-    current_screen_width * to_scale / ESOX_SCREEN_WIDTH
+    current_screen_width * to_scale / F_VALUE_SCREEN_WIDTH
 }
 
 pub(crate) fn propheight(d: &RaylibDrawHandle<'_>, to_scale: i32) -> i32 {
-    if !(0..=ESOX_SCREEN_HEIGHT).contains(&to_scale) {
+    if !(0..=F_VALUE_SCREEN_HEIGHT).contains(&to_scale) {
         panic!("proph():  invalid to_scale value received: {to_scale}");
     }
     let current_screen_height = d.get_screen_height();
-    current_screen_height * to_scale / ESOX_SCREEN_HEIGHT
+    current_screen_height * to_scale / F_VALUE_SCREEN_HEIGHT
 }
 
 pub(crate) fn get_locale() -> Localize {
@@ -384,13 +384,13 @@ impl App {
         let window_title = format!("F-value v{SHORT_PROJECT_VERSION}");
 
         let (mut rl, thread) = raylib::init()
-            .size(ESOX_SCREEN_WIDTH, ESOX_SCREEN_HEIGHT)
+            .size(F_VALUE_SCREEN_WIDTH, F_VALUE_SCREEN_HEIGHT)
             .title(&window_title)
             .log_level(TraceLogLevel::LOG_ERROR) // Gets rid of raylib init text in the terminal
             .resizable()
             .build();
 
-        rl.set_window_min_size(ESOX_SCREEN_WIDTH, ESOX_SCREEN_HEIGHT);
+        rl.set_window_min_size(F_VALUE_SCREEN_WIDTH, F_VALUE_SCREEN_HEIGHT);
         rl.set_exit_key(None); // This allows capturing the exit key with a message box
         rl.set_target_fps(30);
 
