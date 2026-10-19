@@ -2,6 +2,8 @@
 
 ### Changed
 
+- Bump `esox` to `0.2.1`
+  - Changelog: [link](https://github.com/JGGR/esox/releases/tag/0.2.1)
 - Bump `dirs` to `7.0.0`
 - Add `clap` dep
 - Refactor `handle_args()`
