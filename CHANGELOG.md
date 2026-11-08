@@ -1,3 +1,9 @@
+## [0.2.3] - Unreleased
+
+### Changed
+- Bump `esox` to `0.2.5`
+  - Changelog: [link](https://github.com/JGGR/esox/releases/tag/0.2.5)
+
 ## [0.2.2] - 2026-10-19
 
 ### Changed
