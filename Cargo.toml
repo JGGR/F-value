@@ -34,4 +34,4 @@ png = "0.18.1"
 raylib = { version = "6.0.0", features = [
     "raygui",
 ] }
-rfd = { version = "0.17.2", default-features = false }
+rfd = { version = "0.18.0", default-features = false }
