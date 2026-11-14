@@ -59,17 +59,24 @@ fn is_working_tree_clean() -> bool {
 
 fn main() {
     let use_rfd_gtk3 = std::env::var("CARGO_FEATURE_RFD_GTK3").is_ok();
+    let use_rfd_gtk4 = std::env::var("CARGO_FEATURE_RFD_GTK4").is_ok();
     let use_rfd_xdg_portal = std::env::var("CARGO_FEATURE_RFD_XDG_PORTAL").is_ok();
 
-    if use_rfd_gtk3 && use_rfd_xdg_portal {
-        panic!("Features `rfd-gtk3` and `rfd-xdg-portal` are mutually exclusive.");
+    let rfd_backends = ["RFD_GTK3", "RFD_GTK4", "RFD_XDG_PORTAL"]
+        .iter()
+        .filter(|f| std::env::var(format!("CARGO_FEATURE_{f}")).is_ok())
+        .count();
+
+    if rfd_backends != 1 {
+        panic!("You must enable exactly one `rfd` backend feature: `rfd_gtk3`, `rfd_gtk4` or `rfd_xdg_portal`");
     }
 
-    if !use_rfd_gtk3 && !use_rfd_xdg_portal {
-        panic!("You must enable at least one of `rfd-gtk3` or `rfd-xdg-portal`.");
-    }
     let rfd_backend = if use_rfd_xdg_portal {
         "xdg-portal"
+    } else if use_rfd_gtk4 {
+        "gtk4"
+    } else if use_rfd_gtk3 {
+        "gtk3"
     } else {
         "gtk3"
     };

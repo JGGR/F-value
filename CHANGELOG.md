@@ -1,8 +1,13 @@
 ## [0.2.3] - Unreleased
 
+### Added
+
+- Add `rfd-gtk4` feature
+
 ### Changed
 - Bump `esox` to `0.2.5`
   - Changelog: [link](https://github.com/JGGR/esox/releases/tag/0.2.5)
+- Bump `rfd` to `0.18.0`
 
 ## [0.2.2] - 2026-10-19
 
