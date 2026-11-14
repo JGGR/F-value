@@ -17,6 +17,7 @@ default = ["embed-icon", "rfd-xdg-portal", "embed-themes"]
 embed-icon = []
 embed-themes = []
 rfd-gtk3 = ["rfd/gtk3"]
+rfd-gtk4 = ["rfd/gtk4"]
 rfd-xdg-portal = ["rfd/xdg-portal"]
 
 [build-dependencies]
@@ -34,4 +35,4 @@ png = "0.18.1"
 raylib = { version = "6.0.0", features = [
     "raygui",
 ] }
-rfd = { version = "0.17.2", default-features = false }
+rfd = { version = "0.18.0", default-features = false }
