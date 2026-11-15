@@ -81,9 +81,9 @@ impl Controller for ChromeController {
                 Action::ResetSettings => {
                     state.app_model.showing_reset_win = false;
                     state.app_model.current_font_height = state.app_model.default_font_height;
+                    rl.gui_set_style(DEFAULT, TEXT_SIZE, state.app_model.current_font_height);
                     #[cfg(feature = "embed-themes")]
                     {
-                        rl.gui_set_style(DEFAULT, TEXT_SIZE, state.app_model.current_font_height);
                         state.app_model.gui_theme_combobox_active = GuiTheme::Light as i32;
                         if let Err(load_err) =
                             GuiTheme::load_and_set(&GuiTheme::Light, rl, &mut state.app_model)
