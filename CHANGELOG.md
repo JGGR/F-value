@@ -5,6 +5,8 @@
 - Add `rfd-gtk4` feature
 
 ### Changed
+
+- Fix reset settings bug on build without `embed-themes` feature
 - Bump `esox` to `0.2.5`
   - Changelog: [link](https://github.com/JGGR/esox/releases/tag/0.2.5)
 - Bump `rfd` to `0.18.0`
